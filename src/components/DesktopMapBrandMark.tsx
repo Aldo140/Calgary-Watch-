@@ -1,4 +1,4 @@
-import { MapPinned } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 
 interface DesktopMapBrandMarkProps {
@@ -6,31 +6,31 @@ interface DesktopMapBrandMarkProps {
   tone?: 'dark' | 'light';
 }
 
+const SPARK = '/images/brand/calgarywatch-city-spark-v2.webp';
+
 /**
- * A small-format mark for the desktop map chrome. The full Calgary illustration
- * is intentionally not used here: its skyline, tower and plane collapse into
- * noise below roughly 40px. This mark keeps the product's two useful signals —
- * place and live status — legible at toolbar scale.
+ * The CalgaryWatch mark for the map chrome, matching the site's Wordmark
+ * (city spark, CALGARYWATCH, cyan dot).
+ *
+ * `compact` is the command-bar version: the full wordmark, white on the navy
+ * live sky, linking home. The default is a spark tile for mastheads that set
+ * their own title beside it. Styles live in src/styles/map-chrome.css (`lv-`).
  */
 export default function DesktopMapBrandMark({ compact = false, tone = 'light' }: DesktopMapBrandMarkProps) {
-  const dark = tone === 'dark';
+  if (compact) {
+    return (
+      <Link className="lv-wordmark" to="/" aria-label="CalgaryWatch home">
+        <img className="lv-wordmark-logo" src={SPARK} width={34} height={34} alt="" aria-hidden="true" />
+        <span className="lv-wordmark-word">
+          CALGARY<span>WATCH</span><span className="lv-wordmark-dot" aria-hidden="true">•</span>
+        </span>
+      </Link>
+    );
+  }
 
   return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        'relative grid shrink-0 place-items-center',
-        compact ? 'size-9' : 'size-12',
-        dark ? 'bg-[#F2EFE8] text-[#06162F]' : 'bg-[#06162F] text-[#F2EFE8]',
-      )}
-    >
-      <MapPinned size={compact ? 18 : 23} strokeWidth={2.25} />
-      <span
-        className={cn(
-          'absolute bottom-0 right-0 bg-[#2E8B7A]',
-          compact ? 'size-2 border-2 border-[#FFFDF8]' : 'size-2.5 border-[3px] border-[#06162F]',
-        )}
-      />
+    <span aria-hidden="true" className={cn('lv-mark-tile', tone === 'dark' && 'lv-mark-tile-dark')}>
+      <img src={SPARK} width={48} height={48} alt="" />
     </span>
   );
 }

@@ -1,6 +1,7 @@
 import { plansAreaPatch } from '../lib/plansSetup';
 import '../styles/map-brand.css';
 import '../styles/briefing.css';
+import '../styles/map-chrome.css';
 import { useState, useEffect, useCallback, useRef, useMemo, startTransition } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Map, { MapRef } from '@/src/components/Map';
@@ -13,10 +14,9 @@ import LayerToggle from '@/src/components/LayerToggle';
 import MobileMapSheet, { type MapSheetRef, RAISED_FRACTION } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
-import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible, isCommunityFacingIncident } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle, MapPin, Check, ArrowRight } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, Bell, Search, X, LogIn, Home, Siren, Check, ArrowRight, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -47,32 +47,22 @@ import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMa
 import { curateTrafficReports } from '@/src/lib/reportCuration';
 import { categoryColor } from '@/src/lib/tokens';
 import PersonalBriefing from '@/src/components/PersonalBriefing';
-import { communityCentre, fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
+import { communityCentre, fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress, pointInPolygon, type CommunityBoundary } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 import { getDistance } from '@/src/lib/geo';
 import { classify311Service } from '@/src/lib/three11';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
+import NowBriefing from '@/src/components/map/NowBriefing';
+import { LivePill, WhenChips, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
+import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
+import { inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
 
 function getCalgaryQuadrant(lat: number, lng: number) {
   const northSouth = lat >= CALGARY_CENTER.lat ? 'N' : 'S';
   const eastWest = lng >= CALGARY_CENTER.lng ? 'E' : 'W';
   return `${northSouth}${eastWest}`;
 }
-
-type MapNotification = {
-  id: string;
-  title: string;
-  timestamp: number;
-  neighborhood?: string;
-  kind?: 'incident' | 'neighborhood_report';
-  /**
-   * For neighbourhood reports: the saved profile setting this area was derived
-   * from. Shown to the user so it is obvious the report follows their location
-   * settings rather than their current GPS position.
-   */
-  basis?: string;
-};
 
 type UserProfileSettings = {
   uid?: string;
@@ -794,9 +784,55 @@ export default function MapPage() {
    * client-side narrowing of data already loaded — it issues no additional
    * requests and touches no ingest behaviour.
    *
-   * Defaults to 'all' so the feed starts exactly as it did before.
+   * Defaults to 'all' so the feed starts exactly as it did before, unless the
+   * link names a window (`?when=tonight`, `?when=yesterday`, ...). The same
+   * window now narrows the map markers too: it used to change the feed while
+   * the map kept showing everything.
    */
-  const [timeWindow, setTimeWindow] = useState<'24h' | '7d' | 'all'>('all');
+  const [timeWindow, setTimeWindow] = useState<MapTimeWindow>(
+    () => parseWhenParam(typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('when') : null) ?? 'all',
+  );
+
+  // Keep `?when=` in the address bar so the view can be shared or reloaded.
+  // history.replaceState rather than setSearchParams: no router render, no
+  // history entry. Re-applied when the router rewrites the query (it does for
+  // ?i= and friends) because those writes start from its own copy, which
+  // never saw this one.
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      const current = url.searchParams.get('when');
+      const want = timeWindow === 'all' ? null : timeWindow;
+      if (current === want) return;
+      if (want) url.searchParams.set('when', want);
+      else url.searchParams.delete('when');
+      window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+    } catch { /* non-browser */ }
+  }, [timeWindow, searchParams]);
+
+  /**
+   * A community named in the link (`?near=seton`, or the older `?area=`).
+   * Drives the briefing headline ("Tonight near Seton") and scopes its counts
+   * to that community's boundary.
+   */
+  const [nearArea, setNearArea] = useState<{ name: string; boundary: CommunityBoundary | null } | null>(null);
+  /** Latest handleViewNeighborhood, for the deep link that resolves async. */
+  const viewNeighborhoodRef = useRef<((name: string) => void) | null>(null);
+
+  /** A minute clock for the freshness stamp. */
+  const [clock, setClock] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setClock(Date.now()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  /**
+   * A report someone tried to start while signed out. Kept through sign-in so
+   * the form opens once they are in, instead of letting them fill it in and
+   * losing it at submit (the old phone sheet / ?action=report / "Report
+   * related" path).
+   */
+  const [pendingReport, setPendingReport] = useState<{ location: { lat: number; lng: number } | null } | null>(null);
 
   // Clear the geolocation notice on its own. Denied location is a fallback the
   // map handles fine, not a condition worth occupying screen space until the
@@ -1179,15 +1215,40 @@ export default function MapPage() {
     setSheetState('rail');
   }, [handleMarkerClick]);
 
-  const handleReportFromIncident = useCallback((incident: Incident) => {
-    setSelectedIncident(null);
-    setSelectedArea(null);
-    setSelectedLocation({ lat: incident.lat, lng: incident.lng });
-    setConfirmedPinLocation({ lat: incident.lat, lng: incident.lng });
-    setIsPinMode(false);
+  /** Open the report form, optionally pre-pinned to a spot. */
+  const openReportForm = useCallback((location: { lat: number; lng: number } | null) => {
+    if (location) {
+      setSelectedLocation(location);
+      setConfirmedPinLocation(location);
+      setIsPinMode(false);
+    } else {
+      setConfirmedPinLocation(null);
+      // Start neutral - the reader picks GPS or a pin explicitly in the form.
+      setSelectedLocation(CALGARY_CENTER);
+    }
     setIsFormOpen(true);
     setSheetState('rail');
   }, []);
+
+  /**
+   * Every "report" entry point goes through here: Post, the phone sheet,
+   * ?action=report and "Report related". Signed out, it asks them to sign in
+   * first and remembers what they were doing (see pendingReport).
+   */
+  const requestReport = useCallback((location: { lat: number; lng: number } | null = null) => {
+    if (!user) {
+      setPendingReport({ location });
+      openAuthPanel('signin');
+      return;
+    }
+    openReportForm(location);
+  }, [user, openAuthPanel, openReportForm]);
+
+  const handleReportFromIncident = useCallback((incident: Incident) => {
+    setSelectedIncident(null);
+    setSelectedArea(null);
+    requestReport({ lat: incident.lat, lng: incident.lng });
+  }, [requestReport]);
 
   /**
    * How long a community report stays on the map.
@@ -1492,6 +1553,18 @@ export default function MapPage() {
     }
   }, [user]);
 
+  // Resume a report started while signed out, once they are signed in and
+  // past (or have skipped) profile setup.
+  useEffect(() => {
+    if (!pendingReport || !user) return;
+    if (db && userProfile === null) return; // profile still loading
+    if (profileNeedsSetup && !onboardingDismissedThisSession) return;
+    setAuthPanelOpen(false);
+    setAuthPanelMode('signin');
+    openReportForm(pendingReport.location);
+    setPendingReport(null);
+  }, [pendingReport, user, userProfile, profileNeedsSetup, onboardingDismissedThisSession, openReportForm]);
+
   useEffect(() => {
     const targetId = searchParams.get('i');
     if (!targetId || deepLinkHandledRef.current) return;
@@ -1551,11 +1624,6 @@ export default function MapPage() {
     if (coordDeepLinkHandledRef.current) return;
     const latStr = searchParams.get('lat');
     const lngStr = searchParams.get('lng');
-    const actionStr = searchParams.get('action');
-
-    if (actionStr === 'report') {
-      setIsFormOpen(true);
-    }
 
     if (latStr && lngStr) {
       const lat = parseFloat(latStr);
@@ -1569,13 +1637,30 @@ export default function MapPage() {
       return;
     }
 
-    // /map?area=seton — search links a neighbourhood straight to its patch of the map.
-    const area = searchParams.get('area');
+    // /map?area=seton — search links a neighbourhood straight to its patch of
+    // the map. `?near=` is the same thing in the words people search with
+    // (/map?when=yesterday&near=seton), and takes a slug or a plain name.
+    const area = searchParams.get('near') || searchParams.get('area');
     if (area) {
       coordDeepLinkHandledRef.current = true;
       fetchCommunityBoundaries().then((boundaries) => {
         const centre = communityCentre(area, boundaries);
-        if (!centre) return;
+        if (!centre) {
+          // Boundaries unavailable or no polygon match: still name the area
+          // for the briefing, matching reports by their neighbourhood label.
+          const display = area.replace(/[-_]+/g, ' ').trim().replace(/\b\w/g, (c) => c.toUpperCase());
+          if (display) {
+            setNearArea({ name: display, boundary: null });
+            window.setTimeout(() => viewNeighborhoodRef.current?.(display), 400);
+          }
+          return;
+        }
+        const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const boundary = boundaries.find((b) => slug(b.name) === slug(area)) ?? null;
+        const display = (boundary?.name ?? area.replace(/-/g, ' ')).replace(/\b\w/g, (c) => c.toUpperCase());
+        setNearArea({ name: display, boundary });
+        // Open the community the link names, once the map is there to fly.
+        window.setTimeout(() => viewNeighborhoodRef.current?.(display), 400);
         // The map may still be mounting on a cold load; give it a moment.
         let tries = 0;
         const go = () => {
@@ -1586,6 +1671,19 @@ export default function MapPage() {
       });
     }
   }, [searchParams]);
+
+  // ?action=report (linked from neighbourhood stories). Goes through the same
+  // sign-in gate as every other report button, and is stripped once handled
+  // so closing the form does not reopen it.
+  useEffect(() => {
+    if (searchParams.get('action') !== 'report' || !isAuthReady) return;
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.delete('action');
+      return next;
+    }, { replace: true });
+    requestReport(null);
+  }, [searchParams, isAuthReady, requestReport, setSearchParams]);
 
   const [isPinMode, setIsPinMode] = useState(false);
   // Coordinates captured the moment "Set Pin Here" fires - stored in MapPage
@@ -1692,7 +1790,7 @@ export default function MapPage() {
           }
           await batch.commit();
           logProductEvent('report_submitted', { category: incidentData.category });
-          celebrate('Signal live — neighbours nearby can see it now.');
+          celebrate('Your report is live. Neighbours can see it now.');
         } catch (error) {
           console.error('[CalgaryWatch] Report submission failed:', error);
           setSubmitError('Your report could not be saved. Please try again.');
@@ -1755,7 +1853,7 @@ export default function MapPage() {
             });
           }
           await batch.commit();
-          celebrate('Emergency signal live — nearby watchers alerted.');
+          celebrate('Emergency report posted. If anyone is in danger, call 911.');
         } catch (error) {
           handleFirestoreError(error, OperationType.CREATE, path);
         }
@@ -1788,10 +1886,10 @@ export default function MapPage() {
         return !i.expires_at || i.expires_at > now;         // expires_at controls official lifetime
       }
       return now - i.timestamp < MAP_DECAY_MS;              // community reports linger 5 days
-    });
+    }).filter((i) => inMapTimeWindow(i.timestamp, timeWindow, now)); // same window as the feed
     if (selectedCategory === 'all') return visible;
     return visible.filter(i => i.category === selectedCategory || i.category === 'emergency');
-  }, [incidents, selectedCategory]);
+  }, [incidents, selectedCategory, timeWindow, clock]);
 
   /**
    * The report feed is Calgary-focused. Edmonton Open Data can still render as
@@ -1801,9 +1899,38 @@ export default function MapPage() {
   const feedIncidents = useMemo(() => {
     const localFeed = incidents.filter((incident) => incident.source_type !== 'edmonton_open_data');
     if (timeWindow === 'all') return localFeed;
-    const cutoff = Date.now() - (timeWindow === '24h' ? 24 : 24 * 7) * 60 * 60 * 1000;
-    return localFeed.filter((incident) => incident.timestamp >= cutoff);
-  }, [incidents, timeWindow]);
+    const now = Date.now();
+    return localFeed.filter((incident) => inMapTimeWindow(incident.timestamp, timeWindow, now));
+  }, [incidents, timeWindow, clock]);
+
+  /** The feed scoped to the community a ?near= link named, for the briefing. */
+  const briefingIncidents = useMemo(() => {
+    if (!nearArea) return feedIncidents;
+    const b = nearArea.boundary;
+    if (b) {
+      const [minLng, minLat, maxLng, maxLat] = b.bbox;
+      return feedIncidents.filter((i) =>
+        i.lng >= minLng && i.lng <= maxLng && i.lat >= minLat && i.lat <= maxLat
+        && b.polygons.some((poly) => pointInPolygon(i.lng, i.lat, poly)));
+    }
+    const want = nearArea.name.toLowerCase();
+    return feedIncidents.filter((i) => (i.neighborhood || '').toLowerCase() === want);
+  }, [feedIncidents, nearArea]);
+
+  /**
+   * Newest real report time, for "Latest report 2 min ago". Community and
+   * ingested reports plus the City's open data; the weather, air and river
+   * readings are stamped at fetch time, so they would always read "just now".
+   */
+  const newestReportAt = useMemo(() => {
+    let newest: number | null = null;
+    for (const i of [...firebaseIncidents, ...officialOpenData]) {
+      if (!Number.isFinite(i.timestamp) || i.timestamp > clock + 60_000) continue;
+      if (newest === null || i.timestamp > newest) newest = i.timestamp;
+    }
+    return newest;
+  }, [firebaseIncidents, officialOpenData, clock]);
+  const freshness = freshnessLabel(newestReportAt, clock);
 
   /**
    * The one number the mobile feed reports.
@@ -1919,28 +2046,26 @@ export default function MapPage() {
       const canonicalName = resolvedKey
         ? resolvedKey.replace(/^\w+:/, '').replace(/\b\w/g, c => c.toUpperCase())
         : displayName;
-      const totals = [...crimeStats.values()].map(e => e.crime + e.disorder);
-      const cityAvg = totals.reduce((a, b) => a + b, 0) / totals.length;
-      const cityMax = Math.max(...totals);
+      // Calgary communities only: Edmonton rows ("edmonton:…") are a different
+      // city's data and must not move a Calgary comparison.
+      const calgaryEntries = [...crimeStats.entries()].filter(([k]) => !k.includes(':')).map(([, e]) => e);
+      const baseline = calgaryEntries.length > 0 ? calgaryEntries : [...crimeStats.values()];
 
       if (entry) {
         const total = entry.crime + entry.disorder;
-        const score = Math.max(10, Math.round(100 - (total / Math.max(cityMax, 1)) * 75));
-        const delta = total - cityAvg;
-        const trend: 'improving' | 'stable' | 'declining' =
-          delta < -cityAvg * 0.2 ? 'improving' : delta > cityAvg * 0.2 ? 'declining' : 'stable';
 
         // Computed insights from real data. These figures are 311 service
         // requests (or StatCan rows), not police-reported crime, and the copy
         // says so. No ranks: a "#3 of 200" reads as a league table of
         // neighbourhoods, which is the opposite of the awareness framing.
-        const sortedTotals = [...crimeStats.values()]
+        const sortedTotals = baseline
           .map(e => e.crime + e.disorder)
           .sort((a, b) => a - b);
         const median = sortedTotals[Math.floor(sortedTotals.length / 2)] ?? 0;
         const isStatcan = entry.dataSource === 'statcan';
-        const what = isStatcan ? 'incidents in Statistics Canada data' : 'safety-related 311 requests';
-        const comparison = median > 0
+        // crime + disorder together is every 311 request counted for the area.
+        const what = isStatcan ? 'incidents in Statistics Canada data' : '311 requests';
+        const comparison = median > 0 && !resolvedKey?.includes(':')
           ? total > median * 1.2
             ? 'more than most Calgary communities'
             : total < median * 0.8
@@ -1957,17 +2082,17 @@ export default function MapPage() {
           ...base,
           communityName: canonicalName,
           crimeKey: resolvedKey,
-          safetyScore: score,
-          trend,
           insights: [...computedInsights, ...base.insights],
         });
       } else {
-        setSelectedArea({ ...base, communityName: displayName, safetyScore: 50, trend: 'stable' });
+        setSelectedArea({ ...base, communityName: displayName });
       }
       return;
     }
     setSelectedArea({ ...base, communityName: displayName });
   }, [incidents, mapRef, crimeStats, cityAverages]);
+
+  useEffect(() => { viewNeighborhoodRef.current = handleViewNeighborhood; }, [handleViewNeighborhood]);
 
   // Placed here rather than beside handleSheetIncidentClick because it closes
   // over handleViewNeighborhood, which is a `const` declared just above —
@@ -1975,6 +2100,7 @@ export default function MapPage() {
   // temporal-dead-zone ReferenceError on every render.
   const handleSheetNeighbourhoodSelect = useCallback((name: string) => {
     handleViewNeighborhood(name);
+    setNearArea({ name, boundary: null });
     setSheetState('rail');
   }, [handleViewNeighborhood]);
 
@@ -2035,7 +2161,7 @@ export default function MapPage() {
       setNearMeScanning(false);
       const first = nearMeIncidentsRef.current[0];
       if (first) mapRef.current?.flyTo(first.lat, first.lng, 15);
-    }, 1600);
+    }, 450);
   }, []);
 
   const handleNotificationClick = useCallback((notification: MapNotification) => {
@@ -2061,9 +2187,10 @@ export default function MapPage() {
   }, [isPinMode, isEmergencyPinMode]);
 
   // ── Live area snapshot for the neighbourhood-report notification ──────────
-  // Registry-sourced inferredNeighborhood now matches 311 comm_name keys, so
-  // a direct lookup usually lands; ranks come from the same distribution the
-  // choropleth uses.
+  // Registry-sourced inferredNeighborhood matches 311 comm_name keys, so a
+  // direct lookup usually lands. Calgary communities only. The notification
+  // shows a plain comparison with the median, never a rank; the briefing still
+  // receives rank/count for its own "report volume, not a safety grade" strip.
   const areaTotalsDesc = useMemo(() => {
     if (!crimeStats || crimeStats.size === 0) return [];
     return [...crimeStats.entries()]
@@ -2074,17 +2201,17 @@ export default function MapPage() {
 
   const getAreaStats = useCallback((name?: string) => {
     if (!name || !crimeStats || areaTotalsDesc.length === 0) return null;
-    const entry = crimeStats.get(name.toLowerCase().trim());
+    const key = name.toLowerCase().trim();
+    if (key.includes(':')) return null;
+    const entry = crimeStats.get(key);
     if (!entry) return null;
     const total = entry.crime + entry.disorder;
     const rank = Math.max(1, areaTotalsDesc.findIndex((t) => t <= total) + 1);
-    const pct = rank / areaTotalsDesc.length;
-    const band =
-      pct <= 0.1 ? { label: 'Hot', color: '#C0392B' } :
-      pct <= 0.25 ? { label: 'High', color: '#EA580C' } :
-      pct <= 0.5 ? { label: 'Elevated', color: '#B8860B' } :
-      { label: 'Calm', color: '#2E8B7A' };
-    return { entry, total, rank, count: areaTotalsDesc.length, band };
+    const median = areaTotalsDesc[Math.floor(areaTotalsDesc.length / 2)] ?? 0;
+    const comparison: AreaComparison['comparison'] = median > 0
+      ? total > median * 1.2 ? 'more' : total < median * 0.8 ? 'fewer' : 'about the same as'
+      : null;
+    return { entry, total, rank, count: areaTotalsDesc.length, comparison };
   }, [crimeStats, areaTotalsDesc]);
 
   /**
@@ -2104,124 +2231,23 @@ export default function MapPage() {
   const briefingCommunity =
     preferredInferredNeighborhood || preferredNeighborhood || '';
 
-  /** Their community's figures, shaped for the briefing. */
-  const briefingAreaStats = useMemo(() => {
-    const stats = getAreaStats(briefingCommunity);
-    if (!stats) return null;
-    return {
-      crime: stats.entry.crime,
-      disorder: stats.entry.disorder,
-      year: stats.entry.year,
-      rank: stats.rank,
-      count: stats.count,
-    };
-  }, [getAreaStats, briefingCommunity]);
 
-  // Featured card for "your neighbourhood report" — rendered in both dropdowns
-  const renderNotificationRow = useCallback((n: MapNotification, compact: boolean) => {
+  // Featured card for "your neighbourhood report" — rendered in both lists.
+  const renderNotificationRow = useCallback((n: MapNotification) => {
     const stats = n.kind === 'neighborhood_report' ? getAreaStats(n.neighborhood) : null;
-    if (n.kind === 'neighborhood_report') {
-      const areaName = (n.neighborhood ?? 'Your area').replace(/\b\w/g, (c) => c.toUpperCase());
-      return (
-        <div key={n.id} className="p-2">
-          <div
-            className="relative overflow-hidden"
-            style={{ background: '#10283D', border: '1.5px solid #2E8B7A' }}
-          >
-          <button
-            type="button"
-            onClick={() => handleNotificationClick(n)}
-            className="block w-full p-3.5 text-left transition-colors hover:bg-white/[0.04] active:bg-white/[0.07]"
-          >
-            <span className="flex items-start gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center" style={{ background: '#2E8B7A', color: '#FFFDF8' }}>
-                <Bell size={16} />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[11px] font-bold" style={{ color: '#86CDBB' }}>Personalized report ready</span>
-                <span className={cn('mt-0.5 block font-black leading-tight', compact ? 'text-[15px]' : 'text-[16px]')} style={{ color: '#FFFDF8' }}>
-                  {areaName}
-                </span>
-              </span>
-            </span>
-            {/* Without this the card shows only the resolved community name and
-                the user has no idea where it came from. */}
-            {n.basis && (
-              <p className="mt-2.5 flex items-start gap-1.5 text-[11px] font-medium leading-snug" style={{ color: '#B9CBDA' }}>
-                <MapPin size={11} className="mt-[1px] shrink-0" aria-hidden="true" />
-                <span className="min-w-0">
-                  Built from <span className="font-bold" style={{ color: '#F2EFE8' }}>{n.basis}</span>
-                </span>
-              </p>
-            )}
-            {stats ? (
-              <div className="mt-3 border-y py-2.5" style={{ borderColor: 'rgba(201,216,228,0.18)' }}>
-                <span className="flex items-center justify-between gap-3">
-                  <span>
-                    <span className="block text-[10px] font-semibold" style={{ color: '#AFC5DF' }}>City report-volume rank</span>
-                    <span className="mt-0.5 block text-[17px] font-black tabular-nums" style={{ color: '#FFFDF8' }}>
-                      #{stats.rank} <span className="text-[11px] font-semibold" style={{ color: '#AFC5DF' }}>of {stats.count}</span>
-                    </span>
-                  </span>
-                  <span className="px-2 py-1 text-[10.5px] font-bold" style={{ background: stats.band.color, color: '#FFFDF8' }}>
-                    {stats.band.label}
-                  </span>
-                </span>
-                <span className="mt-2 block h-1.5 overflow-hidden" style={{ background: 'rgba(201,216,228,0.16)' }} aria-hidden="true">
-                  <span className="block h-full" style={{ width: `${Math.max(3, ((stats.count - stats.rank + 1) / stats.count) * 100)}%`, background: '#78C7B2' }} />
-                </span>
-                <span className="mt-1.5 block text-[10.5px]" style={{ color: '#AFC5DF' }}>
-                  {(stats.entry.crime + stats.entry.disorder).toLocaleString()} recorded crime + disorder · {stats.entry.year}
-                </span>
-              </div>
-            ) : (
-              <p className="mt-2.5 text-[11px] font-medium" style={{ color: '#AFC5DF' }}>
-                Two lead stories, local crime, nearby cameras and community signals
-              </p>
-            )}
-            <span className="mt-3 flex min-h-11 items-center justify-between gap-3 px-3 text-[12px] font-black" style={{ background: '#F2EFE8', color: '#10283D' }}>
-              Open full report <ArrowRight size={14} />
-            </span>
-          </button>
-          {/* Sibling of the main button, not nested inside it — nesting
-              interactive elements breaks keyboard and screen-reader behaviour. */}
-          <div className="px-3.5 pb-3 pt-0.5">
-            <button
-              type="button"
-              onClick={() => {
-                setShowNotifications(false);
-                openAuthPanel('settings');
-              }}
-              className="min-h-9 text-[11px] font-semibold underline underline-offset-2 transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2"
-              style={{ color: '#86CDBB' }}
-            >
-              Change location settings
-            </button>
-          </div>
-          </div>
-        </div>
-      );
-    }
     return (
-      <button
+      <NotificationRow
         key={n.id}
-        type="button"
-        onClick={() => handleNotificationClick(n)}
-        className="flex w-full items-start gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-black/[0.03]"
-        style={{ borderBottom: '1px solid #E7E0D2' }}
-      >
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(74,144,217,0.12)' }}>
-          <Bell size={12} className="text-[#4A90D9]" />
-        </span>
-        <span className="min-w-0">
-          <span className={cn('block font-bold text-[#1C2B3A] line-clamp-2 leading-snug', compact ? 'text-[11.5px]' : 'text-[12px]')}>{n.title}</span>
-          <span className="block font-mono text-[10px] text-[#5A6B7D] mt-0.5">
-            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        </span>
-      </button>
+        n={n}
+        stats={stats ? { total: stats.total, year: stats.entry.year, comparison: stats.comparison } : null}
+        onOpen={handleNotificationClick}
+        onChangeLocation={() => {
+          setShowNotifications(false);
+          openAuthPanel('settings');
+        }}
+      />
     );
-  }, [getAreaStats, handleNotificationClick]);
+  }, [getAreaStats, handleNotificationClick, openAuthPanel]);
 
   const showProfileStep = Boolean(user);
   const authPanelVisible = authPanelOpen || (profileNeedsSetup && !onboardingDismissedThisSession);
@@ -2328,6 +2354,43 @@ export default function MapPage() {
     } catch { /* profile listener will re-sync */ }
   }, [user, celebrate]);
 
+  /** Close the account panel the way its close button does. */
+  const closeAuthPanel = useCallback(() => {
+    setOnboardingDismissedThisSession(true);
+    setIsEditingPreferences(false);
+    setAuthPanelOpen(false);
+    setAuthPanelMode('signin');
+    setProfileSaveError(null);
+    // Walking away from sign-in drops a report they had tried to start.
+    if (!user) setPendingReport(null);
+  }, [user]);
+
+  /**
+   * Escape closes the topmost open panel, one per press. Surfaces that handle
+   * Escape themselves (camera viewer, traffic panel, personal briefing, tour)
+   * are left to do so, and the report forms are never closed from here so a
+   * stray key cannot throw away a half-written report.
+   */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      if (tourOpen || viewerCamera || selectedTrafficSegment || briefingOpen) return;
+      if (isFormOpen || isEmergencyOpen || isPinMode || isEmergencyPinMode) return;
+      if (digestPromptOpen) { setDigestPromptOpen(false); return; }
+      if (authPanelVisible) { if (canCloseAuthPanel) closeAuthPanel(); return; }
+      if (showNotifications) { setShowNotifications(false); return; }
+      if (showUserMenu) { setShowUserMenu(false); return; }
+      if (selectedIncident) { setSelectedIncident(null); return; }
+      if (selectedArea) { setSelectedArea(null); return; }
+      if (nearMeOpen) { setNearMeOpen(false); setNearMeScanning(false); return; }
+      if (sheetState === 'raised') setSheetState('rail');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tourOpen, viewerCamera, selectedTrafficSegment, briefingOpen, isFormOpen, isEmergencyOpen, isPinMode,
+    isEmergencyPinMode, digestPromptOpen, authPanelVisible, canCloseAuthPanel, closeAuthPanel, showNotifications,
+    showUserMenu, selectedIncident, selectedArea, nearMeOpen, sheetState]);
+
   // Instant alerts write straight to the profile — small, independent controls
   // that must not wait on the larger report-area form's save cycle.
   const updateAlertPrefs = useCallback(async (patch: Partial<UserProfileSettings>) => {
@@ -2377,20 +2440,29 @@ export default function MapPage() {
   }, [user, updateAlertPrefs]);
 
   return (
-    <div className="map-shell cw-map relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
+    <div className="map-shell cw-map lv-root relative flex h-dvh w-full overflow-hidden bg-[#FAF8F3] font-sans text-[#151515]">
       <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
       <AnimatePresence>
         {isLoading && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex bg-[#F7F3EA]"
+            className="fixed inset-0 z-[100] flex bg-[#FAF8F3]"
+            role="status"
+            aria-live="polite"
           >
-            <div className="hidden lg:block w-80 h-full border-r border-white/5">
+            <div className="hidden lg:block w-80 h-full border-r-2 border-[#151515]">
               <SidebarSkeleton />
             </div>
-            <div className="flex-1 h-full relative">
-              <MapShimmer />
+            <div className="lv-loading flex-1 h-full relative">
+              <div className="absolute inset-0 opacity-60"><MapShimmer /></div>
+              <div className="lv-card lv-card-shadow lv-loading-card relative">
+                <span className="lv-loading-spin" style={{ borderColor: 'rgba(21,21,21,0.15)', borderTopColor: '#1554D1' }} aria-hidden="true" />
+                <span>
+                  <span className="lv-h-sm block">Loading the live map</span>
+                  <span className="lv-small block mt-0.5">Neighbour reports and City open data</span>
+                </span>
+              </div>
             </div>
           </motion.div>
         )}
@@ -2403,7 +2475,7 @@ export default function MapPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[180] flex items-center justify-center bg-[rgba(6,22,47,0.72)] p-3 backdrop-blur-xl sm:p-6"
+            className="lv-scrim fixed inset-0 z-[180] flex items-center justify-center p-3 backdrop-blur-sm sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-label={showProfileStep ? 'Calgary Watch profile settings' : 'Sign up or sign in to Calgary Watch'}
@@ -2413,49 +2485,42 @@ export default function MapPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 22, scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-              className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-4xl overflow-y-auto shadow-[0_32px_80px_-32px_rgba(11,31,51,0.6)]"
-              style={{ background: '#FFFDF8', border: '1.5px solid #F2EFE8' }}
+              className="lv-modal lv-auth max-h-[calc(100dvh-1.5rem)] max-w-4xl"
             >
               {canCloseAuthPanel && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setOnboardingDismissedThisSession(true);
-                    setIsEditingPreferences(false);
-                    setAuthPanelOpen(false);
-                    setAuthPanelMode('signin');
-                    setProfileSaveError(null);
-                  }}
-                  className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center border-[1.5px] border-[#0B1F33] bg-[#FFFDF8] text-[#0B1F33] transition-colors hover:bg-[#E8F3FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 sm:right-4 sm:top-4"
+                  onClick={closeAuthPanel}
+                  className="lv-close absolute right-3 top-3 z-10 sm:right-4 sm:top-4"
                   aria-label="Close sign up or sign in panel"
                 >
-                  <X size={16} />
+                  <X size={18} />
                 </button>
               )}
 
               <div className="grid lg:grid-cols-[0.82fr_1.18fr]">
-                <div className="bg-[#06162F] p-6 text-[#D5DFEB] md:p-8">
-                  <div className="flex h-12 w-12 items-center justify-center bg-[#F2EFE8]">
-                    {showProfileStep ? <Home size={22} className="text-[#0B1F33]" /> : <GoogleIcon />}
+                <div className="lv-sky lv-modal-side">
+                  <div className="lv-modal-icon">
+                    {showProfileStep ? <Home size={22} /> : <GoogleIcon />}
                   </div>
-                  <h2 className="mt-6 font-display text-2xl font-black tracking-[-0.02em] text-[#F2EFE8]">
+                  <h2>
                     {showProfileStep
                       ? authPanelMode === 'settings' ? 'Account settings' : 'Finish your profile'
                       : 'Sign up or sign in'}
                   </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-[#D5DFEB]">
+                  <p>
                     {showProfileStep
                       ? 'Choose your report area and privacy preferences. Your neighbourhood report appears each time you sign in.'
-                      : 'Continue with email or Google to create an account or sign back in. Your account lets you post reports, save preferences, and receive neighbourhood-specific safety updates.'}
+                      : 'Continue with Google to create an account or sign back in. An account lets you post reports, save a home area and get a weekly note about what was reported near you.'}
                   </p>
 
                   {showProfileStep && (
-                    <div className="mt-6 border-[1.5px] border-[rgba(242,239,232,0.26)] bg-[rgba(242,239,232,0.08)] p-4">
-                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#AFC5DF]">Current report area</p>
-                      <p className="mt-1 text-lg font-black text-[#F2EFE8]">{locationLabel}</p>
-                      <p className="mt-2 text-xs leading-relaxed text-[#AFC5DF]">
-                        Weekly digest: {userProfile?.weeklyDigestOptIn === true ? 'enabled' : 'off'}
-                      </p>
+                    <div className="lv-side-card">
+                      <p className="lv-eyebrow">Current report area</p>
+                      <strong>{locationLabel}</strong>
+                      <span>
+                        Weekly digest: {userProfile?.weeklyDigestOptIn === true ? 'on' : 'off'}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -2464,22 +2529,23 @@ export default function MapPage() {
                   {!showProfileStep ? (
                     <div className="space-y-5">
                       <div>
-                        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#1F5C93]">Your CalgaryWatch account</p>
-                        <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em] text-[#0B1F33]">Sign up or sign in securely</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-[#5A6B7D]">
-                          New to CalgaryWatch? Create an account with email or Google. Already registered? Sign in with the same method. This panel will then ask for your privacy consent and neighbourhood or address.
+                        <p className="lv-eyebrow lv-eyebrow-blue">Your CalgaryWatch account</p>
+                        <h3 className="lv-h mt-2">Sign up or sign in <span className="lv-mark">securely</span></h3>
+                        <p className="lv-body mt-2">
+                          New to CalgaryWatch? Create an account with Google. Already registered? Sign in the same way. This panel will then ask for your privacy consent and, if you like, a neighbourhood or address.
                         </p>
                       </div>
 
-                      <Button
+                      <button
+                        type="button"
                         onClick={() => void signIn()}
-                        className="h-12 w-full rounded-none bg-[#06162F] text-[#F2EFE8] hover:bg-[#1C2B3A]"
+                        className="lv-btn lv-btn-primary lv-btn-block"
                       >
                         <GoogleIcon />
                         Sign up or sign in with Google
-                      </Button>
+                      </button>
 
-                      <p className="text-[11px] leading-relaxed text-[#5A6B7D]">
+                      <p className="lv-small">
                         Calgary Watch uses your account to reduce spam, support report moderation, and connect neighbourhood reports to your saved preferences.
                       </p>
                     </div>
@@ -2495,51 +2561,51 @@ export default function MapPage() {
                                 src={user.photoURL}
                                 alt={user.displayName || 'Profile'}
                                 referrerPolicy="no-referrer"
-                                className="h-14 w-14 border-[1.5px] border-[#C9D8E4] object-cover"
+                                className="h-14 w-14 rounded-[16px] border-2 border-[#151515] object-cover"
                               />
                             ) : (
-                              <div className="flex h-14 w-14 items-center justify-center bg-[#2F6FB0] text-xl font-black text-[#FFFDF8]">
+                              <div className="flex h-14 w-14 items-center justify-center rounded-[16px] border-2 border-[#151515] bg-[#1554D1] text-xl font-black text-[#FFFFFF]">
                                 {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
                               </div>
                             )}
                             <div className="min-w-0">
-                              <p className="truncate text-lg font-black" style={{ color: '#1C2B3A' }}>
+                              <p className="truncate text-lg font-black" style={{ color: '#151515' }}>
                                 {user?.displayName || 'Calgary User'}
                               </p>
-                              <p className="truncate text-xs" style={{ color: '#5A6B7D' }}>
+                              <p className="truncate text-xs" style={{ color: '#565A61' }}>
                                 {user?.email}
                               </p>
                             </div>
                           </div>
 
                           {/* Preferences summary — ledger rows */}
-                          <div className="overflow-hidden" style={{ border: '1.5px solid #C9D8E4' }}>
-                            <div className="flex items-center gap-3 p-4" style={{ background: '#F7F3EA' }}>
-                              <span className="flex h-9 w-9 shrink-0 items-center justify-center" style={{ background: 'rgba(46,139,122,0.14)' }}>
-                                <Home size={15} className="text-[#2E8B7A]" />
+                          <div className="lv-row-card" style={{ border: '2px solid #151515' }}>
+                            <div className="flex items-center gap-3 p-4" style={{ background: '#FAF8F3' }}>
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px]" style={{ background: 'rgba(21,84,209,0.14)' }}>
+                                <Home size={15} className="text-[#1554D1]" />
                               </span>
                               <div className="min-w-0">
-                                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Report area</p>
-                                <p className="mt-0.5 text-sm font-bold truncate text-[#1C2B3A]">
+                                <p className="lv-eyebrow text-[#565A61]">Report area</p>
+                                <p className="mt-0.5 text-sm font-bold truncate text-[#151515]">
                                   {preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'No location set'}
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3 p-4" style={{ borderTop: '1px dashed #E7E0D2' }}>
-                              <span className="flex h-9 w-9 shrink-0 items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }}>
-                                <Bell size={15} className="text-[#2F6FB0]" />
+                            <div className="flex items-center gap-3 p-4" style={{ borderTop: '1px dashed #E4E1D8' }}>
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px]" style={{ background: 'rgba(21,84,209,0.12)' }}>
+                                <Bell size={15} className="text-[#1554D1]" />
                               </span>
                               <div className="min-w-0 flex-1">
-                                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Weekly digest</p>
-                                <p className="mt-0.5 text-sm font-bold text-[#1C2B3A]">
+                                <p className="lv-eyebrow text-[#565A61]">Weekly digest</p>
+                                <p className="mt-0.5 text-sm font-bold text-[#151515]">
                                   {userProfile?.weeklyDigestOptIn === true ? 'Neighbourhood stats + news, weekly' : 'Off'}
                                 </p>
                               </div>
                               <span
-                                className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.14em] px-2 py-1"
+                                className="shrink-0 rounded-full font-mono text-[11px] font-bold uppercase tracking-[0.08em] px-2.5 py-1"
                                 style={userProfile?.weeklyDigestOptIn === true
-                                  ? { background: 'rgba(46,139,122,0.14)', color: '#2E8B7A' }
-                                  : { background: '#F7F3EA', color: '#9AA6B2', border: '1px solid #E7E0D2' }}
+                                  ? { background: 'rgba(21,84,209,0.14)', color: '#1554D1' }
+                                  : { background: '#FAF8F3', color: '#7A7F87', border: '1px solid #E4E1D8' }}
                               >
                                 {userProfile?.weeklyDigestOptIn === true ? 'On' : 'Off'}
                               </span>
@@ -2563,39 +2629,39 @@ export default function MapPage() {
                               : pushResult === 'error' ? 'Could not turn on — try again.'
                               : 'Get alerts even when the tab is closed.';
                             return (
-                              <div style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4' }}>
+                              <div className="lv-row-card" style={{ background: '#FFFFFF', border: '2px solid #151515' }}>
                                 <button
                                   type="button"
                                   onClick={() => void toggleAlerts(!alertsOn)}
                                   aria-pressed={alertsOn}
                                   className="flex w-full items-center gap-3 p-4 text-left"
                                 >
-                                  <span className="flex h-9 w-9 shrink-0 items-center justify-center" style={{ background: 'rgba(192,57,43,0.12)' }}>
+                                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px]" style={{ background: 'rgba(192,57,43,0.12)' }}>
                                     <Siren size={15} className="text-[#C0392B]" />
                                   </span>
                                   <span className="min-w-0 flex-1">
-                                    <span className="block font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Instant alerts</span>
-                                    <span className="mt-0.5 block text-sm font-bold text-[#1C2B3A]">
+                                    <span className="block lv-eyebrow text-[#565A61]">Instant alerts</span>
+                                    <span className="mt-0.5 block text-sm font-bold text-[#151515]">
                                       {alertsOn ? 'Emergencies + nearby neighbour reports' : 'Off'}
                                     </span>
                                   </span>
                                   <span
-                                    className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.14em] px-2 py-1"
+                                    className="shrink-0 rounded-full font-mono text-[11px] font-bold uppercase tracking-[0.08em] px-2.5 py-1"
                                     style={alertsOn
                                       ? { background: 'rgba(192,57,43,0.14)', color: '#C0392B' }
-                                      : { background: '#F7F3EA', color: '#9AA6B2', border: '1px solid #E7E0D2' }}
+                                      : { background: '#FAF8F3', color: '#7A7F87', border: '1px solid #E4E1D8' }}
                                   >
                                     {alertsOn ? 'On' : 'Off'}
                                   </span>
                                 </button>
 
                                 {alertsOn && (
-                                  <div className="space-y-3 px-4 pb-4" style={{ borderTop: '1px dashed #E7E0D2' }}>
+                                  <div className="space-y-3 px-4 pb-4" style={{ borderTop: '1px dashed #E4E1D8' }}>
                                     {/* Coverage — an alert only fires inside a watched
                                         area, so say plainly which areas those are. */}
                                     {homeArea ? (
-                                      <p className="mt-3 text-[13px]" style={{ color: '#5A6B7D' }}>
-                                        Nearby-report alerts cover <strong style={{ color: '#1C2B3A' }}>{[homeArea, ...extraZones.map((z) => z.neighborhood)].join(', ')}</strong>.
+                                      <p className="mt-3 text-[13px]" style={{ color: '#565A61' }}>
+                                        Nearby-report alerts cover <strong style={{ color: '#151515' }}>{[homeArea, ...extraZones.map((z) => z.neighborhood)].join(', ')}</strong>.
                                       </p>
                                     ) : (
                                       <p className="mt-3 text-[13px]" style={{ color: '#C0392B' }}>
@@ -2605,7 +2671,7 @@ export default function MapPage() {
 
                                     {/* Additional watched areas (Work, School, family). */}
                                     <div className="space-y-1.5">
-                                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                      <p className="lv-eyebrow" style={{ color: '#565A61' }}>
                                         Other areas to watch
                                       </p>
                                       {extraZones.length > 0 && (
@@ -2615,8 +2681,8 @@ export default function MapPage() {
                                               key={z.id}
                                               type="button"
                                               onClick={() => void updateAlertPrefs({ alertZones: extraZones.filter((e) => e.id !== z.id) })}
-                                              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-bold"
-                                              style={{ background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }}
+                                              className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-bold"
+                                              style={{ background: '#06162F', color: '#FFFFFF', border: '2px solid #151515' }}
                                             >
                                               {z.neighborhood} <X size={11} />
                                             </button>
@@ -2627,7 +2693,7 @@ export default function MapPage() {
                                         type="text"
                                         placeholder="Add a neighbourhood, then Enter"
                                         className="w-full px-3 py-2 text-[13px]"
-                                        style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4' }}
+                                        style={{ background: '#FFFFFF', border: '2px solid #151515' }}
                                         onKeyDown={(e) => {
                                           if (e.key !== 'Enter') return;
                                           e.preventDefault();
@@ -2653,8 +2719,8 @@ export default function MapPage() {
                                         className="h-4 w-4 shrink-0"
                                         style={{ accentColor: '#C0392B' }}
                                       />
-                                      <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
-                                        <strong style={{ color: '#1C2B3A' }}>Always alert me to emergencies</strong>, anywhere in the city and at any hour.
+                                      <span className="text-[13px]" style={{ color: '#565A61' }}>
+                                        <strong style={{ color: '#151515' }}>Always alert me to emergencies</strong>, anywhere in the city and at any hour.
                                       </span>
                                     </label>
 
@@ -2668,8 +2734,8 @@ export default function MapPage() {
                                         className="h-4 w-4 shrink-0"
                                         style={{ accentColor: '#C0392B' }}
                                       />
-                                      <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
-                                        <strong style={{ color: '#1C2B3A' }}>Quiet hours 10 PM–7 AM your time.</strong> {emergencyOn ? 'Emergencies still come through.' : 'Nothing comes through.'}
+                                      <span className="text-[13px]" style={{ color: '#565A61' }}>
+                                        <strong style={{ color: '#151515' }}>Quiet hours 10 PM–7 AM your time.</strong> {emergencyOn ? 'Emergencies still come through.' : 'Nothing comes through.'}
                                       </span>
                                     </label>
 
@@ -2678,26 +2744,26 @@ export default function MapPage() {
                                         stays invisible until push is fully set up. */}
                                     {isPushSupported() && isPushConfigured() && (
                                       <div className="flex items-center justify-between gap-3">
-                                        <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
-                                          <strong style={{ color: '#1C2B3A' }}>Browser push on this device.</strong>{' '}
+                                        <span className="text-[13px]" style={{ color: '#565A61' }}>
+                                          <strong style={{ color: '#151515' }}>Browser push on this device.</strong>{' '}
                                           {pushHint}
                                         </span>
                                         <button
                                           type="button"
                                           disabled={pushBusy}
                                           onClick={() => void togglePush()}
-                                          className="shrink-0 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.14em] disabled:opacity-60"
+                                          className="shrink-0 rounded-full px-3.5 py-2 text-[12.5px] font-bold disabled:opacity-60"
                                           style={pushOnHere
-                                            ? { background: 'rgba(46,139,122,0.14)', color: '#2E8B7A', border: '1.5px solid rgba(46,139,122,0.45)' }
-                                            : { background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }}
+                                            ? { background: 'rgba(21,84,209,0.14)', color: '#1554D1', border: '1.5px solid rgba(21,84,209,0.45)' }
+                                            : { background: '#06162F', color: '#FFFFFF', border: '2px solid #151515' }}
                                         >
                                           {pushBusy ? '…' : pushOnHere ? 'Turn off' : 'Enable'}
                                         </button>
                                       </div>
                                     )}
                                     <div className="space-y-1.5">
-                                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
-                                        Alert categories <span style={{ color: '#9AA6B2' }}>· all if none picked</span>
+                                      <p className="lv-eyebrow" style={{ color: '#565A61' }}>
+                                        Alert categories <span style={{ color: '#7A7F87' }}>· all if none picked</span>
                                       </p>
                                       <div className="flex flex-wrap gap-1.5">
                                         {DIGEST_CATEGORY_ORDER.map((cat) => {
@@ -2710,10 +2776,10 @@ export default function MapPage() {
                                               onClick={() => void updateAlertPrefs({
                                                 alertCategories: on ? alertCats.filter((c) => c !== cat) : [...alertCats, cat],
                                               })}
-                                              className="px-2.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em]"
+                                              className="rounded-full px-3 py-1.5 text-[12.5px] font-bold"
                                               style={on
-                                                ? { background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }
-                                                : { background: '#FFFDF8', color: '#5A6B7D', border: '1.5px solid #C9D8E4' }}
+                                                ? { background: '#06162F', color: '#FFFFFF', border: '2px solid #151515' }
+                                                : { background: '#FFFFFF', color: '#565A61', border: '2px solid #151515' }}
                                             >
                                               {DIGEST_CATEGORY_LABEL[cat]}
                                             </button>
@@ -2730,8 +2796,7 @@ export default function MapPage() {
                           <button
                             type="button"
                             onClick={() => setIsEditingPreferences(true)}
-                            className="w-full h-12 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-transform active:scale-[0.98]"
-                            style={{ background: '#06162F', color: '#F2EFE8' }}
+                            className="lv-btn lv-btn-navy lv-btn-block"
                           >
                             Edit preferences
                           </button>
@@ -2740,13 +2805,13 @@ export default function MapPage() {
                         /* ── Edit / onboarding form ─────────────────────────── */
                         <>
                           <div>
-                            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#2E8B7A' }}>
+                            <p className="lv-eyebrow" style={{ color: '#1554D1' }}>
                               {profileNeedsSetup ? 'Set up your report area' : 'Edit preferences'}
                             </p>
-                            <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em] text-[#0B1F33]">
+                            <h3 className="lv-h mt-2">
                               {addressIsSettled ? 'Your report area' : 'Where should we watch?'}
                             </h3>
-                            <p className="mt-2 text-sm leading-relaxed" style={{ color: '#5A6B7D' }}>
+                            <p className="mt-2 text-sm leading-relaxed" style={{ color: '#565A61' }}>
                               {addressIsSettled
                                 ? 'This is the address your briefing is measured from. Change it any time.'
                                 : 'Give an address for a report measured from your door, or just a neighbourhood if you would rather not store one.'}
@@ -2761,12 +2826,12 @@ export default function MapPage() {
                                 alternatives for an address already on file. */}
                             <div className="space-y-2">
                               <span className="flex items-center justify-between gap-3">
-                                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                <span className="lv-eyebrow" style={{ color: '#565A61' }}>
                                   Address or nearby landmark
                                 </span>
                                 <span
-                                  className="px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em]"
-                                  style={{ background: 'rgba(46,139,122,0.14)', color: '#2E8B7A' }}
+                                  className="rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-[0.08em]"
+                                  style={{ background: 'rgba(21,84,209,0.14)', color: '#1554D1' }}
                                 >
                                   Recommended
                                 </span>
@@ -2775,20 +2840,20 @@ export default function MapPage() {
                               {addressIsSettled ? (
                                 /* Settled — confirm it and get out of the way. */
                                 <div
-                                  className="flex items-start gap-3 p-3.5"
-                                  style={{ background: 'rgba(46,139,122,0.08)', border: '1.5px solid rgba(46,139,122,0.45)' }}
+                                  className="flex items-start gap-3 rounded-[16px] p-3.5"
+                                  style={{ background: 'rgba(21,84,209,0.08)', border: '1.5px solid rgba(21,84,209,0.45)' }}
                                 >
                                   <span
                                     className="mt-[1px] grid h-6 w-6 shrink-0 place-items-center"
-                                    style={{ background: '#2E8B7A' }}
+                                    style={{ background: '#1554D1' }}
                                   >
-                                    <Check size={13} style={{ color: '#FFFDF8' }} />
+                                    <Check size={13} style={{ color: '#FFFFFF' }} />
                                   </span>
                                   <span className="min-w-0 flex-1">
-                                    <span className="block text-sm font-bold leading-snug" style={{ color: '#1C2B3A' }}>
+                                    <span className="block text-sm font-bold leading-snug" style={{ color: '#151515' }}>
                                       {profileDraft.address}
                                     </span>
-                                    <span className="mt-0.5 block text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
+                                    <span className="mt-0.5 block text-[11.5px] font-medium" style={{ color: '#565A61' }}>
                                       {profileDraft.inferredNeighborhood
                                         ? `Matched to ${profileDraft.inferredNeighborhood} in the city registry`
                                         : 'Saved as your report area'}
@@ -2798,7 +2863,7 @@ export default function MapPage() {
                                     type="button"
                                     onClick={() => setProfileDraft((prev) => ({ ...prev, address: '', inferredNeighborhood: '' }))}
                                     className="shrink-0 px-2 py-1 text-[11.5px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
-                                    style={{ color: '#1C2B3A' }}
+                                    style={{ color: '#151515' }}
                                   >
                                     Change
                                   </button>
@@ -2813,12 +2878,12 @@ export default function MapPage() {
                                     }}
                                     autoFocus={profileDraft.address.trim().length === 0 && !profileNeedsSetup}
                                     placeholder="Start typing an address, street, or landmark"
-                                    className="h-12 w-full px-4 text-sm outline-none transition-colors focus:border-[#4A90D9]"
-                                    style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
+                                    className="h-12 w-full px-4 text-sm outline-none transition-colors focus:border-[#151515]"
+                                    style={{ background: '#FFFFFF', border: '2px solid #151515', color: '#151515' }}
                                   />
                                   <div className="min-h-6">
                                     {addressQuery.length > 0 && addressQuery.length < 3 && (
-                                      <p className="text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
+                                      <p className="text-[11.5px] font-medium" style={{ color: '#565A61' }}>
                                         Keep typing — matched against the City of Calgary address registry.
                                       </p>
                                     )}
@@ -2829,12 +2894,12 @@ export default function MapPage() {
                                             key={`${item.label}-${item.neighborhood}`}
                                             type="button"
                                             onClick={() => setProfileDraft((prev) => ({ ...prev, address: item.label, inferredNeighborhood: item.neighborhood, neighborhood: '' }))}
-                                            className="px-3 py-2 text-left text-xs font-bold transition-colors hover:bg-[#E8F3FC]"
-                                            style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
+                                            className="rounded-[14px] px-3 py-2 text-left text-xs font-bold transition-colors hover:bg-[#FFF5CC]"
+                                            style={{ background: '#FFFFFF', border: '2px solid #151515', color: '#151515' }}
                                           >
                                             <span className="block truncate">{item.label}</span>
                                             {item.neighborhood && (
-                                              <span className="mt-0.5 block text-[10px] font-medium" style={{ color: '#5A6B7D' }}>
+                                              <span className="mt-0.5 block text-[10px] font-medium" style={{ color: '#565A61' }}>
                                                 {item.neighborhood}
                                               </span>
                                             )}
@@ -2848,9 +2913,9 @@ export default function MapPage() {
                             </div>
 
                             <div className="flex items-center gap-3">
-                              <div className="h-px flex-1" style={{ background: '#E7E0D2' }} />
-                              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>or</span>
-                              <div className="h-px flex-1" style={{ background: '#E7E0D2' }} />
+                              <div className="h-px flex-1" style={{ background: '#E4E1D8' }} />
+                              <span className="lv-eyebrow" style={{ color: '#565A61' }}>or</span>
+                              <div className="h-px flex-1" style={{ background: '#E4E1D8' }} />
                             </div>
 
                             {/* ── Neighbourhood ──────────────────────────────
@@ -2859,7 +2924,7 @@ export default function MapPage() {
                                 option implies the choice is unfinished. */}
                             {!addressIsSettled && (
                               <label className="space-y-2">
-                                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                <span className="lv-eyebrow" style={{ color: '#565A61' }}>
                                   Neighbourhood only
                                 </span>
                                 <input
@@ -2869,12 +2934,12 @@ export default function MapPage() {
                                     setProfileDraft((prev) => ({ ...prev, neighborhood, inferredNeighborhood: '', address: neighborhood.trim() ? '' : prev.address }));
                                   }}
                                   placeholder="Start typing a Calgary neighbourhood"
-                                  className="h-12 w-full px-4 text-sm outline-none transition-colors focus:border-[#4A90D9]"
-                                  style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
+                                  className="h-12 w-full px-4 text-sm outline-none transition-colors focus:border-[#151515]"
+                                  style={{ background: '#FFFFFF', border: '2px solid #151515', color: '#151515' }}
                                 />
                                 <div className="min-h-6">
                                   {neighborhoodQuery.length > 0 && neighborhoodQuery.length < 2 && (
-                                    <p className="text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
+                                    <p className="text-[11.5px] font-medium" style={{ color: '#565A61' }}>
                                       Type 2+ letters — all {neighborhoodSuggestions.length || 300}+ official communities are searchable.
                                     </p>
                                   )}
@@ -2885,8 +2950,8 @@ export default function MapPage() {
                                           key={name}
                                           type="button"
                                           onClick={() => setProfileDraft((prev) => ({ ...prev, neighborhood: name, inferredNeighborhood: '', address: '' }))}
-                                          className="px-3 py-2 text-xs font-bold transition-colors hover:bg-[#E8F3FC]"
-                                          style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
+                                          className="rounded-full px-3 py-2 text-xs font-bold transition-colors hover:bg-[#FFF5CC]"
+                                          style={{ background: '#FFFFFF', border: '2px solid #151515', color: '#151515' }}
                                         >
                                           {name}
                                         </button>
@@ -2897,8 +2962,8 @@ export default function MapPage() {
                               </label>
                             )}
                             {addressIsSettled && (
-                              <p className="text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
-                                Prefer not to store an address? Choose <strong style={{ color: '#1C2B3A' }}>Change</strong> above, then
+                              <p className="text-[11.5px] font-medium" style={{ color: '#565A61' }}>
+                                Prefer not to store an address? Choose <strong style={{ color: '#151515' }}>Change</strong> above, then
                                 give a neighbourhood name instead.
                               </p>
                             )}
@@ -2906,20 +2971,20 @@ export default function MapPage() {
 
                           {(profileDraft.neighborhood.trim() || profileDraft.address.trim()) ? (
                           <label
-                            className="flex cursor-pointer gap-3 p-4"
-                            style={{ background: '#F7F3EA', border: '1.5px solid #C9D8E4' }}
+                            className="flex cursor-pointer gap-3 rounded-[16px] p-4"
+                            style={{ background: '#FAF8F3', border: '2px solid #151515' }}
                           >
                             <input
                               type="checkbox"
                               checked={profileDraft.piiConsent}
                               onChange={(e) => setProfileDraft((prev) => ({ ...prev, piiConsent: e.target.checked }))}
                               className="mt-0.5 h-4 w-4 shrink-0"
-                              style={{ accentColor: '#2E8B7A' }}
+                              style={{ accentColor: '#1554D1' }}
                             />
-                            <span className="text-[13px] leading-relaxed" style={{ color: '#5A6B7D' }}>
-                              <strong style={{ color: '#1C2B3A' }}>Store my location preference.</strong> Calgary Watch keeps your
+                            <span className="text-[13px] leading-relaxed" style={{ color: '#565A61' }}>
+                              <strong style={{ color: '#151515' }}>Store my location preference.</strong> Calgary Watch keeps your
                               profile and report area to run your account, your neighbourhood report and moderation.{' '}
-                              <a href="/privacy" className="font-bold underline underline-offset-2" style={{ color: '#1C2B3A' }}>
+                              <a href="/privacy" className="font-bold underline underline-offset-2" style={{ color: '#151515' }}>
                                 What we keep
                               </a>
                             </span>
@@ -2927,25 +2992,25 @@ export default function MapPage() {
                           ) : <p className="text-sm">Location is optional. Leave it blank to see all of Calgary.</p>}
 
                           <label
-                            className="flex cursor-pointer gap-3 p-4"
-                            style={{ background: 'rgba(46,139,122,0.08)', border: '1.5px solid rgba(46,139,122,0.45)' }}
+                            className="flex cursor-pointer gap-3 rounded-[16px] p-4"
+                            style={{ background: 'rgba(21,84,209,0.08)', border: '1.5px solid rgba(21,84,209,0.45)' }}
                           >
                             <input
                               type="checkbox"
                               checked={profileDraft.weeklyDigestOptIn}
                               onChange={(e) => setProfileDraft((prev) => ({ ...prev, weeklyDigestOptIn: e.target.checked }))}
                               className="mt-0.5 h-4 w-4 shrink-0"
-                              style={{ accentColor: '#2E8B7A' }}
+                              style={{ accentColor: '#1554D1' }}
                             />
-                            <span className="text-[13px] leading-relaxed" style={{ color: '#5A6B7D' }}>
-                              <strong style={{ color: '#1C2B3A' }}>Email me the weekly digest.</strong> Crime stats, notable reports
+                            <span className="text-[13px] leading-relaxed" style={{ color: '#565A61' }}>
+                              <strong style={{ color: '#151515' }}>Email me the weekly digest.</strong> Crime stats, notable reports
                               and community updates for your area. Optional, and you can turn it off any time.
                             </span>
                           </label>
                           <a
                             href="/plans#emails"
-                            className="block px-4 py-3 text-[13px] font-semibold underline underline-offset-2"
-                            style={{ color: '#1C2B3A', background: '#FFF5CC', border: '1.5px solid #E7D27A' }}
+                            className="block rounded-[16px] px-4 py-3 text-[13px] font-semibold underline underline-offset-2"
+                            style={{ color: '#151515', background: '#FFF5CC', border: '2px solid #151515' }}
                           >
                             Also want Thursday weekend picks, your plans and badges? Manage everything in Your CalgaryWatch →
                           </a>
@@ -2955,8 +3020,8 @@ export default function MapPage() {
                               default (nothing ticked) reads as "all". */}
                           {profileDraft.weeklyDigestOptIn && (
                             <div className="space-y-2 px-1">
-                              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
-                                Digest topics <span style={{ color: '#9AA6B2' }}>· all if none picked</span>
+                              <p className="lv-eyebrow" style={{ color: '#565A61' }}>
+                                Digest topics <span style={{ color: '#7A7F87' }}>· all if none picked</span>
                               </p>
                               <div className="flex flex-wrap gap-1.5">
                                 {DIGEST_CATEGORY_ORDER.map((cat) => {
@@ -2972,10 +3037,10 @@ export default function MapPage() {
                                           ? prev.digestCategories.filter((c) => c !== cat)
                                           : [...prev.digestCategories, cat],
                                       }))}
-                                      className="px-2.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] transition-colors"
+                                      className="rounded-full px-3 py-1.5 text-[12.5px] font-bold transition-colors"
                                       style={on
-                                        ? { background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }
-                                        : { background: '#FFFDF8', color: '#5A6B7D', border: '1.5px solid #C9D8E4' }}
+                                        ? { background: '#06162F', color: '#FFFFFF', border: '2px solid #151515' }
+                                        : { background: '#FFFFFF', color: '#565A61', border: '2px solid #151515' }}
                                     >
                                       {DIGEST_CATEGORY_LABEL[cat]}
                                     </button>
@@ -2986,7 +3051,7 @@ export default function MapPage() {
                           )}
 
                           {profileSaveError && (
-                            <p className="px-3 py-2.5 text-[13px] font-bold"
+                            <p className="rounded-[14px] px-3 py-2.5 text-[13px] font-bold"
                                style={{ background: 'rgba(192,57,43,0.08)', border: '1.5px solid rgba(192,57,43,0.45)', color: '#96271C' }}>
                               {profileSaveError}
                             </p>
@@ -2994,18 +3059,13 @@ export default function MapPage() {
 
                           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                             {profileNeedsSetup && (
-                              <Button
-                                variant="secondary"
-                                onClick={skipOnboarding}
-                                className="rounded-none font-mono text-[11px] font-bold uppercase tracking-[0.16em]"
-                                style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#5A6B7D' }}
-                              >
+                              <button type="button" onClick={skipOnboarding} className="lv-btn lv-btn-ghost">
                                 Skip for now
-                              </Button>
+                              </button>
                             )}
                             {!profileNeedsSetup && (
-                              <Button
-                                variant="secondary"
+                              <button
+                                type="button"
                                 onClick={() => {
                                   setIsEditingPreferences(false);
                                   setProfileDraft({
@@ -3018,21 +3078,20 @@ export default function MapPage() {
                                   });
                                   setProfileSaveError(null);
                                 }}
-                                className="rounded-none font-mono text-[11px] font-bold uppercase tracking-[0.16em]"
-                                style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
+                                className="lv-btn lv-btn-ghost"
                               >
                                 Cancel
-                              </Button>
+                              </button>
                             )}
                             {(profileNeedsSetup || isDirty) && (
-                              <Button
+                              <button
+                                type="button"
                                 onClick={saveProfileSettings}
                                 disabled={isSavingProfile}
-                                className="rounded-none font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-opacity hover:opacity-90"
-                                style={{ background: '#06162F', color: '#F2EFE8' }}
+                                className="lv-btn lv-btn-primary"
                               >
                                 {isSavingProfile ? 'Saving…' : 'Save and continue'}
-                              </Button>
+                              </button>
                             )}
                           </div>
                         </>
@@ -3053,8 +3112,7 @@ export default function MapPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[190] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm"
-            style={{ background: 'rgba(20,28,38,0.45)' }}
+            className="lv-scrim fixed inset-0 z-[190] flex items-end sm:items-center justify-center p-4"
             onClick={() => setDigestPromptOpen(false)}
             role="dialog"
             aria-modal="true"
@@ -3065,35 +3123,24 @@ export default function MapPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-              className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl"
-              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
+              className="lv-modal w-full max-w-sm overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative px-6 pt-6 pb-5" style={{ background: 'linear-gradient(135deg, rgba(46,139,122,0.12), rgba(74,144,217,0.1))' }}>
-                <span className="text-2xl" aria-hidden="true">📬</span>
-                <h3 className="mt-2 font-display text-xl font-extrabold tracking-[-0.02em] text-[#1C2B3A]">
-                  {locationLabel !== 'your local report area' ? `${locationLabel}, weekly` : 'Your neighbourhood, weekly'}
+              <div className="lv-sky px-6 pt-6 pb-5">
+                <p className="lv-eyebrow" style={{ color: '#9fe9f5' }}>Weekly email · free</p>
+                <h3 className="mt-2 font-display text-[24px] font-extrabold leading-[1.05] tracking-[-0.03em]" style={{ color: '#fff' }}>
+                  <span className="lv-mark">{locationLabel !== 'your local report area' ? locationLabel : 'Your neighbourhood'}</span>, weekly
                 </h3>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-[#5A6B7D]">
-                  One email a week: real crime and 311 stats for your area, notable
-                  reports, and community news. No spam, opt out anytime.
+                <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.84)' }}>
+                  One email a week: what neighbours reported near you, City 311 figures
+                  for your area, and community news. Opt out any time.
                 </p>
               </div>
-              <div className="flex items-center gap-2.5 px-5 py-4">
-                <button
-                  type="button"
-                  onClick={() => setDigestPromptOpen(false)}
-                  className="flex-1 h-11 rounded-2xl text-[13px] font-bold transition-colors hover:bg-black/5"
-                  style={{ color: '#5A6B7D', border: '1px solid #E7E0D2' }}
-                >
+              <div className="flex items-center gap-3 px-5 py-4">
+                <button type="button" onClick={() => setDigestPromptOpen(false)} className="lv-btn lv-btn-ghost flex-1">
                   Not now
                 </button>
-                <button
-                  type="button"
-                  onClick={() => void enableDigest()}
-                  className="flex-[1.4] h-11 rounded-2xl text-[13px] font-black transition-transform active:scale-[0.97]"
-                  style={{ background: '#1C2B3A', color: '#FFFDF8' }}
-                >
+                <button type="button" onClick={() => void enableDigest()} className="lv-btn lv-btn-primary flex-[1.4]">
                   Email me the digest
                 </button>
               </div>
@@ -3110,42 +3157,16 @@ export default function MapPage() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 280, damping: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[210] pointer-events-none"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[210] pointer-events-none w-max max-w-[calc(100vw-2rem)]"
+            role="status"
           >
-            <div
-              className="relative flex items-center gap-3 pl-4 pr-5 py-3.5 rounded-2xl shadow-2xl overflow-visible"
-              style={{ background: '#1C2B3A', border: '1px solid rgba(46,139,122,0.5)' }}
-            >
-              {/* confetti burst */}
-              {['#4A90D9', '#2E8B7A', '#C77F18', '#C0392B', '#6A63A8', '#2E8B7A', '#C77F18', '#4A90D9', '#C0392B', '#4A90D9'].map((c, i) => (
-                <motion.span
-                  key={i}
-                  className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
-                  style={{ background: c }}
-                  initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                  animate={{
-                    x: Math.cos((i / 10) * Math.PI * 2) * (52 + (i % 3) * 22),
-                    y: Math.sin((i / 10) * Math.PI * 2) * (36 + (i % 3) * 16),
-                    opacity: 0,
-                    scale: 0.4,
-                  }}
-                  transition={{ duration: 1, delay: 0.1, ease: 'easeOut' }}
-                  aria-hidden="true"
-                />
-              ))}
-              <motion.span
-                initial={{ scale: 0, rotate: -30 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 14, delay: 0.05 }}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base"
-                style={{ background: 'rgba(46,139,122,0.25)' }}
-                aria-hidden="true"
-              >
-                🎉
-              </motion.span>
+            <div className="lv-toast lv-toast-navy">
+              <span className="lv-toast-icon" style={{ background: '#ffdf4f', color: '#151515' }} aria-hidden="true">
+                <Check size={18} strokeWidth={3} />
+              </span>
               <div>
-                <p className="text-[13px] font-black" style={{ color: '#FFFDF8' }}>On the map!</p>
-                <p className="text-[11px] font-medium" style={{ color: '#9AA6B2' }}>{celebration}</p>
+                <p className="font-display text-[15px] font-extrabold">On the map</p>
+                <p className="text-[12.5px] font-medium" style={{ color: '#a9b8d0' }}>{celebration}</p>
               </div>
             </div>
           </motion.div>
@@ -3159,27 +3180,26 @@ export default function MapPage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-3 bg-[#06162F] border-[1.5px] border-[#C0392B] shadow-[0_10px_28px_rgba(11,31,51,0.28)] backdrop-blur-xl text-[#F2EFE8] text-xs font-bold"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[calc(100vw-2rem)]"
+            role="alert"
           >
-            <ShieldAlert size={14} className="shrink-0 text-[#E8B871]" />
-            {submitError}
-            <button onClick={() => setSubmitError(null)} className="ml-1 text-[#AFC5DF] hover:text-[#F2EFE8] transition-colors">
-              <X size={14} />
-            </button>
+            <div className="lv-toast">
+              <span className="lv-toast-icon" style={{ background: '#fff5cc' }} aria-hidden="true">
+                <ShieldAlert size={16} />
+              </span>
+              <span>{submitError}</span>
+              <button type="button" onClick={() => setSubmitError(null)} aria-label="Dismiss" className="lv-close" style={{ width: 32, height: 32, borderRadius: 10 }}>
+                <X size={14} />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/*
-        Geolocation notice.
-
-        This used to sit centred at the very top, where on a phone it wrapped to
-        four lines and covered the search field, the home button and the whole
-        category chip row — the primary controls — until it was dismissed by
-        hand. It now sits below the mobile filter bar and the desktop header,
-        stays on one line, and clears itself, because a
-        denied location is a minor fallback rather than an error the map needs
-        to keep insisting on.
+        Geolocation notice. Sits below the phone chrome and the desktop bar,
+        stays on one line, and clears itself: a denied location is a minor
+        fallback, not an error the map needs to keep insisting on.
       */}
       <AnimatePresence>
         {locationError && (
@@ -3188,20 +3208,16 @@ export default function MapPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
             role="status"
-            className="fixed left-3 top-[calc(6.5rem+env(safe-area-inset-top))] z-[200] max-w-[calc(100vw-5rem)]
-                       lg:left-1/2 lg:top-24 lg:-translate-x-1/2 lg:max-w-[calc(100vw-2rem)]
-                       flex items-center gap-2 px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.24)] backdrop-blur-xl
-                       bg-[#06162F] border-[1.5px] border-[#E8B871] text-[#F2EFE8] text-[12px] font-semibold whitespace-nowrap"
+            className="fixed left-3 top-[calc(var(--cw-chrome-h,10rem)+0.75rem)] z-[200] max-w-[calc(100vw-5.5rem)]
+                       lg:left-1/2 lg:top-[5.5rem] lg:-translate-x-1/2 lg:max-w-[calc(100vw-2rem)]"
           >
-            <Navigation size={13} className="shrink-0 text-[#E8B871]" />
-            <span className="truncate">Location off. Showing all of Calgary</span>
-            <button
-              onClick={() => setLocationError(false)}
-              aria-label="Dismiss"
-              className="shrink-0 -mr-1 p-1 text-[#AFC5DF] hover:text-[#F2EFE8] transition-colors"
-            >
-              <X size={13} />
-            </button>
+            <div className="lv-toast whitespace-nowrap" style={{ padding: '8px 8px 8px 14px', borderRadius: 999, boxShadow: '3px 3px 0 #151515' }}>
+              <Navigation size={14} className="shrink-0" style={{ color: '#1554D1' }} />
+              <span className="truncate">Location off. Showing all of Calgary</span>
+              <button type="button" onClick={() => setLocationError(false)} aria-label="Dismiss" className="grid size-7 shrink-0 place-items-center rounded-full hover:bg-[#FFF5CC]">
+                <X size={13} />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -3213,6 +3229,8 @@ export default function MapPage() {
       <div className="relative z-40 hidden h-full shrink-0 flex-col lg:flex" data-tour="feed">
         <Sidebar
           incidents={feedIncidents}
+          briefingIncidents={nearArea ? briefingIncidents : undefined}
+          areaName={nearArea?.name}
           timeWindow={timeWindow}
           onTimeWindowChange={setTimeWindow}
           onIncidentClick={handleSidebarIncidentClick}
@@ -3257,11 +3275,12 @@ export default function MapPage() {
 
         {/* Tap-to-close: covers the exposed map only. It starts below the chrome —
             at top-0 it swallowed the chrome's own controls, so tapping Home or a
-            category chip collapsed the sheet instead of acting. */}
+            time chip collapsed the sheet instead of acting. The sheet itself
+            (z-[52]) sits over the rest. */}
         {sheetState === 'raised' && (
           <div
-            className="fixed inset-x-0 z-[49] cursor-pointer lg:hidden"
-            style={{ top: 'var(--cw-chrome-h, 0px)', bottom: `${RAISED_FRACTION * 100}vh` }}
+            className="fixed inset-x-0 bottom-0 z-[49] cursor-pointer lg:hidden"
+            style={{ top: 'var(--cw-chrome-h, 0px)' }}
             onClick={() => setSheetState('rail')}
             aria-hidden="true"
           />
@@ -3284,124 +3303,97 @@ export default function MapPage() {
           onLoadMore={handleLoadMoreIncidents}
           onIncidentClick={handleSheetIncidentClick}
           onNeighbourhoodSelect={handleSheetNeighbourhoodSelect}
-          onReportPress={() => {
-            setSheetState('rail');
-            setIsFormOpen(true);
-          }}
+          onReportPress={() => requestReport(null)}
           activeIncidentId={activeIncidentId}
           hidden={isFormOpen || isPinMode || isEmergencyPinMode}
+          briefing={
+            /* ── NowBriefing slot (feed worker's component) ── */
+            <>
+              {nearArea && (
+                <button
+                  type="button"
+                  className="lv-chip lv-chip-sm mb-2"
+                  style={{ background: '#fff5cc' }}
+                  onClick={() => setNearArea(null)}
+                  aria-label={`Stop focusing on ${nearArea.name}`}
+                >
+                  <MapPin size={13} /> Near {nearArea.name} <X size={13} />
+                </button>
+              )}
+              <NowBriefing
+              incidents={briefingIncidents}
+              window={timeWindow}
+              areaName={nearArea?.name}
+              selectedCategory={selectedCategory}
+              onSelectCategory={(c) => setSelectedCategory(c as IncidentCategory | 'all')}
+              />
+            </>
+          }
         />
 
-        {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
+        {/* ── Phone chrome: navy live-sky bar. Wordmark + Live, a search entry
+            that raises the sheet with the caret in its field, and the time
+            chips, which drive the map and the feed together. Measured into
+            --cw-chrome-h. ──────────────────────────────────────────────── */}
         <div
           ref={chromeRef}
-          className={cn(
-            'absolute inset-x-0 top-0 z-[51] px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] text-[#0B1F33] transition-all duration-200 pointer-events-none lg:hidden',
-            (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible -translate-y-4'
-          )}
+          className="lv-mtop lv-sky lv-tear lg:hidden"
+          data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}
         >
-          <div className="flex items-center gap-2 pointer-events-auto">
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="flex size-11 shrink-0 items-center justify-center border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
-              aria-label="Back to home"
-            >
-              <Home size={18} />
-            </button>
-            {/* No aria-label: it previously overrode the visible headline,
-                sub-label and count badge with static text that omitted the
-                count entirely (WCAG 2.5.3, Label in Name). Letting the
-                button's own content compute the accessible name means the
-                live count a reader can see is exactly what a voice-control
-                user can speak. */}
-            <button
-              type="button"
-              data-tour="m-feed"
-              onClick={() => sheetRef.current?.raiseAndFocusSearch()}
-              className="flex h-11 min-w-0 flex-1 items-center gap-3 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 text-left shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-transform active:scale-[0.99]"
-            >
-              <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-                <span className={cn('relative inline-flex h-2 w-2', feedCount > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]')} />
-              </span>
-              <div className="min-w-0 flex-1 leading-none">
-                <p className="truncate font-display text-[13px] font-black tracking-[-0.02em] text-[#0B1F33]">
-                  {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
-                </p>
-                <p className="mt-1 truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
-                  {feedCount === 0 ? 'Be first to report' : 'Tap to search the feed'}
-                </p>
-              </div>
-              {/* Colours are inline because the app's `light:` theme layer was
-                  overriding bg-slate-900 to a cream tone while the label stayed
-                  white, leaving the live count invisible on mobile. */}
-              <span
-                className="shrink-0 px-2 py-1 text-[11px] font-black tabular-nums"
-                style={{ background: '#06162F', color: '#F2EFE8' }}
-              >
-                {feedCount}
-              </span>
-              <Search size={15} className="shrink-0 text-[#40566B]" />
-            </button>
+          <div className="lv-mtop-row">
+            <DesktopMapBrandMark compact />
+            <span className="ml-auto" />
+            <LivePill />
           </div>
+          {/* No aria-label: the visible text and count are the accessible
+              name (WCAG 2.5.3, Label in Name). */}
+          <button
+            type="button"
+            data-tour="m-feed"
+            onClick={() => sheetRef.current?.raiseAndFocusSearch()}
+            className="lv-search"
+          >
+            <Search size={18} className="shrink-0" />
+            <span className="lv-search-label">
+              Search reports or areas
+            </span>
+            <span className="lv-search-count">
+              {feedCount} {feedCount === 1 ? 'report' : 'reports'}
+            </span>
+          </button>
+          <WhenChips value={timeWindow} onChange={setTimeWindow} />
         </div>
 
-        {/* Mobile vertical action buttons (right edge). z-[51], matching the
-            chrome bar, keeps these above the tap-to-close scrim (z-[49]) and
-            below the raised sheet (z-[52] in MobileMapSheet.tsx — the sheet
-            must win where it overlaps this column, so its own masthead and
-            search row stay tappable instead of a button poking through) —
-            the container stays pointer-events-none between the buttons, so
-            the scrim still catches taps on the exposed map around them. */}
-        <div
-          className={cn(
-            'absolute right-3 top-28 z-[51] flex flex-col gap-2 pointer-events-none text-[#0B1F33] transition-all duration-200 lg:hidden',
-            (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible translate-x-4'
-          )}
-        >
+        {/* Phone action rail (right edge): locate, alerts, account. z-[51]
+            keeps it above the tap-to-close scrim (z-[49]) and below the raised
+            sheet (z-[52]). The column itself ignores pointer events so the
+            scrim still catches taps on the map around the buttons. */}
+        <div className="lv-rail lg:hidden" data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}>
           <button
             type="button"
             onClick={handleLocate}
             data-tour="near-me"
-            className={cn(
-              'pointer-events-auto flex size-11 items-center justify-center border-[1.5px] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors active:scale-[0.98]',
-              nearMeOpen
-                ? 'border-[#06162F] bg-[#06162F] text-[#F2EFE8]'
-                : 'border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#2F6FB0]'
-            )}
+            data-on={nearMeOpen ? 'true' : undefined}
+            className="lv-sq"
             aria-label="What's near me"
+            aria-pressed={nearMeOpen}
           >
-            <Navigation size={18} />
+            <Navigation size={20} strokeWidth={2.2} />
           </button>
-          <div className="relative pointer-events-auto">
-            <button
-              type="button"
-              onClick={toggleNotifications}
-              data-tour="m-alerts"
-              className="relative flex size-11 items-center justify-center border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
-              aria-label="Notifications"
-            >
-              <Bell size={18} className={cn(unreadNotifications > 0 && 'text-[#2F6FB0]')} />
-              {unreadNotifications > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 min-w-[14px] items-center justify-center border-2 border-[#FFFDF8] bg-[#C0392B] px-0.5 text-[10px] font-black text-[#FFFDF8]">
-                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                </span>
-              )}
-            </button>
-          </div>
-          <div className="relative pointer-events-auto">
+          <button
+            type="button"
+            onClick={toggleNotifications}
+            data-tour="m-alerts"
+            className="lv-sq"
+            aria-label={bellLabel(unreadNotifications)}
+          >
+            <Bell size={20} strokeWidth={2.2} />
+            <UnreadBadge count={unreadNotifications} />
+          </button>
+          <div className="relative">
             {user ? (
-              <button
-                type="button"
-                onClick={toggleUserMenu}
-                className="flex size-11 items-center justify-center overflow-hidden border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg"
-                aria-label="Account menu"
-              >
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" crossOrigin="anonymous" />
-                ) : (
-                  <span className="text-xs font-black text-[#1C2B3A]">{(user.displayName?.[0] ?? user.email?.[0] ?? 'U').toUpperCase()}</span>
-                )}
+              <button type="button" onClick={toggleUserMenu} className="lv-sq" aria-label="Account menu" aria-expanded={showUserMenu}>
+                <AvatarFace user={user} />
               </button>
             ) : (
               <button
@@ -3409,65 +3401,28 @@ export default function MapPage() {
                 onClick={() => openAuthPanel('signin')}
                 aria-label="Sign up or sign in"
                 title="Sign up or sign in"
-                className="flex size-11 items-center justify-center gap-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#0B1F33] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg active:scale-[0.98] md:w-auto md:px-3.5"
+                className="lv-sq"
               >
-                <LogIn size={16} />
-                <span className="hidden md:inline">Sign up / sign in</span>
+                <LogIn size={19} strokeWidth={2.2} />
               </button>
             )}
-            <AnimatePresence>
-              {showUserMenu && user && (
-                <motion.div
-                  initial={{ opacity: 0, x: 8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 8 }}
-                  className="absolute right-full mr-3 top-0 w-52 border-[1.5px] border-[#0B1F33] bg-[#FFFDF8] backdrop-blur-xl shadow-[0_10px_28px_rgba(11,31,51,0.20)] z-[60] pointer-events-auto"
-                >
-                  <div className="border-b-[1.5px] border-[#C9D8E4] bg-[#F7F3EA] p-3">
-                    <p className="text-xs font-bold truncate" style={{ color: '#1C2B3A' }}>{user.displayName}</p>
-                    <p className="text-[10px] truncate" style={{ color: '#5A6B7D' }}>{user.email}</p>
-                  </div>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => { navigate('/admin'); setShowUserMenu(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#2F6FB0] hover:bg-[#E8F3FC] text-left"
-                    >
-                      <LayoutDashboard size={14} />
-                      Admin
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => openAuthPanel('settings')}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] text-left"
-                  >
-                    <Settings size={14} />
-                    Settings
-                  </button>
-                  <button
-                    type="button"
-                    onClick={replayTour}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] text-left"
-                  >
-                    <HelpCircle size={14} />
-                    App tour
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { logout(); setShowUserMenu(false); }}
-                    className="w-full flex items-center gap-2 border-t-[1.5px] border-[#C9D8E4] px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] text-left"
-                  >
-                    <LogOut size={14} />
-                    Sign out
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {user && (
+              <UserMenu
+                open={showUserMenu}
+                user={user}
+                isAdmin={isAdmin}
+                motionFrom="side"
+                className="!top-0 !right-[calc(100%+12px)] z-[60]"
+                onAdmin={() => { navigate('/admin'); setShowUserMenu(false); }}
+                onSettings={() => openAuthPanel('settings')}
+                onTour={replayTour}
+                onSignOut={() => { logout(); setShowUserMenu(false); }}
+              />
+            )}
           </div>
         </div>
 
-        {/* Near Me Panel — bottom sheet (mobile), centered card (desktop) */}
+        {/* Near Me Panel — card above the sheet rail (phone), bottom-left card (desktop) */}
         <AnimatePresence>
           {nearMeOpen && (
             <motion.div
@@ -3478,65 +3433,41 @@ export default function MapPage() {
               transition={{ type: 'spring', damping: 26, stiffness: 220 }}
               className={cn(
                 'absolute z-40 pointer-events-auto',
-                // Clears the sheet's rail rather than sitting under it. This
-                // panel used to be pinned 24px off the bottom, which put its
-                // action buttons behind the rail on every phone — it is opened
-                // by the locate button, so the one control that summons it was
-                // also the one thing guaranteed to be covered. The fallback
-                // matches the rail's typical measured height, so it is right
-                // even in the frame before the sheet has measured itself.
+                // Clears the sheet's measured rail rather than sitting under it.
                 'bottom-[calc(var(--cw-rail-h,66px)+1.5rem)] left-3 right-3',
                 'lg:left-6 lg:right-auto lg:bottom-24 lg:w-[24rem]',
               )}
+              role="dialog"
+              aria-label="Near me"
             >
-              <div className="bg-[rgba(255,253,248,0.97)] backdrop-blur-md shadow-2xl overflow-hidden" style={{ border: '1.5px solid #0B1F33' }}>
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                  <div className="flex items-center gap-2">
-                    <Navigation size={14} className="text-blue-600" />
-                    <span className="text-xs font-black uppercase tracking-widest text-blue-700">
-                      {nearMeStage === 'arrived' ? 'Your location' : 'Near You'}
-                    </span>
-                    {nearMeStage === 'results' && (
-                      <span className="text-[10px] text-[#5A6B7D] font-semibold">within {NEAR_ME_RADIUS_KM} km</span>
-                    )}
-                  </div>
+              <div className="lv-card lv-card-shadow lv-near">
+                <div className="lv-near-head">
+                  <span className="lv-eyebrow lv-eyebrow-blue flex items-center gap-1.5">
+                    <Navigation size={13} />
+                    {nearMeStage === 'arrived' ? 'Your location' : `Within ${NEAR_ME_RADIUS_KM} km`}
+                  </span>
                   <button
+                    type="button"
                     onClick={() => { setNearMeOpen(false); setNearMeScanning(false); }}
-                    className="w-7 h-7 flex items-center justify-center bg-[#E8F3FC] hover:bg-[#C9D8E4] text-[#5A6B7D] transition-colors"
+                    className="lv-close"
+                    style={{ width: 34, height: 34, borderRadius: 10 }}
                     aria-label="Close near me panel"
                   >
-                    <X size={13} />
+                    <X size={15} />
                   </button>
                 </div>
 
                 {nearMeStage === 'arrived' ? (
-                  /* ── Arrival ──────────────────────────────────────────────
-                      Show them where they are and ask before moving the map
-                      somewhere else. The old flow flew straight to the nearest
-                      incident, which took the map off the thing they had just
-                      asked to see. */
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    className="px-4 pb-4 pt-1"
-                  >
+                  /* Arrival: show them where they are and ask before moving
+                     the map somewhere else. */
+                  <div className="px-4 pb-4">
                     <div className="flex items-start gap-3">
-                      <span className="relative mt-0.5 grid h-9 w-9 shrink-0 place-items-center" aria-hidden="true">
-                        <motion.span
-                          className="absolute inset-0 rounded-full"
-                          style={{ background: 'rgba(74,144,217,0.22)' }}
-                          animate={{ scale: [1, 1.9], opacity: [0.7, 0] }}
-                          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
-                        />
-                        <span className="relative h-3 w-3 rounded-full border-2 border-white shadow" style={{ background: '#4A90D9' }} />
-                      </span>
+                      <span className="lv-near-dot mt-0.5" aria-hidden="true"><i /></span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-black leading-tight" style={{ color: '#1C2B3A' }}>
+                        <p className="lv-h-sm">
                           {userLocation ? 'This is where you are' : 'Showing central Calgary'}
                         </p>
-                        <p className="mt-1 text-[12px] font-medium leading-snug" style={{ color: '#5A6B7D' }}>
+                        <p className="lv-small mt-1">
                           {userLocation
                             ? 'Your pin stays on the map while you look around.'
                             : 'Turn on location in your browser to centre the map on you.'}
@@ -3544,22 +3475,17 @@ export default function MapPage() {
                       </div>
                     </div>
 
-                    <div className="mt-3.5 space-y-2">
-                      <button
-                        type="button"
-                        onClick={startNearMeScan}
-                        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-transform active:scale-[0.99]"
-                        style={{ background: '#1C2B3A', color: '#FFFDF8' }}
-                      >
-                        <span className="min-w-0">
-                          <span className="block text-[13.5px] font-black leading-tight">See what is near me</span>
-                          <span className="block text-[11px] font-medium opacity-75">
+                    <div className="mt-4 space-y-2.5">
+                      <button type="button" onClick={startNearMeScan} className="lv-btn lv-btn-primary lv-btn-block justify-between" style={{ minHeight: 54, borderRadius: 16 }}>
+                        <span className="min-w-0 text-left">
+                          <span className="block text-[14.5px] font-extrabold leading-tight">See what is near me</span>
+                          <span className="block text-[12px] font-medium opacity-80 mt-0.5">
                             {nearMeIncidents.length > 0
                               ? `${nearMeIncidents.length} report${nearMeIncidents.length === 1 ? '' : 's'} within ${NEAR_ME_RADIUS_KM} km`
-                              : `Scan ${NEAR_ME_RADIUS_KM} km around this pin`}
+                              : `Look ${NEAR_ME_RADIUS_KM} km around this pin`}
                           </span>
                         </span>
-                        <ArrowRight size={16} className="shrink-0" />
+                        <ArrowRight size={17} className="shrink-0" />
                       </button>
 
                       {/* The deeper version of the same question, for people
@@ -3568,135 +3494,78 @@ export default function MapPage() {
                         <button
                           type="button"
                           onClick={() => { setNearMeOpen(false); setBriefingOpen(true); }}
-                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors"
-                          style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.3)' }}
+                          className="lv-btn lv-btn-ghost lv-btn-block justify-between"
+                          style={{ minHeight: 54, borderRadius: 16 }}
                         >
-                          <span className="min-w-0">
-                            <span className="block text-[13.5px] font-black leading-tight" style={{ color: '#1C2B3A' }}>
-                              Open my full briefing
-                            </span>
-                            <span className="block text-[11px] font-medium" style={{ color: '#5A6B7D' }}>
+                          <span className="min-w-0 text-left">
+                            <span className="block text-[14px] font-extrabold leading-tight">Open my full briefing</span>
+                            <span className="block truncate text-[12px] font-medium mt-0.5" style={{ color: '#565a61' }}>
                               Measured from {preferredAddress}
                             </span>
                           </span>
-                          <ArrowRight size={16} className="shrink-0" style={{ color: '#2E8B7A' }} />
+                          <ArrowRight size={17} className="shrink-0" style={{ color: '#1554D1' }} />
                         </button>
                       )}
                     </div>
-                  </motion.div>
+                  </div>
                 ) : nearMeScanning ? (
-                  /* ── Radar scan — anticipation beat before the reveal ── */
-                  <div className="px-4 pb-6 pt-1 flex flex-col items-center">
-                    <div className="relative h-24 w-24" aria-hidden="true">
-                      {[0, 0.45, 0.9].map((d) => (
-                        <motion.span
-                          key={d}
-                          className="absolute inset-0 rounded-full border-2"
-                          style={{ borderColor: '#2E8B7A' }}
-                          initial={{ scale: 0.25, opacity: 0.8 }}
-                          animate={{ scale: 1.15, opacity: 0 }}
-                          transition={{ duration: 1.3, delay: d, repeat: Infinity, ease: 'easeOut' }}
-                        />
-                      ))}
-                      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-[#4A90D9] border-2 border-[#fff] shadow-[0_0_12px_2px_rgba(74,144,217,0.6)]" />
-                    </div>
-                    <p className="mt-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[#2E8B7A]">
-                      Scanning your 3 km…
-                    </p>
-                    <p className="mt-1 text-[10.5px] text-[#5A6B7D] font-medium">
-                      Checking community + city + weather feeds
-                    </p>
+                  <div className="px-4 pb-6 pt-2 flex flex-col items-center text-center">
+                    <span className="lv-loading-spin" style={{ borderColor: 'rgba(21,21,21,0.15)', borderTopColor: '#1554D1' }} aria-hidden="true" />
+                    <p className="mt-3 lv-eyebrow lv-eyebrow-blue">Looking within 3 km…</p>
+                    <p className="lv-small mt-1">Reports already on the map around your pin</p>
                   </div>
                 ) : nearMeIncidents.length === 0 ? (
-                  /* ── All clear — celebrate it ── */
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                    className="relative px-4 pb-5 pt-2 text-center overflow-hidden"
-                  >
-                    {/* confetti burst */}
-                    {['#4A90D9', '#2E8B7A', '#C77F18', '#C0392B', '#6A63A8', '#2E8B7A', '#C77F18', '#4A90D9', '#C0392B', '#4A90D9'].map((c, i) => (
-                      <motion.span
-                        key={i}
-                        className="absolute left-1/2 top-8 h-1.5 w-1.5 rounded-full"
-                        style={{ background: c }}
-                        initial={{ x: 0, y: 0, opacity: 1 }}
-                        animate={{
-                          x: Math.cos((i / 8) * Math.PI * 2) * (44 + (i % 3) * 16),
-                          y: Math.sin((i / 8) * Math.PI * 2) * (30 + (i % 3) * 12),
-                          opacity: 0,
-                        }}
-                        transition={{ duration: 1, delay: 0.15, ease: 'easeOut' }}
-                        aria-hidden="true"
-                      />
-                    ))}
-                    <p className="text-2xl" aria-hidden="true">✨</p>
-                    <p className="mt-1 text-base font-black text-stone-900">All clear around you</p>
-                    <p className="text-[11px] text-[#5A6B7D] mt-1 font-medium">
-                      Zero open reports within {NEAR_ME_RADIUS_KM} km. That's the whole point of watching.
+                  <div className="px-4 pb-5 pt-1">
+                    <p className="lv-h-sm">Nothing posted within {NEAR_ME_RADIUS_KM} km</p>
+                    <p className="lv-small mt-1.5">
+                      No reports on the map around you right now. Quiet maps are normal, and an empty map isn&rsquo;t proof nothing happened.
                     </p>
-                  </motion.div>
+                  </div>
                 ) : (
                   <>
-                    {/* Reveal headline — the payoff after the scan */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                      className="px-4 pb-2 flex items-center gap-2"
-                    >
-                      <span className="text-lg" aria-hidden="true">
-                        {nearMeIncidents.length <= 3 ? '👀' : '📡'}
-                      </span>
-                      <p className="text-[13.5px] font-black text-stone-900">
-                        {nearMeIncidents.length === 1
-                          ? '1 thing to know nearby'
-                          : `${nearMeIncidents.length} things to know nearby`}
-                      </p>
-                    </motion.div>
+                    <p className="px-4 pb-2.5 lv-h-sm">
+                      {nearMeIncidents.length === 1
+                        ? '1 report nearby'
+                        : `${nearMeIncidents.length} reports nearby`}
+                    </p>
 
-                    {/* Incident card */}
                     {(() => {
                       const inc = nearMeIncidents[nearMeIndex];
                       if (!inc) return null;
-                      // Straight from CATEGORY: the old map used remapped
-                      // Tailwind names, and painted emergency red onto traffic
-                      // and infrastructure cards that are not emergencies.
                       const catInk = categoryColor(inc.category);
                       const age = Date.now() - inc.timestamp;
                       const ageStr = age < 60_000 ? 'Just now'
-                        : age < 3_600_000 ? `${Math.round(age / 60_000)}m ago`
-                        : age < 86_400_000 ? `${Math.round(age / 3_600_000)}h ago`
-                        : `${Math.round(age / 86_400_000)}d ago`;
-
+                        : age < 3_600_000 ? `${Math.round(age / 60_000)} min ago`
+                        : age < 86_400_000 ? `${Math.round(age / 3_600_000)} h ago`
+                        : `${Math.round(age / 86_400_000)} d ago`;
                       return (
                         <div className="px-4 pb-3">
-                          <div
-                            className="p-3.5 cursor-pointer"
-                            style={{ background: `${catInk}14`, border: `1.5px solid ${catInk}59` }}
+                          <button
+                            type="button"
+                            className="lv-near-card"
+                            style={{ borderLeft: `8px solid ${catInk}` }}
                             onClick={() => {
                               handleMarkerClick(inc);
                               setNearMeOpen(false);
                             }}
                           >
-                            <div className="flex items-start justify-between gap-2 mb-1.5">
-                              <span className="text-[10px] font-black uppercase tracking-widest opacity-80">{inc.category}</span>
-                              <span className="text-[10px] text-[#5A6B7D] font-semibold shrink-0">{ageStr}</span>
-                            </div>
-                            <p className="text-sm font-black text-[#1C2B3A] leading-snug mb-1">{inc.title}</p>
-                            <p className="text-[11px] text-[#5A6B7D] line-clamp-2 leading-relaxed">{inc.description}</p>
-                            <div className="flex items-center gap-1 mt-2">
-                              <span className="text-[10px] text-[#5A6B7D]">{inc._dist < 1 ? `${Math.round(inc._dist * 1000)}m` : `${inc._dist.toFixed(1)} km`} away · {inc.neighborhood}</span>
-                            </div>
-                          </div>
+                            <span className="flex items-center justify-between gap-2">
+                              <span className="lv-eyebrow" style={{ color: '#151515' }}>{inc.category}</span>
+                              <span className="font-mono text-[11px] text-[#565a61] shrink-0">{ageStr}</span>
+                            </span>
+                            <span className="mt-1.5 block text-[15px] font-bold leading-snug text-[#151515]">{inc.title}</span>
+                            <span className="mt-1 block text-[12.5px] leading-relaxed text-[#565a61] line-clamp-2">{inc.description}</span>
+                            <span className="mt-2 block text-[12px] font-semibold text-[#151515]">
+                              {inc._dist < 1 ? `${Math.round(inc._dist * 1000)} m` : `${inc._dist.toFixed(1)} km`} away{inc.neighborhood ? ` · ${inc.neighborhood}` : ''}
+                            </span>
+                          </button>
                         </div>
                       );
                     })()}
 
-                    {/* Arrow navigation + counter */}
-                    <div className="flex items-center justify-between px-4 pb-4 pt-1">
+                    <div className="flex items-center justify-between gap-2 px-4 pb-4 pt-1">
                       <button
+                        type="button"
                         onClick={() => {
                           const next = Math.max(0, nearMeIndex - 1);
                           setNearMeIndex(next);
@@ -3704,7 +3573,7 @@ export default function MapPage() {
                           if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
                         }}
                         disabled={nearMeIndex === 0}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-[#1C2B3A] text-xs font-bold transition-colors"
+                        className="lv-near-nav"
                       >
                         ← Prev
                       </button>
@@ -3715,11 +3584,13 @@ export default function MapPage() {
                           const loc = userLocation || CALGARY_CENTER;
                           mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 15 : 11);
                         }}
-                        className="text-[11px] font-semibold underline underline-offset-2 text-[#5A6B7D] transition-opacity hover:opacity-70"
+                        className="lv-link text-[12px]"
+                        style={{ color: '#565a61' }}
                       >
                         {nearMeIndex + 1} of {nearMeIncidents.length} · back to me
                       </button>
                       <button
+                        type="button"
                         onClick={() => {
                           const next = Math.min(nearMeIncidents.length - 1, nearMeIndex + 1);
                           setNearMeIndex(next);
@@ -3727,7 +3598,7 @@ export default function MapPage() {
                           if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
                         }}
                         disabled={nearMeIndex === nearMeIncidents.length - 1}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-[#1C2B3A] text-xs font-bold transition-colors"
+                        className="lv-near-nav"
                       >
                         Next →
                       </button>
@@ -3737,31 +3608,26 @@ export default function MapPage() {
 
                 {/* Weekly digest opt-in — wired to the existing profile setting */}
                 {nearMeStage === 'results' && !nearMeScanning && (!user || userProfile?.weeklyDigestOptIn !== true) && (
-                  <motion.button
+                  <button
                     type="button"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35, duration: 0.4 }}
                     onClick={() => {
                       setNearMeOpen(false);
                       openAuthPanel(user ? 'settings' : 'signin');
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[rgba(46,139,122,0.14)]"
-                    style={{ background: 'rgba(46,139,122,0.09)', borderTop: '1px dashed #E7E0D2' }}
+                    className="lv-digest-row"
                   >
-                    <span className="text-base shrink-0" aria-hidden="true">📬</span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[12px] font-black text-stone-900 leading-tight">
-                        Want this weekly, without opening the app?
+                      <span className="block text-[13px] font-extrabold leading-tight text-[#151515]">
+                        Want this weekly, without opening the map?
                       </span>
-                      <span className="block text-[10.5px] text-[#5A6B7D] font-medium mt-0.5">
-                        Real stats for your neighbourhood + community news, by email. Free, opt out anytime.
+                      <span className="block text-[12px] text-[#565a61] font-medium mt-0.5">
+                        What was reported near you plus community news, by email. Free, opt out any time.
                       </span>
                     </span>
-                    <span className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#2E8B7A]">
+                    <span className="shrink-0 text-[12.5px] font-extrabold text-[#1554d1]">
                       {user ? 'Turn on' : 'Sign up'} →
                     </span>
-                  </motion.button>
+                  </button>
                 )}
               </div>
             </motion.div>
@@ -3769,7 +3635,7 @@ export default function MapPage() {
         </AnimatePresence>
 
         {/* On phones this is a real bottom sheet, not a narrow popover hanging
-            from the map button. It gets its own stacking context so the report
+            from the rail button. It gets its own stacking context so the report
             preview can never fall behind the draggable feed sheet. */}
         <AnimatePresence>
           {showNotifications && (
@@ -3784,240 +3650,158 @@ export default function MapPage() {
                 type="button"
                 aria-label="Close notifications"
                 onClick={() => setShowNotifications(false)}
-                className="absolute inset-0 h-full w-full bg-[#06162F]/45"
+                className="lv-scrim absolute inset-0 h-full w-full"
               />
               <motion.section
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="mobile-notifications-title"
-                className="absolute inset-x-0 bottom-0 flex max-h-[82dvh] flex-col overflow-hidden bg-[#FFFDF8] pb-[env(safe-area-inset-bottom)]"
-                style={{ borderTop: '1.5px solid #0B1F33' }}
+                className="lv-msheet absolute inset-x-0 bottom-0 flex max-h-[82dvh] flex-col overflow-hidden pb-[env(safe-area-inset-bottom)]"
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="flex justify-center py-2" aria-hidden="true">
-                  <span className="h-1 w-10 rounded-full bg-[#C9D8E4]" />
+                <div className="flex justify-center pt-2.5 pb-1" aria-hidden="true">
+                  <span className="h-1.5 w-12 rounded-full bg-[#151515] opacity-25" />
                 </div>
-                <div className="flex items-center justify-between border-b border-[#D9E3EC] px-4 pb-3">
-                  <div>
-                    <h3 id="mobile-notifications-title" className="text-[17px] font-black leading-tight text-[#0B1F33]">Notifications</h3>
-                    <p className="mt-0.5 text-[11.5px] text-[#5A6B7D]">
+                <div className="flex items-center justify-between gap-3 px-4 pb-3 pt-1" style={{ borderBottom: '2px solid #151515' }}>
+                  <div className="min-w-0">
+                    <h3 id="mobile-notifications-title" className="lv-h">Notifications</h3>
+                    <p className="lv-small mt-0.5">
                       {watchFeed.sinceSummary
-                        ? `Since you last checked — ${watchFeed.sinceSummary}`
-                        : 'Personal reports and live updates for your saved area'}
+                        ? `Since you last checked: ${watchFeed.sinceSummary}`
+                        : 'Your neighbourhood report and new reports for your saved area'}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowNotifications(false)}
-                    className="grid size-11 shrink-0 place-items-center text-[#40566B] transition-colors active:bg-[#E8F3FC]"
-                    aria-label="Close notifications"
-                  >
+                  <button type="button" onClick={() => setShowNotifications(false)} className="lv-close" aria-label="Close notifications">
                     <X size={19} />
                   </button>
                 </div>
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-1">
-                  {notifications.length === 0 ? (
-                    <div className="px-5 py-10 text-center">
-                      <span className="mx-auto flex size-11 items-center justify-center bg-[#E8F3FC]">
-                        <Bell size={17} className="text-[#5A6B7D]" />
-                      </span>
-                      <p className="mt-3 text-[14px] font-black text-[#1C2B3A]">All caught up</p>
-                      <p className="mx-auto mt-1 max-w-64 text-[12px] leading-relaxed text-[#5A6B7D]">New reports for your saved area will appear here.</p>
-                    </div>
-                  ) : (
-                    notifications.map((notification) => renderNotificationRow(notification, false))
-                  )}
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                  {notifications.length === 0 ? <NotificationsEmpty /> : notifications.map((notification) => renderNotificationRow(notification))}
                 </div>
               </motion.section>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Desktop map command bar */}
-        <div className="pointer-events-none absolute left-5 right-5 top-5 z-30 hidden items-center justify-between lg:flex">
-          <div className="pointer-events-auto flex h-13 items-center gap-1 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] py-1 pl-1 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
-            <div className="flex items-center gap-3 border-r-[1.5px] border-[#C9D8E4] py-0.5 pl-0.5 pr-4">
-              <DesktopMapBrandMark compact />
-              <div className="min-w-[8.5rem] leading-none">
-                <h2 className="font-display text-[14px] font-black tracking-[-0.02em] text-[#0B1F33]">
-                  {selectedCategory === 'all' ? 'Live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
-                </h2>
-                <p className="mt-1.5 font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#5A6B7D]">
-                  {mapIncidents.length} visible now
-                </p>
-              </div>
-            </div>
+        {/* ── Desktop command bar: the navy live sky across the map. Wordmark,
+            the red Live pulse, how fresh the newest report is, the time
+            window (it drives the map markers and the feed), then Home,
+            Locate, alerts and account. ──────────────────────────────────── */}
+        <div
+          className="lv-cmd lv-sky lv-tear hidden lg:flex"
+          data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}
+        >
+          <DesktopMapBrandMark compact />
+          <LivePill />
+          <div className="lv-cmd-mid">
+            <span className="lv-stamp" title="Time of the newest neighbour report or City record on the map">
+              <b>{freshness}</b>
+            </span>
+            {nearArea && (
+              <button
+                type="button"
+                className="lv-chip lv-chip-sm"
+                onClick={() => setNearArea(null)}
+                aria-label={`Stop focusing on ${nearArea.name}`}
+                style={{ background: '#fff5cc' }}
+              >
+                <MapPin size={13} /> Near {nearArea.name} <X size={13} />
+              </button>
+            )}
+          </div>
+          {/* The time window itself sits at the top of the feed sidebar; it
+              drives these markers and that list together. */}
+          <div className="lv-cmd-actions">
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex size-9 items-center justify-center text-[#40566B] transition-colors hover:bg-[#E8F3FC] hover:text-[#2F6FB0] active:scale-[0.98]"
-              title="Back to landing page"
+              className="lv-icon"
+              title="Back to calgarywatch.ca"
               aria-label="Back to landing page"
             >
-              <Home size={16} />
+              <Home size={18} />
             </button>
             <button
               type="button"
               data-tour="locate"
               onClick={handleLocate}
-              className={cn(
-                'flex size-9 items-center justify-center transition-colors active:scale-[0.98]',
-                nearMeOpen
-                  ? 'bg-[#06162F] text-[#F2EFE8]'
-                  : 'text-[#40566B] hover:bg-[#E8F3FC] hover:text-[#2F6FB0]',
-              )}
+              data-on={nearMeOpen ? 'true' : undefined}
+              aria-pressed={nearMeOpen}
+              className="lv-icon"
               title="Show my location"
               aria-label="Show my location"
             >
-              <Navigation size={16} />
+              <Navigation size={18} />
             </button>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
             <div className="relative">
-              <Button
-                variant="secondary"
-                size="icon"
+              <button
+                type="button"
                 data-tour="alerts"
-                className="size-12 rounded-none border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC]"
                 onClick={toggleNotifications}
+                aria-expanded={showNotifications}
+                className="lv-icon"
+                data-on={showNotifications ? 'true' : undefined}
+                aria-label={bellLabel(unreadNotifications)}
+                title="Notifications"
               >
-                <Bell size={19} className={cn(unreadNotifications > 0 ? 'text-[#2F6FB0]' : 'text-[#40566B]')} />
-                {unreadNotifications > 0 && (
-                  <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center border-2 border-[#FFFDF8] bg-[#C0392B] text-[10px] font-black text-[#FFFDF8]">
-                    {unreadNotifications}
-                  </span>
-                )}
-              </Button>
-              
+                <Bell size={18} />
+                <UnreadBadge count={unreadNotifications} />
+              </button>
               <AnimatePresence>
                 {showNotifications && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-80 overflow-hidden z-50 shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
-                    style={{ background: '#FFFDF8', border: '1.5px solid #0B1F33' }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.16 }}
+                    className="lv-pop w-[22rem]"
+                    role="dialog"
+                    aria-label="Notifications"
                   >
-                    <div className="flex items-center justify-between bg-[#06162F] px-4 py-2.5">
-                      <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#AFC5DF]">Alerts</h3>
-                      <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#7FDCC6]">
-                        <span className="h-1.5 w-1.5 animate-pulse bg-[#7FDCC6]" />
-                        Live
-                      </span>
+                    <div className="lv-pop-head lv-sky">
+                      <h3>Notifications</h3>
+                      <LivePill />
                     </div>
                     {watchFeed.sinceSummary && (
-                      <p className="border-b border-[#D9E3EC] bg-[#F4F8FC] px-4 py-2 text-[11px] font-semibold text-[#1C2B3A]">
-                        Since you last checked — {watchFeed.sinceSummary}
-                      </p>
+                      <p className="lv-note-since">Since you last checked: {watchFeed.sinceSummary}</p>
                     )}
                     <div className="max-h-[min(70dvh,34rem)] overflow-y-auto overscroll-contain">
-                      {notifications.length === 0 ? (
-                        <div className="px-4 py-7 text-center">
-                          <span className="mx-auto flex h-10 w-10 items-center justify-center" style={{ background: '#E8F3FC' }}>
-                            <Bell size={15} className="text-[#5A6B7D]" />
-                          </span>
-                          <p className="mt-2 text-[12px] font-bold text-[#1C2B3A]">All caught up</p>
-                          <p className="text-[10.5px] text-[#5A6B7D] mt-0.5">New reports in your area will land here.</p>
-                        </div>
-                      ) : (
-                        notifications.map((notification) => renderNotificationRow(notification, false))
-                      )}
+                      {notifications.length === 0 ? <NotificationsEmpty /> : notifications.map((notification) => renderNotificationRow(notification))}
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-
             {user ? (
               <div className="relative">
-                <button 
+                <button
+                  type="button"
                   onClick={toggleUserMenu}
-                  className="flex size-12 items-center justify-center overflow-hidden border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] p-1 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC]"
+                  className="lv-sq"
+                  style={{ width: 40, height: 40, borderRadius: 12, boxShadow: '3px 3px 0 #00c2e0' }}
+                  aria-label="Account menu"
+                  aria-expanded={showUserMenu}
                 >
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt=""
-                      className="w-8 h-8 md:w-10 md:h-10 border border-[#C9D8E4]"
-                      referrerPolicy="no-referrer"
-                      crossOrigin="anonymous"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 md:w-10 md:h-10 border border-[#0B1F33] bg-[#2F6FB0] flex items-center justify-center text-[#FFFDF8] text-xs font-black">
-                      {(user.displayName?.[0] ?? user.email?.[0] ?? 'U').toUpperCase()}
-                    </div>
-                  )}
+                  <AvatarFace user={user} />
                 </button>
-                
-                <AnimatePresence>
-                  {showUserMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-52 overflow-hidden border-[1.5px] border-[#0B1F33] bg-[#FFFDF8] shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
-                    >
-                      <div className="border-b-[1.5px] border-[#C9D8E4] bg-[#F7F3EA] p-4">
-                        <p className="text-xs font-bold truncate" style={{ color: '#1C2B3A' }}>{user.displayName}</p>
-                        <p className="text-[10px] text-[#5A6B7D] truncate mt-0.5">{user.email}</p>
-                      </div>
-                      {isAdmin && (
-                        <button
-                          onClick={() => {
-                            navigate('/admin');
-                            setShowUserMenu(false);
-                          }}
-                          className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#2F6FB0] hover:bg-[#E8F3FC] transition-colors text-left"
-                        >
-                          <LayoutDashboard size={14} />
-                          Admin Portal
-                        </button>
-                      )}
-                      <button
-                        onClick={() => openAuthPanel('settings')}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] transition-colors text-left"
-                      >
-                        <Settings size={14} />
-                        Settings
-                      </button>
-                      <button
-                        onClick={replayTour}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] transition-colors text-left"
-                      >
-                        <HelpCircle size={14} />
-                        App tour
-                      </button>
-                      <button 
-                        onClick={() => {
-                          logout();
-                          setShowUserMenu(false);
-                        }}
-                        className="w-full flex items-center gap-2 border-t-[1.5px] border-[#C9D8E4] px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] transition-colors text-left"
-                      >
-                        <LogOut size={14} />
-                        Sign Out
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <UserMenu
+                  open={showUserMenu}
+                  user={user}
+                  isAdmin={isAdmin}
+                  onAdmin={() => { navigate('/admin'); setShowUserMenu(false); }}
+                  onSettings={() => openAuthPanel('settings')}
+                  onTour={replayTour}
+                  onSignOut={() => { logout(); setShowUserMenu(false); }}
+                />
               </div>
             ) : (
-              <Button
-                variant="secondary"
-                className="flex h-12 items-center gap-2 rounded-none border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-4 text-[#0B1F33] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC]"
-                onClick={() => openAuthPanel('signin')}
-                aria-label="Sign up or sign in"
-              >
-                <LogIn size={18} className="text-[#2F6FB0]" />
-                {/* The button turns white in light mode, so the label has to
-                    turn dark with it. Without this it inherits white and the
-                    primary sign-in call to action is invisible. */}
-                <span className="text-sm font-bold text-[#0B1F33]">Sign up / sign in</span>
-              </Button>
+              <button type="button" className="lv-signin" onClick={() => openAuthPanel('signin')} aria-label="Sign up or sign in">
+                <LogIn size={16} />
+                Sign in
+              </button>
             )}
           </div>
         </div>
@@ -4030,20 +3814,19 @@ export default function MapPage() {
           guidedPreview={tourOpen && tourTarget === 'camera-viewer'}
         />
 
-        {/* Emergency and report actions */}
-        <div className={cn(
-          // On a phone the layer bar sits 88–140px off the bottom, centred and
-          // up to 20rem wide, which put it straight through the SOS/Report
-          // column at 7rem. Lifting the column clear of it keeps both usable
-          // one-handed instead of stacking two tap targets on top of each other.
-          'absolute right-3 z-30 flex flex-col items-end gap-2.5 bottom-[calc(var(--cw-rail-h,66px)+1.375rem+var(--cw-layerbar-h,3.25rem)+0.75rem+env(safe-area-inset-bottom))] transition-all duration-200 md:right-5 lg:right-6 lg:bottom-24',
-          (isPinMode || isEmergencyPinMode) && "opacity-0 invisible translate-x-4 pointer-events-none"
-        )}>
-          {/* SOS remains visually separate from standard reporting. */}
-          <Button
-            variant="primary"
+        {/* Emergency and report actions. On a phone the column sits above the
+            layer bar, which sits above the sheet rail. */}
+        <div
+          className="lv-actions bottom-[calc(var(--cw-rail-h,66px)+1.375rem+var(--cw-layerbar-h,3.25rem)+0.75rem+env(safe-area-inset-bottom))] lg:bottom-[5.5rem]"
+          data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}
+        >
+          {/* SOS stays visually separate from standard reporting. */}
+          <button
+            type="button"
             data-tour="sos"
-            className="group relative flex size-12 items-center justify-center gap-2 rounded-none border-[1.5px] border-[#8E241A] bg-[#C0392B] text-[#FFFDF8] shadow-[0_4px_8px_rgba(11,31,51,0.20)] transition-[background-color,transform] hover:bg-[#A91F1F] active:scale-[0.97] md:size-14 lg:h-12 lg:w-auto lg:px-4"
+            className="lv-sos"
+            aria-label="SOS: report an emergency"
+            title="Emergency report"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
@@ -4054,44 +3837,26 @@ export default function MapPage() {
               setIsEmergencyOpen(true);
             }}
           >
-            <Siren size={22} className="relative z-10 shrink-0" />
-            <span className="hidden lg:inline font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-[#fff]">SOS</span>
-            <div className="absolute right-full mr-4 px-3 py-1.5 bg-[#8E241A] text-[#FFFDF8] font-mono text-[10px] font-bold uppercase tracking-[0.14em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border-[1.5px] border-[#8E241A] shadow-[0_4px_8px_rgba(11,31,51,0.20)] hidden md:block lg:hidden">
-              Emergency Report
-            </div>
-          </Button>
+            <Siren size={22} className="shrink-0" />
+            <span className="hidden lg:inline">SOS</span>
+          </button>
 
           {/* Primary reporting action is labelled at every viewport size. */}
-          <Button
-            variant="primary"
+          <button
+            type="button"
             data-tour="report"
-            /* Button's `primary` variant sets --tw-shadow-color (blue-500/20), which
-               would tint this offset away to nothing. Pin the colour on the element. */
-            style={{ ['--tw-shadow-color' as string]: '#151515' } as React.CSSProperties}
-            className="group flex h-12 w-auto items-center justify-center gap-2 rounded-full border-2 border-[#151515] bg-[#ffdf4f] px-5 text-[#151515] shadow-[4px_4px_0_#151515] transition-[background-color,transform,box-shadow] hover:bg-white active:translate-x-1 active:translate-y-1 active:shadow-none md:h-14 md:px-6 lg:h-13 lg:px-6"
+            className="lv-post"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
               if (now - buttonClickDebounceRef.current < 300) return;
               buttonClickDebounceRef.current = now;
-
-              if (!user) {
-                openAuthPanel('signin');
-              } else {
-                setIsFormOpen(true);
-                setConfirmedPinLocation(null);
-                // Start neutral - user picks GPS or pin explicitly in the form.
-                // Don't pre-fill with their home GPS coords.
-                setSelectedLocation(CALGARY_CENTER);
-              }
+              requestReport(null);
             }}
           >
-            <Plus size={21} className="shrink-0 text-[#151515]" />
-            <span className="text-[14px] font-extrabold text-[#151515] sm:text-[15px]">Post<span className="hidden lg:inline"> a report</span></span>
-            <div className="absolute right-full mr-4 px-3 py-1.5 bg-[#06162F] text-[#F2EFE8] font-mono text-[10px] font-bold uppercase tracking-[0.14em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border-[1.5px] border-[#06162F] shadow-[0_4px_8px_rgba(11,31,51,0.20)] hidden md:block lg:hidden">
-              Post a report
-            </div>
-          </Button>
+            <Plus size={21} strokeWidth={2.6} className="shrink-0" />
+            <span>Post<span className="hidden lg:inline"> a report</span></span>
+          </button>
         </div>
 
         {/* Layer Toggle */}
@@ -4121,26 +3886,17 @@ export default function MapPage() {
           isPinMode={isPinMode || isEmergencyPinMode}
         />
 
-        {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}
-        <div className="pointer-events-none absolute bottom-6 left-6 right-6 z-20 hidden items-center justify-between lg:flex">
-          <div className="flex items-center gap-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
-            <div className="relative flex items-center justify-center w-1.5 h-1.5 md:w-2 md:h-2">
-              <div className={cn(
-                "relative w-1.5 h-1.5 md:w-2 md:h-2",
-                mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]'
-              )} />
-            </div>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
-              {mapIncidents.length} on the map
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
-            <ShieldAlert size={12} className="text-[#8A5710]" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
-              Check the source before you act
-            </span>
-          </div>
+        {/* Status bar, desktop only: what the map is showing, and the one
+            caution that matters. Phones carry the count in the chrome. */}
+        <div className="lv-status">
+          <span className="lv-status-pill">
+            <span className="lv-status-dot" data-empty={mapIncidents.length === 0 ? 'true' : undefined} aria-hidden="true" />
+            <b>{mapIncidents.length}</b> on the map · {windowWord(timeWindow)}
+          </span>
+          <span className="lv-status-pill lv-status-note">
+            <ShieldAlert size={14} aria-hidden="true" />
+            Check the source before you act
+          </span>
         </div>
 
         {/* Desktop & Mobile Panels */}
@@ -4174,6 +3930,21 @@ export default function MapPage() {
           statcanYearlyStats={statcanYearlyStats}
           propertyData={propertyData}
           cityAverages={cityAverages}
+          onWatchArea={(name) => {
+            // "Watch this area": add it to the reader's alert areas, then show
+            // the alert settings so they can see it and switch alerts on.
+            if (!user) { openAuthPanel('signin'); return; }
+            const zones = userProfile?.alertZones ?? [];
+            const home = (preferredNeighborhood || preferredInferredNeighborhood).toLowerCase();
+            const exists = zones.some((z) => z.neighborhood.toLowerCase() === name.toLowerCase()) || home === name.toLowerCase();
+            if (!exists && zones.length < 6) {
+              void updateAlertPrefs({
+                alertZones: [...zones, { id: `z${Date.now().toString(36)}`, label: name, neighborhood: name.slice(0, 80), radiusM: 0 }],
+              });
+            }
+            setSelectedArea(null);
+            openAuthPanel('settings');
+          }}
         />
 
         {/* Emergency Modal */}
@@ -4228,7 +3999,10 @@ export default function MapPage() {
             }
             digestOptIn={Boolean(userProfile?.weeklyDigestOptIn)}
             incidents={incidents}
-            areaStats={briefingAreaStats}
+            // The briefing's community strip is a "report-volume rank" (#N of M).
+            // Ranks are off the map now, so the figures are withheld until it
+            // shows a plain comparison instead (see getAreaStats().comparison).
+            areaStats={null}
             airReading={briefingAir}
             safetyCameras={safetyCameras}
             trafficCameras={trafficCameras}

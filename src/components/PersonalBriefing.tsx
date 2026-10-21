@@ -17,6 +17,7 @@ import { findSafetyCamerasNear, type SafetyCamera } from '@/src/hooks/useSafetyC
 import { useTrafficVolumes, volumeAt } from '@/src/hooks/useTrafficVolumes';
 import { useCountUp } from '@/src/hooks/useCountUp';
 import { publicAsset } from '@/src/lib/utils';
+import { CATEGORY, LIVE } from '@/src/lib/tokens';
 import BriefingRadar, { bearingDegrees, type RadarPoint } from '@/src/components/BriefingRadar';
 import BriefingSparkline from '@/src/components/BriefingSparkline';
 import { curatePersonalStories } from '@/src/lib/reportCuration';
@@ -55,11 +56,11 @@ const T = {
   soft: '#4A4F57',
   line: 'rgba(21,21,21,0.12)',
   edge: '#151515',
-  teal: '#00A8C6',
-  deep: '#06162F',
-  deep2: '#0D2447',
-  gold: '#1554D1',
-  clay: '#E2403A',
+  teal: LIVE.cyan,
+  deep: LIVE.navy,
+  deep2: LIVE.navy2,
+  gold: LIVE.blue,
+  clay: CATEGORY.emergency,
 } as const;
 
 /**
@@ -115,9 +116,10 @@ export function selectRing<T extends { distanceM: number }>(
 }
 
 const BAND = [
-  { max: 0.10, label: 'Busy', color: '#B0503A' },
-  { max: 0.25, label: 'Above average', color: '#C0762A' },
-  { max: 0.50, label: 'Middling', color: '#8A7430' },
+  // One blue ramp, like the map's 311 layer: more or fewer reports, not heat.
+  { max: 0.10, label: 'Busy', color: LIVE.blueDeep },
+  { max: 0.25, label: 'Above average', color: LIVE.blue },
+  { max: 0.50, label: 'Middling', color: '#5B86E0' },
   { max: 1.01, label: 'Quiet', color: '#2E8B7A' },
 ] as const;
 
@@ -312,11 +314,12 @@ function ReportRow({
 }
 
 const STORY_TONE: Record<Incident['category'], string> = {
-  emergency: T.clay,
-  crime: '#9B3A35',
-  weather: '#5F6599',
-  infrastructure: '#3E7180',
-  traffic: '#8A7430',
+  // CATEGORY hues, darkened enough to read as 11px text on white.
+  emergency: '#B01D16',
+  crime: '#B23A1C',
+  weather: '#006F86',
+  infrastructure: LIVE.blue,
+  traffic: '#8A5300',
 };
 
 /** One of the two editorial leads: enough context to decide whether to open. */
@@ -561,7 +564,7 @@ export default function PersonalBriefing({
             would open. */}
         <header
           className="br-head relative overflow-hidden px-5 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-6"
-          style={{ background: `radial-gradient(120% 90% at 85% 20%, #0B2552 0%, ${T.deep} 55%, #030B1A 100%)` }}
+          style={{ background: `radial-gradient(90% 80% at 88% 0%, ${LIVE.glow} 0%, transparent 62%), ${T.deep}` }}
         >
           {/* The city, inked into the masthead the way the feed rail does it.
               The linocut is black ink, so on this dark ground it needs the
@@ -611,9 +614,9 @@ export default function PersonalBriefing({
 
             <h2
               className="mt-3.5 font-display font-extrabold leading-[1.06] tracking-[-0.03em] pr-10"
-              style={{ color: '#FDFAF3', fontSize: 'clamp(1.75rem, 6.6vw, 2.5rem)' }}
+              style={{ color: '#FFFFFF', fontSize: 'clamp(1.75rem, 6.6vw, 2.5rem)' }}
             >
-              Here&rsquo;s your <span style={{ color: '#FFDF4F' }}>corner of Calgary.</span>
+              Here&rsquo;s your <span style={{ color: LIVE.yellow }}>corner of Calgary.</span>
             </h2>
 
             <p className="mt-3 flex items-start gap-1.5 text-[13px] font-medium leading-snug" style={{ color: 'rgba(255,255,255,.78)' }}>
@@ -641,11 +644,11 @@ export default function PersonalBriefing({
           {allClear && (
             <motion.p
               className="mt-5 text-[15px] font-semibold leading-snug"
-              style={{ color: '#C3D6CE' }}
+              style={{ color: LIVE.onNavy }}
               initial={still ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.16, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span style={{ color: '#E8B871' }}>All quiet.</span> Nothing has been reported near you —
+              <span style={{ color: LIVE.yellow }}>All quiet.</span> Nothing has been reported near you —
               by anyone.
             </motion.p>
           )}
@@ -658,11 +661,11 @@ export default function PersonalBriefing({
             >
               <span
                 className="font-display font-extrabold leading-none tabular-nums"
-                style={{ color: '#E8B871', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}
+                style={{ color: LIVE.yellow, fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}
               >
                 {still ? headline.figure : headlineCount}
               </span>
-              <span className="min-w-0 pb-1.5 text-[13px] font-semibold leading-tight" style={{ color: '#C3D6CE' }}>
+              <span className="min-w-0 pb-1.5 text-[13px] font-semibold leading-tight" style={{ color: LIVE.onNavy }}>
                 {headline.label}
                 <span className="block font-normal">{headline.sub}</span>
               </span>
@@ -739,7 +742,7 @@ export default function PersonalBriefing({
                             {camera.direction ? ` · watches ${camera.direction.toLowerCase()} traffic` : ''}
                           </span>
                           {daily && (
-                            <span className="mt-1.5 inline-block px-2 py-0.5 font-mono text-[10px] font-bold tabular-nums" style={{ background: 'rgba(176,121,60,0.14)', color: '#8A5710' }}>
+                            <span className="mt-1.5 inline-block px-2 py-0.5 font-mono text-[10px] font-bold tabular-nums" style={{ background: '#E6EDFB', color: LIVE.blueDeep }}>
                               {Math.round(daily).toLocaleString()} vehicles a day
                             </span>
                           )}

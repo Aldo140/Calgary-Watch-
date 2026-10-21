@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { publicAsset } from '@/src/lib/utils';
-import { MAP, CATEGORY } from '@/src/lib/tokens';
-import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, AlertTriangle, Image as ImageIcon } from 'lucide-react';
+import { cn } from '@/src/lib/utils';
+import { CATEGORY, LIVE } from '@/src/lib/tokens';
+import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, Image as ImageIcon, Phone, ArrowRight, Check } from 'lucide-react';
+import '@/src/styles/map-overlays.css';
 import { uploadIncidentImage } from '@/src/lib/storage';
 
 const NEIGHBOURHOODS = [
@@ -43,11 +44,11 @@ function detectNeighbourhood(lat: number, lng: number): string {
 // The severity ramp from tokens, not five unrelated Tailwind hues — these are
 // the same colours the pins carry on the map.
 const EMERGENCY_TYPES = [
-  { id: 'emergency',      label: 'Emergency', icon: Siren,        color: CATEGORY.emergency },
-  { id: 'crime',          label: 'Crime',     icon: AlertCircle,  color: CATEGORY.crime },
-  { id: 'traffic',        label: 'Crash',     icon: Car,          color: CATEGORY.traffic },
-  { id: 'infrastructure', label: 'Hazard',    icon: Construction, color: CATEGORY.infrastructure },
-  { id: 'weather',        label: 'Weather',   icon: CloudRain,    color: CATEGORY.weather },
+  { id: 'emergency',      label: 'Emergency', icon: Siren,        color: CATEGORY.emergency,      fg: '#FFFFFF', tint: '#FFE1DC' },
+  { id: 'crime',          label: 'Crime',     icon: AlertCircle,  color: CATEGORY.crime,          fg: '#FFFFFF', tint: '#FDE6DE' },
+  { id: 'traffic',        label: 'Crash',     icon: Car,          color: CATEGORY.traffic,        fg: LIVE.ink,  tint: '#FDEFD6' },
+  { id: 'infrastructure', label: 'Hazard',    icon: Construction, color: CATEGORY.infrastructure, fg: '#FFFFFF', tint: '#E3EBFB' },
+  { id: 'weather',        label: 'Weather',   icon: CloudRain,    color: CATEGORY.weather,        fg: '#FFFFFF', tint: '#DDF2F7' },
 ] as const;
 
 export interface EmergencySubmitData {
@@ -100,6 +101,16 @@ export default function EmergencyModal({
   // 'choose' = pick location method; 'form' = fill in details
   const [step, setStep] = useState<'choose' | 'form'>('choose');
   const submitDebounceRef = useRef(0);
+  // Phones get a bottom sheet; desktop a centred card.
+  const [isPhone, setIsPhone] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)');
+    const fn = () => setIsPhone(mq.matches);
+    mq.addEventListener('change', fn);
+    return () => mq.removeEventListener('change', fn);
+  }, []);
 
   // Crosshair pin / tap coordinates take precedence over GPS
   const activeLocation = pinLocation ?? location;
@@ -174,269 +185,226 @@ export default function EmergencyModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" style={{ background: 'rgba(30,15,15,0.5)' }}>
+        <div className="lv-o lv-em-wrap lv-o-scrim">
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 40 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 40 }}
-            transition={{ duration: 0.18 }}
-            className="w-full max-w-md overflow-hidden shadow-[0_32px_80px_-24px_rgba(127,29,29,0.5)]"
-            style={{ background: MAP.panel, border: `1.5px solid ${CATEGORY.emergency}` }}
+            initial={isPhone ? { y: '100%' } : { opacity: 0, scale: 0.96, y: 20 }}
+            animate={isPhone ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={isPhone ? { y: '100%' } : { opacity: 0, scale: 0.96, y: 20 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Emergency"
+            className={cn('lv-em', isPhone && 'lv-em-phone')}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Pulsing top bar */}
-            <div className="h-1.5 w-full animate-pulse" style={{ background: CATEGORY.emergency }} aria-hidden="true" />
-
-            <div className="relative p-6 space-y-4">
-              {/* The beacon, sitting behind the header rather than competing
-                  with it — this is a form, and the artwork sets the register
-                  without taking a turn in the reading order. */}
-              <img
-                src={publicAsset('images/illustration/emergency-siren.webp')}
-                alt=""
-                width={800} height={800} loading="lazy"
-                className="pointer-events-none absolute -right-6 -top-8 w-36 opacity-[0.07] sm:w-44"
-                aria-hidden="true"
-              />
-
-              {/* Header */}
-              <div className="relative flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Siren size={15} className="animate-pulse" style={{ color: CATEGORY.emergency }} />
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.26em]" style={{ color: CATEGORY.emergency }}>Emergency signal</span>
-                  </div>
-                  <h2 className="font-display text-xl font-extrabold tracking-[-0.02em] leading-tight" style={{ color: MAP.ink }}>
-                    {step === 'choose' ? 'Where is it?' : "What's happening?"}
-                  </h2>
-                  <p className="text-xs mt-0.5" style={{ color: MAP.muted }}>Goes live instantly for everyone nearby</p>
+            <div className="lv-em-scroll no-scrollbar">
+              {/* ── First: get help. Nothing on this sheet competes with the call. ── */}
+              <div className="lv-em-top">
+                {isPhone && <div className="lv-o-grabber pb-2" aria-hidden="true"><span /></div>}
+                <div className="lv-em-top-row">
+                  <span className="lv-em-eyebrow"><Siren size={16} aria-hidden="true" /> Emergency</span>
+                  <button type="button" onClick={handleClose} aria-label="Close emergency form" className="lv-o-iconbtn">
+                    <X size={20} strokeWidth={2.2} />
+                  </button>
                 </div>
-                <button onClick={handleClose} aria-label="Close emergency form" className="p-2 transition-colors hover:bg-black/5" style={{ color: MAP.muted }}>
-                  <X size={18} />
-                </button>
-              </div>
+                <h2 className="lv-em-title">Someone in danger? Call 911 now.</h2>
+                <p className="lv-em-sub">Police, fire and ambulance. Calling is always the fastest way to get help.</p>
 
-              {/* ── Disclaimer ── */}
-              <div className="flex items-start gap-2.5 px-3.5 py-3" style={{ background: 'rgba(192,57,43,0.07)', border: `1px solid ${CATEGORY.emergency}` }}>
-                <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: CATEGORY.emergency }} />
-                <p className="text-[11px] leading-relaxed" style={{ color: '#8A2A22' }}>
-                  <span className="font-black">For life-threatening emergencies call 911 first.</span>{' '}
-                  This tool is for community awareness only, not a substitute for emergency services. Do not submit false reports.
+                <a href="tel:911" className="lv-em-call">
+                  <Phone size={28} strokeWidth={2.4} aria-hidden="true" />
+                  Call 911
+                </a>
+                <a href="tel:4032661234" className="lv-em-nonem">
+                  <span>Not urgent? Calgary Police non-emergency</span>
+                  <b>403-266-1234</b>
+                </a>
+                <p className="lv-em-fine">
+                  CalgaryWatch doesn't dispatch help and doesn't hear police radio. Posting here does not contact 911.
                 </p>
               </div>
 
-              {/* ── Step 1: Location ── */}
-              {step === 'choose' && (
-                <div className="space-y-2.5">
-                  {locationAvailable ? (
-                    <button
-                      onClick={() => setStep('form')}
-                      className="w-full flex items-center justify-between p-4 transition-all text-left group hover:-translate-y-0.5"
-                      style={{ background: MAP.panel, border: `1.5px solid ${MAP.line}` }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }}>
-                          <Navigation size={17} style={{ color: MAP.accent }} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-black" style={{ color: MAP.ink }}>Right where I am</p>
-                          <p className="font-mono text-[10px] tabular-nums" style={{ color: MAP.muted }}>
-                            {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'GPS active'}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="transition-transform group-hover:translate-x-1" style={{ color: MAP.accent }}>→</span>
-                    </button>
-                  ) : (
-                    <div className="p-4 flex items-start gap-3" style={{ background: 'rgba(199,127,24,0.09)', border: `1px solid ${MAP.line}`, borderLeft: `3px solid ${MAP.warn}` }}>
-                      <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#8A5710' }} />
-                      <p className="text-xs" style={{ color: '#8A5710' }}>GPS unavailable. Use the pin below to mark the location.</p>
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => { onRequestMapPin?.(); }}
-                    className="w-full flex items-center justify-between p-4 transition-all text-left group hover:-translate-y-0.5"
-                    style={{ background: MAP.panel, border: `1.5px solid ${MAP.line}` }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-10 h-10 flex items-center justify-center" style={{ background: 'rgba(46,139,122,0.12)' }}>
-                        <span className="absolute inset-2 rounded-full animate-ping opacity-25" style={{ background: MAP.ok }} aria-hidden="true" />
-                        <MapPin size={17} style={{ color: MAP.ok }} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-black" style={{ color: MAP.ink }}>Drop a pin</p>
-                        <p className="text-[11px]" style={{ color: MAP.muted }}>Pan the map to the exact spot</p>
-                      </div>
-                    </div>
-                    <span className="transition-transform group-hover:translate-x-1" style={{ color: MAP.ok }}>→</span>
-                  </button>
+              {/* ── Then, optionally: a pin neighbours can see. ── */}
+              <div className="lv-em-post">
+                <div className="lv-em-post-head">
+                  <p className="lv-o-eyebrow">Then, if it's safe · optional</p>
+                  <h3 className="mt-1.5">Let neighbours know</h3>
+                  <p>Posts a pin on the map so people nearby can steer clear. Please don't post false reports.</p>
                 </div>
-              )}
 
-              {/* ── Step 2: Details ── */}
-              {step === 'form' && (
-                <>
-                  {/* Active location display */}
-                  <div className="flex items-center justify-between px-3.5 py-2.5" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
-                    <div className="flex items-center gap-2">
-                      <MapPin size={13} style={{ color: activeLocation ? MAP.ok : CATEGORY.emergency }} />
-                      <span className="text-xs font-mono tabular-nums" style={{ color: MAP.ink }}>
-                        {activeLocation
-                          ? `${activeLocation.lat.toFixed(5)}, ${activeLocation.lng.toFixed(5)}`
-                          : 'No location set'}
+                {/* ── Step 1: Location ── */}
+                {step === 'choose' && (
+                  <>
+                    {locationAvailable ? (
+                      <button type="button" onClick={() => setStep('form')} className="lv-rf-choice">
+                        <span className="lv-rf-choice-icon" style={{ background: '#E3EBFB', color: LIVE.blue }}><Navigation size={22} /></span>
+                        <span className="min-w-0 flex-1">
+                          <b>Right where I am</b>
+                          <small className="tabular-nums">{location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'GPS active'}</small>
+                        </span>
+                        <ArrowRight size={20} className="shrink-0" />
+                      </button>
+                    ) : (
+                      <div className="lv-rf-warn">
+                        <b>Location is off</b>
+                        Use a pin to mark where it is.
+                      </div>
+                    )}
+
+                    <button type="button" onClick={() => { onRequestMapPin?.(); }} className="lv-rf-choice">
+                      <span className="lv-rf-choice-icon" style={{ background: LIVE.yellow, color: LIVE.ink }}><MapPin size={22} /></span>
+                      <span className="min-w-0 flex-1">
+                        <b>Drop a pin</b>
+                        <small>Pan the map to the exact spot</small>
                       </span>
-                    </div>
-                    <button
-                      onClick={() => setStep('choose')}
-                      className="text-[11px] font-bold px-2.5 py-1 transition-colors hover:bg-black/5"
-                      style={{ color: MAP.ink, border: `1px solid ${MAP.line}`, background: MAP.panel }}
-                    >
-                      Change
+                      <ArrowRight size={20} className="shrink-0" />
                     </button>
-                  </div>
+                  </>
+                )}
 
-                  {/* Type selector */}
-                  <div>
-                    <p className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2" style={{ color: MAP.muted }}>Type</p>
-                    <div className="grid grid-cols-5 gap-2">
-                      {EMERGENCY_TYPES.map(({ id, label, icon: Icon, color }) => {
-                        const active = selectedType === id;
-                        return (
+                {/* ── Step 2: Details ── */}
+                {step === 'form' && (
+                  <>
+                    {/* Active location display */}
+                    <div className="lv-rf-loc">
+                      <div className="lv-rf-loc-text">
+                        <MapPin size={20} className="shrink-0" aria-hidden="true" />
+                        <span className="min-w-0">
+                          <b>{pinLocation ? 'Pin placed' : activeLocation ? 'Your location' : 'No location set'}</b>
+                          {activeLocation && <small>{activeLocation.lat.toFixed(5)}, {activeLocation.lng.toFixed(5)}</small>}
+                        </span>
+                      </div>
+                      <button type="button" onClick={() => setStep('choose')} className="lv-o-btn">
+                        Change
+                      </button>
+                    </div>
+
+                    {/* Type selector */}
+                    <div>
+                      <p className="lv-o-label">What kind?</p>
+                      <div className="lv-em-types" role="group" aria-label="Type">
+                        {EMERGENCY_TYPES.map(({ id, label, icon: Icon, color, fg, tint }) => (
                           <button
                             key={id}
-                            onClick={() => setSelectedType(id)}
-                            aria-pressed={active}
-                            className="flex flex-col items-center gap-1.5 p-2 transition-all active:scale-95"
-                            style={active
-                              ? { background: color, border: `1.5px solid ${color}`, color: MAP.panel }
-                              : { background: MAP.panel, border: `1.5px solid ${MAP.line}`, color: MAP.muted }}
-                          >
-                            <Icon size={16} style={{ color: active ? MAP.panel : color }} />
-                            <span className="text-[8px] font-black uppercase leading-tight text-center">{label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Neighbourhood */}
-                  <div>
-                    <p className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2" style={{ color: MAP.muted }}>Neighbourhood</p>
-                    <select
-                      value={neighborhood}
-                      onChange={(e) => setNeighborhood(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#C0392B] font-bold"
-                      style={{ background: MAP.panel, border: `1.5px solid ${MAP.line}`, color: MAP.ink }}
-                    >
-                      <option value="">Select area…</option>
-                      {NEIGHBOURHOODS.map((n) => (
-                        <option key={n.name} value={n.name}>{n.name}</option>
-                      ))}
-                      <option value="Other">Other / Not Listed</option>
-                    </select>
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <p className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2" style={{ color: MAP.muted }}>What's happening?</p>
-                    <textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="e.g. Collision blocking intersection, smoke from building, person needs help…"
-                      rows={3}
-                      autoFocus
-                      className="w-full px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#C0392B] transition-all placeholder:font-medium"
-                      style={{ background: MAP.panel, border: `1.5px solid ${MAP.line}`, color: MAP.ink }}
-                    />
-                    <p className="font-mono text-[9px] mt-1 text-right uppercase tracking-[0.12em]" style={{ color: description.trim().length >= 5 ? MAP.ok : MAP.faint }}>
-                      {description.trim().length >= 5 ? '✓ Ready to send' : `${Math.max(0, 5 - description.trim().length)} more characters`}
-                    </p>
-                  </div>
-
-                  {/* Photo — optional, and never allowed to hold up an SOS. */}
-                  {userUid && (
-                    <div>
-                      <p className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2" style={{ color: MAP.muted }}>Photo (optional)</p>
-                      {imagePreview ? (
-                        <div className="relative overflow-hidden" style={{ border: `1.5px solid ${MAP.line}` }}>
-                          <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
-                          <button
                             type="button"
-                            onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
-                            className="absolute top-2 right-2 p-1.5"
-                            style={{ background: 'rgba(28,43,58,0.8)', color: '#fff' }}
-                            aria-label="Remove photo"
+                            onClick={() => setSelectedType(id)}
+                            aria-pressed={selectedType === id}
+                            className="lv-em-type"
+                            style={{ ['--cat' as string]: color, ['--cat-fg' as string]: fg, ['--tint' as string]: tint }}
                           >
-                            <X size={14} />
+                            <span aria-hidden="true"><Icon size={16} strokeWidth={2.2} /></span>
+                            {label}
                           </button>
-                        </div>
-                      ) : (
-                        <label
-                          className="flex items-center justify-center gap-3 w-full h-14 cursor-pointer transition-colors hover:bg-black/[0.02]"
-                          style={{ border: `1.5px dashed ${MAP.line}`, background: MAP.paper }}
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Neighbourhood */}
+                    <div>
+                      <label className="lv-o-label" htmlFor="sos-neighbourhood">Neighbourhood</label>
+                      <div className="lv-rf-select">
+                        <select
+                          id="sos-neighbourhood"
+                          value={neighborhood}
+                          onChange={(e) => setNeighborhood(e.target.value)}
+                          className="lv-o-input"
                         >
-                          <ImageIcon size={17} style={{ color: MAP.muted }} />
-                          <span className="text-sm font-bold" style={{ color: MAP.muted }}>Attach a photo</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="sr-only"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0] ?? null;
-                              setImageError(null);
-                              if (!file) { setImageFile(null); setImagePreview(null); return; }
-                              if (file.size > 25 * 1024 * 1024) {
-                                setImageError('Photo must be under 25 MB.');
-                                setImageFile(null);
-                                setImagePreview(null);
-                                return;
-                              }
-                              setImageFile(file);
-                              setImagePreview(URL.createObjectURL(file));
-                            }}
-                          />
-                        </label>
-                      )}
-                      {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: MAP.danger }}>{imageError}</p>}
+                          <option value="">Select area…</option>
+                          {NEIGHBOURHOODS.map((n) => (
+                            <option key={n.name} value={n.name}>{n.name}</option>
+                          ))}
+                          <option value="Other">Other / Not Listed</option>
+                        </select>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
                     </div>
-                  )}
 
-                  {/* Reporter */}
-                  <div className="flex items-center gap-2.5 px-3.5 py-2.5" style={{ background: MAP.paper, border: `1px solid ${MAP.line}` }}>
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black" style={{ background: CATEGORY.emergency, color: MAP.panel }}>
-                      {userName.charAt(0).toUpperCase()}
+                    {/* Description */}
+                    <div>
+                      <label className="lv-o-label" htmlFor="sos-description">What's happening?</label>
+                      <textarea
+                        id="sos-description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="e.g. Collision blocking the intersection, smoke from a building…"
+                        rows={3}
+                        className="lv-o-input"
+                      />
+                      <p className={cn('lv-em-ready', description.trim().length >= 5 && 'is-ok')}>
+                        {description.trim().length >= 5 ? 'Ready to post' : `${Math.max(0, 5 - description.trim().length)} more characters`}
+                      </p>
                     </div>
-                    <span className="text-xs" style={{ color: MAP.muted }}>Posting as <span className="font-bold" style={{ color: MAP.ink }}>{userName}</span> · never anonymous for SOS</span>
-                  </div>
 
-                  {/* Submit */}
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!canSubmit || isSubmitting}
-                    className={`w-full h-14 font-black text-base tracking-wide flex items-center justify-center gap-3 transition-transform ${
-                      canSubmit && !submitted
-                        ? 'hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none'
-                        : 'cursor-not-allowed'
-                    }`}
-                    style={
-                      submitted
-                        ? { background: MAP.ok, color: MAP.panel }
-                        : canSubmit
-                        ? { background: CATEGORY.emergency, color: MAP.panel, boxShadow: `4px 4px 0 ${MAP.inkDeep}` }
-                        : { background: MAP.paper, color: MAP.faint, border: `1px solid ${MAP.line}` }
-                    }
-                  >
-                    {isSubmitting ? (
-                      <><Loader2 size={20} className="animate-spin" /> Sending alert…</>
-                    ) : submitted ? (
-                      <>✓ Live. Stay safe out there.</>
-                    ) : (
-                      <><Siren size={20} /> Send emergency signal</>
+                    {/* Photo — optional, and never allowed to hold up an SOS. */}
+                    {userUid && (
+                      <div>
+                        <p className="lv-o-label">Photo <small>Optional</small></p>
+                        {imagePreview ? (
+                          <div className="lv-rf-preview">
+                            <img src={imagePreview} alt="Preview" />
+                            <button
+                              type="button"
+                              onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
+                              className="lv-o-iconbtn"
+                              aria-label="Remove photo"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="lv-rf-drop" style={{ minHeight: 92 }}>
+                            <ImageIcon size={22} aria-hidden="true" />
+                            <b style={{ fontSize: 16 }}>Attach a photo</b>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="sr-only"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0] ?? null;
+                                setImageError(null);
+                                if (!file) { setImageFile(null); setImagePreview(null); return; }
+                                if (file.size > 25 * 1024 * 1024) {
+                                  setImageError('Photo must be under 25 MB.');
+                                  setImageFile(null);
+                                  setImagePreview(null);
+                                  return;
+                                }
+                                setImageFile(file);
+                                setImagePreview(URL.createObjectURL(file));
+                              }}
+                            />
+                          </label>
+                        )}
+                        {imageError && <p className="lv-o-err">{imageError}</p>}
+                      </div>
                     )}
-                  </button>
-                </>
-              )}
+
+                    {/* Reporter */}
+                    <div className="lv-rf-who">
+                      <span className="lv-rf-initial" aria-hidden="true">{userName.charAt(0).toUpperCase()}</span>
+                      <span className="min-w-0">
+                        <b className="truncate">Posting as {userName}</b>
+                        <small>Emergency posts are never anonymous.</small>
+                      </span>
+                    </div>
+
+                    {/* Submit */}
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={!canSubmit || isSubmitting}
+                      className={cn('lv-o-btn lv-o-btn-navy lv-em-send', submitted && 'is-done')}
+                    >
+                      {isSubmitting && !submitted ? (
+                        <><Loader2 size={20} className="animate-spin" /> Posting…</>
+                      ) : submitted ? (
+                        <><Check size={20} strokeWidth={2.6} /> Posted to the map. Stay safe.</>
+                      ) : (
+                        <><MapPin size={20} /> Post to the map</>
+                      )}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>

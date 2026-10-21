@@ -1,40 +1,29 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink, Image, Siren, AlertCircle, Car, Construction, CloudRain, ArrowRight, Check } from 'lucide-react';
+import { X, Loader2, Navigation, MapPin, ExternalLink, Image, Siren, AlertCircle, Car, Construction, CloudRain, ArrowRight, ArrowLeft, Check, Phone } from 'lucide-react';
 import { INCIDENT_CATEGORY_VALUES } from '@/src/constants';
 import { uploadIncidentImage } from '@/src/lib/storage';
 import { motion, AnimatePresence } from 'motion/react';
-import { MAP, CATEGORY } from '@/src/lib/tokens';
-import { publicAsset } from '@/src/lib/utils';
+import { MAP, CATEGORY, LIVE } from '@/src/lib/tokens';
+import { cn } from '@/src/lib/utils';
+import '@/src/styles/map-overlays.css';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-// ── Field-atlas palette ─────────────────────────────────────────────────────
-// Aliases onto MAP so this file holds no hex of its own; several Tailwind colour
-// utilities are globally remapped in index.css, so colour is applied inline.
-const P = {
-  paper: MAP.panel,
-  card: MAP.paper,
-  ink: MAP.ink,
-  soft: MAP.muted,
-  faint: MAP.faint,
-  line: MAP.line,
-  bow: MAP.ok,
-  sky: MAP.accent,
-  danger: MAP.danger,
-};
-
-// Severity ramp, straight from CATEGORY — the chips have to be the same colours
-// the pins are, or the form is teaching the wrong legend. Note infrastructure
-// is the ramp's slate-teal and NOT MAP.accent: the blue means "interactive"
-// everywhere else on the map and must not double as a category.
+// Category tiles, straight from CATEGORY: the tiles have to be the same colours
+// the pins are, or the form is teaching the wrong legend. `fg` is the glyph
+// colour on the fill (amber needs ink), `tint` the selected-tile wash.
 const CATEGORY_CHIPS = [
-  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: CATEGORY.crime },
-  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: CATEGORY.traffic },
-  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: CATEGORY.infrastructure },
-  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: CATEGORY.weather },
-  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: CATEGORY.emergency },
+  { id: 'crime' as const,          label: 'Crime',          hint: 'Theft, break-ins, something suspicious', Icon: AlertCircle,  color: CATEGORY.crime,          fg: '#FFFFFF', tint: '#FDE6DE' },
+  { id: 'traffic' as const,        label: 'Traffic',        hint: 'Crashes, closures, stalled vehicles',     Icon: Car,          color: CATEGORY.traffic,        fg: LIVE.ink,  tint: '#FDEFD6' },
+  { id: 'infrastructure' as const, label: 'Infrastructure', hint: 'Water, power, streetlights, roads',      Icon: Construction, color: CATEGORY.infrastructure, fg: '#FFFFFF', tint: '#E3EBFB' },
+  { id: 'weather' as const,        label: 'Weather',        hint: 'Ice, flooding, storm damage',            Icon: CloudRain,    color: CATEGORY.weather,        fg: '#FFFFFF', tint: '#DDF2F7' },
+  { id: 'emergency' as const,      label: 'Emergency',      hint: 'Someone may be in danger. Call 911 first.', Icon: Siren,     color: CATEGORY.emergency,      fg: '#FFFFFF', tint: '#FFE1DC' },
 ];
+
+type ReportStep = 'what' | 'choose' | 'pinning' | 'details' | 'photo';
+const STEP_ORDER: ReportStep[] = ['what', 'choose', 'details', 'photo'];
+const STEP_LABELS = ['What', 'Where', 'Details', 'Photo'];
 
 // Approximate neighbourhood centres for Calgary.
 // Returns the closest neighbourhood name or '' if outside all radii.
@@ -113,16 +102,14 @@ function useLgUp() {
   return lg;
 }
 
-function FieldLabel({ children, hint }: { children: React.ReactNode; hint?: string }) {
+function FieldLabel({ children, hint, htmlFor }: { children: React.ReactNode; hint?: string; htmlFor?: string }) {
   return (
-    <label className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2 flex items-baseline justify-between" style={{ color: P.soft }}>
+    <label className="lv-o-label" htmlFor={htmlFor}>
       <span>{children}</span>
-      {hint && <span className="normal-case tracking-normal font-medium text-[10px]" style={{ color: P.faint }}>{hint}</span>}
+      {hint && <small>{hint}</small>}
     </label>
   );
 }
-
-const inputStyle: React.CSSProperties = { background: P.paper, border: `1.5px solid ${P.line}`, color: P.ink };
 
 interface IncidentFormProps {
   isOpen: boolean;
@@ -174,10 +161,13 @@ export default function IncidentForm({
   // reporter behind an error they cannot clear.
   const [photoUploadFailed, setPhotoUploadFailed] = useState(false);
   const isLgUp = useLgUp();
+  // One thing at a time:
+  // 'what'    = category tiles
   // 'choose'  = picking location method
   // 'pinning' = crosshair active on map; form hidden
-  // 'form'    = filling in report details
-  const [step, setStep] = useState<'choose' | 'pinning' | 'form'>('choose');
+  // 'details' = neighbourhood, headline, description
+  // 'photo'   = optional photo, name toggle, post
+  const [step, setStep] = useState<ReportStep>('what');
   // Whether user explicitly chose "Use My Location" (GPS)
   const [usingGPS, setUsingGPS] = useState(false);
   const submitLockRef = useRef(false);
@@ -188,6 +178,7 @@ export default function IncidentForm({
     watch,
     setValue,
     setError,
+    trigger,
     clearErrors,
     formState: { errors },
     reset,
@@ -225,21 +216,20 @@ export default function IncidentForm({
   // When a confirmed pin arrives while we're in pinning step, advance to form
   useEffect(() => {
     if (step === 'pinning' && pinLocation) {
-      setStep('form');
+      setStep('details');
     }
   }, [pinLocation, step]);
 
-  // Reset when form is reopened.
-  // If a confirmed pin already exists (user tapped pin → returned to form state),
-  // skip straight to 'form' so the choose-location step never flashes.
+  // Reset when form is reopened. The flow always starts with "what happened";
+  // a pin that already exists (Report related) skips the "where" step later.
   useEffect(() => {
     if (isOpen) {
-      setStep(pinLocation ? 'form' : 'choose');
+      setStep('what');
       setUsingGPS(false);
       setNeighborhoodOverride(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]); // intentionally omit pinLocation — only re-run when the form opens
+  }, [isOpen]); // only re-run when the form opens
 
   // Resolution order: tapped pin > explicit GPS choice > Calgary centre fallback
   const activeLocation = pinLocation ?? (usingGPS ? (gpsLocation ?? location) : location);
@@ -293,7 +283,7 @@ export default function IncidentForm({
         setImagePreview(null);
         setImageError(null);
         setPhotoUploadFailed(false);
-        setStep('choose');
+        setStep('what');
         setUsingGPS(false);
         onClose();
       } catch (err) {
@@ -320,7 +310,7 @@ export default function IncidentForm({
     setImagePreview(null);
     setImageError(null);
     setPhotoUploadFailed(false);
-    setStep('choose');
+    setStep('what');
     setUsingGPS(false);
     onClose();
   };
@@ -329,7 +319,7 @@ export default function IncidentForm({
     // Explicitly opt into GPS - this is the ONLY path that uses the device location.
     onClearPin?.();
     setUsingGPS(true);
-    setStep('form');
+    setStep('details');
   };
 
   const handlePinOnMap = () => {
@@ -337,415 +327,365 @@ export default function IncidentForm({
     onRequestMapPin?.();
   };
 
-  // ── Header: progress dots make the promise explicit — 2 steps, <30 s ──────
-  const stepIndex = step === 'choose' ? 0 : 1;
+  // ── Step navigation ───────────────────────────────────────────────────────
+  const visibleStep: Exclude<ReportStep, 'pinning'> = step === 'pinning' ? 'choose' : step;
+  const stepIndex = STEP_ORDER.indexOf(visibleStep);
+  const selectedChip = CATEGORY_CHIPS.find((c) => c.id === watchedCategory) ?? CATEGORY_CHIPS[0];
+
+  const goNext = async () => {
+    if (step === 'what') {
+      // A pin that already exists (Report related) answers "where" for us.
+      setStep(pinLocation ? 'details' : 'choose');
+      return;
+    }
+    if (step === 'details') {
+      const ok = await trigger(['neighborhood', 'title', 'description']);
+      if (ok) setStep('photo');
+    }
+  };
+
+  const goBack = () => {
+    if (step === 'choose') setStep('what');
+    else if (step === 'details') setStep(pinLocation || usingGPS ? 'what' : 'choose');
+    else if (step === 'photo') setStep('details');
+  };
+
+  // A field that fails at the final submit lives on the details step.
+  const onInvalid = () => setStep('details');
+  const submitReport = handleSubmit((data) => handleFormSubmit(data), onInvalid);
+
+  const titles: Record<typeof visibleStep, React.ReactNode> = {
+    what: <>What <span>happened?</span></>,
+    choose: <>Where <span>was it?</span></>,
+    details: <>Tell <span>neighbours</span></>,
+    photo: <>Add a photo, <span>then post</span></>,
+  };
+
   const header = (
-    <div className="relative flex items-start justify-between gap-3 overflow-hidden px-6 pt-5 pb-4 shrink-0" style={{ borderBottom: `1px solid ${P.line}` }}>
-      <div className="absolute top-0 inset-x-0 h-1" style={{ background: P.sky }} aria-hidden="true" />
-      {/* The city held in one frame, sitting behind the masthead. Decoration
-          only — it never enters the reading order and never takes a tap. */}
-      <img
-        src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
-        alt=""
-        width={800} height={800} loading="lazy" aria-hidden="true"
-        className="pointer-events-none absolute -right-9 -top-8 w-28 opacity-[0.05] select-none sm:w-36"
-      />
-      <div className="relative">
-        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.28em]" style={{ color: P.bow }}>
-          New report · under 30 seconds
-        </p>
-        <h2 className="mt-1 font-display text-xl font-extrabold tracking-[-0.02em]" style={{ color: P.ink }}>
-          Put it on the map
-        </h2>
-        <div className="mt-2.5 flex items-center gap-2" aria-hidden="true">
-          {['Location', 'Details'].map((label, i) => (
-            <span key={label} className="flex items-center gap-1.5">
-              <span
-                className="flex h-4 w-4 items-center justify-center text-[8px] font-black transition-colors"
-                style={i <= stepIndex ? { background: P.ink, color: P.paper } : { background: P.card, color: P.soft, border: `1px solid ${P.line}` }}
-              >
-                {i < stepIndex ? <Check size={9} /> : i + 1}
-              </span>
-              <span className="font-mono text-[8.5px] font-bold uppercase tracking-[0.14em]" style={{ color: i <= stepIndex ? P.ink : P.soft }}>
-                {label}
-              </span>
-              {i === 0 && <span className="h-px w-5" style={{ background: P.line }} />}
-            </span>
-          ))}
-        </div>
+    <div className="lv-rf-head">
+      <div className="lv-rf-head-top">
+        <p className="lv-o-eyebrow">Post a report · step {stepIndex + 1} of 4</p>
+        <button type="button" onClick={handleClose} className="lv-o-iconbtn" aria-label="Close report form">
+          <X size={20} strokeWidth={2.2} />
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={handleClose}
-        className="relative flex h-9 w-9 shrink-0 items-center justify-center transition-colors hover:bg-black/5"
-        style={{ color: P.soft }}
-        aria-label="Close report form"
-      >
-        <X size={17} />
-      </button>
+      <h2 className="lv-rf-title">{titles[visibleStep]}</h2>
+      <div className="lv-rf-progress" aria-hidden="true">
+        {STEP_LABELS.map((label, i) => (
+          <span key={label} className={cn(i < stepIndex && 'is-done', i === stepIndex && 'is-now')}>{label}</span>
+        ))}
+      </div>
     </div>
   );
 
+  const emergencyNote = (
+    <p className="lv-o-note">
+      <Phone size={17} className="mt-0.5 shrink-0" aria-hidden="true" />
+      <span>For emergencies call <b>911</b>. CalgaryWatch doesn't dispatch help.</span>
+    </p>
+  );
+
+  const fieldError = (message?: string) => message ? <p className="lv-o-err">{message}</p> : null;
+
   // Single copy of steps in the DOM - never mount desktop + mobile forms together (breaks RHF / zod).
   const reportSteps = (
-    <AnimatePresence>
-      {step === 'choose' && (
-        <motion.div key="choose" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
-          <div className="space-y-3 p-6">
-            <p className="text-sm font-semibold" style={{ color: P.soft }}>
-              Where did it happen?
-            </p>
+    <AnimatePresence mode="wait" initial={false}>
+      {step === 'what' && (
+        <motion.div key="what" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="lv-rf-step">
+          <p className="lv-rf-lead">Pick the closest fit. Neighbours see it as a coloured pin.</p>
+          <div className="lv-rf-tiles" role="group" aria-label="Category">
+            {CATEGORY_CHIPS.map(({ id, label, hint, Icon, color, fg, tint }) => {
+              const active = watchedCategory === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setValue('category', id, { shouldValidate: true, shouldDirty: true })}
+                  className={cn('lv-o-tile', id === 'emergency' && 'is-wide')}
+                  style={{ ['--cat' as string]: color, ['--cat-fg' as string]: fg, ['--tint' as string]: tint }}
+                  aria-pressed={active}
+                >
+                  <span className="lv-o-tile-icon" aria-hidden="true"><Icon size={22} strokeWidth={2.2} /></span>
+                  <span className="flex flex-col gap-1">
+                    <b>{label}</b>
+                    <small>{hint}</small>
+                  </span>
+                  {active && <span className="lv-o-tile-check" aria-hidden="true"><Check size={15} strokeWidth={3} /></span>}
+                </button>
+              );
+            })}
+          </div>
+          {emergencyNote}
+        </motion.div>
+      )}
 
-            {locationAvailable ? (
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.98 }}
-                onClick={handleUseCurrentLocation}
-                className="w-full p-4 text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
-                style={{ background: P.paper, border: `1.5px solid ${P.line}` }}
-              >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }}>
-                  <Navigation size={19} style={{ color: P.sky }} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[14.5px] font-black" style={{ color: P.ink }}>Right where I'm standing</span>
-                  <span className="block text-xs mt-0.5" style={{ color: P.soft }}>Uses your device GPS — fastest option</span>
-                </span>
-                <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" style={{ color: P.sky }} />
-              </motion.button>
+      {(step === 'choose' || step === 'pinning') && (
+        <motion.div key="choose" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="lv-rf-step">
+          <p className="lv-rf-lead">The exact spot helps the neighbours nearby.</p>
+
+          {locationAvailable ? (
+            <button type="button" onClick={handleUseCurrentLocation} className="lv-rf-choice">
+              <span className="lv-rf-choice-icon" style={{ background: '#E3EBFB', color: LIVE.blue }}><Navigation size={22} /></span>
+              <span className="min-w-0 flex-1">
+                <b>Right where I'm standing</b>
+                <small>Uses your device location. Fastest.</small>
+              </span>
+              <ArrowRight size={20} className="shrink-0" />
+            </button>
+          ) : (
+            <div className="lv-rf-warn">
+              <b>Location access is off</b>
+              Your browser hasn't shared your location. No problem: drop a pin instead.
+              <br />
+              <a href="https://support.google.com/chrome/answer/142065" target="_blank" rel="noopener noreferrer">
+                How to turn location on <ExternalLink size={13} />
+              </a>
+            </div>
+          )}
+
+          <button type="button" onClick={handlePinOnMap} className="lv-rf-choice">
+            <span className="lv-rf-choice-icon" style={{ background: LIVE.yellow, color: LIVE.ink }}><MapPin size={22} /></span>
+            <span className="min-w-0 flex-1">
+              <b>Drop a pin on the map</b>
+              <small>{locationAvailable ? 'Pan to any spot in Calgary' : 'Pan to the exact spot'}</small>
+            </span>
+            <ArrowRight size={20} className="shrink-0" />
+          </button>
+        </motion.div>
+      )}
+
+      {step === 'details' && (
+        <motion.div key="details" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="lv-rf-step">
+          {/* Location confirmation */}
+          <div className="lv-rf-loc">
+            <div className="lv-rf-loc-text">
+              <span className="lv-o-tile-icon" style={{ ['--cat' as string]: selectedChip.color, ['--cat-fg' as string]: selectedChip.fg, width: 38, height: 38, borderRadius: 11 }} aria-hidden="true">
+                <selectedChip.Icon size={18} />
+              </span>
+              <span className="min-w-0">
+                <b>{selectedChip.label} · {pinLocation ? 'Pin placed' : usingGPS ? 'Your location' : 'City centre (approx.)'}</b>
+                <small className="truncate">{activeLocation?.lat.toFixed(5)}, {activeLocation?.lng.toFixed(5)}</small>
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                onClearPin?.();
+                setStep('choose');
+                setUsingGPS(false);
+              }}
+              className="lv-o-btn"
+            >
+              Change
+            </button>
+          </div>
+
+          {/* Neighbourhood */}
+          <div>
+            <FieldLabel htmlFor="rf-neighbourhood">Neighbourhood</FieldLabel>
+            {activeLocation && watchedNeighborhood && !neighborhoodOverride ? (
+              <div className="lv-rf-auto">
+                <span><b>{watchedNeighborhood}</b><small>Auto-detected</small></span>
+                <button type="button" onClick={() => setNeighborhoodOverride(true)} className="lv-o-btn lv-o-btn-ghost">
+                  Change
+                </button>
+              </div>
             ) : (
-              <div className="p-4" style={{ background: 'rgba(199,127,24,0.09)', border: `1px solid ${P.line}`, borderLeft: `3px solid ${MAP.warn}` }}>
-                <div className="flex items-start gap-3">
-                  <AlertTriangle size={15} className="mt-0.5 shrink-0" style={{ color: '#8A5710' }} />
-                  <div className="flex-1 space-y-1.5">
-                    <p className="text-[13px] font-black" style={{ color: '#8A5710' }}>Location access is off</p>
-                    <p className="text-xs leading-relaxed" style={{ color: P.soft }}>
-                      Your browser hasn't shared your location — no problem, just drop a pin below.
-                    </p>
-                    <a
-                      href="https://support.google.com/chrome/answer/142065"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[11px] font-bold underline underline-offset-2"
-                      style={{ color: '#8A5710' }}
-                    >
-                      How to enable location
-                      <ExternalLink size={10} />
-                    </a>
-                  </div>
-                </div>
+              <div className="lv-rf-select">
+                <select id="rf-neighbourhood" {...register('neighborhood')} className="lv-o-input" aria-invalid={errors.neighborhood ? 'true' : undefined}>
+                  <option value="">Select area</option>
+                  {NEIGHBOURHOODS.map((n) => (
+                    <option key={n.name} value={n.name}>{n.name}</option>
+                  ))}
+                  <option value="Other">Other / Not listed</option>
+                </select>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </div>
             )}
+            {fieldError(errors.neighborhood?.message)}
+          </div>
 
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.98 }}
-              onClick={handlePinOnMap}
-              className="w-full p-4 text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
-              style={{ background: P.paper, border: `1.5px solid ${P.line}` }}
-            >
-              <span className="relative flex h-11 w-11 shrink-0 items-center justify-center" style={{ background: 'rgba(46,139,122,0.12)' }}>
-                <span className="absolute inset-2 rounded-full animate-ping opacity-25" style={{ background: P.bow }} aria-hidden="true" />
-                <MapPin size={19} style={{ color: P.bow }} />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[14.5px] font-black" style={{ color: P.ink }}>Drop a pin on the map</span>
-                <span className="block text-xs mt-0.5" style={{ color: P.soft }}>
-                  {locationAvailable ? 'Pan to any spot in Calgary' : 'Pan to the exact spot'}
-                </span>
-              </span>
-              <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" style={{ color: P.bow }} />
-            </motion.button>
+          {/* Headline */}
+          <div>
+            <FieldLabel htmlFor="rf-title">Headline</FieldLabel>
+            <input
+              id="rf-title"
+              {...register('title')}
+              placeholder="e.g. Stolen bike, blue Norco, 9 Ave SE"
+              className="lv-o-input"
+              aria-invalid={errors.title ? 'true' : undefined}
+            />
+            {fieldError(errors.title?.message)}
+          </div>
 
-            <p className="pt-1 text-center font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: P.faint }}>
-              The exact spot helps neighbours nearby
-            </p>
+          {/* Description */}
+          <div>
+            <FieldLabel htmlFor="rf-description" hint={`${(watchedDescription ?? '').length}/1000`}>What happened?</FieldLabel>
+            <textarea
+              id="rf-description"
+              {...register('description')}
+              placeholder="What neighbours should know: what, when, anything identifying. Your bike's serial number. The truck's colour."
+              rows={4}
+              className="lv-o-input"
+              aria-invalid={errors.description ? 'true' : undefined}
+            />
+            {fieldError(errors.description?.message)}
           </div>
         </motion.div>
       )}
-      {step === 'form' && (
-        <motion.div key="form" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
-          <form
-            onSubmit={handleSubmit((data) => handleFormSubmit(data))}
-            className="flex flex-col gap-5 p-6"
-            onClick={(e) => e.stopPropagation()}
-            noValidate
-          >
-            {/* Location confirmation bar */}
-            <div className="flex items-center justify-between gap-3 px-4 py-3" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
-              <div className="flex items-center gap-2.5 min-w-0">
-                <MapPin size={14} className="shrink-0" style={{ color: P.bow }} />
-                <div className="min-w-0">
-                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em]" style={{ color: P.bow }}>
-                    {pinLocation ? 'Pin locked' : usingGPS ? 'GPS locked' : 'City centre (approx.)'}
-                  </p>
-                  <p className="font-mono text-[10.5px] mt-0.5 truncate tabular-nums" style={{ color: P.ink }}>
-                    {activeLocation?.lat.toFixed(5)}, {activeLocation?.lng.toFixed(5)}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  onClearPin?.();
-                  setStep('choose');
-                  setUsingGPS(false);
-                }}
-                className="shrink-0 text-[11px] font-bold px-3 py-1.5 transition-colors hover:bg-black/5"
-                style={{ color: P.ink, border: `1px solid ${P.line}`, background: P.paper }}
-              >
-                Change
-              </button>
-            </div>
 
-            {/* 911 notice — compact strip */}
-            <div className="flex items-center gap-2.5 px-3.5 py-2.5" style={{ background: 'rgba(192,57,43,0.06)', border: '1px solid rgba(192,57,43,0.25)' }}>
-              <AlertTriangle size={13} className="shrink-0" style={{ color: P.danger }} />
-              <p className="text-[11px] leading-snug font-medium" style={{ color: '#8A2A22' }}>
-                Not sent to police. Emergencies: call <b>911</b> — this alerts neighbours in parallel.
-              </p>
-            </div>
-
-            {/* Category — one-tap colour chips, same language as the map */}
-            <div>
-              <FieldLabel>Category</FieldLabel>
-              <div className="grid grid-cols-5 gap-1.5">
-                {CATEGORY_CHIPS.map(({ id, label, Icon, color }) => {
-                  const active = watchedCategory === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => setValue('category', id, { shouldValidate: true, shouldDirty: true })}
-                      className="flex flex-col items-center gap-1 py-2.5 transition-all active:scale-95"
-                      style={active
-                        ? { background: color, border: `1.5px solid ${color}`, color: '#fff' }
-                        : { background: P.paper, border: `1.5px solid ${P.line}`, color: P.soft }}
-                      aria-pressed={active}
-                    >
-                      <Icon size={16} style={{ color: active ? '#fff' : color }} />
-                      <span className="text-[9.5px] font-black uppercase tracking-[0.06em]">{label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Neighbourhood */}
-            <div>
-              <FieldLabel>Neighbourhood</FieldLabel>
-              {activeLocation && watchedNeighborhood && !neighborhoodOverride ? (
-                <div className="flex items-center justify-between px-4 py-3" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2" style={{ background: P.bow }} />
-                    <span className="font-bold text-sm" style={{ color: P.ink }}>{watchedNeighborhood}</span>
-                    <span className="font-mono text-[8.5px] font-bold uppercase tracking-[0.14em]" style={{ color: P.bow }}>Auto-detected</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setNeighborhoodOverride(true)}
-                    className="text-[10px] font-bold uppercase tracking-wider transition-colors hover:opacity-70"
-                    style={{ color: P.soft }}
-                  >
-                    Change
-                  </button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <select
-                    {...register('neighborhood')}
-                    className="w-full appearance-none px-4 py-3 pr-10 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9]"
-                    style={inputStyle}
-                  >
-                    <option value="">Select area</option>
-                    {NEIGHBOURHOODS.map((n) => (
-                      <option key={n.name} value={n.name}>{n.name}</option>
-                    ))}
-                    <option value="Other">Other / Not listed</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: P.soft }}><polyline points="6 9 12 15 18 9"/></svg>
-                  </div>
-                </div>
-              )}
-              {errors.neighborhood && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{errors.neighborhood.message}</p>
-              )}
-            </div>
-
-            {/* Headline */}
-            <div>
-              <FieldLabel>Headline</FieldLabel>
-              <input
-                {...register('title')}
-                placeholder="e.g. Stolen bike — blue Norco, 9 Ave SE"
-                className="w-full h-11 px-4 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
-                style={inputStyle}
-              />
-              {errors.title && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{errors.title.message}</p>
-              )}
-            </div>
-
-            {/* Description */}
-            <div>
-              <FieldLabel hint={`${(watchedDescription ?? '').length}/1000`}>What happened?</FieldLabel>
-              <textarea
-                {...register('description')}
-                placeholder="Give neighbours the details they need — what, when, anything identifying. Your bike's serial number. The truck's colour."
-                rows={3}
-                className="w-full px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
-                style={inputStyle}
-              />
-              {errors.description && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{errors.description.message}</p>
-              )}
-            </div>
-
-            {/* Photo */}
-            <div>
-              <FieldLabel hint="Optional · JPEG/PNG/WebP · max 5 MB">Photo</FieldLabel>
-              {/* Photos are published on a public map. People do not think about
-                  what is in the frame until it is already up there, so the
-                  guidance sits at the point of choosing rather than in a policy
-                  page nobody opens. */}
-              <p className="-mt-1 text-[10px] leading-snug" style={{ color: P.soft }}>
-                Anyone can see this. Avoid faces, licence plates and house numbers.
-              </p>
-              {imagePreview ? (
-                <div className="relative overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
-                  <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); setPhotoUploadFailed(false); }}
-                    className="absolute top-2 right-2 p-1.5 transition-all"
-                    style={{ background: 'rgba(28,43,58,0.8)', color: '#fff' }}
-                    aria-label="Remove photo"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ) : (
-                <label
-                  className="flex items-center justify-center gap-3 w-full h-16 cursor-pointer transition-colors hover:bg-black/[0.02]"
-                  style={{ border: `1.5px dashed ${P.line}`, background: P.card }}
+      {step === 'photo' && (
+        <motion.div key="photo" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="lv-rf-step">
+          {/* Photo */}
+          <div>
+            <FieldLabel hint="Optional">Photo</FieldLabel>
+            {imagePreview ? (
+              <div className="lv-rf-preview">
+                <img src={imagePreview} alt="Preview" />
+                <button
+                  type="button"
+                  onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); setPhotoUploadFailed(false); }}
+                  className="lv-o-iconbtn"
+                  aria-label="Remove photo"
                 >
-                  <Image size={18} style={{ color: P.soft }} />
-                  <span className="text-sm font-bold" style={{ color: P.soft }}>Attach a photo</span>
-                  <input
-                    type="file"
-                    // Broad accept on purpose: HEIC and oversized phone photos
-                    // are converted to JPEG before upload, so filtering them out
-                    // of the picker would reject photos we can actually handle.
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] ?? null;
-                      setImageError(null);
-                      setPhotoUploadFailed(false);
-                      if (!file) { setImageFile(null); setImagePreview(null); return; }
-                      // Generous gate: anything past here is downscaled and
-                      // re-encoded to fit the 5 MB upload ceiling, so rejecting
-                      // at 5 MB here would turn ordinary phone photos away.
-                      if (file.size > 25 * 1024 * 1024) {
-                        setImageError('Photo must be under 25 MB.');
-                        setImageFile(null);
-                        setImagePreview(null);
-                        return;
-                      }
-                      setImageFile(file);
-                      setImagePreview(URL.createObjectURL(file));
-                    }}
-                  />
-                </label>
-              )}
-              {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{imageError}</p>}
-            </div>
-
-            {/* Anonymous toggle */}
-            <label
-              className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-black/[0.02]"
-              style={{ background: P.card, border: `1px solid ${P.line}` }}
-            >
-              <input
-                type="checkbox"
-                {...register('anonymous', { setValueAs: (v) => v === true })}
-                className="h-4 w-4 cursor-pointer accent-[#2E8B7A]"
-              />
-              <div className="flex-1">
-                <p className="text-xs font-bold" style={{ color: P.ink }}>Hide my name</p>
-                {/* "Your name won't appear" understated it: the account and
-                    email are still recorded against the report for moderation.
-                    Saying so is both honest and a disclosure obligation. */}
-                <p className="text-[10px]" style={{ color: P.soft }}>
-                  Hidden from the public map. Moderators can still see your account.
-                </p>
+                  <X size={18} />
+                </button>
               </div>
-              <span
-                className="font-mono text-[8.5px] font-bold uppercase tracking-[0.12em] px-2 py-1"
-                style={isAnonymous ? { background: 'rgba(46,139,122,0.14)', color: P.bow } : { background: P.paper, color: P.faint, border: `1px solid ${P.line}` }}
-              >
-                {isAnonymous ? 'Name hidden' : 'Named'}
-              </span>
-            </label>
-
-            {errors.root && (
-              <div className="px-1 space-y-2" role="alert">
-                <p className="text-xs font-bold" style={{ color: P.danger }}>
-                  {errors.root.message}
-                </p>
-                {photoUploadFailed && (
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={handleSubmit((data) => handleFormSubmit(data, { skipPhoto: true }))}
-                    className="w-full px-3 py-2.5 text-[11px] font-black uppercase tracking-[0.1em] transition-colors disabled:opacity-60"
-                    style={{ background: P.ink, color: '#fff' }}
-                  >
-                    Post the report without the photo
-                  </button>
-                )}
-              </div>
+            ) : (
+              <label className="lv-rf-drop">
+                <Image size={28} aria-hidden="true" />
+                <b>Attach a photo</b>
+                {/* Photos are published on a public map. People do not think about
+                    what is in the frame until it is already up there, so the
+                    guidance sits at the point of choosing rather than in a policy
+                    page nobody opens. */}
+                <small>Anyone can see this. Avoid faces, licence plates and house numbers.</small>
+                <input
+                  type="file"
+                  // Broad accept on purpose: HEIC and oversized phone photos
+                  // are converted to JPEG before upload, so filtering them out
+                  // of the picker would reject photos we can actually handle.
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null;
+                    setImageError(null);
+                    setPhotoUploadFailed(false);
+                    if (!file) { setImageFile(null); setImagePreview(null); return; }
+                    // Generous gate: anything past here is downscaled and
+                    // re-encoded to fit the 5 MB upload ceiling, so rejecting
+                    // at 5 MB here would turn ordinary phone photos away.
+                    if (file.size > 25 * 1024 * 1024) {
+                      setImageError('Photo must be under 25 MB.');
+                      setImageFile(null);
+                      setImagePreview(null);
+                      return;
+                    }
+                    setImageFile(file);
+                    setImagePreview(URL.createObjectURL(file));
+                  }}
+                />
+              </label>
             )}
+            {imagePreview && (
+              <p className="mt-2 text-[13px]" style={{ color: MAP.muted }}>Anyone can see this. Avoid faces, licence plates and house numbers.</p>
+            )}
+            {fieldError(imageError ?? undefined)}
+          </div>
 
-            {/* Submit row */}
-            <div className="flex items-center gap-3 pt-3" style={{ borderTop: `1px solid ${P.line}` }}>
-              <img
-                src={userProfile?.photoURL || 'https://ui-avatars.com/api/?name=Calgary+User&background=1C2B3A&color=fff'}
-                alt=""
-                className="w-9 h-9 rounded-full object-cover"
-                style={{ border: `1px solid ${P.line}`, opacity: isAnonymous ? 0.4 : 1 }}
-                referrerPolicy="no-referrer"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold truncate" style={{ color: P.ink }}>
-                  {isAnonymous ? 'Anonymous' : userProfile?.displayName || 'Calgary User'}
-                </p>
-                <p className="font-mono text-[8.5px] uppercase tracking-[0.14em]" style={{ color: P.soft }}>Reporting live</p>
-              </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="h-12 px-6 font-black text-sm flex items-center gap-2 transition-transform hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-50 whitespace-nowrap"
-                style={{ background: P.ink, color: P.paper, boxShadow: `4px 4px 0 ${P.sky}` }}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={15} className="animate-spin" />
-                    Sending…
-                  </>
-                ) : (
-                  <>
-                    Send it live
-                    <ArrowRight size={14} className="opacity-80" />
-                  </>
-                )}
-              </button>
+          {/* Anonymous toggle */}
+          <label className="lv-rf-toggle">
+            <input
+              type="checkbox"
+              {...register('anonymous', { setValueAs: (v) => v === true })}
+            />
+            <span className="min-w-0 flex-1">
+              <b>Hide my name</b>
+              {/* "Your name won't appear" understated it: the account and
+                  email are still recorded against the report for moderation.
+                  Saying so is both honest and a disclosure obligation. */}
+              <small>Hidden from the public map. Moderators can still see your account.</small>
+            </span>
+            <span className={cn('lv-o-chip', isAnonymous && 'lv-o-chip-yellow')}>{isAnonymous ? 'Hidden' : 'Named'}</span>
+          </label>
+
+          <div className="lv-rf-who">
+            {userProfile?.photoURL && !isAnonymous ? (
+              <img src={userProfile.photoURL} alt="" referrerPolicy="no-referrer" />
+            ) : (
+              <span className="lv-rf-initial" aria-hidden="true">
+                {isAnonymous ? '?' : (userProfile?.displayName || 'C').charAt(0).toUpperCase()}
+              </span>
+            )}
+            <span className="min-w-0">
+              <b className="truncate">Posting as {isAnonymous ? 'Anonymous' : userProfile?.displayName || 'Calgary User'}</b>
+              <small>Shows on the map for neighbours right away.</small>
+            </span>
+          </div>
+
+          {errors.root && (
+            <div className="space-y-3" role="alert">
+              <p className="lv-o-err">{errors.root.message}</p>
+              {photoUploadFailed && (
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={handleSubmit((data) => handleFormSubmit(data, { skipPhoto: true }), onInvalid)}
+                  className="lv-o-btn lv-o-btn-navy w-full"
+                >
+                  Post the report without the photo
+                </button>
+              )}
             </div>
-          </form>
+          )}
+
+          {emergencyNote}
         </motion.div>
       )}
     </AnimatePresence>
+  );
+
+  const footer = (
+    <div className="lv-rf-foot">
+      {step === 'what' ? (
+        <button type="button" onClick={handleClose} className="lv-o-btn lv-o-btn-ghost">Cancel</button>
+      ) : (
+        <button type="button" onClick={goBack} className="lv-o-btn lv-o-btn-ghost">
+          <ArrowLeft size={18} /> Back
+        </button>
+      )}
+      {step === 'photo' ? (
+        <button type="submit" disabled={isSubmitting} className="lv-o-btn lv-o-btn-yellow">
+          {isSubmitting ? (
+            <><Loader2 size={18} className="animate-spin" /> Posting…</>
+          ) : (
+            <>Post report <ArrowRight size={18} /></>
+          )}
+        </button>
+      ) : step === 'what' || step === 'details' ? (
+        <button type="button" onClick={() => void goNext()} className="lv-o-btn lv-o-btn-blue">
+          Continue <ArrowRight size={18} />
+        </button>
+      ) : null}
+    </div>
+  );
+
+  // One <form> around every step, so Enter on the details step moves on
+  // instead of posting a half-finished report.
+  const body = (
+    <form
+      onSubmit={(e) => {
+        if (step === 'photo') { void submitReport(e); return; }
+        e.preventDefault();
+        void goNext();
+      }}
+      onClick={(e) => e.stopPropagation()}
+      className="flex min-h-0 flex-1 flex-col"
+      noValidate
+    >
+      <div className="lv-rf-scroll no-scrollbar">{reportSteps}</div>
+      {footer}
+    </form>
   );
 
   if (!isOpen) return null;
@@ -757,37 +697,40 @@ export default function IncidentForm({
 
   return isLgUp ? (
     <div
-      className="fixed inset-0 z-[115] flex items-center justify-center p-4 backdrop-blur-sm"
-      style={{ background: 'rgba(20,28,38,0.5)', ...hiddenStyle }}
+      className="lv-o lv-rf-wrap lv-o-scrim"
+      style={hiddenStyle}
       onClick={handleClose}
     >
       <div
-        className="relative z-50 w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_32px_80px_-32px_rgba(28,43,58,0.6)]"
-        style={{ background: P.paper, border: `1.5px solid ${P.ink}` }}
+        className="lv-rf"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Post a report"
         onClick={(e) => e.stopPropagation()}
       >
         {header}
-        <div className="flex-1 overflow-y-auto no-scrollbar">{reportSteps}</div>
+        {body}
       </div>
     </div>
   ) : (
-    <>
+    <div className="lv-o">
       <div
-        className="fixed inset-0 backdrop-blur-sm z-[110]"
-        style={{ background: 'rgba(20,28,38,0.45)', ...hiddenStyle }}
+        className="fixed inset-0 z-[110] lv-o-scrim"
+        style={hiddenStyle}
         onClick={handleClose}
       />
       <div
-        className="fixed bottom-0 left-0 right-0 z-[111] flex flex-col"
-        style={{ maxHeight: '92dvh', background: P.paper, borderTop: `2px solid ${P.ink}`, ...hiddenStyle }}
+        className="lv-rf lv-rf-phone"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Post a report"
+        style={hiddenStyle}
         onPointerDown={(e) => e.stopPropagation()}
       >
-        <div className="flex-shrink-0 flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full" style={{ background: P.line }} />
-        </div>
+        <div className="lv-o-grabber" aria-hidden="true" style={{ background: LIVE.paper }}><span /></div>
         {header}
-        <div className="flex-1 overflow-y-auto no-scrollbar pb-[max(0.5rem,env(safe-area-inset-bottom))]">{reportSteps}</div>
+        {body}
       </div>
-    </>
+    </div>
   );
 }

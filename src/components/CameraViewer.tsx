@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, RefreshCw, Video, X } from 'lucide-react';
 import { distanceMeters, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import { formatDistance } from '@/src/lib/format';
-import { MAP } from '@/src/lib/tokens';
+import '@/src/styles/map-overlays.css';
 
 /**
  * What the roads actually look like, at a size worth looking at.
@@ -122,7 +122,7 @@ export default function CameraViewer({ camera, cameras, onClose, onFocus, guided
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[130] flex items-end justify-center lg:items-center"
+      className="lv-o fixed inset-0 z-[130] flex items-end justify-center lg:items-center lg:p-6"
       role={guidedPreview ? undefined : 'dialog'}
       aria-modal={guidedPreview ? undefined : 'true'}
       aria-hidden={guidedPreview || undefined}
@@ -132,97 +132,63 @@ export default function CameraViewer({ camera, cameras, onClose, onFocus, guided
         type="button"
         aria-label="Close camera view"
         onClick={onClose}
-        className="absolute inset-0 cursor-default"
-        style={{ background: 'rgba(6,22,47,0.72)', backdropFilter: 'blur(6px)' }}
+        className="lv-o-scrim absolute inset-0 cursor-default"
       />
 
-      <div
-        data-tour="camera-viewer"
-        className="relative w-full max-w-xl"
-        style={{ background: MAP.panel, border: `1.5px solid ${MAP.inkDeep}` }}
-      >
-        <div className="flex items-center justify-between gap-2 px-3 py-2.5" style={{ background: MAP.inkDeep }}>
-          <span className="flex min-w-0 items-center gap-2">
-            <Video size={13} className="shrink-0" style={{ color: MAP.ok }} aria-hidden="true" />
-            <span className="truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#AFC5DF' }}>
-              City of Calgary · {current.quadrant}
-            </span>
+      <div data-tour="camera-viewer" className="lv-cam">
+        <div className="lv-cam-head">
+          <span className="lv-cam-src">
+            <span aria-hidden="true"><Video size={17} /></span>
+            <span>City of Calgary · {current.quadrant}</span>
           </span>
-          <span className="flex shrink-0 items-center gap-1">
-            <button
-              type="button"
-              onClick={refresh}
-              aria-label="Load a newer frame"
-              className="grid h-8 w-8 place-items-center transition-transform active:scale-90"
-              style={{ color: '#AFC5DF' }}
-            >
-              <RefreshCw size={14} aria-hidden="true" />
+          <span className="lv-cam-actions">
+            <button type="button" onClick={refresh} aria-label="Load a newer frame" className="lv-o-iconbtn">
+              <RefreshCw size={17} aria-hidden="true" />
             </button>
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={onClose}
-              aria-label="Close camera view"
-              className="grid h-8 w-8 place-items-center transition-transform active:scale-90"
-              style={{ color: '#F2EFE8' }}
-            >
-              <X size={16} aria-hidden="true" />
+            <button ref={closeRef} type="button" onClick={onClose} aria-label="Close camera view" className="lv-o-iconbtn">
+              <X size={19} strokeWidth={2.2} aria-hidden="true" />
             </button>
           </span>
         </div>
 
-        <div className="relative aspect-[3/2] w-full overflow-hidden" style={{ background: MAP.tint }}>
+        <div className="lv-cam-frame">
           {!failed && (
             <img
               key={`${current.id}-${nonce}`}
               src={`${current.imageUrl}?t=${nonce}`}
               alt={`Live traffic camera view at ${current.location}`}
-              className="h-full w-full object-cover"
               onLoad={() => setLoaded(true)}
               onError={() => setFailed(true)}
             />
           )}
           {failed && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-6 text-center" style={{ color: MAP.muted }}>
-              <Video size={22} aria-hidden="true" />
-              <p className="text-[12.5px] font-bold" style={{ color: MAP.inkDeep }}>This camera isn’t sending a picture</p>
-              <p className="font-mono text-[10px]">It may be down for maintenance — try refresh, or step to the next one</p>
+            <div className="lv-cam-fail">
+              <Video size={26} aria-hidden="true" />
+              <b>This camera isn’t sending a picture</b>
+              <small>It may be down for maintenance. Try refresh, or step to the next one.</small>
             </div>
           )}
-          {!failed && !loaded && <div className="absolute inset-0 animate-pulse" style={{ background: MAP.tint }} aria-hidden="true" />}
+          {!failed && !loaded && <div className="absolute inset-0 animate-pulse" style={{ background: '#EAF0FC' }} aria-hidden="true" />}
 
           {walk.length > 1 && (
             <>
-              <button
-                type="button"
-                onClick={() => step(-1)}
-                aria-label="Previous nearby camera"
-                className="absolute left-2 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center transition-transform active:scale-90"
-                style={{ background: 'rgba(6,22,47,0.62)', color: '#F2EFE8' }}
-              >
-                <ChevronLeft size={20} aria-hidden="true" />
+              <button type="button" onClick={() => step(-1)} aria-label="Previous nearby camera" className="lv-o-iconbtn lv-cam-nav is-prev">
+                <ChevronLeft size={22} aria-hidden="true" />
               </button>
-              <button
-                type="button"
-                onClick={() => step(1)}
-                aria-label="Next nearby camera"
-                className="absolute right-2 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center transition-transform active:scale-90"
-                style={{ background: 'rgba(6,22,47,0.62)', color: '#F2EFE8' }}
-              >
-                <ChevronRight size={20} aria-hidden="true" />
+              <button type="button" onClick={() => step(1)} aria-label="Next nearby camera" className="lv-o-iconbtn lv-cam-nav is-next">
+                <ChevronRight size={22} aria-hidden="true" />
               </button>
             </>
           )}
         </div>
 
-        <div className="px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-          <p className="text-[15px] font-black leading-tight" style={{ color: MAP.inkDeep }}>
-            {current.location}
-          </p>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em]" style={{ color: MAP.muted }}>
+        <div className="lv-cam-foot">
+          <h2>{current.location}</h2>
+          <p>
             {walk.length > 1 ? `${index + 1} of ${walk.length} nearby` : 'Nearest camera'}
             {distanceFromOpened !== null && ` · ${formatDistance(distanceFromOpened / 1000)} from where you tapped`}
           </p>
+          <small>A still image the City publishes. Refresh for a newer one.</small>
         </div>
       </div>
     </div>,

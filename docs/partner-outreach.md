@@ -163,3 +163,41 @@ Before sending profile/claim links: check for the canonical entity, deploy/reuse
 - Future specific artwork/photos: email the exact original files to aldo@calgarywatch.ca, with the listing name and requested artist/photographer credit. The form accepts context and an optional HTTPS source URL; it has no file upload.
 - The four existing Downstage event records remain canonical: Dreaming Climate Consciousness on Oct 23 and Oct 24, Creative Stretch (free, as Dylan confirmed), and A Study of Choices. Canonical organizerEntityId links them to biz-downstage. From Scratch has no scheduled record; do not invent dates.
 - Before replying: review/deploy the pending code, install the actual approved image file, verify live public/manage routes and inspect Clare's existing production claim/account/email status. Approval is a separate admin decision. No email was sent by this task.
+
+
+## Outlook outreach batch (2026-10-21)
+
+On 2026-10-21, 30 new organizations got the claim invitation from Outlook. They are venues, attractions, festivals, arts groups, BIAs, breweries and community associations. Each profile was published first in commit 6bfb6a7. The full list, with emails, links and everyone skipped, is in the project file `organizer-replies/2026-10-21-outreach-batch.md`. These addresses aren't in `partner-prospects.json`, so add any STOP reply to `outreach_suppression` by hand.
+
+| Organization | Entity | Contact |
+|---|---|---|
+| Pumphouse Theatres | `biz-pumphouse-theatres` | `operations@pumphousetheatre.ca` |
+| Calgary Underground Film Festival | `biz-calgary-underground-film-festival` | `cuff@calgaryundergroundfilm.org` |
+| Calgary Queer Arts Society | `biz-calgary-queer-arts-society` | `administration@calgaryqueerartssociety.com` |
+| Kensington Sinfonia | `biz-kensington-sinfonia` | `kensingtonsinfonia@gmail.com` |
+| Marda Loop Business Improvement Area | `biz-marda-loop-bia` | `info@visitmardaloop.com` |
+| Kensington Business Improvement Area | `biz-kensington-bia` | `office@kensingtonyyc.com` |
+| The Calgary Boys' Choir | `biz-calgary-boys-choir` | `info@calgaryboyschoir.com` |
+| Calaway Park | `biz-calaway-park` | `info@calawaypark.com` |
+| Butterfield Acres Children's Farm | `biz-butterfield-acres` | `office@butterfieldacres.com` |
+| Calgary Farmyard | `biz-calgary-farmyard` | `info@calgaryfarmyard.com` |
+| Brentwood Community Association | `biz-brentwood-community-association` | `office@brentwoodcommunity.com` |
+| Leighton Art Centre | `biz-leighton-art-centre` | `info@leightoncentre.org` |
+| Calgary Youth Orchestra | `biz-calgary-youth-orchestra` | `cyo@mtroyal.ca` |
+| Village Brewery | `biz-village-brewery` | `info@villagebrewery.com` |
+| Expo Latino Festival | `biz-expo-latino` | `media@expolatino.com` |
+| Taste of Calgary | `biz-taste-of-calgary` | `taste@tasteofcalgary.com` |
+| Stage West Theatre Restaurant | `biz-stage-west-calgary` | `mail@stagewestcalgary.com` |
+| Calgary Young People's Theatre | `biz-calgary-young-peoples-theatre` | `cypt@cypt.ca` |
+| Calgary Tower | `biz-calgary-tower` | `events@calgarytower.com` |
+| Alberta Printmakers | `biz-alberta-printmakers` | `director@albertaprintmakers.com` |
+| Last Best Brewing & Distilling | `biz-last-best-brewing` | `talktous@lastbestbrewing.com` |
+| Marda Loop Communities Association | `biz-marda-loop-communities-association` | `info@mardaloop.com` |
+| Inglewood Community Association | `biz-inglewood-community-association` | `info@icacalgary.com` |
+| Parkdale Community Association | `biz-parkdale-community-association` | `office@parkdaleyyc.com` |
+| Beltline Neighbourhoods Association | `biz-beltline-neighbourhoods-association` | `president@beltlineyyc.ca` |
+| Mount Pleasant Community Association | `biz-mount-pleasant-community-association` | `hallmanager@mpca.ca` |
+| Crescent Heights Community Association | `biz-crescent-heights-community-association` | `info@crescentheightsyyc.ca` |
+| Killarney-Glengarry Community Association | `biz-killarney-glengarry-community-association` | `gm@kgca.ca` |
+| Renfrew Community Association | `biz-renfrew-community-association` | `contact@renfrewyyc.ca` |
+| 17th Avenue Retail & Entertainment District | `biz-17th-avenue-district` | `tulene@17thave.ca` |

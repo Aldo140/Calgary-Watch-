@@ -14,11 +14,12 @@ export const CALGARY_CENTER = {
  * production.
  */
 export const INCIDENT_CATEGORIES = [
-  { value: 'emergency', label: 'Emergency', color: '#dc2626' }, // red-600
-  { value: 'crime', label: 'Crime', color: '#ef4444' }, // red-500
-  { value: 'traffic', label: 'Traffic', color: '#f97316' }, // orange-500
-  { value: 'infrastructure', label: 'Infrastructure', color: '#3b82f6' }, // blue-500
-  { value: 'weather', label: 'Weather', color: '#a855f7' }, // purple-500
+  // Colours mirror CATEGORY in src/lib/tokens.ts so markers, chips and forms agree.
+  { value: 'emergency', label: 'Emergency', color: '#D7261E' },
+  { value: 'crime', label: 'Crime', color: '#E4572E' },
+  { value: 'traffic', label: 'Traffic', color: '#E8920C' },
+  { value: 'infrastructure', label: 'Infrastructure', color: '#1554D1' },
+  { value: 'weather', label: 'Weather', color: '#0094B3' },
 ] as const;
 
 /** Category values accepted on new reports, in display order. */

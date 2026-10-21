@@ -1010,6 +1010,19 @@ export default function MapPage() {
   useEffect(() => {
     if (!isAuthReady) return;
 
+    // Local screenshot harness only. `import.meta.env.DEV` is false in every
+    // production build, so this branch is removed there and the live map can
+    // never show anything but Firestore reports.
+    if (import.meta.env.DEV) {
+      const fixture = (window as { __CW_MAP_FIXTURE__?: Incident[] }).__CW_MAP_FIXTURE__;
+      if (Array.isArray(fixture)) {
+        setFirebaseIncidents(fixture);
+        setHasMoreIncidents(false);
+        setIsLoading(false);
+        return;
+      }
+    }
+
     if (!db) {
       // Firebase not configured — start with an empty map.
       setFirebaseIncidents([]);
@@ -1848,7 +1861,7 @@ export default function MapPage() {
     }
     // Title-case the name so the panel header looks correct regardless of input case
     const displayName = neighborhood.replace(/\b\w/g, c => c.toUpperCase());
-    const base = getAreaIntelligence(displayName);
+    const base = getAreaIntelligence(displayName, incidents);
 
     if (crimeStats && crimeStats.size > 0) {
       const rawKey = neighborhood.toLowerCase().trim();
@@ -1917,29 +1930,27 @@ export default function MapPage() {
         const trend: 'improving' | 'stable' | 'declining' =
           delta < -cityAvg * 0.2 ? 'improving' : delta > cityAvg * 0.2 ? 'declining' : 'stable';
 
-        // Computed insights from real data
-        const sortedTotals = [...crimeStats.entries()]
-          .map(([, e]) => e.crime + e.disorder)
-          .sort((a, b) => b - a);
-        const rawIdx = sortedTotals.findIndex(v => v <= total);
-        const rank = rawIdx === -1 ? sortedTotals.length : rawIdx + 1;
-        const totalCommunities = crimeStats.size;
-
-        const propPct = entry.violent + entry.property > 0
-          ? Math.round((entry.property / (entry.violent + entry.property)) * 100)
-          : 0;
-        const cityPropPct = cityAverages.avgProperty + cityAverages.avgViolent > 0
-          ? Math.round((cityAverages.avgProperty / (cityAverages.avgProperty + cityAverages.avgViolent)) * 100)
-          : 0;
-        const propVsCityText = propPct > cityPropPct
-          ? `above the city average of ${cityPropPct}%`
-          : propPct < cityPropPct
-          ? `below the city average of ${cityPropPct}%`
-          : `equal to the city average of ${cityPropPct}%`;
+        // Computed insights from real data. These figures are 311 service
+        // requests (or StatCan rows), not police-reported crime, and the copy
+        // says so. No ranks: a "#3 of 200" reads as a league table of
+        // neighbourhoods, which is the opposite of the awareness framing.
+        const sortedTotals = [...crimeStats.values()]
+          .map(e => e.crime + e.disorder)
+          .sort((a, b) => a - b);
+        const median = sortedTotals[Math.floor(sortedTotals.length / 2)] ?? 0;
+        const isStatcan = entry.dataSource === 'statcan';
+        const what = isStatcan ? 'incidents in Statistics Canada data' : 'safety-related 311 requests';
+        const comparison = median > 0
+          ? total > median * 1.2
+            ? 'more than most Calgary communities'
+            : total < median * 0.8
+            ? 'fewer than most Calgary communities'
+            : 'about the same as most Calgary communities'
+          : '';
 
         const computedInsights = [
-          `This community ranks #${rank} of ${totalCommunities} Calgary neighbourhoods by total incident volume`,
-          `Property crime accounts for ${propPct}% of all criminal offences — ${propVsCityText}`,
+          `${total.toLocaleString('en-CA')} ${what} in ${entry.year}${comparison ? `, ${comparison}` : ''}.`,
+          'Counts follow population and foot traffic, so busy areas see more. Reports aren\u2019t a score.',
         ];
 
         setSelectedArea({

@@ -12,7 +12,7 @@ import { useMyClaims } from '../../lib/claimsApi';
  * is opened, so a page view costs nothing extra.
  */
 export function AccountMenu() {
-  const { user, logout, isAdmin, isAuthReady } = useAuth();
+  const { user, logout, isAdmin, isAuthReady, openVerification } = useAuth();
   const [open, setOpen] = useState(false);
   const [opened, setOpened] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -68,7 +68,7 @@ export function AccountMenu() {
           >
             <div className="cw-acct-head">
               <span className="cw-acct-avatar cw-acct-avatar-lg">{avatar}</span>
-              <span><strong>{user.displayName || first}</strong><small>{user.email}</small><small>{user.emailVerified ? 'Email verified' : 'Email not verified'}</small></span>
+              <span><strong>{user.displayName || first}</strong><small>{user.email}</small>{user.emailVerified ? <small>Email verified</small> : <button type="button" className="cw-acct-verify" onClick={() => { setOpen(false); openVerification(); }}>Verify your email</button>}</span>
             </div>
             {items.map((i) => (
               <Link key={i.label} to={i.to} role="menuitem" className="cw-acct-item">

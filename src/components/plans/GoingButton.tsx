@@ -70,7 +70,7 @@ export function GoingButton({ eventId, start, past = false, compact = false }: {
           if (user) { void toggle(!on); return; }
           // Remember the tap across sign-in; forget it if sign-in was cancelled.
           setPending(true);
-          await signIn();
+          await signIn({ title: 'Save it to your plans.', intro: 'A free account keeps everything you’re going to in one place. Only the total is ever public, never who’s going.' });
           if (!auth?.currentUser) setPending(false);
         }}
       >

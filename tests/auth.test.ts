@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { authErrorMessage, continueUriRefused, emailProblem, passwordProblem, returnLink } from '../src/lib/auth';
+import { authErrorMessage, continueUriRefused, emailProblem, inboxLink, passwordProblem, returnLink, suggestEmail } from '../src/lib/auth';
 
 describe('email authentication', () => {
   it('validates the signup fields without imposing extra password rules', () => {
@@ -43,11 +43,11 @@ describe('email authentication', () => {
     const dialog = readFileSync('src/components/auth/AuthDialog.tsx', 'utf8');
     assert.match(dialog, /auth\/email-already-in-use'\) \{ switchMode\('signin'\)/);
     assert.match(dialog, /visibilitychange/);
-    assert.match(dialog, /request\.mode \?\? 'signin'/);
+    assert.match(dialog, /request\.mode \?\? \(remembered \? 'signin' : 'signup'\)/);
   });
   it('holds unverified claims and vendor applications, and sends them once verified', () => {
     const claim = readFileSync('src/pages/ClaimListingPage.tsx', 'utf8');
-    assert.match(claim, /signIn\(\{ mode: 'signup', email: draft\.workEmail \}\)/);
+    assert.match(claim, /signIn\(\{ mode: 'signup', email: draft\.workEmail,/);
     assert.match(claim, /pending\.current && user\?\.emailVerified && claims/);
     const vendor = readFileSync('src/pages/VendorApplyPage.tsx', 'utf8');
     assert.match(vendor, /<VerifyEmailNotice action="send your application"/);
@@ -55,6 +55,24 @@ describe('email authentication', () => {
     const submit = readFileSync('src/pages/SubmitDiscoveryPage.tsx', 'utf8');
     assert.match(submit, /<VerifyEmailNotice action="send a listing"/);
     assert.match(submit, /if \(!user\.emailVerified\)/);
+  });
+  it('catches mistyped email domains before an unverifiable account exists', () => {
+    assert.equal(suggestEmail('alison@gmial.com'), 'alison@gmail.com');
+    assert.equal(suggestEmail('Jo@Hotmial.com'), 'jo@hotmail.com');
+    assert.equal(suggestEmail('a@gmail.co'), 'a@gmail.com');
+    assert.equal(suggestEmail('a@yaho.ca'), 'a@yahoo.ca');
+    for (const fine of ['a@gmail.com', 'info@thebarnartisanmarket.ca', 'a@shaw.ca', 'a@acme.co', 'nope']) assert.equal(suggestEmail(fine), '', fine);
+  });
+  it('opens the right webmail from the verify screen, and nothing for custom domains', () => {
+    assert.equal(inboxLink('a@gmail.com')?.label, 'Open Gmail');
+    assert.equal(inboxLink('a@hotmail.ca')?.label, 'Open Outlook');
+    assert.equal(inboxLink('a@icloud.com')?.label, 'Open iCloud Mail');
+    assert.equal(inboxLink('info@thebarnartisanmarket.ca'), null);
+  });
+  it('remembers the last sign-in method and gives every entry point its own reason', () => {
+    assert.match(readFileSync('src/components/FirebaseProvider.tsx', 'utf8'), /rememberSignIn\(currentUser\.providerData\.some/);
+    assert.match(readFileSync('src/components/auth/AuthDialog.tsx', 'utf8'), /Last used/);
+    for (const [file, title] of [['src/components/plans/GoingButton.tsx', 'Save it to your plans.'], ['src/pages/PlansPage.tsx', 'Last step: save it.'], ['src/pages/ClaimListingPage.tsx', 'title: `Claim ${entity.title}.`'], ['src/pages/VendorApplyPage.tsx', 'title: `Apply to ${market.title}.`'], ['src/pages/MarketHQPage.tsx', 'Open Market HQ.']]) assert.ok(readFileSync(file, 'utf8').includes(title), file);
   });
   it('keeps verification enforced in the client and Firestore rules', () => {
     assert.match(readFileSync('src/lib/claimsApi.ts','utf8'), /!user\.emailVerified/);

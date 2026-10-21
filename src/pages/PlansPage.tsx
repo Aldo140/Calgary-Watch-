@@ -318,7 +318,7 @@ export default function PlansPage() {
   const save = async () => {
     if (asUid&&!adminMode.enabled) { setError('Admin view is read-only. Enable admin editing to save changes.'); return; }
     const current = demo ? demo.user : auth?.currentUser;
-    if (!current) { pendingSave.current = true; await signIn(); if (!auth?.currentUser) pendingSave.current = false; return; }
+    if (!current) { pendingSave.current = true; await signIn({ mode: 'signup', title: 'Last step: save it.', intro: 'Create a free account so your neighbourhood, interests and emails stick, on any device.' }); if (!auth?.currentUser) pendingSave.current = false; return; }
     if (problem) { setError(problem); return; }
     setSaving(true); setError('');
     try {
@@ -394,7 +394,7 @@ export default function PlansPage() {
         {asUid ? (
           <div className="cw-wrap"><p className="pl-adminview" role="status"><Shield size={15} aria-hidden="true" /> <span><strong>Admin view.</strong> You’re seeing {profile?.displayName || 'this member'}’s dashboard as they see it. Read-only.</span> <Link to="/admin">Back to admin</Link></p></div>
         ) : null}
-        <SignupSky editing={Boolean(user && hasPlans)} signedIn={Boolean(user)} area={draftArea} onSignIn={() => void signIn()} />
+        <SignupSky editing={Boolean(user && hasPlans)} signedIn={Boolean(user)} area={draftArea} onSignIn={() => void signIn({ mode: 'signin' })} />
         <div className="cw-wrap su-sill">
           <SignupForm
               formRef={formRef}

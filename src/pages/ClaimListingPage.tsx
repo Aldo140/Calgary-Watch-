@@ -122,7 +122,7 @@ function ClaimForm({ id }: { id: string }) {
     }
     // Most claimants are new here: open on "Create account" with their work email, so
     // the account email matches the organization's domain and the claim checks itself.
-    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: draft.workEmail }); if (!auth?.currentUser) pending.current = false; return; }
+    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: draft.workEmail, title: `Claim ${entity.title}.`, intro: 'Create a free account to send your claim. Your work email is filled in: using it lets us confirm you faster.' }); if (!auth?.currentUser) pending.current = false; return; }
     // Unverified: keep the claim queued and send it the moment verification lands.
     if (!current.emailVerified) { pending.current = true; setError('Verify your email before submitting this claim. We’ll send it as soon as you do.'); return; }
     setBusy(true); setError('');

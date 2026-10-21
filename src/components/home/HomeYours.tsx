@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, MapPin } from 'lucide-react';
 import { useAuth } from '../FirebaseProvider';
+import { auth as firebaseAuth } from '../../firebase';
 import { homeAreaOf, useMyGoing, usePlansProfile } from '../../lib/plans';
 import { buildEventPicks, nextUp, pickWhenAt } from '../../lib/eventPicks';
 import { emailPlan, nearHome, partOfDay, setupPercent, setupSteps } from '../../lib/memberHome';
@@ -149,7 +150,7 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
         <p className="h-yours-lead">Choose your emails and interests. Add a neighbourhood for nearby picks, or explore all of Calgary.</p>
         <div className="h-yours-actions">
           <Link to="/plans" className="h-yours-go">Sign up free <ArrowUpRight size={18} aria-hidden="true" /></Link>
-          <button type="button" className="h-yours-signin" onClick={async () => { await signIn(); navigate('/plans'); }}>I have an account</button>
+          <button type="button" className="h-yours-signin" onClick={async () => { await signIn({ mode: 'signin' }); if (firebaseAuth?.currentUser) navigate('/plans'); }}>I have an account</button>
         </div>
       </div>
       <ul className="h-yours-deck">

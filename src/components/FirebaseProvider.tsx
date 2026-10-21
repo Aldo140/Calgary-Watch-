@@ -14,7 +14,7 @@ import { auth, db, isFirebaseConfigured } from '../firebase';
 import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 import { AuthDialog } from './auth/AuthDialog';
-import { continueUriRefused, returnLink, syncVerifiedToken, type AuthRequest } from '../lib/auth';
+import { continueUriRefused, rememberSignIn, returnLink, syncVerifiedToken, type AuthRequest } from '../lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -25,6 +25,8 @@ interface AuthContextType {
   signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   sendVerificationEmail: () => Promise<void>;
+  /** Opens the dialog's verify screen for a signed-in account that hasn't verified yet. */
+  openVerification: () => void;
   refreshCurrentUser: () => Promise<User | null>;
   sendPasswordReset: (email: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -132,6 +134,8 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
 
       // Profile sync is best-effort and deliberately not awaited — nothing the
       // user sees depends on it completing.
+      // Remember how this browser signs in, so the dialog can steer the next visit to the same method.
+      if (currentUser) rememberSignIn(currentUser.providerData.some(p => p.providerId === 'google.com') ? { method: 'google' } : { method: 'email', email: currentUser.email ?? undefined });
       if (currentUser) void syncVerifiedToken(currentUser).catch(error => console.error('Token refresh error:', error));
       if (currentUser && db) {
         void syncUserProfile(currentUser, isApprovedAdmin);
@@ -144,7 +148,8 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const requireAuth = async (request: AuthRequest = {}) => {
     if (auth?.currentUser) return;
     // Guard against an event object when signIn is passed straight to onClick.
-    setAuthRequest({ mode: request?.mode, email: typeof request?.email === 'string' ? request.email : undefined });
+    const text = (value: unknown) => typeof value === 'string' && value.trim() ? value : undefined;
+    setAuthRequest({ mode: request?.mode, email: text(request?.email), title: text(request?.title), intro: text(request?.intro) });
     setAuthOpen(true);
     await new Promise<void>(resolve => { pendingAuth.current = resolve; });
     pendingAuth.current = null;
@@ -256,6 +261,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
         signUpWithEmail,
         signInWithEmail: signInWithEmailAccount,
         sendVerificationEmail,
+        openVerification: () => { if (auth?.currentUser && !auth.currentUser.emailVerified) { setAuthRequest({}); setAuthOpen(true); } },
         refreshCurrentUser,
         sendPasswordReset,
         logout,

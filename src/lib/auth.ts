@@ -2,8 +2,72 @@ import type { ActionCodeSettings, User } from 'firebase/auth';
 
 export type AuthMode = 'signin' | 'signup' | 'reset';
 
-/** What a page can ask of the sign-in dialog: which form to open on, and an email it already knows. */
-export type AuthRequest = { mode?: AuthMode; email?: string };
+/**
+ * What a page can ask of the sign-in dialog: which form to open on, an email
+ * it already knows, and why the person is being asked (a headline and a line
+ * under it), so the dialog reads as the next step of what they were doing.
+ */
+export type AuthRequest = { mode?: AuthMode; email?: string; title?: string; intro?: string };
+
+/** How this browser last signed in, so returning people are steered to the same method. */
+export type LastSignIn = { method: 'google' | 'email'; email?: string };
+const LAST_KEY = 'cw-last-sign-in';
+
+export function readLastSignIn(): LastSignIn | null {
+  try {
+    const value = JSON.parse(localStorage.getItem(LAST_KEY) ?? 'null') as LastSignIn | null;
+    return value && (value.method === 'google' || value.method === 'email') ? { method: value.method, email: typeof value.email === 'string' ? value.email : undefined } : null;
+  } catch { return null; }
+}
+
+export function rememberSignIn(value: LastSignIn): void {
+  try { localStorage.setItem(LAST_KEY, JSON.stringify(value)); } catch { /* private mode: nothing to remember */ }
+}
+
+/** Mail providers Calgarians use most. A near miss of one is almost always a typo. */
+const COMMON_DOMAINS = ['gmail.com', 'hotmail.com', 'hotmail.ca', 'outlook.com', 'live.com', 'live.ca', 'yahoo.com', 'yahoo.ca', 'icloud.com', 'me.com', 'msn.com', 'shaw.ca', 'telus.net', 'protonmail.com', 'proton.me', 'aol.com', 'ucalgary.ca', 'mtroyal.ca'];
+
+function distance(a: string, b: string): number {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0]; row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const next = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = next;
+    }
+  }
+  return row[b.length];
+}
+
+/**
+ * "jo@gmial.com" → "jo@gmail.com". A mistyped address can never be verified,
+ * which locks the person out of claims, so catch it before the account exists.
+ */
+export function suggestEmail(email: string): string {
+  const value = email.trim().toLowerCase();
+  const at = value.lastIndexOf('@');
+  if (at < 1) return '';
+  const domain = value.slice(at + 1);
+  if (domain.length < 4 || COMMON_DOMAINS.includes(domain)) return '';
+  let best = ''; let bestScore = 3;
+  for (const known of COMMON_DOMAINS) {
+    const score = distance(domain, known);
+    if (score < bestScore) { best = known; bestScore = score; }
+  }
+  return best && bestScore <= (domain.length > 6 ? 2 : 1) ? `${value.slice(0, at)}@${best}` : '';
+}
+
+/** Where to open someone's inbox from the verify screen, for the big webmail providers. */
+export function inboxLink(email: string): { label: string; href: string } | null {
+  const domain = email.trim().toLowerCase().split('@')[1] ?? '';
+  if (domain === 'gmail.com' || domain === 'googlemail.com') return { label: 'Open Gmail', href: 'https://mail.google.com/mail/u/0/#search/in%3Aanywhere+calgarywatch' };
+  if (/^(hotmail|outlook|live|msn)\.(com|ca)$/.test(domain)) return { label: 'Open Outlook', href: 'https://outlook.live.com/mail/0/' };
+  if (/^yahoo\.(com|ca)$/.test(domain)) return { label: 'Open Yahoo Mail', href: 'https://mail.yahoo.com/' };
+  if (domain === 'icloud.com' || domain === 'me.com') return { label: 'Open iCloud Mail', href: 'https://www.icloud.com/mail' };
+  if (domain === 'proton.me' || domain === 'protonmail.com') return { label: 'Open Proton Mail', href: 'https://mail.proton.me/' };
+  return null;
+}
 
 export function authCode(error: unknown): string {
   return error instanceof Error ? (error as Error & { code?: string }).code ?? '' : '';

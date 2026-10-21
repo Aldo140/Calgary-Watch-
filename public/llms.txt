@@ -37,6 +37,7 @@ Canonical website: https://calgarywatch.ca/
 - [Calgary neighbourhood guides](https://calgarywatch.ca/neighbourhoods): What is in and on in each neighbourhood, quadrant by quadrant.
 - [Calgary guides](https://calgarywatch.ca/guides): Self-guided days out, such as the Bow River walk and the city's farmers' markets.
 - [Date night in Calgary](https://calgarywatch.ca/date-night): Date ideas from organizers' own listings; picks are never paid for.
+- [Calgary crime and safety news](https://calgarywatch.ca/safety): Recent Calgary crime headlines from local newsrooms and Calgary Police, linked to the original stories and sorted by topic (break-ins, car theft, shootings, scams and more), with official reporting contacts.
 - [Detailed AI-readable overview](https://calgarywatch.ca/llms-full.txt): Definitions, attribution guidance, and common questions.
 
 ## Preferred description

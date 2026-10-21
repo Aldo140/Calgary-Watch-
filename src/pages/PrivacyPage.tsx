@@ -225,7 +225,7 @@ export default function PrivacyPage() {
             <p>
               Separate Calgary Watch scheduled jobs retrieve attributed public information from
               Calgary 311, the Calgary Police newsroom, Environment Canada, Alberta Emergency
-              Alert, Global News Calgary, ENMAX and, when configured, 511 Alberta and an aggregate
+              Alert, the public news feeds of CTV, CBC, Global News, CityNews and LiveWire Calgary, ENMAX and, when configured, 511 Alberta and an aggregate
               traffic-flow provider. Those server-side
               requests do not include information about site visitors.
             </p>

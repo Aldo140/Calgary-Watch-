@@ -104,6 +104,29 @@
           "Rich results report: no new Event or Breadcrumb errors"
         ]
       }
+    },
+    {
+      "id": "seo-2026-10-21-safety-topic-pages-v1",
+      "status": "awaiting_deployment",
+      "commits": [],
+      "routes": ["/safety", "/safety/*"],
+      "targetQueries": [
+        "calgary <crime type>",
+        "calgary car theft",
+        "calgary break ins",
+        "calgary shooting",
+        "calgary crime news",
+        "calgary scams"
+      ],
+      "hypothesis": "One indexable page per crime type, with recent Calgary newsroom and Calgary Police headlines linking out, who to call, FAQ JSON-LD, breadcrumbs, prerendered HTML and sitemap entries, will earn impressions and clicks for 'Calgary <crime>' queries that the map and guide pages don't rank for.",
+      "measurement": {
+        "evaluateAfterDays": 28,
+        "successCriteria": [
+          "Search Console: impressions for /safety/* URLs on 'calgary <crime type>' queries, growing week over week",
+          "No rise in 'Crawled - currently not indexed' for /safety URLs",
+          "Rich results report: no new FAQ or Breadcrumb errors"
+        ]
+      }
     }
   ]
 }

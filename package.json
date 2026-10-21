@@ -40,6 +40,7 @@
     "send:alerts": "tsx scripts/alerts/send.ts",
     "discovery:ingest": "tsx scripts/discovery/ingest.ts",
     "discovery:export": "tsx scripts/discovery/export.ts",
+    "news:crime": "tsx scripts/news/export-crime-news.ts",
     "discovery:actions": "tsx scripts/discovery/actions.ts",
     "discovery:preview": "tsx scripts/discovery/preview.ts"
   },

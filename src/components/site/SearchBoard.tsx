@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, ExternalLink } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
 import { PageHero } from './PageHero';
 import type { SearchIntent } from '../../lib/searchIntent';
 import type { DiscoveryEntity } from '../../types/discovery';
+import type { SafetyHeadline } from '../../lib/safetyNews';
 import { DISCOVERY_SECTIONS, entityPath } from '../../lib/discovery';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import '../../styles/search-page.css';
@@ -28,6 +29,7 @@ const BROWSE: Array<{ to: string; label: string; note: string; icon: ReactNode }
   { to: '/guides', label: 'Guides', note: 'Self-guided days out', icon: <BookOpen size={20} /> },
   { to: '/local', label: 'Local', note: 'Places worth knowing', icon: <MapPin size={20} /> },
   { to: '/best', label: 'Best of Calgary', note: 'Pho, pizza and trades, cited', icon: <Trophy size={20} /> },
+  { to: '/safety', label: 'Safety news', note: 'Calgary crime headlines by topic', icon: <ShieldCheck size={20} /> },
 ];
 
 const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'jazz', 'Kensington', 'free this weekend'];
@@ -68,7 +70,7 @@ export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: Discove
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best, bestLists = [] }: {
+export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best, bestLists = [], safety }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   listingCount: number; resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
@@ -78,6 +80,8 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
   best?: BestAnswer;
   /** Best of Calgary lists the search asks for ("pho", "junk removal"). */
   bestLists?: Array<{ to: string; label: string; note: string }>;
+  /** Safety topic pages and recent headlines for "car theft", "police news Bowness". */
+  safety?: { topics: Array<{ to: string; label: string; note: string }>; headlines: SafetyHeadline[] };
 }) {
   const [tab, setTab] = useState<string>('all');
   const [open, setOpen] = useState<Record<string, boolean>>({});
@@ -138,6 +142,37 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                     </li>
                   ))}
                 </ul>
+              </section>
+            ) : null}
+            {safety && (safety.topics.length || safety.headlines.length) && tab === 'all' ? (
+              <section className="bp-section sx-group" aria-labelledby="sx-safety">
+                <div className="bp-head"><h2 id="sx-safety">Calgary <span>safety news</span></h2><Link className="bp-link" to="/safety">All topics <ArrowRight size={15} aria-hidden="true" /></Link></div>
+                {safety.topics.length ? (
+                  <ul className="sx-results">
+                    {safety.topics.map(t => (
+                      <li key={t.to}>
+                        <Link to={t.to} className="sx-result">
+                          <span className="sx-thumb sx-thumb-best" aria-hidden="true"><ShieldCheck size={26} /></span>
+                          <span className="sx-result-copy"><span className="sx-kind sx-kind-safety">Topic</span><strong>{t.label}</strong><small>{t.note}</small></span>
+                          <ArrowUpRight size={20} aria-hidden="true" className="sx-arrow" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {safety.headlines.length ? (
+                  <ul className="sx-news">
+                    {safety.headlines.map(h => (
+                      <li key={h.url}>
+                        <a href={h.url} target="_blank" rel="noopener noreferrer">
+                          <strong>{h.title}</strong>
+                          <small>{h.source} · {when.format(new Date(h.publishedAt))}{h.community ? ` · ${h.community}` : ''}</small>
+                          <ExternalLink size={16} aria-hidden="true" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </section>
             ) : null}
             {top && tab === 'all' ? <TopHit e={top.e} more={top.more} /> : null}

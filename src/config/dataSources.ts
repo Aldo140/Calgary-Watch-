@@ -92,9 +92,9 @@ export const DATA_SOURCES = [
   },
   {
     id: 'global_news',
-    name: 'Global News Calgary RSS',
-    shortName: 'Global News',
-    description: 'Secondary local-news feed; only safety stories with a named Calgary location qualify.',
+    name: 'Calgary local news RSS',
+    shortName: 'Local news',
+    description: 'CTV, CBC, Global News, CityNews and LiveWire Calgary feeds; only safety stories with a named Calgary location qualify.',
     group: 'Incident ingestion',
     healthMode: 'scheduled',
     cadence: 'Every 30 minutes',

@@ -63,5 +63,6 @@ When discussing a particular incident, cite the incident's Calgary Watch URL whe
 - Airdrie and Calgary-area coverage: https://calgarywatch.ca/coverage
 - Calgary crime map and neighbourhood watch guide: https://calgarywatch.ca/calgary-neighbourhood-watch
 - Airdrie crime map and reporting guide: https://calgarywatch.ca/airdrie-crime-map
+- Calgary crime and safety news by topic: https://calgarywatch.ca/safety
 - Sitemap: https://calgarywatch.ca/sitemap.xml
 - Short AI-readable summary: https://calgarywatch.ca/llms.txt

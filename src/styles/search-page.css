@@ -118,6 +118,14 @@
 .sx-kind-guide { background: #d7f3f9; }
 .sx-kind-neighbourhood { background: var(--navy); color: #fff; }
 .sx-kind-best { background: #111214; color: var(--yellow, #ffdf4f); }
+.sx-kind-safety { background: #d7f3f9; }
+.sx-news { display: grid; margin-top: 18px; border-top: 2px solid var(--ink); }
+.sx-news li { border-bottom: 1.5px solid rgba(21, 21, 21, .16); }
+.sx .sx-news a { position: relative; display: grid; gap: 6px; padding: 14px 36px 14px 4px; color: var(--ink); }
+.sx-news strong { font: 750 17px/1.25 var(--display); letter-spacing: -.01em; }
+.sx-news small { font: 500 12.5px/1.3 var(--mono); color: var(--muted); }
+.sx-news svg { position: absolute; top: 16px; right: 6px; color: var(--muted); }
+.sx .sx-news a:hover strong { text-decoration: underline; text-decoration-color: var(--cyan); text-underline-offset: 3px; }
 .sx-result-copy { display: grid; gap: 5px; min-width: 0; }
 .sx-result-copy strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font: 800 19px/1.15 var(--display); letter-spacing: -.02em; color: var(--ink); }
 .sx-result-copy small { font: 500 13px/1.3 var(--mono); color: var(--muted); }

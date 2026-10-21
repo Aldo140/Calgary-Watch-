@@ -12,6 +12,8 @@ import {
 import { BEST_CATEGORIES } from '@/src/content/bestOf';
 import { BEST_PATH, bestCategory, bestIndexJsonLd, bestItemListJsonLd, bestPath } from './bestOf';
 import { DEFAULT_SHARE_ALT, DEFAULT_SHARE_IMAGE, SHARE_CARD, shareCardFor } from './shareImage';
+import { SAFETY_PATH, SAFETY_TOPICS, SAFETY_UPDATED } from '@/src/content/safetyTopics';
+import { safetyJsonLd, safetyPath } from './safety';
 
 /**
  * Single source of truth for per-route SEO.
@@ -203,6 +205,18 @@ ROUTE_SEO[BEST_PATH] = {
 for (const c of BEST_CATEGORIES) {
   ROUTE_SEO[bestPath(c)] = { title: c.seoTitle, description: c.seoDescription, index: true, pageType: 'CollectionPage', dateModified: c.updated, image: DEFAULT_IMAGE };
 }
+// Calgary safety news (experiment, 2026-10-21): one page per crime people search for.
+ROUTE_SEO[SAFETY_PATH] = {
+  title: 'Calgary Crime News Today: Police & Safety Headlines | CalgaryWatch',
+  description: 'Recent Calgary crime and safety headlines from CTV, CBC, Global, CityNews, LiveWire and Calgary Police, sorted by topic, with who to call and what neighbours can do.',
+  index: true,
+  pageType: 'CollectionPage',
+  dateModified: SAFETY_UPDATED,
+  image: DEFAULT_IMAGE,
+};
+for (const t of SAFETY_TOPICS) {
+  ROUTE_SEO[safetyPath(t)] = { title: t.seoTitle, description: t.seoDescription, index: true, pageType: 'CollectionPage', dateModified: SAFETY_UPDATED, image: DEFAULT_IMAGE };
+}
 ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Search a Calgary neighbourhood or street for recent reports, or find events, markets and local places.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
   ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], index: false, title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
@@ -245,6 +259,11 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
     { name: 'For local businesses', item: `${PRODUCTION_ORIGIN}/partners` },
   ],
 };
+
+ROUTE_BREADCRUMBS[SAFETY_PATH] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Calgary safety news', item: `${PRODUCTION_ORIGIN}${SAFETY_PATH}` }];
+for (const t of SAFETY_TOPICS) {
+  ROUTE_BREADCRUMBS[safetyPath(t)] = [...ROUTE_BREADCRUMBS[SAFETY_PATH], { name: t.label, item: `${PRODUCTION_ORIGIN}${safetyPath(t)}` }];
+}
 
 ROUTE_BREADCRUMBS[BEST_PATH] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Best of Calgary', item: `${PRODUCTION_ORIGIN}${BEST_PATH}` }];
 for (const c of BEST_CATEGORIES) {
@@ -318,6 +337,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
   const entity = kind && slug ? repository.find(kind, slug) : undefined;
   const best = section === BEST_PATH.slice(1) ? (slug ? bestCategory(slug) : undefined) : undefined;
   const bestList = best ? bestItemListJsonLd(best, origin) : pathname === BEST_PATH ? bestIndexJsonLd(origin) : undefined;
+  const safety = safetyJsonLd(pathname);
   const crumbs = ROUTE_BREADCRUMBS[pathname]
     ?? (entity ? listingBreadcrumbs(entity).map(c => ({ name: c.name, item: `${PRODUCTION_ORIGIN}${c.path}` }))
       : hub && !slug ? [ROUTE_BREADCRUMBS['/'][0], { name: hub.label, item: `${PRODUCTION_ORIGIN}${hub.path}` }]
@@ -348,6 +368,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
     },
     ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin, repository.occurrences(), repository.list()) } : {}),
     ...(bestList ? { mainEntity: bestList } : {}),
+    ...(safety ?? {}),
     ...(pathname === COMMUNITY_PATH
       ? {
           about: ['Calgary crime map', 'Calgary crime watch', 'Community watch', 'Calgary public safety map'],

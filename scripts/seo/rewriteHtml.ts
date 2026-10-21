@@ -41,6 +41,11 @@ import type { DiscoveryEntity } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 import { BEST_CATEGORIES } from '../../src/content/bestOf.js';
 import { BEST_PATH, bestCategory, bestPath, publishersOf, rankPlaces, sourceOf, sourcesFor } from '../../src/lib/bestOf.js';
+import { SAFETY_CONTACTS, SAFETY_FAQS, SAFETY_PATH, SAFETY_TOPICS } from '../../src/content/safetyTopics.js';
+import { NEWS_FEEDS } from '../../src/content/newsFeeds.js';
+import { safetyPath, safetyTopic } from '../../src/lib/safety.js';
+import { communitiesFor, headlinesFor, type CrimeNewsFile } from '../../src/lib/safetyNews.js';
+import crimeNews from '../../src/generated/crime-news.json';
 import { listingBreadcrumbs, relatedGroups } from '../../src/lib/listingSeo.js';
 import { organizerProfile } from '../../src/lib/organizations.js';
 import { calendarDateForDisplay, lastEventDate } from '../../src/lib/eventSchedule.js';
@@ -215,6 +220,7 @@ function routeSections(pathname: string, now: Date): string {
  */
 export function buildStaticRouteBody(pathname: string, now = new Date()): string {
   if (pathname === BEST_PATH || pathname.startsWith(`${BEST_PATH}/`)) return bestStaticBody(pathname);
+  if (pathname === SAFETY_PATH || pathname.startsWith(`${SAFETY_PATH}/`)) return safetyStaticBody(pathname);
   if (pathname === AIRDRIE_GUIDE_PATH) {
     const comparisons = AIRDRIE_MAP_COMPARISON.map((row) => `
       <tr>
@@ -405,6 +411,29 @@ function bestStaticBody(pathname: string): string {
   const sources = sourcesFor(c).map(s => `<li>${staticLink(s.url, `${s.publisher}: ${s.title}`)}</li>`).join('');
   const title = c.kind === 'food' ? `Best ${c.noun} in Calgary.` : `${c.label} in Calgary, compared.`;
   return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><p>Best of Calgary · Updated ${escapeText(c.updated)}</p><h1>${escapeText(title)}</h1><p>${escapeText(c.lead)}</p><ol>${rows}</ol><h2>${c.kind === 'food' ? 'Before you go' : 'Before you book'}</h2><ul>${c.tips.map(t => `<li>${escapeText(t)}</li>`).join('')}</ul>${sources ? `<h2>Sources</h2><ul>${sources}</ul>` : ''}<p>${staticLink(BEST_PATH, 'All Best of Calgary lists')} · ${staticLink('/local', 'Browse Local')}</p></article></main>`;
+}
+
+const NEWS = crimeNews as CrimeNewsFile;
+const newsDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric', year: 'numeric' });
+
+/** /safety and /safety/:slug, mirroring SafetyPage: headlines that link out, what to do, who to call. */
+export function safetyStaticBody(pathname: string, news: CrimeNewsFile = NEWS): string {
+  const t = safetyTopic(pathname.split('/')[2]);
+  if (!t && pathname !== SAFETY_PATH) return '';
+  const items = headlinesFor(news.items, t?.slug, t ? 40 : 30);
+  const list = items.length
+    ? `<ol>${items.map(h => `<li>${staticLink(h.url, h.title)} · ${escapeText(h.source)} · <time datetime="${escapeAttr(h.publishedAt)}">${escapeText(newsDay.format(new Date(h.publishedAt)))}</time>${h.community ? ` · ${escapeText(h.community)}` : ''}</li>`).join('')}</ol>`
+    : '<p>Headlines from Calgary newsrooms and Calgary Police appear here as they’re published.</p>';
+  const faqs = [...(t?.faqs ?? []), ...SAFETY_FAQS].map(f => `<h3>${escapeText(f.question)}</h3><p>${escapeText(f.answer)}</p>`).join('');
+  const sources = `<h2>Where headlines come from</h2><ul>${NEWS_FEEDS.map(f => `<li>${staticLink(f.site, f.name)}</li>`).join('')}</ul><p>CalgaryWatch is an independent community-awareness site, not a police service. Charges are allegations until proven in court.</p>`;
+  const call = `<p>${staticLink('tel:911', 'Call 911')} for danger or a crime happening now. Calgary Police non-emergency: ${staticLink(`tel:${SAFETY_CONTACTS.nonEmergency.tel}`, SAFETY_CONTACTS.nonEmergency.label)}. Crime Stoppers: ${staticLink(`tel:${SAFETY_CONTACTS.crimeStoppers.tel}`, SAFETY_CONTACTS.crimeStoppers.label)}.</p>`;
+  const topics = `<ul>${SAFETY_TOPICS.filter(x => x !== t).map(x => `<li>${staticLink(safetyPath(x), `${x.label} in Calgary`)}</li>`).join('')}</ul>`;
+  if (!t) {
+    return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>Calgary crime and safety news.</h1><p>Recent headlines from Calgary newsrooms and Calgary Police, sorted by what happened, with who to call and what neighbours can do.</p>${call}<h2>By topic</h2>${topics}<h2>Latest headlines</h2>${list}<h2>Questions people ask</h2>${faqs}${sources}</article></main>`;
+  }
+  const places = communitiesFor(headlinesFor(news.items, t.slug, 200));
+  const near = places.length ? `<p>Communities named in these headlines: ${places.map(p => staticLink(`/search?q=${encodeURIComponent(p.community)}`, p.community)).join(', ')}.</p>` : '';
+  return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><p>Calgary safety · ${escapeText(t.label)}</p><h1>${escapeText(t.label)} in Calgary.</h1><p>${escapeText(t.lead)}</p>${call}<h2>Recent headlines</h2>${list}<h2>What to do</h2><ol>${t.steps.map(s => `<li>${escapeText(s)}</li>`).join('')}</ol>${t.online ? `<p>Online with Calgary Police, when there’s no suspect: ${escapeText(t.online.toLowerCase())}. ${staticLink(SAFETY_CONTACTS.reportOnline.url, 'Report online')}</p>` : ''}<h2>Near you</h2>${near}<p>${staticLink('/map', 'Recent reports on the map')} · ${staticLink('/check-your-community', 'Know your community')}</p><h2>Questions people ask</h2>${faqs}${sources}<h2>Other safety topics</h2>${topics}<p>${staticLink(SAFETY_PATH, 'All Calgary safety news')}</p></article></main>`;
 }
 
 const fullDate = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'full' });

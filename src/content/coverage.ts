@@ -22,7 +22,7 @@ export const COVERAGE_SERVER_SOURCES: CoverageSource[] = [
   { id: 'calgary_police_news', name: 'Calgary Police news releases', covers: 'Releases from the Calgary Police newsroom that name a Calgary community or quadrant. This is not a police dispatch log.', often: 'Every 30 minutes' },
   { id: 'environment_canada', name: 'Environment Canada warnings', covers: 'Active weather warnings for the Calgary area.', often: 'Every 30 minutes' },
   { id: 'alberta_emergency', name: 'Alberta Emergency Alerts', covers: 'Provincial alerts for Calgary, plus Alberta-wide alerts.', often: 'Every 30 minutes' },
-  { id: 'global_news', name: 'Global News Calgary', covers: 'Safety stories that name a Calgary location.', often: 'Every 30 minutes' },
+  { id: 'global_news', name: 'Calgary newsrooms (CTV, CBC, Global, CityNews, LiveWire)', covers: 'Safety stories that name a Calgary location.', often: 'Every 30 minutes' },
   { id: 'enmax_outages', name: 'ENMAX power outages', covers: 'Current power outages.', often: 'Every 5 minutes' },
   { id: 'alberta_511', name: '511 Alberta', covers: 'Road events in the Calgary region.', often: 'Every 30 minutes', note: 'When available' },
 ];

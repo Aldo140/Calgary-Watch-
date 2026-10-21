@@ -1,0 +1,72 @@
+/*
+ * Calgary safety news (/safety, /safety/:slug), on the brand page kit. A
+ * newsroom-style list of headlines, calm and plain: no red alarms, no
+ * rankings. Rules sit under `.sf` to beat the `.cw-site` link colours.
+ */
+.sf .sf-tel { flex-wrap: wrap; row-gap: 2px; }
+.sf .sf-tel small { flex-basis: 100%; text-align: center; font: 500 11.5px/1.2 var(--mono); opacity: .8; }
+
+.sf .sf-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.sf .sf-topics a { padding: 8px 13px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; color: var(--ink); font: 700 13.5px/1 Inter, sans-serif; transition: background .15s; }
+.sf .sf-topics a:hover { background: #fff5cc; }
+
+/* Headlines */
+.sf-news { display: grid; gap: 0; border-top: 2px solid var(--ink); }
+.sf-item { padding: 16px 4px; border-bottom: 1.5px solid rgba(21, 21, 21, .16); }
+.sf .sf-item-link { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; color: var(--ink); }
+.sf .sf-item-link strong { font: 750 clamp(18px, 1.8vw, 21px)/1.25 var(--display); letter-spacing: -.015em; }
+.sf .sf-item-link svg { flex: none; margin-top: 4px; color: var(--muted); }
+.sf .sf-item-link:hover strong { text-decoration: underline; text-decoration-color: var(--cyan); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.sf-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 8px !important; font: 500 13px/1.3 var(--mono); color: var(--muted); }
+.sf-src { font-weight: 700; color: var(--ink); }
+.sf-src-police::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--blue); vertical-align: 1px; }
+.sf .sf-meta a { display: inline-flex; align-items: center; gap: 4px; color: var(--blue); }
+.sf .sf-meta a:hover { text-decoration: underline; }
+.sf .sf-meta .sf-topic-tag { padding: 3px 8px; border: 1.5px solid var(--ink); border-radius: 999px; background: #fff5cc; color: var(--ink); font-size: 11.5px; }
+.sf-empty { padding: 22px; border: 2px dashed var(--ink); border-radius: 18px; font: 400 16px/1.5 Inter, sans-serif; color: var(--muted); }
+
+/* What to do */
+.sf-do { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.sf-steps { counter-reset: step; display: grid; gap: 14px; }
+.sf-steps li { counter-increment: step; position: relative; padding-left: 52px; min-height: 36px; font: 400 16.5px/1.55 Inter, sans-serif; color: var(--body); }
+.sf-steps li::before { content: counter(step); position: absolute; left: 0; top: -2px; width: 36px; height: 36px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%; background: var(--yellow); color: var(--ink); font: 800 16px/1 var(--display); }
+.sf .sf-call ul li::before { background-color: var(--cyan); }
+.sf .sf-call a { font-weight: 700; white-space: nowrap; }
+
+/* Near you */
+.sf-places { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.sf .sf-places a { display: inline-flex; align-items: center; gap: 5px; padding: 8px 12px; border: 2px solid var(--ink); border-radius: 12px; background: #fff; color: var(--ink); font: 600 14px/1 Inter, sans-serif; }
+.sf .sf-places a:hover { background: #d7f3f9; }
+.sf .sf-near a.bp-card { color: var(--ink); transition: transform .15s, box-shadow .15s; }
+.sf .sf-near a.bp-card:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+.sf .sf-near h3 { display: flex; justify-content: space-between; gap: 12px; }
+
+/* Index grid */
+.sf-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.sf .sf-grid a { position: relative; display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px 46px 18px 18px; border: 2px solid var(--ink); border-radius: 18px; background: #fff; color: var(--ink); transition: transform .15s, box-shadow .15s; }
+.sf .sf-grid a:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.sf-grid strong { font: 800 20px/1.15 var(--display); letter-spacing: -.02em; }
+.sf-grid small { font: 500 13px/1.35 var(--mono); color: var(--muted); }
+.sf-grid svg { position: absolute; top: 18px; right: 16px; }
+
+/* FAQ, sources */
+.sf-faqs { display: grid; gap: 10px; }
+.sf-faqs details { border: 2px solid var(--ink); border-radius: 16px; background: #fff; }
+.sf-faqs summary { padding: 16px 18px; cursor: pointer; font: 750 17px/1.3 var(--display); color: var(--ink); }
+.sf-faqs details p { padding: 0 18px 16px; font: 400 16px/1.55 Inter, sans-serif; color: var(--body); }
+.sf-sources { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.sf .sf-sources a { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font: 600 15px/1.3 Inter, sans-serif; }
+.sf .sf-sources a:hover { text-decoration: underline; }
+.sf-note { display: flex; gap: 10px; align-items: flex-start; margin-top: 22px !important; max-width: 46em; font: 400 14.5px/1.5 Inter, sans-serif; color: var(--muted); }
+.sf-note svg { flex: none; margin-top: 2px; }
+.sf-back { margin-top: 36px !important; }
+.sf .sf-back a { display: inline-flex; align-items: center; gap: 6px; }
+
+@media (max-width: 960px) {
+  .sf-do { grid-template-columns: minmax(0, 1fr); }
+  .sf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .sf-grid { grid-template-columns: minmax(0, 1fr); }
+  .sf .sf-item-link strong { font-size: 17.5px; }
+}

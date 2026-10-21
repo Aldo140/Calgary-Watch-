@@ -12,6 +12,10 @@ import { answerCount, normalizeWords, parseSearchIntent } from '../lib/searchInt
 import { recordSearch } from '../lib/searchDemand';
 import { BEST_CATEGORIES, type BestCategory } from '../content/bestOf';
 import { bestForQuery, bestPath, isRanked } from '../lib/bestOf';
+import { SAFETY_TOPICS } from '../content/safetyTopics';
+import { safetyForQuery, safetyPath } from '../lib/safety';
+import type { CrimeNewsFile } from '../lib/safetyNews';
+import crimeNews from '../generated/crime-news.json';
 
 const KIND: Record<string, string> = { event: 'Event', market: 'Market', business: 'Local', guide: 'Guide', neighbourhood: 'Neighbourhood' };
 const SHORTCUTS: Suggestion[] = [
@@ -20,7 +24,10 @@ const SHORTCUTS: Suggestion[] = [
   { label: 'Live map', note: 'Section', to: '/map' },
   { label: 'Check your community', note: 'Section', to: '/check-your-community' },
   { label: 'Best of Calgary', note: 'Section', to: '/best' },
+  { label: 'Calgary safety news', note: 'Section', to: '/safety' },
 ];
+const NEWS = crimeNews as CrimeNewsFile;
+const NEWS_WORDS = /\b(?:police|crime|crimes|news|safety)\b/i;
 const bestLabel = (c: BestCategory) => c.kind === 'food' ? `Best ${c.noun} in Calgary` : `${c.label} in Calgary`;
 const bestNote = (c: BestCategory) => `${c.places.length} ${c.kind === 'food' ? 'spots' : 'companies'}, ${isRanked(c) ? 'ranked by how many guides name them' : 'A–Z with a source for every fact'}`;
 const COMMUNITY_KEYS = CALGARY_COMMUNITIES.flatMap(c => [c.name, ...(c.aliases ?? [])].map(raw => ({ label: raw.replace(/\b\p{Ll}/gu, ch => ch.toUpperCase()), key: normalizeWords(raw).join(' '), c })));
@@ -45,8 +52,20 @@ export default function SearchPage() {
     ? { picks: bestPicks(all, occurrences, intent.best.thing, new Date(now)), service: serviceFor(intent.best.thing) }
     : undefined, [intent.best, bestLists.length, all, occurrences, now]);
   // "Best pho" counts as answered only when we list one, so Search demand still shows what to add.
+  const safety = useMemo(() => {
+    const topics = safetyForQuery(q);
+    if (!topics.length && !NEWS_WORDS.test(q)) return undefined;
+    const slugs = new Set(topics.map(t => t.slug));
+    const where = intent.communities[0]?.community.name;
+    const onTopic = slugs.size ? NEWS.items.filter(h => h.topics.some(s => slugs.has(s))) : NEWS.items;
+    const local = where ? onTopic.filter(h => h.community === where) : [];
+    return {
+      topics: topics.map(t => ({ to: safetyPath(t), label: `${t.label} in Calgary`, note: 'Recent headlines, what to do and who to call' })),
+      headlines: (local.length ? local : onTopic).slice(0, 4),
+    };
+  }, [q, intent]);
   const answers = q ? answerCount(intent) + (best?.picks.length ? 1 : 0) : 0;
-  const resultCount = results.total + answers + bestLists.length;
+  const resultCount = results.total + answers + bestLists.length + (safety?.topics.length ?? 0);
   const place = intent.communities[0]?.community;
   const nearby = useMemo(() => {
     if (results.total || !place || place.quadrant === 'Centre') return undefined;
@@ -78,6 +97,10 @@ export default function SearchPage() {
       if (out.length >= 5) break;
       if (c.keywords.some(k => normalizeWords(k).join(' ').startsWith(text)) || normalizeWords(bestLabel(c)).join(' ').startsWith(text)) out.push({ label: bestLabel(c), note: 'Best of Calgary', to: bestPath(c) });
     }
+    for (const t of SAFETY_TOPICS) {
+      if (out.length >= 5) break;
+      if ([t.label, ...t.keywords].some(k => normalizeWords(k).join(' ').startsWith(text))) out.push({ label: `${t.label} in Calgary`, note: 'Safety news', to: safetyPath(t) });
+    }
     for (const s of SHORTCUTS) if (normalizeWords(s.label).join(' ').startsWith(text) && out.length < 5) out.push(s);
     // Listings whose title or place starts a word with what's typed, one per title.
     const last = text.split(' ').at(-1) ?? '';
@@ -93,7 +116,7 @@ export default function SearchPage() {
 
   return (
     <SiteLayout>
-      <SearchBoard key={q} q={q} best={best} bestLists={bestLists} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
+      <SearchBoard key={q} q={q} best={best} bestLists={bestLists} safety={safety} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
         listingCount={results.total} resultCount={resultCount} answers={answers}
         partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} nearby={nearby} />
     </SiteLayout>

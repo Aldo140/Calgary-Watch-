@@ -1,5 +1,5 @@
 /**
- * News RSS feeds — Global News Calgary
+ * News RSS feeds — Calgary newsrooms (CTV, CBC, Global, CityNews, LiveWire)
  *
  * Fetches and parses RSS/Atom XML feeds from Calgary local news outlets,
  * filters for safety-relevant stories, and normalises them.
@@ -14,17 +14,14 @@ import { createHash } from 'crypto';
 import type { IncidentCategory } from '../../../src/types/index.js';
 import type { NormalizedIncident } from '../types.js';
 import { NEIGHBOURHOOD_COORDS } from '../../../src/data/neighbourhoodCoords.js';
+import { NEWS_FEEDS } from '../../../src/content/newsFeeds.js';
 
 // ---------------------------------------------------------------------------
 // Feed definitions
 // ---------------------------------------------------------------------------
 
-const FEEDS = [
-  {
-    name: 'Global News Calgary',
-    url: 'https://globalnews.ca/calgary/feed/',
-  },
-];
+// Calgary Police releases have their own source (calgary-police-news.ts).
+const FEEDS = NEWS_FEEDS.filter((feed) => !feed.police);
 
 // ---------------------------------------------------------------------------
 // Keyword → category (ordered: first match wins)
@@ -181,14 +178,24 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
   await Promise.allSettled(
     FEEDS.map(async (feed) => {
       try {
-        const res = await fetch(feed.url, {
-          headers: {
-            'User-Agent': 'CalgaryWatch-Ingest/1.0 (community safety aggregator)',
-            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-          },
-          signal: AbortSignal.timeout(10_000),
-        });
+        // Feeds that move keep their old address as a fallback; the first that answers wins.
+        let res: Response | null = null;
+        for (const url of feed.urls) {
+          res = await fetch(url, {
+            headers: {
+              'User-Agent': 'CalgaryWatch-Ingest/1.0 (community safety aggregator)',
+              'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+            },
+            signal: AbortSignal.timeout(10_000),
+          }).catch(() => null);
+          if (res?.ok) break;
+        }
 
+        if (!res) {
+          failures.push(`${feed.name} could not be reached`);
+          console.warn(`[rss] ${feed.name} could not be reached`);
+          return;
+        }
         if (!res.ok) {
           const message = `${feed.name} responded HTTP ${res.status}`;
           failures.push(message);

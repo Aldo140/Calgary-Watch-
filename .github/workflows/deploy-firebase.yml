@@ -51,6 +51,12 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
         run: npm run ops:feed
 
+      # Calgary crime and safety headlines for /safety and search, from newsroom
+      # RSS feeds (no keys), merged with what the live site already published.
+      - name: Export Calgary safety headlines
+        continue-on-error: true
+        run: npm run news:crime
+
       - name: Build Site
         env:
           VITE_BASE_PATH: /
@@ -84,6 +90,10 @@ jobs:
       # open pages instead of hitting "Failed to fetch dynamically imported module".
       - name: Keep earlier builds' page files for open tabs
         run: node scripts/deploy/keep-previous-assets.mjs
+
+      # The next deploy merges into this copy, so headlines outlive the feeds' short windows.
+      - name: Publish the safety headlines
+        run: cp src/generated/crime-news.json dist/crime-news.json
 
       # Publish the UI before backend provisioning. This keeps ordinary site
       # releases available even when a Google Cloud IAM or Secret Manager
@@ -155,6 +165,7 @@ jobs:
                 "https://calgarywatch.ca/coverage",
                 "https://calgarywatch.ca/calgary-neighbourhood-watch",
                 "https://calgarywatch.ca/airdrie-crime-map",
+                "https://calgarywatch.ca/safety",
                 "https://calgarywatch.ca/llms.txt",
                 "https://calgarywatch.ca/llms-full.txt"
               ]

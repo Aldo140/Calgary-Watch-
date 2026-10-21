@@ -7,7 +7,10 @@ export type AuthMode = 'signin' | 'signup' | 'reset';
  * it already knows, and why the person is being asked (a headline and a line
  * under it), so the dialog reads as the next step of what they were doing.
  */
-export type AuthRequest = { mode?: AuthMode; email?: string; title?: string; intro?: string };
+export type AuthRequest = { mode?: AuthMode; email?: string; name?: string; title?: string; intro?: string; verify?: boolean };
+// `verify`: the page needs a verified email (claims, applications, submissions), so the
+// dialog stays on "Check your inbox" after sign-up. Everywhere else it closes and the
+// account companion nudges later, so saving a plan never waits on an inbox.
 
 /** How this browser last signed in, so returning people are steered to the same method. */
 export type LastSignIn = { method: 'google' | 'email'; email?: string };
@@ -106,6 +109,21 @@ export function continueUriRefused(error: unknown): boolean {
 export function emailProblem(email: string): string {
   if (!email.trim()) return 'Enter your email address.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return 'Enter a valid email address.';
+  return '';
+}
+
+/**
+ * A name a person actually gave us. "Anonymous" is the placeholder profile
+ * sync writes when an account has none (Firestore rules need a non-empty
+ * string), so it never counts as one.
+ */
+export function realName(value: unknown): string {
+  const name = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : '';
+  return name && !/^(anonymous|calgary neighbour)$/i.test(name) ? name.slice(0, 80) : '';
+}
+
+export function nameProblem(name: string): string {
+  if (!realName(name)) return 'Enter your name.';
   return '';
 }
 

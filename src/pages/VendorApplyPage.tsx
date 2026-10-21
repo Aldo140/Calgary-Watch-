@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowUpRight, Check, Lock, Store } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
+import { realName } from '../lib/auth';
 import { discoveryRepository } from '../data/discovery';
 import { entityPath } from '../lib/discovery';
 import { VENDOR_CATEGORIES, applicationProblem, type ApplicationDraft } from '../lib/markets';
@@ -20,7 +21,7 @@ import '../styles/hq.css';
  */
 export default function VendorApplyPage() {
   const { id = '' } = useParams();
-  const { user, signIn, isFirebaseConfigured } = useAuth();
+  const { user, signIn, saveName, isFirebaseConfigured } = useAuth();
   const market = useMemo(() => discoveryRepository.list().find((e) => e.id === id && e.kind === 'market'), [id]);
   const [d, setD] = useState<ApplicationDraft>({ businessName: '', category: '', description: '', website: '', instagram: '', contactName: '', email: '', phone: '', availability: '', agree: false });
   const [state, setState] = useState<'idle' | 'busy' | 'sent' | 'already'>('idle');
@@ -39,7 +40,8 @@ export default function VendorApplyPage() {
     const current = auth?.currentUser;
     const problem = applicationProblem(d);
     if (problem) { setError(problem); return; }
-    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: d.email, title: `Apply to ${market.title}.`, intro: 'Create a free account to send your application. Everything you typed is kept, and the organizer replies by email.' }); if (!auth?.currentUser) pending.current = false; return; }
+    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: d.email, name: d.contactName, verify: true, title: `Apply to ${market.title}.`, intro: 'Create a free account to send your application. Everything you typed is kept, and the organizer replies by email.' }); if (!auth?.currentUser) pending.current = false; return; }
+    if (!realName(current.displayName)) void saveName(d.contactName).catch(() => {});
     // The rules only take applications from verified emails; send it once verification lands.
     if (!current.emailVerified) { pending.current = true; setError('Verify your email to send this application. We’ll send it as soon as you do.'); return; }
     setState('busy'); setError('');

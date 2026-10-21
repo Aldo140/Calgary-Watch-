@@ -14,7 +14,7 @@ import { auth, db, isFirebaseConfigured } from '../firebase';
 import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 import { AuthDialog } from './auth/AuthDialog';
-import { continueUriRefused, rememberSignIn, returnLink, syncVerifiedToken, type AuthRequest } from '../lib/auth';
+import { continueUriRefused, realName, rememberSignIn, returnLink, syncVerifiedToken, type AuthRequest } from '../lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -22,7 +22,9 @@ interface AuthContextType {
   /** Opens the sign-in dialog and resolves once someone is signed in or the dialog is closed. */
   signIn: (request?: AuthRequest) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
+  /** Sets the signed-in account's name, on the Auth profile and the member record. */
+  saveName: (name: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   sendVerificationEmail: () => Promise<void>;
   /** Opens the dialog's verify screen for a signed-in account that hasn't verified yet. */
@@ -50,16 +52,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  * or data subscriptions on this — it is bookkeeping, not something the UI reads
  * before it can show the map.
  */
-async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean): Promise<void> {
+async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean, nameHint?: string): Promise<void> {
   if (!db) return;
   const userRef = doc(db, 'users', currentUser.uid);
   try {
     const existing = await getDoc(userRef);
+    // A new email account fires onAuthStateChanged before updateProfile has set its
+    // name, so the name typed in the form comes in as a hint. Never trade a real name
+    // already on the record for the placeholder.
+    const displayName = realName(currentUser.displayName) || realName(nameHint) || realName(existing.data()?.displayName) || 'Anonymous';
     await setDoc(
       userRef,
       {
         uid: currentUser.uid,
-        displayName: currentUser.displayName || 'Anonymous',
+        displayName,
         email: currentUser.email || '',
         photoURL: currentUser.photoURL || '',
         emailVerified: currentUser.emailVerified,
@@ -94,6 +100,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [authRequest, setAuthRequest] = useState<AuthRequest>({});
   const [, setAuthRevision] = useState(0);
   const pendingAuth = useRef<(() => void) | null>(null);
+  const signupName = useRef('');
 
   useEffect(() => {
     if (!auth || !db) {
@@ -140,7 +147,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       if (currentUser) rememberSignIn(currentUser.providerData.some(p => p.providerId === 'google.com') ? { method: 'google' } : { method: 'email', email: currentUser.email ?? undefined });
       if (currentUser) void syncVerifiedToken(currentUser).catch(error => console.error('Token refresh error:', error));
       if (currentUser && db) {
-        void syncUserProfile(currentUser, isApprovedAdmin);
+        void syncUserProfile(currentUser, isApprovedAdmin, signupName.current);
       }
     });
 
@@ -151,7 +158,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     if (auth?.currentUser) return;
     // Guard against an event object when signIn is passed straight to onClick.
     const text = (value: unknown) => typeof value === 'string' && value.trim() ? value : undefined;
-    setAuthRequest({ mode: request?.mode, email: text(request?.email), title: text(request?.title), intro: text(request?.intro) });
+    setAuthRequest({ mode: request?.mode, email: text(request?.email), name: text(request?.name), title: text(request?.title), intro: text(request?.intro), verify: request?.verify === true });
     setAuthOpen(true);
     await new Promise<void>(resolve => { pendingAuth.current = resolve; });
     pendingAuth.current = null;
@@ -209,14 +216,30 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     try { await sendEmailVerification(account, settings); }
     catch (error) { if (!settings || !continueUriRefused(error)) throw error; await sendEmailVerification(account); }
   };
-  const signUpWithEmail = (email: string, password: string, displayName?: string) => withAuthAction(async () => {
+  const signUpWithEmail = (email: string, password: string, displayName: string) => withAuthAction(async () => {
+    const name = realName(displayName);
+    signupName.current = name;
     const credential = await createUserWithEmailAndPassword(auth!, email, password);
-    if (displayName) await updateProfile(credential.user, { displayName }).catch(error => console.error('Display name error:', error));
+    if (name) await updateProfile(credential.user, { displayName: name }).catch(error => console.error('Display name error:', error));
     // The account exists now; a failed email is offered again from the verify screen.
     await sendVerificationTo(credential.user).catch(error => console.error('Verification email error:', error));
     setUser(credential.user);
-    void syncUserProfile(credential.user, false);
+    await syncUserProfile(credential.user, false, name);
+    signupName.current = '';
   });
+  const saveName = async (value: string) => {
+    const name = realName(value);
+    const account = auth?.currentUser;
+    if (!account || !name || realName(account.displayName) === name) return;
+    await updateProfile(account, { displayName: name });
+    setAuthRevision(v => v + 1);
+    await syncUserProfile(account, account.emailVerified && isApprovedAdminEmail(account.email), name);
+  };
+  // Only pages that need a verified email keep the dialog on "Check your inbox".
+  const finishAuth = async (action: () => Promise<void>) => {
+    await action();
+    if (!authRequest.verify && auth?.currentUser) { setAuthOpen(false); pendingAuth.current?.(); pendingAuth.current = null; }
+  };
   const signInWithEmailAccount = (email: string, password: string) => withAuthAction(async () => {
     await signInWithEmailAndPassword(auth!, email, password);
   });
@@ -261,9 +284,10 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
         signIn: requireAuth,
         signInWithGoogle: signInWithGoogleAccount,
         signUpWithEmail,
+        saveName,
         signInWithEmail: signInWithEmailAccount,
         sendVerificationEmail,
-        openVerification: () => { if (auth?.currentUser && !auth.currentUser.emailVerified) { setAuthRequest({}); setAuthOpen(true); } },
+        openVerification: () => { if (auth?.currentUser && !auth.currentUser.emailVerified) { setAuthRequest({ verify: true }); setAuthOpen(true); } },
         refreshCurrentUser,
         sendPasswordReset,
         logout,
@@ -277,7 +301,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-      <AuthDialog open={authOpen} request={authRequest} user={user} busy={isSigningIn} onClose={() => { setAuthOpen(false); pendingAuth.current?.(); pendingAuth.current=null; }} onGoogle={signInWithGoogleAccount} onSignIn={signInWithEmailAccount} onSignUp={signUpWithEmail} onReset={sendPasswordReset} onResend={sendVerificationEmail} onRefresh={refreshCurrentUser} onLogout={logout} />
+      <AuthDialog open={authOpen} request={authRequest} user={user} busy={isSigningIn} onClose={() => { setAuthOpen(false); pendingAuth.current?.(); pendingAuth.current=null; }} onGoogle={signInWithGoogleAccount} onSignIn={(email, password) => finishAuth(() => signInWithEmailAccount(email, password))} onSignUp={(email, password, name) => finishAuth(() => signUpWithEmail(email, password, name))} onReset={sendPasswordReset} onResend={sendVerificationEmail} onRefresh={refreshCurrentUser} onLogout={logout} />
     </AuthContext.Provider>
   );
 }

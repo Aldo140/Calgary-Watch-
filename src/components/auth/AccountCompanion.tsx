@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowUpRight, BadgeCheck, Building2, Mail, X } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, Building2, Mail, UserRound, X } from 'lucide-react';
 import { useAuth } from '../FirebaseProvider';
-import { inboxLink } from '../../lib/auth';
+import { inboxLink, realName } from '../../lib/auth';
 import { useMyClaims } from '../../lib/claimsApi';
 import { organizationForEmail } from '../../lib/orgMatch';
 import { discoveryRepository } from '../../data/discovery';
 import '../../styles/auth.css';
 
-type Card = 'verify' | 'verified' | 'org' | null;
+type Card = 'name' | 'verify' | 'verified' | 'org' | null;
 
 function stored(key: string, session = false): boolean {
   try { return (session ? sessionStorage : localStorage).getItem(key) === '1'; } catch { return false; }
@@ -20,18 +20,21 @@ function store(key: string, session = false): void {
 /**
  * One small card, bottom of the screen, for the moment after an account
  * exists: a nudge to finish verifying, a "you're verified" with what it
- * unlocked, and, when the sign-in email's domain matches a listing's own
+ * unlocked, a one-field "what should we call you?" for accounts made
+ * before sign-up asked for a name, and, when the sign-in email's domain matches a listing's own
  * website, "Is this yours? Claim it". Only one shows at a time, each can be
  * dismissed, and none appear while the sign-in dialog is open.
  */
 export function AccountCompanion() {
-  const { user, isAuthDialogOpen, sendVerificationEmail, openVerification } = useAuth();
+  const { user, isAuthDialogOpen, sendVerificationEmail, openVerification, saveName } = useAuth();
   const { pathname } = useLocation();
   const claims = useMyClaims(user?.emailVerified ? user.uid : undefined);
   const [dismissed, setDismissed] = useState<Record<string, boolean>>({});
   const [justVerified, setJustVerified] = useState(false);
   const [ready, setReady] = useState(false);
   const [sent, setSent] = useState(false);
+  const [name, setName] = useState('');
+  const [saving, setSaving] = useState(false);
   const seen = useRef<{ uid: string; verified: boolean } | null>(null);
 
   // Let the page settle before anything slides in.
@@ -59,6 +62,7 @@ export function AccountCompanion() {
   let card: Card = null;
   if (user && !isAuthDialogOpen && ready) {
     if (justVerified && !dismissed.verified) card = 'verified';
+    else if (!realName(user.displayName) && !dismissed.name && !stored(`cw-name-nudge:${uid}`)) card = 'name';
     else if (!verified && !dismissed.verify && !stored(`cw-verify-nudge:${uid}`, true)) card = 'verify';
     else if (verified && org && !onClaimPage && !dismissed.org && !stored(orgKey)) card = 'org';
   }
@@ -67,6 +71,7 @@ export function AccountCompanion() {
   const close = (which: Exclude<Card, null>) => {
     setDismissed(d => ({ ...d, [which]: true }));
     if (which === 'verify') store(`cw-verify-nudge:${uid}`, true);
+    if (which === 'name') store(`cw-name-nudge:${uid}`);
     if (which === 'org' && orgKey) store(orgKey);
   };
   const inbox = user?.email ? inboxLink(user.email) : null;
@@ -74,7 +79,17 @@ export function AccountCompanion() {
   return (
     <aside className="cw-companion" data-card={card} role="status" aria-live="polite">
       <button type="button" className="cw-companion-x" aria-label="Dismiss" onClick={() => close(card)}><X size={16} /></button>
-      {card === 'verify' ? <>
+      {card === 'name' ? <>
+        <span className="cw-companion-mark" data-tone="brand"><UserRound size={20} aria-hidden="true" /></span>
+        <div>
+          <strong>What should we call you?</strong>
+          <p>So your dashboard and emails greet you properly. It takes a second.</p>
+          <form className="cw-companion-name" onSubmit={e => { e.preventDefault(); if (!realName(name)) return; setSaving(true); void saveName(name).catch(() => setSaving(false)); }}>
+            <input aria-label="Your name" autoComplete="name" autoCapitalize="words" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
+            <button type="submit" disabled={saving || !realName(name)}>{saving ? 'Saving…' : 'Save'}</button>
+          </form>
+        </div>
+      </> : card === 'verify' ? <>
         <span className="cw-companion-mark"><Mail size={20} aria-hidden="true" /></span>
         <div>
           <strong>One tap left: verify {user!.email}</strong>

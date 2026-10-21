@@ -40,6 +40,7 @@ async function render({admin=false,user=true,emailVerified=true,claim=null,path=
   '../data/discovery':moduleUrl(`export const discoveryRepository={list:()=>${JSON.stringify(inventory)}};`),
   '../lib/discovery':moduleUrl("export const entityPath=e=>`/${e.kind==='business'?'local':e.kind==='market'?'markets':'events'}/${e.slug}`;"),
   '../lib/claims':claimsModule,
+  '../lib/auth':compile('../src/lib/auth.ts'),
   '../firebase':moduleUrl(`export const auth={currentUser:${JSON.stringify(userData)}};`),
   '../components/plans/Motion':moduleUrl('export const EASE_OUT=[0.2,0.8,0.2,1];'),
  }));

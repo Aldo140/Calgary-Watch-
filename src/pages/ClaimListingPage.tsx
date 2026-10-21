@@ -14,6 +14,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, BadgeCheck, CalendarClock, CalendarDays, Check, Clock, Link2, Lock, Mail, MapPinned, ShieldCheck, Store, Theater, Music, Palette, Building2, UtensilsCrossed, Users } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
+import { realName } from '../lib/auth';
 import { discoveryRepository } from '../data/discovery';
 import { entityPath } from '../lib/discovery';
 import { CLAIM_ROLES, claimEvidence, claimProblem, claimTimeline, emailDomain, sourceDomains, type ClaimDraft } from '../lib/claims';
@@ -55,7 +56,7 @@ export default function ClaimListingPage() {
 }
 
 function ClaimForm({ id }: { id: string }) {
-  const { user, signIn, sendVerificationEmail, refreshCurrentUser, isAuthActionLoading, isFirebaseConfigured, isAdmin } = useAuth();
+  const { user, signIn, saveName, sendVerificationEmail, refreshCurrentUser, isAuthActionLoading, isFirebaseConfigured, isAdmin } = useAuth();
   const [params] = useSearchParams();
   const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
   const adminView = isAdmin && (!!previewUid || params.get('view') === 'admin');
@@ -122,7 +123,9 @@ function ClaimForm({ id }: { id: string }) {
     }
     // Most claimants are new here: open on "Create account" with their work email, so
     // the account email matches the organization's domain and the claim checks itself.
-    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: draft.workEmail, title: `Claim ${entity.title}.`, intro: 'Create a free account to send your claim. Your work email is filled in: using it lets us confirm you faster.' }); if (!auth?.currentUser) pending.current = false; return; }
+    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: draft.workEmail, name: draft.name, verify: true, title: `Claim ${entity.title}.`, intro: 'Create a free account to send your claim. Your work email is filled in: using it lets us confirm you faster.' }); if (!auth?.currentUser) pending.current = false; return; }
+    // Accounts made before names were asked for take the name typed on the claim.
+    if (!realName(current.displayName)) void saveName(draft.name).catch(() => {});
     // Unverified: keep the claim queued and send it the moment verification lands.
     if (!current.emailVerified) { pending.current = true; setError('Verify your email before submitting this claim. We’ll send it as soon as you do.'); return; }
     setBusy(true); setError('');

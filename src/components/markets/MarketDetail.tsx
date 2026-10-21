@@ -1,6 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Accessibility, ArrowRight, ArrowUpRight, BadgeCheck, Bus, CalendarPlus, Car, Check, Clock, Copy, Dog, ExternalLink, Map as MapIcon, MapPin, Navigation, Quote, Share2, ShieldCheck, Sparkles, Store, Users, type LucideIcon } from 'lucide-react';
+import { Accessibility, ArrowRight, ArrowUpRight, BadgeCheck, Bus, CalendarPlus, Car, Check, Clock, Dog, ExternalLink, Map as MapIcon, MapPin, Navigation, Quote, Share2, ShieldCheck, Sparkles, Store, Users, type LucideIcon } from 'lucide-react';
 import type { Business, DiscoveryEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
@@ -12,7 +12,7 @@ import {
 import { MarketCover } from '../discovery/ListingArt';
 import { TEAR } from '../home/HomeHero';
 import { VerifiedMark } from '../entity/ClaimCta';
-import { CLAIM_BENEFIT } from '../entity/VerifiedBadge';
+import { OrganizerDesk } from '../entity/OrganizerDesk';
 import { SourceBadge } from '../entity/EntityDetail';
 import { MarketLineup } from '../entity/MarketLineup';
 import { MarketMap } from './MarketMap';
@@ -22,10 +22,9 @@ import { iconFor, StorySpread, useSectionReveal } from '../discovery/ProfileSect
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { organizerMarkets } from '../../lib/organizations';
 import { shelfOf, SHELVES } from '../../lib/localShelves';
-import { isOwnerVerified, VERIFICATION_PRIORITY_ENABLED } from '../../lib/verified';
+import { isOwnerVerified } from '../../lib/verified';
 import { useVerifiedListing } from '../../lib/claimsApi';
 import { organizationClaimPath } from '../../lib/claimOrganization';
-import '../../styles/claim.css';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/markets.css';
@@ -49,7 +48,6 @@ const amenityIcon = (a: string): LucideIcon => /accessib/i.test(a) ? Accessibili
 export function MarketDetail({ market, all, occurrences }: { market: Market; all: readonly DiscoveryEntity[]; occurrences: readonly MarketOccurrence[] }) {
   const [now] = useState(() => new Date());
   const [shared, setShared] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [allDates, setAllDates] = useState(false);
   const dates = upcoming(market, occurrences, now);
   const next = nextOpen(market, occurrences, now);
@@ -80,9 +78,6 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
     a.download = `${market.slug}.ics`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  };
-  const copyLink = async () => {
-    try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* blocked */ }
   };
   const share = async () => {
     try {
@@ -237,38 +232,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
 
           <MarketLineup marketId={market.id} sell={false} />
 
-          <section className="mk-dsec mk-desk" data-reveal aria-labelledby="mk-desk-title">
-            <header className="mk-sec-head"><h2 id="mk-desk-title"><span>Vendors &amp; organizers</span></h2><p>Free on CalgaryWatch</p></header>
-            <div className="mk-desk-grid">
-              <div className="mk-desk-card is-vendor">
-                <p className="mk-desk-kicker"><Store size={15} aria-hidden="true" /> For vendors</p>
-                <h3>Sell at {shortName(market)}.</h3>
-                <p>Send {org?.title ?? (market.organizer || 'the organizer')} your application in a couple of minutes. It goes straight to them.</p>
-                <Link className="mk-btn mk-btn-sun" to={`/apply/${encodeURIComponent(market.id)}`}>Apply as a vendor <ArrowUpRight size={16} aria-hidden="true" /></Link>
-              </div>
-              <div className={`mk-desk-card is-org${verified ? ' is-verified' : ''}`}>
-                <p className="mk-desk-kicker"><BadgeCheck size={15} aria-hidden="true" /> For the organizer</p>
-                {verified ? <>
-                  <h3>This page is run by its organizer.</h3>
-                  <p>{org?.title ?? market.organizer ?? 'The organizer'} claimed it and we confirmed them. Dates, hours and links come from their account.</p>
-                  <Link className="mk-btn" to={claimPath}>Manage or request access <ArrowUpRight size={16} aria-hidden="true" /></Link>
-                </> : <>
-                  <h3>Run {shortName(market)}? Make this page yours.</h3>
-                  <ul className="mk-desk-perks">
-                    <li><Check size={16} aria-hidden="true" /> Keep dates, hours and links right yourself</li>
-                    <li><Check size={16} aria-hidden="true" /> A Verified mark beside your name</li>
-                    {VERIFICATION_PRIORITY_ENABLED ? <li><Check size={16} aria-hidden="true" /> More weight when we surface listings</li> : null}
-                  </ul>
-                  <p className="mk-desk-fine" title={CLAIM_BENEFIT}>Free. We check every claim by hand.</p>
-                  <Link className="mk-btn mk-btn-sun" to={claimPath} aria-label={`Claim this listing for ${org?.title ?? market.title}`}>Claim this listing <ArrowUpRight size={16} aria-hidden="true" /></Link>
-                </>}
-                <div className="mk-desk-link">
-                  <span><small>Put it in your bio</small>calgarywatch.ca{entityPath(market)}</span>
-                  <button type="button" onClick={() => void copyLink()}>{copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />} {copied ? 'Copied' : 'Copy'}</button>
-                </div>
-              </div>
-            </div>
-          </section>
+          <OrganizerDesk listing={market} all={all} name={shortName(market)} organizer={org?.title ?? (market.organizer || 'the organizer')} vendorApply={`/apply/${encodeURIComponent(market.id)}`} />
 
           {next && sameDay.length ? (
             <section className="mk-dsec" data-reveal aria-labelledby="mk-same-title">

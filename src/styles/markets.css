@@ -29,6 +29,9 @@
   box-shadow: 3px 3px 0 var(--ink); transition: transform .18s cubic-bezier(.2, 1.4, .4, 1), box-shadow .18s, background .18s;
 }
 .mk .mk-btn { color: var(--ink); }
+/* Buttons too: other page styles loaded alongside (plans.css) reset button backgrounds. */
+.mk button.mk-btn { padding: 0 18px; background: #fff; border: 2px solid var(--ink); color: var(--ink); font: 700 14.5px/1 Inter, sans-serif; }
+.mk button.mk-btn:hover { background: var(--sun); }
 .mk-btn:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); background: var(--sun); }
 .mk-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 .mk .mk-btn-ink { background: var(--navy); color: var(--sun); }
@@ -372,21 +375,24 @@
 
 /* Vendors & organizers: what the page does for the people who make the market. */
 .mk-desk-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 16px; align-items: stretch; }
-.mk-desk-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 22px; border: 2px solid var(--ink); border-radius: 22px; box-shadow: 6px 6px 0 var(--ink); }
+.mk-desk-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; padding: 22px; border: 2px solid var(--ink); border-radius: 22px; box-shadow: 6px 6px 0 var(--ink); }
 .mk-desk-card.is-vendor { background: var(--cyan); }
 .mk-desk-card.is-org { background: var(--navy); color: #fff; box-shadow: 6px 6px 0 var(--sun), 6px 6px 0 2px var(--ink); }
 .mk-desk-kicker { display: flex; align-items: center; gap: 6px; font: 700 12px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .07em; }
 .mk-desk-card.is-org .mk-desk-kicker { color: var(--sun); }
-.mk-desk-card h3 { font: 800 clamp(22px, 2.2vw, 28px)/1.05 var(--display); letter-spacing: -.03em; }
-.mk-desk-card > p { font: 500 14.5px/1.45 Inter, sans-serif; }
+.mk-desk-card h3 { max-width: 100%; overflow-wrap: break-word; font: 800 clamp(22px, 2.2vw, 28px)/1.05 var(--display); letter-spacing: -.03em; }
+.mk-desk-card > p, .mk-desk-main > p { font: 500 14.5px/1.45 Inter, sans-serif; }
 .mk-desk-card .mk-btn { margin-top: 4px; }
 .mk-desk-card.is-vendor .mk-btn { margin-top: auto; }
+.mk-desk-main { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; align-self: stretch; }
+.mk-desk-grid.is-solo { grid-template-columns: 1fr; }
+.mk-desk-grid.is-solo .mk-desk-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 340px); align-items: end; gap: 16px 32px; }
 .mk-desk-perks { display: flex; flex-direction: column; gap: 8px; }
 .mk-desk-perks li { display: flex; align-items: flex-start; gap: 8px; font: 600 14.5px/1.35 Inter, sans-serif; }
 .mk-desk-perks svg { flex: none; margin-top: 1px; color: var(--sun); }
-.mk-desk-card > p.mk-desk-fine { font-size: 13px; color: rgba(255, 255, 255, .7); }
+.mk-desk-card p.mk-desk-fine { font-size: 13px; color: rgba(255, 255, 255, .7); }
 .mk-desk-link { align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; padding: 10px 10px 10px 14px; border: 1.5px dashed rgba(255, 255, 255, .4); border-radius: 14px; }
-.mk-desk-link span { min-width: 0; font: 600 13px/1.35 var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mk-desk-link span { flex: 1; min-width: 0; font: 600 13px/1.35 var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mk-desk-link small { display: block; font: 700 10.5px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--sun); }
 .mk .mk-desk-link button { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px; background: #fff; color: var(--ink); font: 800 13px/1 Inter, sans-serif; }
 .mk .mk-desk-link button:hover { background: var(--sun); }
@@ -545,7 +551,10 @@
   .mk-tickets { grid-template-columns: 1fr; gap: 10px; }
   .mk-tickets li { grid-template-columns: 68px minmax(0, 1fr) auto; box-shadow: 3px 3px 0 var(--ink); }
   .mk-desk-grid { grid-template-columns: 1fr; gap: 14px; }
+  .mk-desk-grid.is-solo .mk-desk-card { display: flex; }
   .mk-desk-card { padding: 18px; box-shadow: 4px 4px 0 var(--ink); }
   .mk-desk-card.is-org { box-shadow: 4px 4px 0 var(--sun), 4px 4px 0 2px var(--ink); }
+  .mk-desk-card .mk-btn { max-width: 100%; height: auto; min-height: 46px; padding: 10px 18px; white-space: normal; text-align: center; line-height: 1.2; }
+  .mk-desk .mk-sec-head h2 { font-size: 23px; }
   .mk-detail .lp-spread-cover { display: none; }
 }

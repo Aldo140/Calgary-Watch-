@@ -55,3 +55,28 @@ describe('market date tickets', () => {
     assert.doesNotMatch(page, /ProfileRibbon/);
   });
 });
+
+describe('event page themes', async () => {
+  const { eventThemeId } = await import('../src/lib/eventTheme.ts');
+  const ev = (title: string, categories: string[] = [], summary = '', venue = '') => ({ kind: 'event' as const, title, categories, tags: [], summary, pricing: 'paid' as const, venue });
+  it('dresses each event for what it is', () => {
+    assert.equal(eventThemeId(ev("Men's Hockey — Calgary Dinos vs. Mount Royal Cougars", ['sports'])), 'sports');
+    assert.equal(eventThemeId(ev('Death From Above 1979', [], 'Doors at 7pm. Dance-punk duo DEATH FROM ABOVE 1979.')), 'music');
+    assert.equal(eventThemeId(ev('A Concrete Jungle Book', [], '', 'StoryBook Theatre')), 'stage');
+    assert.equal(eventThemeId(ev('Jazz Combos', ['arts'], 'jazz combos', 'Reeve Theatre')), 'music');
+    assert.equal(eventThemeId(ev('Nickle@Noon – Artist Talk', ['arts'])), 'talks');
+    assert.equal(eventThemeId(ev('TOUR – Weaving Conflict: Afghan War Carpets at Nickle Galleries', ['arts'])), 'gallery');
+    assert.equal(eventThemeId(ev('Frozen Frights — Halloween on Ice', ['sports'])), 'family');
+    assert.equal(eventThemeId(ev('Ghouls’ Night Out', ['family'])), 'other');
+    assert.equal(eventThemeId(ev('Mercantile on 9th', ['market', 'shopping'])), 'market');
+  });
+  it('the event page uses the theme, the shared organizer desk and #151’s venue list', () => {
+    const page = read('src/components/entity/ListingDetail.tsx');
+    assert.match(page, /const theme = eventTheme\(event\)/);
+    assert.match(page, /<EventScene theme=\{theme\.id\} \/>/);
+    assert.match(page, /moreAtVenue\(event, all, now\)/);
+    assert.match(page, /<OrganizerDesk listing=\{event\}/);
+    assert.match(read('src/components/markets/MarketDetail.tsx'), /<OrganizerDesk listing=\{market\}/);
+    assert.match(read('src/styles/event-detail.css'), /prefers-reduced-motion: reduce/);
+  });
+});

@@ -168,6 +168,9 @@ describe('partner events on the calendar', () => {
   });
 
   it('shows a date-only event without a fake midnight start on its page', () => {
-    assert.match(read('src/components/entity/ListingDetail.tsx'), /<span>\{startClock\(event\.start, time\)\}/);
+    const page = read('src/components/entity/ListingDetail.tsx');
+    assert.match(page, /const dateOnly = event\.schedulePrecision === 'date'/);
+    assert.match(page, /dateOnly\s*\? `\$\{sameDay \? 'All day'/);
+    assert.match(page, /startClock\(event\.start, time\)/);
   });
 });

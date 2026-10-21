@@ -11,7 +11,7 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
-import MobileMapSheet, { type MapSheetRef, RAISED_FRACTION } from '@/src/components/MobileMapSheet';
+import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible, isCommunityFacingIncident } from '@/src/types';
@@ -1564,6 +1564,19 @@ export default function MapPage() {
     openReportForm(pendingReport.location);
     setPendingReport(null);
   }, [pendingReport, user, userProfile, profileNeedsSetup, onboardingDismissedThisSession, openReportForm]);
+
+  // If the profile snapshot never arrives (offline, rules error), don't hold
+  // the report hostage: open the form after a few seconds anyway.
+  useEffect(() => {
+    if (!pendingReport || !user || !db || userProfile !== null) return;
+    const timer = window.setTimeout(() => {
+      setAuthPanelOpen(false);
+      setAuthPanelMode('signin');
+      openReportForm(pendingReport.location);
+      setPendingReport(null);
+    }, 5000);
+    return () => window.clearTimeout(timer);
+  }, [pendingReport, user, userProfile, openReportForm]);
 
   useEffect(() => {
     const targetId = searchParams.get('i');

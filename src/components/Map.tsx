@@ -965,7 +965,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       {isOutsideServiceArea && (
         /* Tucks under whatever the chrome actually measures. */
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(var(--cw-chrome-h,66px)+0.75rem)] lg:top-[5.5rem]">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(var(--cw-chrome-h,66px)+0.75rem)] lg:top-[8.5rem]">
           <div className="lv-notice">
             Zoom in for Calgary metro coverage
           </div>

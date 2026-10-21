@@ -13,7 +13,7 @@ import { Search, X, ChevronDown, ChevronUp, Plus, Activity, Layers, Siren, Alert
 import type { MapTimeWindow } from '@/src/lib/mapTimeWindow';
 import { windowWord } from '@/src/components/map/ChromeParts';
 import { Incident, IncidentCategory, isCommunityFacingIncident, isPubliclyVisible } from '@/src/types';
-import { cn, publicAsset } from '@/src/lib/utils';
+import { cn } from '@/src/lib/utils';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import IncidentRow from '@/src/components/IncidentRow';
 import { useSheetDrag, type SheetState } from '@/src/hooks/useSheetDrag';

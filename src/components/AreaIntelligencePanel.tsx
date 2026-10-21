@@ -167,12 +167,12 @@ function Section({
   subtitle?: string;
   children: React.ReactNode;
 }) {
-  const [ref, inView] = useInView(0.05);
+  // Plays on mount rather than on scroll-into-view: when the panel opens from
+  // a ?near= link mid-load the observer never fired and sections stayed blank.
   return (
     <motion.div
-      ref={ref}
       initial={{ opacity: 0, y: 12 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
     >
       <div className="lv-area-sechead">
@@ -304,8 +304,8 @@ function Masthead({
           <p className="lv-area-stat__num">{fmt(reports)}</p>
           <p className="lv-area-stat__sub">
             {reports === 0
-              ? 'No community reports from here in the last 24 hours.'
-              : `${reports === 1 ? 'community report' : 'community reports'} from neighbours`}
+              ? 'Nothing on the map from here in the last 24 hours.'
+              : `${reports === 1 ? 'report' : 'reports'} on the map from neighbours and public sources`}
           </p>
         </div>
 
@@ -636,7 +636,7 @@ export default function AreaIntelligencePanel({
             <div className="lv-area-sheet__grip" aria-hidden="true" />
             <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
             <Drawer.Description className="sr-only">
-              Community reports from the last 24 hours, Calgary 311 requests and City open data for {data.communityName}.
+              Map reports from the last 24 hours (neighbours and public sources), Calgary 311 requests and City open data for {data.communityName}.
             </Drawer.Description>
             <Content {...contentProps} variant="phone" />
           </div>

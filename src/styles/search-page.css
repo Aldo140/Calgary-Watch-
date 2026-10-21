@@ -98,7 +98,7 @@
 .sx-thumb-market { background: #c9f2d4; }
 .sx-thumb-business { background: #efe3ff; }
 .sx-thumb-guide { background: #d7f3f9; }
-.sx-thumb-neighbourhood { background: var(--navy); color: var(--yellow); }
+.sx-thumb-neighbourhood, .sx-thumb-best { background: var(--navy); color: var(--yellow); }
 .sx-thumb.is-big svg { width: 96px; height: 96px; }
 
 .sx-group { margin-top: clamp(40px, 5vw, 64px); }
@@ -117,6 +117,7 @@
 .sx-kind-business { background: #efe3ff; }
 .sx-kind-guide { background: #d7f3f9; }
 .sx-kind-neighbourhood { background: var(--navy); color: #fff; }
+.sx-kind-best { background: #111214; color: var(--yellow, #ffdf4f); }
 .sx-result-copy { display: grid; gap: 5px; min-width: 0; }
 .sx-result-copy strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font: 800 19px/1.15 var(--display); letter-spacing: -.02em; color: var(--ink); }
 .sx-result-copy small { font: 500 13px/1.3 var(--mono); color: var(--muted); }

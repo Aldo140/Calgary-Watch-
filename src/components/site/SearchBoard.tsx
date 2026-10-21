@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
@@ -27,6 +27,7 @@ const BROWSE: Array<{ to: string; label: string; note: string; icon: ReactNode }
   { to: '/neighbourhoods', label: 'Neighbourhoods', note: 'Quadrant by quadrant', icon: <Compass size={20} /> },
   { to: '/guides', label: 'Guides', note: 'Self-guided days out', icon: <BookOpen size={20} /> },
   { to: '/local', label: 'Local', note: 'Places worth knowing', icon: <MapPin size={20} /> },
+  { to: '/best', label: 'Best of Calgary', note: 'Pho, pizza and trades, cited', icon: <Trophy size={20} /> },
 ];
 
 const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'jazz', 'Kensington', 'free this weekend'];
@@ -67,7 +68,7 @@ export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: Discove
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best }: {
+export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best, bestLists = [] }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   listingCount: number; resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
@@ -75,6 +76,8 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
   nearby?: { title: ReactNode; items: DiscoveryEntity[] };
   /** Listed places for a "best pho" search. */
   best?: BestAnswer;
+  /** Best of Calgary lists the search asks for ("pho", "junk removal"). */
+  bestLists?: Array<{ to: string; label: string; note: string }>;
 }) {
   const [tab, setTab] = useState<string>('all');
   const [open, setOpen] = useState<Record<string, boolean>>({});
@@ -105,8 +108,8 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
             <div className="sx-bar">
               <p className="sx-count" role="status">
                 {resultCount
-                  ? <>{answers ? ready : null}{answers > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
-                  : intent.best ? <>Nothing on CalgaryWatch for <b>“{intent.best.thing}”</b> yet. Here’s where to look.</>
+                  ? <>{bestLists.length ? <><b>{bestLists.length}</b> Best of Calgary {bestLists.length === 1 ? 'list' : 'lists'}{answers || distinct ? ', ' : null}</> : null}{answers ? ready : null}{answers > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
+                  : best && intent.best ? <>Nothing on CalgaryWatch for <b>“{intent.best.thing}”</b> yet. Here’s where to look.</>
                   : <>Nothing matched <b>“{q}”</b> yet. Try a neighbourhood, a street, or one of these.</>}
               </p>
               {kinds.length > 1 ? (
@@ -121,6 +124,22 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
             </div>
             {didYouMean ? <p className="sx-dym">Did you mean <Link to={`/search?q=${encodeURIComponent(didYouMean)}`}>{didYouMean}</Link>?</p> : null}
             {tab === 'all' ? <SearchAnswers intent={intent} now={now} best={best} /> : null}
+            {bestLists.length && tab === 'all' ? (
+              <section className="bp-section sx-group" aria-labelledby="sx-best">
+                <div className="bp-head"><h2 id="sx-best">Best of <span>Calgary</span></h2><Link className="bp-link" to="/best">All lists <ArrowRight size={15} aria-hidden="true" /></Link></div>
+                <ul className="sx-results">
+                  {bestLists.map(b => (
+                    <li key={b.to}>
+                      <Link to={b.to} className="sx-result">
+                        <span className="sx-thumb sx-thumb-best" aria-hidden="true"><Trophy size={26} /></span>
+                        <span className="sx-result-copy"><span className="sx-kind sx-kind-best">List</span><strong>{b.label}</strong><small>{b.note}</small></span>
+                        <ArrowUpRight size={20} aria-hidden="true" className="sx-arrow" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
             {top && tab === 'all' ? <TopHit e={top.e} more={top.more} /> : null}
             {shown.map(kind => {
               const section = DISCOVERY_SECTIONS.find(s => s.kind === kind);
@@ -148,7 +167,7 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                 <Rows rows={collapseRepeats(nearby.items)} />
               </section>
             ) : null}
-            {!resultCount && !intent.best ? <Starters title="Try one of these" /> : null}
+            {!resultCount && !best ? <Starters title="Try one of these" /> : null}
           </>
         ) : (
           <>

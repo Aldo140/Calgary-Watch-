@@ -30,10 +30,10 @@ const categoryColor = (c: string) => INCIDENT_CATEGORIES.find(x => x.value === c
 export function SearchAnswers({ intent, now, best }: { intent: SearchIntent; now: number; best?: BestAnswer }) {
   const reports = useLatestReports(wantsReports(intent) || !!intent.street || !!intent.landmark);
   const boundaries = useBoundaries(intent.communities.length > 0 || !!intent.landmark);
-  if (!intent.communities.length && !intent.street && !intent.landmark && !intent.best && !showsCitywide(intent)) return null;
+  if (!intent.communities.length && !intent.street && !intent.landmark && !best && !showsCitywide(intent)) return null;
   return (
     <div className="cw-answers" aria-label="Answers for your search">
-      {intent.best && <BestCard thing={intent.best.thing} answer={best} where={intent.communities[0]?.community.name} />}
+      {intent.best && best && <BestCard thing={intent.best.thing} answer={best} where={intent.communities[0]?.community.name} />}
       {intent.landmark && <LandmarkCard landmark={intent.landmark} reports={reports} boundaries={boundaries} now={now} />}
       {intent.street && <StreetCard street={intent.street} reports={reports} now={now} />}
       {intent.communities.map(c => <CommunityCard key={c.slug} match={c} intent={intent} reports={reports} boundaries={boundaries} now={now} />)}

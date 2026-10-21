@@ -10,6 +10,8 @@ import { DISCOVERY_SECTIONS, entityPath, normalizeSearch } from '../lib/discover
 import { bestPicks, nearbyListings, searchListings, serviceFor } from '../lib/listingSearch';
 import { answerCount, normalizeWords, parseSearchIntent } from '../lib/searchIntent';
 import { recordSearch } from '../lib/searchDemand';
+import { BEST_CATEGORIES, type BestCategory } from '../content/bestOf';
+import { bestForQuery, bestPath, isRanked } from '../lib/bestOf';
 
 const KIND: Record<string, string> = { event: 'Event', market: 'Market', business: 'Local', guide: 'Guide', neighbourhood: 'Neighbourhood' };
 const SHORTCUTS: Suggestion[] = [
@@ -17,7 +19,10 @@ const SHORTCUTS: Suggestion[] = [
   { label: 'Date night', note: 'Section', to: '/date-night' },
   { label: 'Live map', note: 'Section', to: '/map' },
   { label: 'Check your community', note: 'Section', to: '/check-your-community' },
+  { label: 'Best of Calgary', note: 'Section', to: '/best' },
 ];
+const bestLabel = (c: BestCategory) => c.kind === 'food' ? `Best ${c.noun} in Calgary` : `${c.label} in Calgary`;
+const bestNote = (c: BestCategory) => `${c.places.length} ${c.kind === 'food' ? 'spots' : 'companies'}, ${isRanked(c) ? 'ranked by how many guides name them' : 'A–Z with a source for every fact'}`;
 const COMMUNITY_KEYS = CALGARY_COMMUNITIES.flatMap(c => [c.name, ...(c.aliases ?? [])].map(raw => ({ label: raw.replace(/\b\p{Ll}/gu, ch => ch.toUpperCase()), key: normalizeWords(raw).join(' '), c })));
 
 /**
@@ -34,12 +39,14 @@ export default function SearchPage() {
   const now = useMemo(() => Date.now(), [q]);
   const results = useMemo(() => searchListings(all, occurrences, q, new Date(now)), [all, occurrences, q, now]);
   const intent = useMemo(() => parseSearchIntent(q, now), [q, now]);
-  const best = useMemo(() => intent.best
+  const bestLists = useMemo(() => bestForQuery(q).map(c => ({ to: bestPath(c), label: bestLabel(c), note: bestNote(c) })), [q]);
+  // A cited Best of Calgary list beats the "best …" card; the card covers everything else.
+  const best = useMemo(() => intent.best && !bestLists.length
     ? { picks: bestPicks(all, occurrences, intent.best.thing, new Date(now)), service: serviceFor(intent.best.thing) }
-    : undefined, [intent.best, all, occurrences, now]);
+    : undefined, [intent.best, bestLists.length, all, occurrences, now]);
   // "Best pho" counts as answered only when we list one, so Search demand still shows what to add.
   const answers = q ? answerCount(intent) + (best?.picks.length ? 1 : 0) : 0;
-  const resultCount = results.total + answers;
+  const resultCount = results.total + answers + bestLists.length;
   const place = intent.communities[0]?.community;
   const nearby = useMemo(() => {
     if (results.total || !place || place.quadrant === 'Centre') return undefined;
@@ -67,6 +74,10 @@ export default function SearchPage() {
       const where = label === c.name ? c.quadrant : `${c.name}, ${c.quadrant}`;
       out.push({ label, note: c.quadrant === 'Centre' && label === c.name ? 'Community' : `Community · ${where}`, to: `/search?q=${encodeURIComponent(label)}` });
     }
+    for (const c of BEST_CATEGORIES) {
+      if (out.length >= 5) break;
+      if (c.keywords.some(k => normalizeWords(k).join(' ').startsWith(text)) || normalizeWords(bestLabel(c)).join(' ').startsWith(text)) out.push({ label: bestLabel(c), note: 'Best of Calgary', to: bestPath(c) });
+    }
     for (const s of SHORTCUTS) if (normalizeWords(s.label).join(' ').startsWith(text) && out.length < 5) out.push(s);
     // Listings whose title or place starts a word with what's typed, one per title.
     const last = text.split(' ').at(-1) ?? '';
@@ -82,7 +93,7 @@ export default function SearchPage() {
 
   return (
     <SiteLayout>
-      <SearchBoard key={q} q={q} best={best} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
+      <SearchBoard key={q} q={q} best={best} bestLists={bestLists} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
         listingCount={results.total} resultCount={resultCount} answers={answers}
         partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} nearby={nearby} />
     </SiteLayout>

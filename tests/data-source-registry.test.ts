@@ -93,6 +93,7 @@ describe('source health contract', () => {
   it('derives admin health from the registry and detects stale workflows', () => {
     assert.match(adminHook, /DATA_SOURCES\.map/);
     assert.match(adminHook, /healthClock - checkedAt > staleAfterMs/);
+    assert.match(adminHook, /staleAfterMs = SCHEDULER_SLACK_MINUTES \* 60_000/);
     assert.match(adminHook, /\? 'stale'/);
     assert.match(adminPage, /Incident ingestion/);
     assert.match(adminPage, /Live map layers/);

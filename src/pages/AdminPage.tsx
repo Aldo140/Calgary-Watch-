@@ -45,7 +45,13 @@ import {
   CATEGORY_COLOR, type Tone,
 } from '@/src/components/admin/ui';
 import { INCIDENT_CATEGORIES } from '@/src/constants';
-import { summarizeDataSourceHealth } from '@/src/config/dataSources';
+import { DATA_SOURCES, summarizeDataSourceHealth } from '@/src/config/dataSources';
+import { AdminOverview } from '@/src/components/admin/AdminOverview';
+import { useAdminPulse } from '@/src/hooks/useAdminPulse';
+import type { ApiHealth } from '@/src/hooks/useAdminData';
+import { catalogueStats } from '@/src/lib/adminPulse';
+import { readFeed, summarizeFeeds } from '@/src/lib/feedHealth';
+import { discoveryRepository } from '@/src/data/discovery';
 import { cn } from '@/src/lib/utils';
 
 type Section = AdminSection;
@@ -111,9 +117,8 @@ export default function AdminPage() {
   const d=useAdminData(section==='members'&&params.get('view')!=='insights'?'members-directory':section);
   const work = useAdminWorkload(Boolean(d.isAdmin));
 
-  const failingFeeds = d.apiHealths.filter((a) =>
-    a.status === 'error' || a.status === 'stale' || (a.status === 'disabled' && !a.optional),
-  ).length;
+  // Late-but-running GitHub schedules are expected (lib/feedHealth), not failures.
+  const failingFeeds = summarizeFeeds(d.apiHealths).problems;
 
   const navItems: NavItem[] = useMemo(() => {
     const contentWork = work.suggestions + work.failedActions + work.stuckActions;
@@ -193,8 +198,7 @@ export default function AdminPage() {
       {Object.keys(d.dataErrors).length?<details className="admin-read-warning"><summary>Some reports could not be loaded</summary>{Object.entries(d.dataErrors).map(([name,error])=><p key={name} role="alert"><strong>{name}:</strong> {error}</p>)}</details>:null}
       {work.error ? <details className="admin-read-warning"><summary>Some task counts are unavailable</summary><p role="alert">{work.error}</p></details> : null}
       <AdminSectionBoundary key={section}><Suspense fallback={<Panel title="Opening workspace"><SkeletonRows /></Panel>}>
-      {section==='desk'&&<div className="admin-quick-actions">{ADMIN_SECTIONS.filter(i=>['partners','content','members','planner','ops','feeds'].includes(i.id)).map(i=><button key={i.id} onClick={()=>setSection(i.id)}><strong>{i.title}</strong><span>{i.description}</span></button>)}</div>}
-      {section === 'desk' && <DeskSection d={d} work={work} tasks={deskTasks(work, () => setSection('content'), view => setSection('partners',view), queue=>setSection('ops','queue',queue),()=>setSection('planner','replies'))} />}
+      {section === 'desk' && <DeskSection d={d} work={work} preview={preview} onOpen={(id, view) => setSection(id as Section, view)} tasks={deskTasks(work, () => setSection('content'), view => setSection('partners',view), queue=>setSection('ops','queue',queue),()=>setSection('planner','replies'))} />}
       {section === 'planner' && <WeeklyEmailPlanner profiles={d.digestSubscribers} profilesLoading={!d.digestSubscribersLoaded} profilesError={d.digestSubscribersError} />}
       {section === 'reports' && <ReportsSection d={d} />}
       {section === 'people' && <PeopleSection d={d} />}
@@ -230,22 +234,42 @@ function deskTasks(work: AdminWorkload, openContent: () => void, openPartners?: 
   return tasks;
 }
 
-function DeskSection({ d, work, tasks }: { d: D; work:AdminWorkload; tasks: ReturnType<typeof deskTasks> }) {
+function DeskSection({ d, work, tasks, preview, onOpen }: { d: D; work:AdminWorkload; tasks: ReturnType<typeof deskTasks>; preview?: boolean; onOpen: (section: string, view?: string) => void }) {
+  const live = useAdminPulse(Boolean(d.isAdmin), d.user?.uid);
+  const catalogue = useMemo(() => catalogueStats(discoveryRepository.list(), discoveryRepository.occurrences()), []);
+  // Dev-only `?preview=demo`: the layout with the Oct 21 2026 audience snapshot
+  // and illustrative traffic, so the page can be reviewed without Firebase.
+  const demo = preview && new URLSearchParams(window.location.search).get('preview') === 'demo' ? previewDemo() : null;
+  const apiHealths = demo?.apiHealths ?? d.apiHealths;
   return (
     <>
-      <AttentionQueue
-        emptyStatus={work.loading||d.loadingData?'loading':work.error||Object.values(d.dataErrors).some(Boolean)?'unavailable':'clear'}
-        tasks={tasks}
-        flagged={d.flaggedIncidents}
-        pendingReview={d.pendingReviewIncidents}
-        apiHealths={d.apiHealths}
-        onRestore={d.handleRestore}
-        onDelete={d.handlePermanentDelete}
-        onApprove={d.approveIncident}
-        onHide={d.softDeleteIncident}
-        restoringId={d.restoringId}
-        deletingId={d.deletingId}
-      />
+      <AdminOverview
+        name={demo ? 'Aldo' : d.user?.displayName ?? undefined}
+        members={demo?.members ?? d.totalUsers}
+        pulse={demo?.pulse ?? live}
+        pageViewsTotal={demo?.pageViewsTotal ?? d.totalPageViews}
+        residentReports={demo?.reports ?? d.totalIncidents}
+        reportsToday={d.todayIncidents}
+        apiHealths={apiHealths}
+        catalogue={catalogue}
+        onOpen={onOpen}
+      >
+        <div className="ao-queue">
+          <AttentionQueue
+            emptyStatus={demo ? 'clear' : work.loading||d.loadingData?'loading':work.error||Object.values(d.dataErrors).some(Boolean)?'unavailable':'clear'}
+            tasks={demo?.tasks ?? tasks}
+            flagged={d.flaggedIncidents}
+            pendingReview={d.pendingReviewIncidents}
+            apiHealths={apiHealths}
+            onRestore={d.handleRestore}
+            onDelete={d.handlePermanentDelete}
+            onApprove={d.approveIncident}
+            onHide={d.softDeleteIncident}
+            restoringId={d.restoringId}
+            deletingId={d.deletingId}
+          />
+        </div>
+      </AdminOverview>
 
       <details className="admin-overview-details"><summary>Reports, traffic & city overview</summary><div className="space-y-4 mt-3">
       <StatGrid>
@@ -301,6 +325,38 @@ function DeskSection({ d, work, tasks }: { d: D; work:AdminWorkload; tasks: Retu
       </div></details>
     </>
   );
+}
+
+/** Dev preview data only; never reachable in a production build (see `preview`). */
+function previewDemo() {
+  const now = Date.now();
+  const at = (min: number) => now - min * 60_000;
+  const health = (id: string, status: ApiHealth['status'], lastChecked: number | null, error: string | null = null): ApiHealth => {
+    const source = DATA_SOURCES.find((s) => s.id === id)!;
+    return { ...source, status, lastChecked, lastSuccessAt: lastChecked, recordCount: null, responseMs: 300, error, runId: null };
+  };
+  const apiHealths: ApiHealth[] = [
+    health('calgary_311', 'ok', at(190)), health('calgary_police_news', 'ok', at(190)), health('environment_canada', 'ok', at(190)),
+    health('alberta_emergency', 'ok', at(190)), health('global_news', 'ok', at(190)), health('alberta_511', 'disabled', null),
+    health('enmax_outages', 'ok', at(200)), health('aggregate_traffic_flow', 'disabled', null), health('resend_inbound', 'ok', at(235)),
+    health('calgary_traffic', 'ok', at(1)), health('water_main', 'ok', at(1)), health('open_meteo', 'ok', at(1)),
+  ];
+  const noop = () => {};
+  return {
+    members: 84,
+    pageViewsTotal: 18_420,
+    reports: 37,
+    pulse: { monday: 22, thursday: 4, plans: 31, searchesWeek: 212, viewsWeek: 1_964, newMembersWeek: 6,
+      viewsByDay: [180, 204, 166, 241, 199, 230, 268, 251, 262, 233, 301, 288, 309, 320],
+      signupsByDay: [0, 1, 0, 2, 0, 1, 1, 0, 2, 1, 0, 1, 2, 0] },
+    apiHealths,
+    tasks: [
+      { id: 'social-corrections', tone: 'critical' as const, kind: 'Instagram', title: '11 corrections to handle', open: noop },
+      { id: 'suggestions', tone: 'attention' as const, kind: 'Suggestions', title: '2 event suggestions from residents', detail: 'Check the source, then approve or reject', open: noop },
+      { id: 'social-review', tone: 'attention' as const, kind: 'Instagram', title: '11 drafts to review', open: noop },
+      { id: 'reader-replies', tone: 'attention' as const, kind: 'Email', title: '2 reader replies to handle', open: noop },
+    ],
+  };
 }
 
 function FeedCount({ label, value }: { label: string; value: number | null }) {
@@ -552,23 +608,23 @@ function PeopleSection({ d }: { d: D }) {
 // ── Data feeds ────────────────────────────────────────────────────────────────
 
 function FeedsSection({ d }: { d: D }) {
-  const toneFor = (s: string): Tone =>
-    s === 'ok' ? 'ok'
-      : s === 'slow' || s === 'disabled' ? 'attention'
-        : s === 'error' || s === 'stale' ? 'critical'
-          : 'neutral';
+  const now = Date.now();
+  const verdictTone: Record<ReturnType<typeof readFeed>['verdict'], Tone> = { live: 'ok', late: 'neutral', slow: 'attention', setup: 'attention', stale: 'critical', down: 'critical', waiting: 'neutral' };
+  const toneOf = (api: D['apiHealths'][number]): Tone => {
+    const reading = readFeed(api, now);
+    return reading.verdict === 'down' && !reading.urgent ? 'attention' : verdictTone[reading.verdict];
+  };
   const statusCopy = (api: D['apiHealths'][number]) => {
     if (api.status === 'disabled') return api.setupHint ?? 'Setup required';
     if (api.status === 'stale') return `No check-in since ${api.lastChecked ? new Date(api.lastChecked).toLocaleString('en-CA') : 'unknown'}`;
+    if (readFeed(api, now).verdict === 'late') return readFeed(api, now).note;
     if (api.status === 'error') return api.error ?? 'Not responding';
     if (api.status === 'checking') return 'Checking now…';
     if (api.status === 'idle') return 'Waiting for first health report';
     const noun = api.healthMode === 'scheduled' ? 'produced' : 'returned';
     return `${api.recordCount ?? 0} record${api.recordCount === 1 ? '' : 's'} ${noun}`;
   };
-  const attention = d.apiHealths.filter((api) =>
-    ['error', 'stale', 'slow'].includes(api.status) || (api.status === 'disabled' && !api.optional),
-  ).length;
+  const attention = summarizeFeeds(d.apiHealths, now).problems;
   const setupRequired = d.apiHealths.filter((api) => api.status === 'disabled').length;
   const sourceSummary = summarizeDataSourceHealth(d.apiHealths);
   const groups = ['Incident ingestion', 'Live map layers', 'Email operations'] as const;
@@ -601,12 +657,12 @@ function FeedsSection({ d }: { d: D }) {
           <ul className="divide-y divide-[#E4E2DC]">
             {d.apiHealths.filter((api) => api.group === group).map((api) => (
               <li key={api.id} className="p-3 flex items-start gap-3">
-                <span className="pt-1"><StatusDot tone={toneFor(api.status)} pulse={api.status === 'checking'} /></span>
+                <span className="pt-1"><StatusDot tone={toneOf(api)} pulse={api.status === 'checking'} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-semibold" style={{ color: T.ink }}>{api.name}</p>
                     {api.optional && <Chip tone={api.status === 'disabled' ? 'attention' : 'neutral'}>Optional</Chip>}
-                    <Chip tone={toneFor(api.status)}>{api.status === 'disabled' ? 'Setup required' : api.status}</Chip>
+                    <Chip tone={toneOf(api)}>{api.status === 'disabled' ? 'Setup required' : readFeed(api, now).verdict === 'late' ? 'late · normal' : api.status}</Chip>
                   </span>
                   <p className="text-xs mt-0.5 leading-snug" style={{ color: T.muted }}>{api.description}</p>
                   <p className="text-[0.68rem] mt-1" style={{ color: T.muted }}>
@@ -615,7 +671,7 @@ function FeedsSection({ d }: { d: D }) {
                 </span>
                 <span className="text-right shrink-0 flex flex-col items-end gap-1">
                   {api.responseMs !== null && api.status !== 'disabled' && (
-                    <Figure value={api.responseMs} unit="ms" size="sm" tone={toneFor(api.status)} />
+                    <Figure value={api.responseMs} unit="ms" size="sm" tone={toneOf(api)} />
                   )}
                   <TimeAgo ts={api.lastChecked ?? undefined} />
                   <a

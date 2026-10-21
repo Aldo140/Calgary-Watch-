@@ -45,13 +45,15 @@ export function DiscoveryContent() {
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState('');
+  // Only a failed read hides the lists; a failed save shows in the banner and keeps them.
+  const [loadError, setLoadError] = useState('');
   const [message, setMessage] = useState('');
   const [editor, setEditor] = useState<Editor | null>(null);
   const [ack, setAck] = useState(false);
 
   async function load() {
     if (!db) { setLoaded(true); return; }
-    const database = db;setError('');
+    const database = db;setLoadError('');
     const [events, markets, subs, srcs, actions] = await Promise.all([
       getDocs(collection(database, 'events')),
       getDocs(collection(database, 'markets')),
@@ -65,13 +67,13 @@ export function DiscoveryContent() {
     setQueue(actions ? actions.docs.map(d=>{const raw=d.data(),action=adminObject(raw.action);return {id:d.id,status:adminText(raw.status,'pending'),createdAt:adminTimestamp(raw.createdAt),error:adminText(raw.error),action:{action:adminText(action.action,'moderate'),kind:adminText(action.kind)}} as QueuedAction;}) : []);
     setLoaded(true);
   }
-  useEffect(() => { void load().catch((e) => { setError(firestoreActionError(e)); setLoaded(true); }); }, []);
+  useEffect(() => { void load().catch((e) => { setLoadError(firestoreActionError(e)); setLoaded(true); }); }, []);
 
   async function run(data: Record<string, unknown>) {
     setBusy(true); setError(''); setMessage('');
     try {
       const r = await manageDiscovery(data);
-      await load();
+      await load().catch((e) => setLoadError(firestoreActionError(e)));
       setMessage(r.queued
         ? 'Queued. The moderation job applies it within the hour, then republishes the site.'
         : 'Saved. Published changes reach the public site after the next verified export and release.');
@@ -102,7 +104,7 @@ export function DiscoveryContent() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <AdminButton tone="signal" onClick={() => setEditor({ sourceId: approvedSources[0]?.id || '', recordId: crypto.randomUUID() })}><Plus size={15} /> Add a listing</AdminButton>
-        <AdminButton variant="outline" tone="neutral" disabled={busy} onClick={() => void load().catch((e) => setError(firestoreActionError(e)))}><RefreshCw size={14} /> Refresh</AdminButton>
+        <AdminButton variant="outline" tone="neutral" disabled={busy} onClick={() => { setError(''); void load().catch((e) => setLoadError(firestoreActionError(e))); }}><RefreshCw size={14} /> Refresh</AdminButton>
         {pendingQueue ? <Chip tone="attention">{pendingQueue} change{pendingQueue > 1 ? 's' : ''} queued</Chip> : null}
         <span className="text-xs" style={{ color: T.muted }}>Verification expires after 14 days. A source change sends a listing back to review.</span>
       </div>
@@ -136,7 +138,7 @@ export function DiscoveryContent() {
       ) : null}
 
       <Panel title="Suggested by residents" subtitle="People waiting to hear back. Check the source, then approve or reject." action={submissions.length ? <Chip tone="attention">{submissions.length} waiting</Chip> : undefined}>
-        {error?<p className="p-4">Suggestions could not be confirmed. Refresh to try again.</p>:!loaded ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+        {loadError?<p className="p-4">Suggestions could not be confirmed. Refresh to try again.</p>:!loaded ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
           : submissions.length ? (
             <ul className="divide-y" style={{ borderColor: T.line }}>
               {submissions.map((s) => (
@@ -173,7 +175,7 @@ export function DiscoveryContent() {
             </label>
           ) : null}
         </div>
-        {error?<p className="p-4">Inventory could not be refreshed. Existing data may be out of date.</p>:shown.length ? (
+        {loadError?<p className="p-4">Inventory could not be refreshed. Existing data may be out of date.</p>:shown.length ? (
           <ul className="divide-y mt-2" style={{ borderColor: T.line }}>
             {shown.map((r) => (
               <li key={r.id} className="p-4">

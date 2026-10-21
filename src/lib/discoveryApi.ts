@@ -2,6 +2,7 @@ import { syncVerifiedToken } from './auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { withoutUndefined } from './firestoreSafe';
 
 /**
  * Events and markets: suggestions from residents and moderation by admins.
@@ -46,7 +47,7 @@ export async function submitDiscovery(input: unknown): Promise<DiscoveryResult> 
     for (let slot = 1; slot <= 5; slot++) {
       try {
         await setDoc(doc(db, 'entity_submissions', `${uid}_${day}_${slot}`), {
-          id: `${uid}_${day}_${slot}`, input, submittedBy: uid, status: 'pending', createdAt: new Date().toISOString(), via: 'direct',
+          id: `${uid}_${day}_${slot}`, input: withoutUndefined(input), submittedBy: uid, status: 'pending', createdAt: new Date().toISOString(), via: 'direct',
         });
         return { queued: true };
       } catch (writeError) {
@@ -66,7 +67,7 @@ export async function manageDiscovery(data: Record<string, unknown>): Promise<Di
     if (!functionMissing(error) || !db || !auth?.currentUser) throw error;
     const id = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await setDoc(doc(db, 'discovery_actions', id), {
-      id, action: data, adminUid: auth.currentUser.uid, adminEmail: auth.currentUser.email ?? '', status: 'pending', createdAt: Date.now(),
+      id, action: withoutUndefined(data), adminUid: auth.currentUser.uid, adminEmail: auth.currentUser.email ?? '', status: 'pending', createdAt: Date.now(),
     });
     return { queued: true };
   }

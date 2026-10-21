@@ -123,24 +123,6 @@
         ]
       },
       {
-        "source": "/local",
-        "headers": [
-          {
-            "key": "X-Robots-Tag",
-            "value": "noindex, follow"
-          }
-        ]
-      },
-      {
-        "source": "/local/**",
-        "headers": [
-          {
-            "key": "X-Robots-Tag",
-            "value": "noindex, follow"
-          }
-        ]
-      },
-      {
         "source": "/search",
         "headers": [
           {

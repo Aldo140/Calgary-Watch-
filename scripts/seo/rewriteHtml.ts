@@ -39,6 +39,9 @@ import {
 import { weekAgenda } from '../../src/lib/discoveryCalendar.js';
 import type { DiscoveryEntity } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
+import { listingBreadcrumbs, relatedGroups } from '../../src/lib/listingSeo.js';
+import { organizerProfile } from '../../src/lib/organizations.js';
+import { calendarDateForDisplay, lastEventDate } from '../../src/lib/eventSchedule.js';
 
 /**
  * Where a route's static HTML is written, relative to dist/.
@@ -330,6 +333,11 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
       copy: 'Local guides to Calgary: a day along the Bow River from Harvie Passage to the Peace Bridge, Calgary’s farmers’ markets and artisan food halls, and the historic laneways and craft coffee of Inglewood and Ramsay. Each guide links to the places and official sources it’s built from.',
       links: [['/neighbourhoods', 'Neighbourhood guides'], ['/markets', 'Markets'], ['/date-night', 'Date night ideas']],
     },
+    '/local': {
+      heading: 'Local Calgary places and the people behind what’s on.',
+      copy: 'Calgary venues, markets, cafés, community associations and event organizers, each with its address and official links. Organizer profiles list their upcoming events and markets on CalgaryWatch. Listings are free, and a place that confirms it runs a profile is marked Verified.',
+      links: [['/events', 'Events'], ['/markets', 'Markets'], ['/neighbourhoods', 'Neighbourhoods'], ['/partners', 'How listings work']],
+    },
     '/neighbourhoods': {
       heading: 'Calgary neighbourhood guides.',
       copy: 'Guides to Calgary neighbourhoods and what’s on in them: Inglewood, Kensington, the Beltline, Bridgeland-Riverside, Marda Loop, Bowness and Ramsay, quadrant by quadrant. Each one draws on its community association or business improvement area.',
@@ -377,6 +385,44 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
   return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>${escapeText(summary.heading)}</h1><p>${escapeText(summary.copy)}</p><p>${links}</p>${routeSections(pathname, now)}</article></main>`;
 }
 
+const fullDate = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'full' });
+const fullDateTime = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'full', timeStyle: 'short' });
+const clockTime = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+const sameCalgaryDay = (a: string, b: string) => fullDate.format(new Date(a)) === fullDate.format(new Date(b));
+const dated = (start: string, end: string) => `${fullDateTime.format(new Date(start))} to ${sameCalgaryDay(start, end) ? clockTime.format(new Date(end)) : fullDateTime.format(new Date(end))} (Calgary time)`;
+const fact = (label: string, value: string) => `<dt>${escapeText(label)}</dt><dd>${value}</dd>`;
+
+/** The facts a listing page shows, then the pages it links on to (src/lib/listingSeo.ts). */
+function entityBodyHtml(entity: DiscoveryEntity, pathname: string, now = new Date()): string {
+  const all = discoveryRepository.list();
+  const occurrences = discoveryRepository.occurrences();
+  const crumbs = `<nav aria-label="Breadcrumb"><ol>${listingBreadcrumbs(entity).map((c, i, list) => `<li>${i === list.length - 1 ? escapeText(c.name) : staticLink(c.path, c.name)}</li>`).join('')}</ol></nav>`;
+  const facts: string[] = [];
+  if (entity.kind === 'event') {
+    const days = entity.schedulePrecision === 'date' ? [entity.start, lastEventDate(entity.end)].map(d => fullDate.format(calendarDateForDisplay(d))) : [];
+    const when = days.length ? (days[0] === days[1] ? days[0] : `${days[0]} to ${days[1]}`) + ' (check official showtimes)' : dated(entity.start, entity.end);
+    facts.push(fact('When', escapeText(when) + (entity.cancelled ? ' — Cancelled' : '')));
+    const price = entity.cancelled ? '' : entity.ticketSaleStatus === 'not-on-sale' ? 'Tickets not yet on sale' : entity.pricing === 'free' ? 'Free' : entity.priceRange ? `$${entity.priceRange[0]}${entity.priceRange[1] !== entity.priceRange[0] ? `–$${entity.priceRange[1]}` : ''}` : entity.pricing === 'paid' ? 'Ticketed, see organizer' : '';
+    if (price) facts.push(fact('Price', escapeText(price)));
+    const org = organizerProfile(entity, all);
+    if (entity.organizer && !/^organizer not listed/i.test(entity.organizer)) facts.push(fact('Organizer', org ? staticLink(entityPath(org), entity.organizer) : escapeText(entity.organizer)));
+    if (entity.tickets && entity.ticketSaleStatus !== 'not-on-sale' && !entity.cancelled) facts.push(fact('Tickets', staticLink(entity.tickets, 'Tickets from the organizer')));
+  }
+  if ('address' in entity && entity.address) facts.push(fact('Where', escapeText([('venue' in entity && entity.venue) || '', entity.address, entity.neighbourhood ?? ''].filter((v, i, list) => v && list.indexOf(v) === i).join(' · '))));
+  if (entity.kind === 'business') {
+    if (entity.phone) facts.push(fact('Phone', escapeText(entity.phone)));
+    if (entity.website) facts.push(fact('Website', staticLink(entity.website, entity.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))));
+  }
+  const upcoming = entity.kind === 'market' ? occurrences.filter(o => o.marketId === entity.id && Date.parse(o.end) > now.getTime()).sort((a, b) => Date.parse(a.start) - Date.parse(b.start)) : [];
+  const dates = entity.kind === 'market' ? `<section><h2>Upcoming dates</h2>${upcoming.length ? `<ul>${upcoming.slice(0, 12).map(o => `<li>${escapeText(dated(o.start, o.end))}${o.cancelled ? ' — Cancelled' : ''}</li>`).join('')}</ul>${upcoming.length > 12 ? `<p>And ${upcoming.length - 12} more listed dates.</p>` : ''}` : '<p>No upcoming dates are listed yet. Check the market’s own site below.</p>'}</section>` : '';
+  const stops = entity.kind === 'guide' && entity.stops?.length ? `<p>${escapeText(entity.introduction)}</p><ol>${entity.stops.map(s => `<li><h2>${escapeText(s.name)}</h2><p>${escapeText(s.area)}</p><p>${escapeText(s.note)}</p></li>`).join('')}</ol>` : '';
+  const related = relatedGroups(entity, all, occurrences, now)
+    .map(g => `<section><h2>${escapeText(g.heading)}</h2><ul>${g.links.map(l => `<li>${staticLink(l.path, l.title)}${l.note ? ` — ${escapeText(l.note)}` : ''}</li>`).join('')}</ul></section>`).join('');
+  const sources = entity.sources.map(s => staticLink(s.url, s.name)).join(' · ');
+  const description = entity.description && entity.description.trim() !== entity.summary.trim() ? `<p>${escapeText(entity.description)}</p>` : '';
+  return `<main data-prerendered-route="${escapeAttr(pathname)}">${crumbs}<article><h1>${escapeText(entity.title)}</h1>${entity.ownerVerifiedAt ? '<p>Verified: confirmed by the organization</p>' : ''}<p>${escapeText(entity.summary)}</p>${description}${facts.length ? `<dl>${facts.join('')}</dl>` : ''}${dates}${stops}<p>Last checked: ${escapeText(entity.verifiedAt || entity.updatedAt)}</p><p>Source: ${sources}</p></article>${related}</main>`;
+}
+
 /** Place route content inside the React mount point for the first response. */
 export function upsertStaticRouteBody(html: string, pathname: string): string {
   const entity = discoveryRepository.list().find(e => entityPath(e) === pathname);
@@ -386,12 +432,8 @@ export function upsertStaticRouteBody(html: string, pathname: string): string {
     ? discoveryRepository.list().find(e => e.id === claimId && ['event', 'market', 'business'].includes(e.kind))
     : undefined;
   const section = DISCOVERY_SECTIONS.find(s => pathname === s.path);
-  const dated = (start: string, end: string) => `${calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(start))} to ${calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(end))} (Calgary time)`;
-  const sourceLinks = entity?.sources.map(s=>staticLink(s.url,s.name)).join(' · ');
-  const dates = entity?.kind === 'event' ? `<p>${escapeText(dated(entity.start,entity.end))}${entity.cancelled ? ' — Cancelled' : ''}</p>` : entity?.kind === 'market' ? `<ul>${discoveryRepository.occurrences().filter(o=>o.marketId===entity.id).map(o=>`<li>${escapeText(dated(o.start,o.end))}${o.cancelled?' — Cancelled':''}</li>`).join('')}</ul>` : '';
-  const stops = entity?.kind === 'guide' && entity.stops?.length ? `<p>${escapeText(entity.introduction)}</p><ol>${entity.stops.map(s=>`<li><h2>${escapeText(s.name)}</h2><p>${escapeText(s.area)}</p><p>${escapeText(s.note)}</p></li>`).join('')}</ol>` : '';
   const claimBody = claimEntity ? `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>Run ${escapeText(claimEntity.title)}? Claim it.</h1><p>Claiming is free. We’ll verify that you represent the organization before giving you a direct way to request updates to its dates, photos and links. Once verified, the listing is marked as verified, and verified listings get more weight when we surface relevant listings and recommendations across CalgaryWatch.</p><p>${staticLink(entityPath(claimEntity), `View ${claimEntity.title}`)}</p></article></main>` : '';
-  const body = claimBody || (entity ? `<main><article><h1>${escapeText(entity.title)}</h1>${entity.ownerVerifiedAt ? '<p>Verified: confirmed by the organization</p>' : ''}<p>${escapeText(entity.summary)}</p><p>${escapeText(entity.description)}</p>${'address' in entity ? `<p>${escapeText(entity.address)}</p>`:''}${dates}${stops}<p>Last checked: ${escapeText(entity.verifiedAt||entity.updatedAt)}</p><p>${sourceLinks}</p></article></main>` : section && !buildStaticRouteBody(pathname) ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname));
+  const body = claimBody || (entity ? entityBodyHtml(entity, pathname) : section && !buildStaticRouteBody(pathname) ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname));
   if (!body) return html;
   return html.replace(/<div id=["']root["']>[\s\S]*?<\/div>/i, `<div id="root">${body}</div>`);
 }

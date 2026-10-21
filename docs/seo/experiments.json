@@ -83,6 +83,27 @@
           "The guide pages gain non-branded impressions and clicks without cannibalizing /map."
         ]
       }
+    },
+    {
+      "id": "seo-2026-10-21-listing-pages-v1",
+      "status": "awaiting_deployment",
+      "commits": [],
+      "routes": ["/events/*", "/markets/*", "/local", "/local/*", "/neighbourhoods/*", "/guides/*"],
+      "targetQueries": [
+        "<market name> hours",
+        "<event name> calgary",
+        "<venue name> events",
+        "things to do in <neighbourhood> calgary"
+      ],
+      "hypothesis": "Listing titles and descriptions that state the date, venue, neighbourhood and known price, Home > hub > listing breadcrumbs, structured addresses, sitemap lastmod, onward links (organizer, same venue, same area) in the first-response HTML, and opening /local profiles to indexing will grow impressions and clicks on long-tail listing queries.",
+      "measurement": {
+        "evaluateAfterDays": 28,
+        "successCriteria": [
+          "Search Console Pages report: impressions for /events/, /markets/ and /local/ URLs up versus the preceding 28 days",
+          "No rise in 'Crawled - currently not indexed' for listing URLs",
+          "Rich results report: no new Event or Breadcrumb errors"
+        ]
+      }
     }
   ]
 }

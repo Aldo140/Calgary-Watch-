@@ -7,6 +7,7 @@ import { matchesTonight, calgaryInstant, filterInventory } from '../src/lib/disc
 import { createDiscoveryRepository } from '../src/lib/discovery';
 import { buildEntityJsonLd, buildSitemap } from '../src/lib/discoverySeo';
 import { getSeoConfig, buildPageJsonLd } from '../src/lib/seo';
+import { listingTitle } from '../src/lib/listingSeo';
 import type { DiscoveryEntity, EventSubmissionInput, MarketSubmissionInput } from '../src/types/discovery';
 
 const source={id:'organizer',name:'Official organizer',approved:true,hosts:['example.org'],kind:'official'};
@@ -80,14 +81,16 @@ describe('Recurring market occurrence-window rolling',()=>{
 describe('Publication and SEO',()=>{
   it('uses the same approved repository for entity metadata and JSON-LD',()=>{
     const e=published();const repository=createDiscoveryRepository([e]);const path=`/events/${e.slug}`;
-    assert.equal(getSeoConfig(path,repository).title,`${e.title} | CalgaryWatch`);
+    assert.equal(getSeoConfig(path,repository).title,listingTitle(e,repository.list()));
+    assert.ok(getSeoConfig(path,repository).title.startsWith(e.title));
     assert.equal(getSeoConfig(path,repository).index,true); // single listings indexed since 2026-10-01
     assert.equal((buildPageJsonLd(path,'https://calgarywatch.ca',repository) as any).mainEntity.name,e.title);
     assert.equal(getSeoConfig('/events/not-published',repository).index,false);
   });
-  it('keeps local business pages noindex while events are indexed',()=>{
+  it('indexes published local profiles alongside events (owner decision 2026-10-21)',()=>{
     const e={...published(),kind:'business',slug:'a-shop',name:'A shop',images:[],socials:{},services:[],claimed:false,partner:false,editorialSelection:false} as unknown as DiscoveryEntity;
-    assert.equal(getSeoConfig('/local/a-shop',createDiscoveryRepository([e])).index,false);
+    assert.equal(getSeoConfig('/local/a-shop',createDiscoveryRepository([e])).index,true);
+    assert.equal(getSeoConfig('/local/a-shop',createDiscoveryRepository([{...e,status:'draft'} as DiscoveryEntity])).index,false);
   });
   it('excludes stale, unreviewed, archived and fixture inventory',()=>{
     const valid=published();

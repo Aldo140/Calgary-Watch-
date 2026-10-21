@@ -57,15 +57,15 @@ describe('Discovery search and calendar', () => {
   });
 });
 describe('Discovery routes and presentation', () => {
-  it('indexes the hubs with real content; keeps /local, search, derived and unknown pages out', () => {
-    for (const path of ['/events', '/markets', '/guides', '/neighbourhoods']) assert.equal(getSeoConfig(path).index, true, path);
-    for (const path of ['/local', '/search', '/events/missing', '/events/today', '/events/this-weekend', '/local/food']) assert.equal(getSeoConfig(path).index, false, path);
+  it('indexes the hubs with real content; keeps search, derived and unknown pages out', () => {
+    for (const path of ['/events', '/markets', '/local', '/guides', '/neighbourhoods']) assert.equal(getSeoConfig(path).index, true, path);
+    for (const path of ['/search', '/events/missing', '/events/today', '/events/this-weekend', '/local/food']) assert.equal(getSeoConfig(path).index, false, path);
     assert.ok(!/being prepared/.test(getSeoConfig('/events').description));
     assert.equal(getSeoConfig('/map').index, true);
     assert.equal(getSeoConfig('/calgary-neighbourhood-watch').index, true);
     const hosting = JSON.parse(readFileSync('firebase.json', 'utf8')).hosting;
     const noindexHeader = (source: string) => hosting.headers.some((rule: { source: string; headers: { key: string; value: string }[] }) => rule.source === source && rule.headers.some(h => h.key === 'X-Robots-Tag' && h.value.includes('noindex')));
-    for (const section of DISCOVERY_SECTIONS) assert.equal(noindexHeader(`${section.path}/**`), section.path === '/local', section.path);
+    for (const section of DISCOVERY_SECTIONS) assert.equal(noindexHeader(`${section.path}/**`), false, section.path);
     // Organization workspaces and newly published event URLs need SPA fallback between static releases.
     assert.deepEqual(hosting.rewrites.map((r: { source: string }) => r.source), ['/admin', '/admin/**', '/organization/**', '/events/**']);
   });
@@ -81,7 +81,7 @@ describe('Discovery routes and presentation', () => {
   });
   it('prerenders noindex and removes the homepage preload from other routes', () => {
     const shell = '<html><head><link rel="preload" as="image" href="/hero.webp"></head><body><div id="root"></div></body></html>';
-    const html = renderRouteHtml(shell, '/local', 'https://calgarywatch.ca');
+    const html = renderRouteHtml(shell, '/search', 'https://calgarywatch.ca');
     assert.match(html, /noindex, nofollow/); assert.ok(!html.includes('rel="preload"'));
   });
   it('loads verified real events in generated inventory and validates their fields', () => {

@@ -7,6 +7,7 @@ import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
 import { interestLabel, interestsFor, pickWhen, type EventInterestId } from '../../lib/eventPicks';
 import { entityPath } from '../../lib/discovery';
+import { moreAtVenue, moreLikeThis } from '../../lib/listingSeo';
 import { GoingButton } from '../plans/GoingButton';
 import { ThursdayNudge } from '../plans/ThursdayNudge';
 import '../../styles/plans.css';
@@ -33,13 +34,9 @@ export function EventPanel({ entity, all, part = 'both' }: { entity: Event; all:
   const interests: EventInterestId[] = interestsFor(entity).filter((i) => i !== 'free');
   const price = entity.cancelled ? 'Cancelled' : entity.ticketSaleStatus==='not-on-sale'?'Tickets not yet on sale': entity.pricing === 'free' ? 'Free' : entity.priceRange ? `$${entity.priceRange[0]}${entity.priceRange[1] !== entity.priceRange[0] ? `–$${entity.priceRange[1]}` : ''}` : entity.pricing === 'paid' ? 'Ticketed, see organizer' : 'Check with the organizer';
 
-  const more = all
-    .filter((e): e is Event => e.kind === 'event' && e.id !== entity.id && !e.cancelled && Date.parse(e.end) > Date.now())
-    .map((e) => ({ e, score: interestsFor(e).filter((i) => interests.includes(i)).length * 2 + (e.neighbourhood && e.neighbourhood === entity.neighbourhood ? 1 : 0) }))
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score || Date.parse(a.e.start) - Date.parse(b.e.start))
-    .slice(0, 3)
-    .map((x) => x.e);
+  const more = moreLikeThis(entity, all);
+  // Same venue, next dates first, without repeating what "More like this" shows.
+  const atVenue = moreAtVenue(entity, all).filter((e) => !more.some((m) => m.id === e.id)).slice(0, 3);
 
   const download = () => {
     const blob = new Blob([icsFile(cal)], { type: 'text/calendar;charset=utf-8' });
@@ -89,6 +86,17 @@ export function EventPanel({ entity, all, part = 'both' }: { entity: Event; all:
             ))}
           </ul>
           <p><Link to="/plans">Get picks like these every Thursday</Link></p>
+        </section>
+      ) : null}
+
+      {part !== 'plan' && atVenue.length ? (
+        <section className="cw-evp-more" aria-labelledby="cw-evp-venue-title">
+          <h2 id="cw-evp-venue-title">Also at {entity.venue}</h2>
+          <ul>
+            {atVenue.map((e) => (
+              <li key={e.id}><Link to={entityPath(e)}><time dateTime={e.start}>{pickWhen(e.start)}</time><strong>{e.title}</strong><span>{e.venue}</span><ArrowUpRight size={17} aria-hidden="true" /></Link></li>
+            ))}
+          </ul>
         </section>
       ) : null}
     </>

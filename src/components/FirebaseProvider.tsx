@@ -35,6 +35,8 @@ interface AuthContextType {
   isEmailVerified: boolean;
   isSigningIn: boolean;
   isAuthActionLoading: boolean;
+  /** The sign-in dialog is showing, so other account prompts stay out of its way. */
+  isAuthDialogOpen: boolean;
   /** Build has VITE_FIREBASE_* vars (CI secrets or local .env). */
   isFirebaseConfigured: boolean;
 }
@@ -270,6 +272,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
         isEmailVerified: Boolean(user?.emailVerified),
         isSigningIn,
         isAuthActionLoading: isSigningIn,
+        isAuthDialogOpen: authOpen,
         isFirebaseConfigured,
       }}
     >

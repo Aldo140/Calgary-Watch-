@@ -27,3 +27,13 @@ a.auth-primary,a.auth-secondary{text-decoration:none;box-sizing:border-box}
 .auth-dialog label>.auth-last{justify-self:start;margin:-2px 0 0}
 .auth-typo{margin:-6px 0 0;color:#425264;font:500 13px/1.4 Inter,sans-serif}.auth-typo button,.auth-inline{padding:0;border:0;background:none;color:#1554d1;font:700 13px/1.4 Inter,sans-serif;text-decoration:underline;cursor:pointer}
 .auth-inline{color:inherit}
+
+.cw-companion{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:60;display:flex;gap:12px;width:min(420px,calc(100vw - 32px));padding:14px 40px 14px 14px;border:2px solid #07182e;border-radius:14px;background:#fff;color:#101a27;box-shadow:4px 4px 0 #07182e;box-sizing:border-box;animation:cw-companion-in .35s cubic-bezier(.2,.8,.2,1)}
+.cw-companion strong{display:block;font:800 15px/1.25 Inter,sans-serif;overflow-wrap:anywhere}.cw-companion p{margin:4px 0 10px;color:#425264;font:500 13px/1.45 Inter,sans-serif}
+.cw-companion-mark{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:#fff1c2;color:#6b4e00}.cw-companion-mark[data-tone=ok]{background:#e9f6f0;color:#145a4c}.cw-companion-mark[data-tone=brand]{background:#e8f0ff;color:#1554d1}
+.cw-companion-actions{display:flex;flex-wrap:wrap;gap:8px}.cw-companion-actions a,.cw-companion-actions button{display:inline-flex;align-items:center;gap:4px;min-height:36px;padding:0 12px;border:1.5px solid #07182e;border-radius:9px;background:#fff;color:#07182e;font:700 13px/1 Inter,sans-serif;text-decoration:none;cursor:pointer}
+.cw-companion-actions>:first-child{background:#ffdd45}.cw-companion-actions button:disabled{opacity:.6;cursor:default}
+.cw-companion-x{position:absolute;top:8px;right:8px;display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:50%;background:#eef2f5;color:#07182e;cursor:pointer}
+@keyframes cw-companion-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.cw-companion{animation:none}}
+@media(max-width:520px){.cw-companion{left:12px;right:12px;width:auto;bottom:calc(12px + env(safe-area-inset-bottom))}}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { BadgeCheck, ChevronDown, LayoutDashboard, LogOut, Mail, Map as MapIcon, Shield, Ticket } from 'lucide-react';
+import { BadgeCheck, ChevronDown, Store, LayoutDashboard, LogOut, Mail, Map as MapIcon, Shield, Ticket } from 'lucide-react';
 import { useAuth } from '../FirebaseProvider';
 import { useMyClaims } from '../../lib/claimsApi';
 
@@ -42,6 +42,7 @@ export function AccountMenu() {
     { to: '/plans#pd-next', icon: Ticket, label: 'Your plans', note: 'What you said you’re going to' },
     { to: '/plans?edit=1', icon: Mail, label: 'Settings', note: 'Home, emails and interests' },
     ...((claims ?? []).length ? [{ to: `/claim/${encodeURIComponent(claims![0].entityId)}`, icon: BadgeCheck, label: claims!.length > 1 ? 'Your listings' : 'Your listing', note: claims![0].entityTitle }] : []),
+    ...(claims && !claims.length ? [{ to: '/local', icon: Store, label: 'Run something in Calgary?', note: 'Find your organization and claim it free' }] : []),
     { to: '/map', icon: MapIcon, label: 'Live map', note: 'Alerts and quiet hours live here' },
     ...(isAdmin ? [{ to: '/admin', icon: Shield, label: 'Admin', note: 'The desk' }] : []),
   ];

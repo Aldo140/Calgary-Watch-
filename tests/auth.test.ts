@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
+import { organizationForEmail } from '../src/lib/orgMatch';
 import { authErrorMessage, continueUriRefused, emailProblem, inboxLink, passwordProblem, returnLink, suggestEmail } from '../src/lib/auth';
 
 describe('email authentication', () => {
@@ -73,6 +74,24 @@ describe('email authentication', () => {
     assert.match(readFileSync('src/components/FirebaseProvider.tsx', 'utf8'), /rememberSignIn\(currentUser\.providerData\.some/);
     assert.match(readFileSync('src/components/auth/AuthDialog.tsx', 'utf8'), /Last used/);
     for (const [file, title] of [['src/components/plans/GoingButton.tsx', 'Save it to your plans.'], ['src/pages/PlansPage.tsx', 'Last step: save it.'], ['src/pages/ClaimListingPage.tsx', 'title: `Claim ${entity.title}.`'], ['src/pages/VendorApplyPage.tsx', 'title: `Apply to ${market.title}.`'], ['src/pages/MarketHQPage.tsx', 'Open Market HQ.']]) assert.ok(readFileSync(file, 'utf8').includes(title), file);
+  });
+  it('suggests the organization a sign-in email belongs to, organizer profile first', () => {
+    const site = [{ url: 'https://www.thebarnartisanmarket.ca/' }];
+    const list = [
+      { id: 'barn-fall', kind: 'event', title: 'Barn Fall Market', sources: site },
+      { id: 'biz-barn', kind: 'business', title: 'The Barn Artisan Market', sources: site },
+      { id: 'mru-talk', kind: 'event', title: 'MRU talk', sources: [{ url: 'https://events.mtroyal.ca/x' }] },
+      { id: 'guide', kind: 'guide', title: 'Guide', sources: site },
+    ];
+    assert.equal(organizationForEmail('info@thebarnartisanmarket.ca', list)?.id, 'biz-barn');
+    assert.equal(organizationForEmail('info@thebarnartisanmarket.ca', list, new Set(['biz-barn']))?.id, 'barn-fall');
+    assert.equal(organizationForEmail('alison@gmail.com', list), null);
+    assert.equal(organizationForEmail('student@mtroyal.ca', list), null);
+  });
+  it('mounts the account companion inside the router with verify, verified and claim cards', () => {
+    assert.match(readFileSync('src/App.tsx', 'utf8'), /<AccountCompanion \/>/);
+    const companion = readFileSync('src/components/auth/AccountCompanion.tsx', 'utf8');
+    for (const text of ['One tap left: verify', 'Email verified. You’re all set.', 'Is {org!.title} yours?', 'Not mine']) assert.ok(companion.includes(text), text);
   });
   it('keeps verification enforced in the client and Firestore rules', () => {
     assert.match(readFileSync('src/lib/claimsApi.ts','utf8'), /!user\.emailVerified/);

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { AccountCompanion } from './components/auth/AccountCompanion';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import SeoManager from '@/src/components/SeoManager';
@@ -170,6 +171,7 @@ export default function App() {
       <RedirectHandler />
       <PageTracker />
       <SeoManager />
+      <AccountCompanion />
       <Suspense fallback={<PageLoader />}>
         <SplashDone />
         <Routes>

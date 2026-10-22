@@ -3546,22 +3546,43 @@
       "name": "Calgary Underground Film Festival",
       "website": "https://calgaryundergroundfilm.org/",
       "address": "Calgary, AB",
-      "summary": "Calgary's festival of cult, genre, documentary and offbeat independent film, held each spring.",
-      "description": "The Calgary Underground Film Festival (CUFF) screens independent features, shorts and documentaries that sit outside the mainstream, from horror and comedy to music films. The main festival runs each spring, with special screenings through the year. Dates, programme and passes are announced on CUFF's own website.",
+      "summary": "Independent film beyond the mainstream: CUFF.Docs brings documentaries to Globe Cinema November 18–22, 2026, ahead of CUFF’s April 2027 festival.",
+      "description": "Calgary Underground Film Festival (CUFF) presents independent features, shorts and documentaries beyond the mainstream, from horror and comedy to music films. Its programme includes the main festival, CUFF.Docs and special screenings throughout the year.\n\nComing up: the 14th CUFF.Docs Documentary Film Festival runs November 18–22, 2026 at Globe Cinema, 617 8 Avenue SW. The five-day festival showcases non-fiction features and shorts across a range of subjects and filmmaking styles. Festival passes are available through CUFF’s official site; the full programme and individual tickets are scheduled for release on October 28. Check the official programme for individual screening times and availability.\n\nThe 24th Calgary Underground Film Festival takes place April 15–25, 2027. Its official site says the programme will be announced and passes will go on sale in late March. See CUFF’s website for confirmed screenings, passes and programme updates.",
       "categories": [
         "arts"
       ],
       "tags": [
         "organization",
         "film",
-        "festival"
+        "festival",
+        "documentary",
+        "CUFF.Docs",
+        "independent cinema"
       ],
       "sources": [
         {
           "name": "Calgary Underground Film Festival — official website",
           "url": "https://calgaryundergroundfilm.org/",
           "kind": "official",
-          "retrievedAt": "2026-10-21T00:32:35.000Z"
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF.Docs — official festival information",
+          "url": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF.Docs — official passes and ticket information",
+          "url": "https://www.calgaryundergroundfilm.org/cuff-docs/pass-sale/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF — official visitor and 2027 festival information",
+          "url": "https://www.calgaryundergroundfilm.org/plan-your-trip/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
         }
       ],
       "images": [],
@@ -3570,15 +3591,17 @@
       },
       "services": [
         "Film festival",
-        "Special screenings"
+        "Special screenings",
+        "Documentary film festival"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-21T00:32:35.000Z",
-      "email": "cuff@calgaryundergroundfilm.org"
+      "updatedAt": "2026-10-22T19:27:17.122Z",
+      "email": "cuff@calgaryundergroundfilm.org",
+      "verifiedAt": "2026-10-22T19:27:17.122Z"
     },
     {
       "id": "biz-calgary-queer-arts-society",

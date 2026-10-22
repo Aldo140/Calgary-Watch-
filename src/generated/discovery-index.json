@@ -16437,6 +16437,117 @@
       "cancelled": false,
       "verifiedAt": "2026-10-22T06:40:14.416Z",
       "organizerEntityId": "biz-morpheus-theatre"
+    },
+    {
+      "id": "biz-calgary-underground-film-festival",
+      "kind": "business",
+      "slug": "calgary-underground-film-festival",
+      "title": "Calgary Underground Film Festival",
+      "name": "Calgary Underground Film Festival",
+      "website": "https://calgaryundergroundfilm.org/",
+      "address": "Calgary, AB",
+      "summary": "Independent film beyond the mainstream: CUFF.Docs brings documentaries to Globe Cinema November 18–22, 2026, ahead of CUFF’s April 2027 festival.",
+      "description": "Calgary Underground Film Festival (CUFF) presents independent features, shorts and documentaries beyond the mainstream, from horror and comedy to music films. Its programme includes the main festival, CUFF.Docs and special screenings throughout the year.\n\nComing up: the 14th CUFF.Docs Documentary Film Festival runs November 18–22, 2026 at Globe Cinema, 617 8 Avenue SW. The five-day festival showcases non-fiction features and shorts across a range of subjects and filmmaking styles. Festival passes are available through CUFF’s official site; the full programme and individual tickets are scheduled for release on October 28. Check the official programme for individual screening times and availability.\n\nThe 24th Calgary Underground Film Festival takes place April 15–25, 2027. Its official site says the programme will be announced and passes will go on sale in late March. See CUFF’s website for confirmed screenings, passes and programme updates.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "festival",
+        "documentary",
+        "CUFF.Docs",
+        "independent cinema"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Underground Film Festival — official website",
+          "url": "https://calgaryundergroundfilm.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF.Docs — official festival information",
+          "url": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF.Docs — official passes and ticket information",
+          "url": "https://www.calgaryundergroundfilm.org/cuff-docs/pass-sale/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF — official visitor and 2027 festival information",
+          "url": "https://www.calgaryundergroundfilm.org/plan-your-trip/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryundergroundfilm.org/"
+      },
+      "services": [
+        "Film festival",
+        "Special screenings",
+        "Documentary film festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-22T19:27:17.122Z",
+      "email": "cuff@calgaryundergroundfilm.org",
+      "verifiedAt": "2026-10-22T19:27:17.122Z"
+    },
+    {
+      "id": "42bbaab50dd31676b617a197979d",
+      "kind": "event",
+      "slug": "14th-cuff-docs-documentary-film-festival-42bbaa",
+      "title": "14th CUFF.Docs Documentary Film Festival",
+      "summary": "Five days of independent documentary features and shorts at Globe Cinema, presented by Calgary Underground Film Festival.",
+      "description": "The 14th CUFF.Docs Documentary Film Festival runs November 18–22, 2026 at Globe Cinema. Presented by Calgary Underground Film Festival, the festival showcases non-fiction features and shorts across a range of subjects, styles and genres.\n\nThis listing covers the festival dates, not continuous screening hours. CUFF says the full programme and individual tickets will be released October 28; confirm each screening’s start time and availability on its official site. Festival passes are available through the official pass page.\n\nVenue: Globe Cinema, 617 8 Avenue SW, Calgary. Check the official programme for film details, ticket categories and current prices.",
+      "categories": [
+        "arts",
+        "film",
+        "festivals"
+      ],
+      "tags": [
+        "documentary",
+        "film festival",
+        "independent film",
+        "CUFF.Docs"
+      ],
+      "address": "617 8 Avenue SW, Calgary, AB",
+      "organizer": "Calgary Underground Film Festival",
+      "sources": [
+        {
+          "name": "Calgary Underground Film Festival",
+          "url": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        }
+      ],
+      "sourceId": "calgary-underground-film-festival",
+      "sourceRecordId": "cuff-docs-2026",
+      "fetchedAt": "2026-10-22T19:27:17.122Z",
+      "updatedAt": "2026-10-22T19:27:17.122Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Globe Cinema",
+      "start": "2026-11-18T00:00:00-06:00",
+      "end": "2026-11-23T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "endTimeEstimated": true,
+      "pricing": "paid",
+      "schedulePrecision": "date",
+      "tickets": "https://www.calgaryundergroundfilm.org/cuff-docs/pass-sale/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-22T19:27:17.122Z",
+      "organizerEntityId": "biz-calgary-underground-film-festival"
     }
   ],
   "occurrences": [

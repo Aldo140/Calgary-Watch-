@@ -1,3 +1,4 @@
+import {moderationPublicationNote} from '../../lib/moderationPublication';
 import {adminSubmissionInput} from '../../lib/adminContentRecords';
 import {adminObject,adminText,adminTimestamp} from '../../lib/adminRecord';
 import {discoveryRepository} from '../../data/discovery';
@@ -18,7 +19,7 @@ import '../../styles/discovery.css';
 type RecordRow = AdminInventoryRow;
 type Raw = { entityId: string; input: InventorySubmissionInput; sourceId: string; sourceRecordId: string; cancelled: boolean };
 type Source = { id: string; name: string; approved: boolean; hosts: string[] };
-type QueuedAction = { id: string; status: 'pending' | 'applied' | 'failed'; createdAt: number; error?: string; action: { action?: string; id?: string; kind?: string; title?: string }; result?: {stage?:string}; payload:Record<string,unknown> };
+type QueuedAction = { id: string; status: 'pending' | 'applied' | 'failed'; createdAt: number; error?: string; action: { action?: string; id?: string; kind?: string; title?: string }; result?: {stage?:string;id?:string;entityId?:string}; payload:Record<string,unknown> };
 type Editor = { input?: InventorySubmissionInput; sourceId: string; recordId: string; submissionId?: string; cancelled?: boolean };
 
 const STATUSES = ['pending', 'draft', 'published', 'archived'] as const;
@@ -78,7 +79,7 @@ export function DiscoveryContent() {
     const subscribe=()=>{stop?.();stop=undefined;if(document.hidden)return;
       stop=onSnapshot(query(collection(db!,'discovery_actions'),orderBy('createdAt','desc'),limit(25)),snapshot=>{
         setQueueError('');
-        const next=snapshot.docs.map(d=>{const raw=d.data(),action=adminObject(raw.action),input=adminObject(action.input),result=adminObject(raw.result);return {id:d.id,status:adminText(raw.status,'pending'),createdAt:adminTimestamp(raw.createdAt)??0,error:adminText(raw.error),action:{action:adminText(action.action,'moderate'),kind:adminText(action.kind),id:adminText(action.id),title:adminText(input.title)},result:{stage:adminText(result.stage)},payload:action} as QueuedAction;});
+        const next=snapshot.docs.map(d=>{const raw=d.data(),action=adminObject(raw.action),input=adminObject(action.input),result=adminObject(raw.result);return {id:d.id,status:adminText(raw.status,'pending'),createdAt:adminTimestamp(raw.createdAt)??0,error:adminText(raw.error),action:{action:adminText(action.action,'moderate'),kind:adminText(action.kind),id:adminText(action.id),title:adminText(input.title)},result:{stage:adminText(result.stage),id:adminText(result.id),entityId:adminText(result.entityId)},payload:action} as QueuedAction;});
         const completed=next.some(q=>previous.has(q.id)&&q.status!=='pending');previous=new Set(next.filter(q=>q.status==='pending').map(q=>q.id));setQueue(next);
         if(completed)void load().catch(e=>setLoadError(firestoreActionError(e)));
       },e=>setQueueError(firestoreActionError(e)));
@@ -257,7 +258,7 @@ export function DiscoveryContent() {
             {queue.map((q) => (
               <li key={q.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
                 <Chip tone={q.status === 'applied' ? 'ok' : q.status === 'failed' ? 'critical' : 'attention'}>{q.status==='pending'?'Waiting for worker':q.status==='applied'?'Processed':'Failed'}</Chip>
-                <span className="flex-1 min-w-0 truncate" style={{ color: T.ink }}>{q.action.title||records.find(r=>r.id===q.action.id)?.title||q.action.action||'Listing decision'}{q.status==='failed'&&q.error ? ` — ${q.error}` : ''}{q.status==='applied'&&q.action.action==='review-submission'&&q.payload.reject!==true&&q.result?.stage!=='rejected'?' · Imported for review; open the listing to verify & publish.':q.status==='applied'&&q.result?.stage==='verified'?' · Verified; awaiting a successful website release.':''}</span>
+                <span className="flex-1 min-w-0 truncate" style={{ color: T.ink }}>{q.action.title||records.find(r=>r.id===q.action.id)?.title||q.action.action||'Listing decision'}{q.status==='failed'&&q.error ? ` — ${q.error}` : ''}{moderationPublicationNote(q,discoveryRepository.list())?` · ${moderationPublicationNote(q,discoveryRepository.list())}`:''}</span>
                 <TimeAgo ts={q.createdAt} />
                 {q.status==='failed'?<AdminButton size="sm" variant="outline" disabled={busy} onClick={()=>retryDecision(q)}>Retry decision</AdminButton>:null}
               </li>

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'DRY_RUN previews only; APPLY publishes the four specifically reviewed submissions, without emails'
+        description: 'DRY_RUN previews only; APPLY publishes the five specifically reviewed submissions, without emails'
         required: true
         default: DRY_RUN
         type: choice
@@ -25,7 +25,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Recover only the four reviewed organizer submissions
+      - name: Recover only the five reviewed organizer submissions
         run: npx tsx scripts/discovery/recover-approved-programmes.ts
         env:
           CONFIRM_APPROVED_PROGRAMMES: ${{ inputs.confirm }}

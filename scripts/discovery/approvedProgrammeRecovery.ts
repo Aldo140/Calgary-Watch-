@@ -2,7 +2,7 @@ import {createHash} from 'node:crypto';
 import {ownerInstant} from '../../src/lib/ownerListingEdits';
 import {marketOpeningDates} from '../../src/lib/marketOpeningDates';
 import type {InventorySubmissionInput} from '../../src/types/discovery';
-export const APPROVED_PROGRAMME_TITLES = ['FunnyFest Halloween Comedy and Dance Party','Halloween Comedy Extravaganza by FunnyFest - Saturday, October 31 @ 7 PM','Stand Up Comedy Workshop - Weekly Course - Tuesdays Calgary - YYC','Festive Foothills Art Market'] as const;
+export const APPROVED_PROGRAMME_TITLES = ['FunnyFest Halloween Comedy and Dance Party','Halloween Comedy Extravaganza by FunnyFest - Saturday, October 31 @ 7 PM','Stand Up Comedy Workshop - Weekly Course - Tuesdays Calgary - YYC','Festive Foothills Art Market','Stand Up Comedy WORKSHOP- Weekend - \"Laugh and Learn\"'] as const;
 const stable=(value:unknown):unknown=>Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>[k,stable(v)])):value;
 export const submissionFingerprint=(input:unknown)=>createHash('sha256').update(JSON.stringify(stable(input))).digest('hex');
 export type RecoverySubmission={id:string;input:InventorySubmissionInput;createdAt:string};
@@ -10,6 +10,7 @@ export function approvedProgrammePlan(submissions:readonly RecoverySubmission[])
  const selected=submissions.filter(s=>(APPROVED_PROGRAMME_TITLES as readonly string[]).includes(s.input.title));
  const halloween=selected.filter(s=>s.input.sourceUrl==='https://funnyfest-comedy-halloween-show-calgary-yyc.eventbrite.ca').sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
  const workshop=selected.find(s=>s.input.title===APPROVED_PROGRAMME_TITLES[2]);
+ const weekend=selected.find(s=>s.input.title===APPROVED_PROGRAMME_TITLES[4]);
  const market=selected.find(s=>s.input.title===APPROVED_PROGRAMME_TITLES[3]);
  const groups:Array<{submissionIds:string[];organizationId:string;records:Array<{recordId:string;input:InventorySubmissionInput}>}>=[];
  if(halloween.length){
@@ -27,6 +28,10 @@ export function approvedProgrammePlan(submissions:readonly RecoverySubmission[])
  if(market){
   if(market.input.kind!=='market'||market.input.sourceUrl!=='https://leightoncentre.org/event/festive-foothills-art-market-2026/')throw Error('Market source changed; review again.');
   groups.push({submissionIds:[market.id],organizationId:'biz-leighton-art-centre',records:[{recordId:`submission-${market.id}`,input:{...market.input,organizer:'Leighton Art Centre',venue:'Leighton Art Centre',categories:['markets','arts','shopping','day-trip'],tags:['outside-calgary','holiday market','local art'],occurrences:[{sourceRecordId:'preview-2026-11-06',start:ownerInstant('2026-11-06T15:00'),end:ownerInstant('2026-11-06T18:00'),cancelled:false},...marketOpeningDates('2026-11-07','2026-12-20','10:00','16:00',[0,1,2,3,4,5,6])]}}]});
+ }
+ if(weekend){
+  if(weekend.input.kind!=='event'||weekend.input.sourceUrl!=='https://funnyfest-comedy-workshop-weekend-calgary-yyc.eventbrite.ca/?discount=100off')throw Error('Weekend workshop source changed; review again.');
+  groups.push({submissionIds:[weekend.id],organizationId:'biz-funnyfest',records:['2026-11-07','2026-11-08'].map((day,i)=>({recordId:`submission-${weekend.id}${i?`-${day}`:''}`,input:{...weekend.input,kind:'event' as const,title:`FunnyFest Weekend Comedy Workshop — day ${i+1} of 2`,organizer:'FunnyFest Calgary Comedy Festival',venue:'Capitol Hill Community Association',address:'1531 21 Avenue NW, Calgary, AB T2M 1L9',summary:`Day ${i+1} of FunnyFest’s two-day stand-up and comedy-writing workshop at Capitol Hill Community Association.`,description:`FunnyFest’s weekend stand-up comedy workshop runs November 7 and 8, 2026, from 10 a.m. to 4 p.m. each day at Capitol Hill Community Association. This listing covers day ${i+1}, on ${day}; the workshop is not open overnight.\n\nThe course combines comedy-writing and performance techniques, practice and course materials. Registration covers the weekend course. Check the organizer’s official ticket page for current availability, fees and any graduation showcase arrangements; no separate showcase date is published here.`,start:ownerInstant(day+'T10:00'),end:ownerInstant(day+'T16:00'),tickets:weekend.input.sourceUrl,categories:['arts','comedy','learning'],tags:['workshop','stand-up comedy','comedy writing','weekend course'],pricing:'paid' as const}}))});
  }
  return groups;
 }

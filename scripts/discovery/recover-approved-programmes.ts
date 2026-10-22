@@ -4,14 +4,14 @@ import {approvedProgrammePlan,submissionFingerprint} from './approvedProgrammeRe
 import store from '../../functions/discovery-store.cjs';
 import domain from '../../functions/discovery-domain.cjs';
 import type {InventorySubmissionInput} from '../../src/types/discovery';
-const APPROVED_FINGERPRINTS:readonly string[]=["ec2c5d2dd6b79796c2285d9189c124e85b30d6a3b580dc44a4c175ab0e600306", "5116771d4c5520ebb53963b51db2babccba2fb5eb7e5c316818f7494ec4324b0", "5a0183724f6029013ced27e2f8e40fff415adcc6368a93d79055bb418a9d7b6d", "eb8442c1a523a6780ad61570a3cb7b57ce71aa152bdcb52257ae3e7471b0d452"];
+const APPROVED_FINGERPRINTS:readonly string[]=["7467f136216de15fc243ca01f917b8e630d735224055a2db08b3e23cad8b9ba4","ec2c5d2dd6b79796c2285d9189c124e85b30d6a3b580dc44a4c175ab0e600306", "5116771d4c5520ebb53963b51db2babccba2fb5eb7e5c316818f7494ec4324b0", "5a0183724f6029013ced27e2f8e40fff415adcc6368a93d79055bb418a9d7b6d", "eb8442c1a523a6780ad61570a3cb7b57ce71aa152bdcb52257ae3e7471b0d452"];
 const RUN='approved-programmes-2026-10-22';
-const urls=['https://funnyfest-comedy-halloween-show-calgary-yyc.eventbrite.ca','https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca','https://leightoncentre.org/event/festive-foothills-art-market-2026/'];
+const urls=['https://funnyfest-comedy-workshop-weekend-calgary-yyc.eventbrite.ca/?discount=100off','https://funnyfest-comedy-halloween-show-calgary-yyc.eventbrite.ca','https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca','https://leightoncentre.org/event/festive-foothills-art-market-2026/'];
 const db=inventoryDatabase(),apply=process.env.CONFIRM_APPROVED_PROGRAMMES==='APPLY';
 const snapshot=await db.collection('entity_submissions').where('input.sourceUrl','in',urls).limit(50).get();
 const selected=snapshot.docs.filter(doc=>APPROVED_FINGERPRINTS.includes(submissionFingerprint(doc.get('input'))));
 if(selected.some(doc=>!['pending','approved'].includes(doc.get('status'))))throw Error('A reviewed submission changed status; audit again.');
-if(selected.length!==4)throw Error('The four reviewed submissions could not be matched unchanged. Run a new private audit.');
+if(selected.length!==5)throw Error('The five reviewed submissions could not be matched unchanged. Run a new private audit.');
 const rows=selected.map(doc=>({id:doc.id,input:doc.get('input') as InventorySubmissionInput,createdAt:String(doc.get('createdAt'))}));
 const groups=approvedProgrammePlan(rows);
 for(const group of groups)for(const record of group.records)domain.validateSubmission(record.input);

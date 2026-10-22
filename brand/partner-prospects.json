@@ -444,6 +444,126 @@
       "website": "https://www.calgaryalliedartsfoundation.ca/",
       "category": "arts",
       "why": "Calgary arts nonprofit promoting artist programs and a 2026 Fuse33 Makerspace Residency application deadline."
+    },
+    {
+      "name": "Bowness Community Association",
+      "website": "https://mybowness.com/",
+      "category": "arts",
+      "why": "Community association with year-round neighbourhood events and public programs."
+    },
+    {
+      "name": "Lake Bonavista Community Association",
+      "website": "https://thelbca.ca/",
+      "category": "arts",
+      "why": "Hosts craft fairs, workshops and local community events."
+    },
+    {
+      "name": "Lakeview Community Association",
+      "website": "https://lakeviewyyc.ca/events-calendar/",
+      "category": "arts",
+      "why": "Maintains a neighbourhood calendar of community events."
+    },
+    {
+      "name": "Varsity Community Association",
+      "website": "https://varsitycommunityassociation.ca/",
+      "category": "arts",
+      "why": "Hosts community markets, workshops and public programs."
+    },
+    {
+      "name": "Fairview Community Association",
+      "website": "https://fairviewcommunity.ca/",
+      "category": "arts",
+      "why": "Runs community programming and neighbourhood events."
+    },
+    {
+      "name": "Hawkwood Community Association",
+      "website": "https://www.hawkwoodca.com/",
+      "category": "arts",
+      "why": "Runs neighbourhood programs and seasonal activities."
+    },
+    {
+      "name": "Coral Springs Community Association",
+      "website": "https://coralspringscommunityassociation.ca/",
+      "category": "arts",
+      "why": "Maintains local community event information."
+    },
+    {
+      "name": "Citadel Community Association",
+      "website": "https://www.citadelca.ab.ca/CCA/index.php",
+      "category": "arts",
+      "why": "Hosts community activities and seasonal events."
+    },
+    {
+      "name": "Bridgeland Riverside Community Association",
+      "website": "https://brcacalgary.org/",
+      "category": "arts",
+      "why": "Organizes neighbourhood and community activities in Bridgeland-Riverside."
+    },
+    {
+      "name": "SCA Community Association",
+      "website": "https://scacalgary.ca/",
+      "category": "arts",
+      "why": "Hosts programs for Strathcona, Christie Park and Aspen Woods."
+    },
+    {
+      "name": "Fourth Street BIA",
+      "website": "https://www.4streetcalgary.com/",
+      "category": "arts",
+      "why": "Promotes the 4th Street corridor and community events, including Lilac Festival."
+    },
+    {
+      "name": "International Avenue BIA",
+      "website": "https://www.intlave17se.ca/",
+      "category": "arts",
+      "why": "Promotes cultural events and local businesses along International Avenue."
+    },
+    {
+      "name": "Montgomery on the Bow BIA",
+      "website": "https://montgomerybia.com/",
+      "category": "arts",
+      "why": "Promotes Montgomery-area businesses and neighbourhood activities."
+    },
+    {
+      "name": "Greenview Industrial BIA",
+      "website": "https://www.greenviewindustrial.com/",
+      "category": "arts",
+      "why": "Promotes local industrial businesses and community initiatives."
+    },
+    {
+      "name": "Antyx Community Arts",
+      "website": "https://antyx.ca/",
+      "category": "arts",
+      "why": "Offers creative programming and artistic projects for young people."
+    },
+    {
+      "name": "Prospect's Studio C",
+      "website": "https://www.studiocprospect.ca/",
+      "category": "arts",
+      "why": "Hosts visual-arts programming and exhibitions in Calgary."
+    },
+    {
+      "name": "Kiyooka Ohe Arts Centre",
+      "website": "https://www.koartscentre.org/",
+      "category": "arts",
+      "why": "Art centre with a sculpture park and public programming."
+    },
+    {
+      "name": "Swinton's Art",
+      "website": "https://www.swintonsart.com/",
+      "category": "arts",
+      "why": "Calgary art school offering workshops and classes."
+    },
+    {
+      "name": "Polaris Centre",
+      "website": "https://polariscentre.ca/",
+      "category": "arts",
+      "why": "Hosts public music and cultural events."
+    },
+    {
+      "name": "Calgary Multicultural Centre",
+      "website": "https://calgarymulticulturalcentre.com/",
+      "category": "arts",
+      "why": "Promotes multicultural arts and public community activities."
     }
   ]
 }

@@ -21,7 +21,8 @@ describe('Firestore fallback writes', () => {
 
   it('both fallback writes in discoveryApi go through it', () => {
     const src = readFileSync('src/lib/discoveryApi.ts', 'utf8');
-    assert.match(src, /action: withoutUndefined\(data\)/);
+    assert.match(src, /const clean=withoutUndefined\(data\)/);
+    assert.match(src, /action:clean/);
     assert.match(src, /input: withoutUndefined\(input\)/);
   });
 

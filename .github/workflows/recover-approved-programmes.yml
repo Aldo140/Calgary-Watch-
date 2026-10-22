@@ -1,0 +1,39 @@
+name: Recover reviewed FunnyFest and Leighton submissions
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'DRY_RUN previews only; APPLY publishes the four specifically reviewed submissions, without emails'
+        required: true
+        default: DRY_RUN
+        type: choice
+        options: [DRY_RUN, APPLY]
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: discovery-actions
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Recover only the four reviewed organizer submissions
+        run: npx tsx scripts/discovery/recover-approved-programmes.ts
+        env:
+          CONFIRM_APPROVED_PROGRAMMES: ${{ inputs.confirm }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+      - name: Publish the recovered listings
+        if: ${{ inputs.confirm == 'APPLY' }}
+        run: gh workflow run deploy-firebase.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

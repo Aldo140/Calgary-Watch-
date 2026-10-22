@@ -119,6 +119,19 @@ export function DiscoveryContent() {
   const staleQueue=queue.some(q=>q.status==='pending'&&Date.now()-q.createdAt>3600000);
   const openSubmission=(s:EntitySubmission)=>{let host='';try{host=new URL(s.input.sourceUrl).hostname;}catch{}const source=approvedSources.find(source=>source.hosts.includes(host));setEditor({input:s.input,sourceId:source?.id??'__official',recordId:`submission-${s.id}`,submissionId:s.id});};
 
+  function retryDecision(action:QueuedAction) {
+    if (['review-submission','publish-submission'].includes(action.action.action??'') && action.payload.reject!==true) {
+      const submission=submissions.find(s=>s.id===action.action.id);
+      if (!submission) {setError('This submission is no longer waiting for review. Refresh the listings before retrying.');return;}
+      if (submission.invalidInput) {setError('This submission has an unsupported format. Review its source before retrying.');return;}
+      setCheckedSource(false);setReviewDuplicates(false);setError('');
+      setMessage('Review the current submission and confirm its official source before approving again.');
+      openSubmission(submission);
+      return;
+    }
+    act(action.payload);
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -246,7 +259,7 @@ export function DiscoveryContent() {
                 <Chip tone={q.status === 'applied' ? 'ok' : q.status === 'failed' ? 'critical' : 'attention'}>{q.status==='pending'?'Waiting for worker':q.status==='applied'?'Processed':'Failed'}</Chip>
                 <span className="flex-1 min-w-0 truncate" style={{ color: T.ink }}>{q.action.title||records.find(r=>r.id===q.action.id)?.title||q.action.action||'Listing decision'}{q.error ? ` — ${q.error}` : ''}{q.status==='applied'&&q.action.action==='review-submission'&&q.payload.reject!==true&&q.result?.stage!=='rejected'?' · Imported for review; open the listing to verify & publish.':q.status==='applied'&&q.result?.stage==='verified'?' · Verified; awaiting a successful website release.':''}</span>
                 <TimeAgo ts={q.createdAt} />
-                {q.status==='failed'?<AdminButton size="sm" variant="outline" disabled={busy} onClick={()=>act(q.payload)}>Retry decision</AdminButton>:null}
+                {q.status==='failed'?<AdminButton size="sm" variant="outline" disabled={busy} onClick={()=>retryDecision(q)}>Retry decision</AdminButton>:null}
               </li>
             ))}
           </ul>

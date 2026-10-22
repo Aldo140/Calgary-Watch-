@@ -1,3 +1,4 @@
+import {useAdminView} from '../../hooks/useAdminView';
 import {SubmissionHistory} from './SubmissionHistory';
 import {moderationPublicationNote} from '../../lib/moderationPublication';
 import {adminSubmissionInput} from '../../lib/adminContentRecords';
@@ -38,7 +39,7 @@ const STATUS_TONE = { pending: 'attention', draft: 'neutral', published: 'ok', a
  */
 export function DiscoveryContent() {
   const[search,setSearch]=useState('');
-  const [submissionView,setSubmissionView]=useState<'pending'|'history'>('pending');
+  const [submissionView,setSubmissionView]=useAdminView(['pending','history'] as const,'pending','submissions');
   const [records, setRecords] = useState<RecordRow[]>([]);
   const [submissions, setSubmissions] = useState<Array<EntitySubmission & {invalidInput?:boolean}>>([]);
   const [sources, setSources] = useState<Source[]>([]);

@@ -227,7 +227,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
               {place.email ? <li><a href={`mailto:${place.email}`}><Mail size={15} aria-hidden="true" />{place.email}</a></li> : null}
             </ul>
           </div> : null}
-          {hours.length ? <div className="lp-fact lp-fact-hours"><small><Clock size={14} aria-hidden="true" />Hours</small><ul>{hours.slice(0, 3).map(([d, h]) => <li key={d}><b>{d}</b>{h}</li>)}</ul>{hours.length > 3 ? <span>More on their site</span> : null}</div> : null}
+          {hours.length ? <div className="lp-fact lp-fact-hours"><small><Clock size={14} aria-hidden="true" />Hours</small><ul>{hours.map(([d, h]) => <li key={d}><b>{d}</b>{h}</li>)}</ul></div> : null}
         </section>
 
         {spot ? <NextUp date={spot} now={now} count={ahead.count} onNow={spot === ahead.onNow} /> : null}

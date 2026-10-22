@@ -1384,10 +1384,10 @@
       "title": "Alliance Française de Calgary",
       "name": "Alliance Française de Calgary",
       "website": "https://www.afcalgary.ca/",
-      "address": "Calgary, AB",
-      "summary": "Discover Alliance Française de Calgary through its official homepage.",
-      "description": "Use the organization’s homepage for its current activities and published information. CalgaryWatch links officially sourced associated events here when available. Check the official site for locations, schedules and registration.",
-      "neighbourhood": "",
+      "address": "#350, 1721 29 Avenue SW, Calgary, AB T2T 6T7",
+      "summary": "French language classes, a French library and cultural activities for adults, kids and families, based at cSPACE Marda Loop.",
+      "description": "Alliance Française de Calgary brings French language learning and cultural activities together, with classes, film screenings, workshops and opportunities to practise French with other Calgarians. Its main campus and reception are at cSPACE Marda Loop, suite 350, 1721 29 Avenue SW.\n\nReception is open Monday–Friday, 9 a.m.–6 p.m., and Saturday, 9 a.m.–5 p.m.; closed Sunday. Adult events and kids-and-family activities each have their own official programme page. Check the individual event for its venue and registration requirements.\n\nSome activities take place elsewhere. The Kahanoff Centre testing campus at suite 315, 105 12 Avenue SE is for registered candidates and enrolled students, or by appointment; it has no public walk-in reception. Some Saturday children’s classes take place at the Lycée International de Calgary. Use your booking confirmation to choose the correct campus.",
+      "neighbourhood": "South Calgary",
       "categories": [
         "arts"
       ],
@@ -1399,20 +1399,61 @@
         {
           "name": "Alliance Française de Calgary",
           "url": "https://www.afcalgary.ca/",
-          "kind": "official"
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        },
+        {
+          "name": "Alliance Française — locations, contact and hours",
+          "url": "https://www.afcalgary.ca/contact/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        },
+        {
+          "name": "Alliance Française — adult programme",
+          "url": "https://www.afcalgary.ca/culture/activities/adults/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        },
+        {
+          "name": "Alliance Française — kids and family programme",
+          "url": "https://www.afcalgary.ca/culture/activities/kids/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
         }
       ],
       "socials": {
-        "website": "https://www.afcalgary.ca/"
+        "website": "https://www.afcalgary.ca/",
+        "events": "https://www.afcalgary.ca/culture/activities/",
+        "adult_events": "https://www.afcalgary.ca/culture/activities/adults/",
+        "family_events": "https://www.afcalgary.ca/culture/activities/kids/"
       },
-      "services": [],
+      "services": [
+        "French language classes",
+        "French cultural activities",
+        "Adult events and workshops",
+        "Kids and family activities",
+        "French library",
+        "Official French examinations"
+      ],
       "images": [],
       "claimed": false,
       "partner": false,
       "editorialSelection": true,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-15T00:00:00Z"
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
+      "phone": "403-245-5662",
+      "email": "info@afcalgary.ca",
+      "hours": {
+        "Monday": "09:00–18:00",
+        "Tuesday": "09:00–18:00",
+        "Wednesday": "09:00–18:00",
+        "Thursday": "09:00–18:00",
+        "Friday": "09:00–18:00",
+        "Saturday": "09:00–17:00",
+        "Sunday": "Closed"
+      },
+      "verifiedAt": "2026-10-21T22:40:36.864477Z"
     },
     {
       "id": "biz-werklund-centre",
@@ -3220,7 +3261,7 @@
       "title": "The Mercantile on 9th",
       "name": "The Mercantile on 9th",
       "summary": "Inglewood's sustainability-minded seasonal artisan market, presented by The Apothecary in Inglewood.",
-      "description": "The Mercantile brings local makers, growers, artists and bakers together at the Alexandra Centre in Inglewood. The Apothecary in Inglewood created and presents the market.",
+      "description": "The Mercantile on 9th brings seasonal, eco-minded markets to the Alexandra Centre at 922 9 Avenue SE in Inglewood. Presented by The Apothecary In Inglewood, its indoor and outdoor editions showcase local makers, growers, artists and bakers.\n\nThe organizer has confirmed two upcoming holiday dates: the Holiday Market on November 28, 2026, and Pottery Market on December 5, 2026, both 10 a.m.–5 p.m. Admission is by donation, with proceeds supporting The Alice Sanctuary. These holiday hours replace the general 11 a.m.–4 p.m. hours still shown on the website’s older seasonal FAQ. Check each edition for its specific programme.",
       "categories": [
         "markets",
         "shopping"
@@ -3247,8 +3288,8 @@
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T12:00:00.000Z",
-      "updatedAt": "2026-10-16T12:00:00.000Z",
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
       "address": "922 9 Avenue SE, Calgary, AB",
       "website": "https://www.mercantileon9th.ca/",
       "email": "mercantile@the-apothecary.ca",

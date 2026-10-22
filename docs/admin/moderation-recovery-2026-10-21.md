@@ -29,7 +29,7 @@ Confirmed October 31, 2026, 7 p.m., doors 5:45 p.m.; Offside Pub & Eatery, 2820 
 Leighton official page:
 https://leightoncentre.org/event/festive-foothills-art-market-2026/
 
-Confirmed November 7–December 20, 2026, 10 a.m.–4 p.m., admission by donation, 282027 144 Street West, Foothills AB T1S 0Y4. Preview November 6, 3–6 p.m. Event text says daily but regular footer hours say closed Monday: confirm Monday openings before supplying daily occurrences. Do not copy the calendar widget's incorrect post-DST -06:00 offsets; use America/Edmonton. Do not replace the pending vendor record with a second market.
+Confirmed November 7–December 20, 2026, 10 a.m.–4 p.m., admission by donation, 282027 144 Street West, Foothills AB T1S 0Y4. Preview November 6, 3–6 p.m. Event text says daily but regular footer hours say closed Monday: confirm Monday openings before supplying daily occurrences. Use the shared Calgary time helper and its configured year-round UTC-6 policy; do not substitute the execution host’s older timezone rules. Do not replace the pending vendor record with a second market.
 
 ## Production blockers and limits
 
@@ -38,3 +38,16 @@ Hosting release 39685365098 failed with HTTP 403 while checking firebasehosting.
 Approved-claim messages are preserved by the existing approval patch. Display restoration and searchable verified-account cards are committed, but deployment success must be checked separately. It is not yet possible to say every organizer's requested change has been fulfilled: the actual notes still need to be inspected.
 
 An encrypted read-only audit was prepared locally but automatic approval review rejected publishing it because the artifact destination exports private records. It remains unpublished pending explicit user approval. No alternate private-data export was attempted. No emails sent.
+
+## Read-only audit completed with user approval
+
+Audit 39687660516 completed October 21 at 16:36 Calgary time. Output was encrypted before upload, retained one day, and decrypted only in the task workspace. Eleven approved claims were checked: four actionable requests, one thank-you and six empty messages. No private claim text, personal contact information or submission IDs are included in this report.
+
+- Morpheus: It's a Wonderful Life is already published at `/events/morpheus-theatre-it-s-a-wonderful-life-275657`; the live discovery index confirms December 11–19.
+- Alliance Française: production still had a city-only address and generic description. Updated authored profile with the official contact page’s main-campus address, hours, phone, email and adult/family programme links. Kahanoff appointment-only testing campus is described separately. Added fully timed Ciné Kids (October 31) and Collectif Devenir talk (November 6). Starbuck screening has no confirmed end time, so no guessed record was added.
+- Mercantile: production still had outdated November 28 hours and lacked December 5 pottery. Corrected 10 a.m.–5 p.m. hours, presenter, venue and donation beneficiary; retained the exact November holiday ID and slug. Added the pottery edition under the same organization. New holiday details come from the approved representative and the owner's supplied correction; the general website FAQ is older.
+- FunnyFest: a request to post 100 shows/workshops, not a supplied 100-show schedule. Existing weekly draft capped a submission at 25 changes. Added a local CSV importer and a shared 100-change cap, with the same confirmation, seven-day allowance, access controls and protected images. An oversized audit receipt aborts atomically. Backend deployment is required before 100-change production publication can be verified; no nonexistent events were invented.
+
+There were ZERO pending moderation decisions at audit time. The three previously queued decisions had FAILED because their sourceId was empty. The two suggestions themselves remained pending. Do not describe these as waiting for the worker anymore. The existing hourly worker processed them independently; the manually requested recovery worker was never run.
+
+Leighton's original suggestion contains one continuous November 6–December 20 occurrence. Its own description confirms daily 10 a.m.–4 p.m. openings plus a November 6, 3–6 p.m. preview. Added a repeated-opening control that generates individual days, using the existing Calgary helper. The configured policy is year-round UTC-6 after March 2026; the earlier claim of a one-hour UTC error was incorrect. Neither original suggestion has been approved or altered by this audit.

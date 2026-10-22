@@ -20,7 +20,7 @@ test('exhibition and timed reception stay distinct and share the exact organizat
  const records=batch.records.map((r:any)=>domain.normalizeRecord(r.input,batch.source,r.id,org.updatedAt).entity);
  assert.equal(records.length,2);assert.notEqual(records[0].id,records[1].id);
  for(const r of records){const event=all.find(e=>e.id===r.id)!;assert.ok(validateEntity(event));assert.equal((event as any).organizerEntityId,org.id);assert.equal(organizationClaimPath(event,all),'/claim/'+org.id+'?listing='+event.id);}
- assert.equal(records[0].schedulePrecision,'date');assert.equal(records[0].end,'2026-12-13T00:00:00-07:00');assert.equal(records[1].start,'2026-10-23T18:30:00-06:00');assert.equal(records[1].end,'2026-10-23T21:00:00-06:00');assert.equal(records[1].schedulePrecision,undefined);
+ assert.equal(records[0].schedulePrecision,'date');assert.equal(records[0].end,'2026-12-13T00:00:00-06:00');assert.equal(records[1].start,'2026-10-23T18:30:00-06:00');assert.equal(records[1].end,'2026-10-23T21:00:00-06:00');assert.equal(records[1].schedulePrecision,undefined);
  assert.ok(!all.some(e=>e.kind==='event'&&(e as any).organizerEntityId===org.id&&/Lo Bak Go|Solving a Problem/.test(e.title)));
 });
 test('exact organization authority is required; pending claims and unrelated event edits fail',()=>{

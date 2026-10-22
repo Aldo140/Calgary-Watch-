@@ -2,6 +2,7 @@ import type {ManagementOrganization} from './claimOrganization';
 import {adminListingPatch} from './adminListingEdits';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../types/discovery';
 import { ownerEditPatch, ownerEditableFields, OWNER_EDIT_INTERVAL } from './ownerListingEdits';
+export const MAX_ORGANIZATION_CHANGES=100;
 export const ORGANIZATION_CATALOG='organization_catalog';
 export const ORGANIZATION_LIVE='organization_live_content';
 export type OrganizationChange={entityId:string;action:'edit'|'add'|'delete';changes:Record<string,unknown>};
@@ -14,7 +15,7 @@ export function organizationEvent(org:ManagementOrganization,id:string,now:numbe
   return {id,slug:id,kind:'event',title:'New event',summary:'',description:'',address:org.address,categories:[],tags:[],sources:org.sources.filter(s=>s.kind==='official'),status:'published',verification:'organization-confirmed',verifiedAt:new Date(now).toISOString(),updatedAt:new Date(now).toISOString(),start:'',end:'',timezone:'America/Edmonton',pricing:'unknown',organizer:org.title,organizerEntityId:org.id,ownerVerifiedAt:new Date(now).toISOString()};
 }
 export function prepareOrganizationBatch(org:ManagementOrganization,entities:readonly DiscoveryEntity[],operations:OrganizationChange[],now:number,adminEdit=false) {
-  if(!Array.isArray(operations)||!operations.length||operations.length>25)throw Error('Include between 1 and 25 changes in one submission.');
+  if(!Array.isArray(operations)||!operations.length||operations.length>MAX_ORGANIZATION_CHANGES)throw Error(`Include between 1 and ${MAX_ORGANIZATION_CHANGES} changes in one submission.`);
   if(new Set(operations.map(o=>o.entityId)).size!==operations.length)throw Error('Bundle each listing into one change.');
   return operations.map(op=>{
     if(!op||!['edit','add','delete'].includes(op.action)||typeof op.entityId!=='string'||op.entityId.length>200||!/^[a-z0-9-]+$/.test(op.entityId))throw Error('Invalid listing operation.');

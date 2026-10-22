@@ -263,3 +263,11 @@ test('organization profiles can set a contact email; slug, verification and imag
  assert.throws(()=>prepareOrganizationBatch(org,all,[{entityId:org.id,action:'edit',changes:{email:'not an email'}}],now),/contact email/);
  for(const field of ['ownerVerifiedAt','claimed','verification','partner'])assert.throws(()=>prepareOrganizationBatch(org,all,[{entityId:org.id,action:'edit',changes:{[field]:'x'}}],now));
 });
+
+test('a 100-show programme commits atomically under one weekly allowance',async()=>{
+ const db=memory();const operations=Array.from({length:100},(_,i)=>({...add,entityId:`${org.id}-event-12345678-1234-4234-8234-${i.toString(16).padStart(12,'0')}`,changes:{...add.changes,title:`Confirmed show ${i}`}}));const result=await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations},now);assert.ok(result.nextAt>now);assert.equal([...db.data.keys()].filter(k=>k.startsWith(ORGANIZATION_LIVE+'/')).length,100);await assert.rejects(()=>submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{...operations[0],entityId:`${org.id}-event-22345678-1234-1234-1234-123456789abc`}]},now+1),/seven complete days/);
+});
+
+test('oversized 100-listing audit aborts the whole save and preserves the allowance',async()=>{
+ const db=memory();const operations=Array.from({length:100},(_,i)=>{const entityId=`large-event-${i}`;db.data.set(`${ORGANIZATION_CATALOG}/${entityId}`,{entity:{...event,id:entityId,description:'a'.repeat(5000)}});return{entityId,action:'edit' as const,changes:{description:'b'.repeat(5000)}};});await assert.rejects(()=>submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations},now),/too large to save safely/);assert.equal([...db.data.keys()].filter(k=>k.startsWith(ORGANIZATION_LIVE+'/')).length,0);assert.equal(db.data.has('owner_business_edit_limits/'+org.id),false);
+});

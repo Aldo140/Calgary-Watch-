@@ -8,7 +8,7 @@ Checked the official homepage, About-The-New-Gallery, Contact, Events, Otipemisi
 
 Published reviewed records:
 
-- Otipemisiwak Fantasy — Riel Starr: October 23–December 12, 2026. Date-only exhibition run; end boundary is December 13 exclusive, with the correct November DST offset. Regular hours are explained, not continuous admission.
+- Otipemisiwak Fantasy — Riel Starr: October 23–December 12, 2026. Date-only exhibition run; end boundary is December 13 exclusive, using the shared Calgary year-round UTC-6 policy. Regular hours are explained, not continuous admission.
 - Otipemisiwak Fantasy — Opening Reception: October 23, 2026, 6:30–9 p.m. Exact times from official exhibition page.
 
 Both use the same exact official organizer/source association. Lo Bak Go and Solving a Problem have no published run dates: linked from profile sources and described as current projects, not invented timed events. No artist talk date was found. Official website images do not establish reuse permission; no artwork copied and no image permission invented. No newsletter subscription or external integration created.

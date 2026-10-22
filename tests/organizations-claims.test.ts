@@ -55,7 +55,7 @@ describe('permanent organization profiles and provenance', () => {
 
 describe('claim approval and Mercantile account regression', () => {
   it('keeps the existing Mercantile event canonical and claimable', () => {
-    const matches = index.entities.filter((e: DiscoveryEntity) => e.kind === 'event' && /Mercantile on 9th/i.test(e.title)); assert.equal(matches.length, 1);
+    const matches = index.entities.filter((e: DiscoveryEntity) => e.kind === 'event' && e.sourceId==='inglewood-bia' && e.sourceRecordId==='mercantile-on-9th-2026-11-28'); assert.equal(matches.length, 1);
     assert.equal(matches[0].id, claim().entityId); assert.equal(entityPath(matches[0]), claim().entityPath);
     assert.ok(createDiscoveryRepository(index.entities,index.occurrences).list().some(e=>e.id===claim().entityId));
   });

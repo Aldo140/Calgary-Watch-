@@ -7958,3 +7958,9 @@
      display: none;
    }
  }
+
+.cw-market-repeat { border:1px solid #cbd5e1; border-radius:12px; padding:16px; background:#f8fafc; min-width:0; }
+.cw-market-repeat summary { cursor:pointer; font-weight:700; }
+.cw-market-repeat p { margin:12px 0; line-height:1.5; }
+.cw-inventory-form .cw-market-weekdays { display:flex; flex-wrap:wrap; gap:12px 20px; margin-bottom:16px; }
+.cw-inventory-form .cw-market-weekdays label { display:flex; align-items:center; gap:8px; }

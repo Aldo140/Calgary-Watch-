@@ -11826,8 +11826,8 @@
       "kind": "event",
       "slug": "mercantile-on-9th-697290",
       "title": "Mercantile on 9th",
-      "summary": "The Mercantile's indoor-outdoor holiday market of local makers, artists and bakers in Inglewood.",
-      "description": "A one-day holiday edition of The Mercantile, Calgary's sustainability-minded artisan market. Entry is free with a donation to a local charity.",
+      "summary": "The Mercantile’s holiday market at The Alexandra Centre, November 28, 10 a.m.–5 p.m., presented by The Apothecary In Inglewood.",
+      "description": "The Mercantile on 9th Holiday Market takes place on November 28, 2026, from 10 a.m. to 5 p.m. at The Alexandra Centre, 922 9 Avenue SE, Calgary. Presented by The Apothecary In Inglewood, the seasonal market brings together local makers, growers, artists and bakers.\n\nThe organizer has confirmed the corrected venue, presenter, dates and hours directly. Admission is by donation, with proceeds supporting The Alice Sanctuary. Holiday programming includes warm drinks and local treats, sustainable gift wrapping, a raffle, music by DJ Shaun Selects and a Santa visit; individual activity times have not been announced.\n\nThe separate Pottery Market follows on December 5, also 10 a.m.–5 p.m. The holiday hours supersede the older general market hours on the website.",
       "categories": [
         "market",
         "shopping",
@@ -11842,24 +11842,24 @@
           "name": "The Mercantile on 9th",
           "url": "https://www.mercantileon9th.ca/vendors",
           "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
+      "fetchedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
       "sourceId": "inglewood-bia",
       "sourceRecordId": "mercantile-on-9th-2026-11-28",
       "neighbourhood": "Inglewood",
       "address": "922 9 Avenue SE, Calgary, AB",
-      "venue": "Alexandra Centre Society",
-      "start": "2026-11-28T11:00:00-07:00",
-      "end": "2026-11-28T16:00:00-07:00",
+      "venue": "The Alexandra Centre",
+      "start": "2026-11-28T10:00:00-06:00",
+      "end": "2026-11-28T17:00:00-06:00",
       "timezone": "America/Edmonton",
-      "pricing": "free",
-      "organizer": "The Mercantile on 9th",
+      "pricing": "unknown",
+      "organizer": "The Apothecary In Inglewood — The Mercantile on 9th",
       "cancelled": false,
       "organizerEntityId": "biz-mercantile-on-9th"
     },
@@ -12096,10 +12096,10 @@
       "title": "Alliance Française de Calgary",
       "name": "Alliance Française de Calgary",
       "website": "https://www.afcalgary.ca/",
-      "address": "Calgary, AB",
-      "summary": "Discover Alliance Française de Calgary through its official homepage.",
-      "description": "Use the organization’s homepage for its current activities and published information. CalgaryWatch links officially sourced associated events here when available. Check the official site for locations, schedules and registration.",
-      "neighbourhood": "",
+      "address": "#350, 1721 29 Avenue SW, Calgary, AB T2T 6T7",
+      "summary": "French language classes, a French library and cultural activities for adults, kids and families, based at cSPACE Marda Loop.",
+      "description": "Alliance Française de Calgary brings French language learning and cultural activities together, with classes, film screenings, workshops and opportunities to practise French with other Calgarians. Its main campus and reception are at cSPACE Marda Loop, suite 350, 1721 29 Avenue SW.\n\nReception is open Monday–Friday, 9 a.m.–6 p.m., and Saturday, 9 a.m.–5 p.m.; closed Sunday. Adult events and kids-and-family activities each have their own official programme page. Check the individual event for its venue and registration requirements.\n\nSome activities take place elsewhere. The Kahanoff Centre testing campus at suite 315, 105 12 Avenue SE is for registered candidates and enrolled students, or by appointment; it has no public walk-in reception. Some Saturday children’s classes take place at the Lycée International de Calgary. Use your booking confirmation to choose the correct campus.",
+      "neighbourhood": "South Calgary",
       "categories": [
         "arts"
       ],
@@ -12111,20 +12111,61 @@
         {
           "name": "Alliance Française de Calgary",
           "url": "https://www.afcalgary.ca/",
-          "kind": "official"
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        },
+        {
+          "name": "Alliance Française — locations, contact and hours",
+          "url": "https://www.afcalgary.ca/contact/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        },
+        {
+          "name": "Alliance Française — adult programme",
+          "url": "https://www.afcalgary.ca/culture/activities/adults/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        },
+        {
+          "name": "Alliance Française — kids and family programme",
+          "url": "https://www.afcalgary.ca/culture/activities/kids/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
         }
       ],
       "socials": {
-        "website": "https://www.afcalgary.ca/"
+        "website": "https://www.afcalgary.ca/",
+        "events": "https://www.afcalgary.ca/culture/activities/",
+        "adult_events": "https://www.afcalgary.ca/culture/activities/adults/",
+        "family_events": "https://www.afcalgary.ca/culture/activities/kids/"
       },
-      "services": [],
+      "services": [
+        "French language classes",
+        "French cultural activities",
+        "Adult events and workshops",
+        "Kids and family activities",
+        "French library",
+        "Official French examinations"
+      ],
       "images": [],
       "claimed": false,
       "partner": false,
       "editorialSelection": true,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-15T00:00:00Z"
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
+      "phone": "403-245-5662",
+      "email": "info@afcalgary.ca",
+      "hours": {
+        "Monday": "09:00–18:00",
+        "Tuesday": "09:00–18:00",
+        "Wednesday": "09:00–18:00",
+        "Thursday": "09:00–18:00",
+        "Friday": "09:00–18:00",
+        "Saturday": "09:00–17:00",
+        "Sunday": "Closed"
+      },
+      "verifiedAt": "2026-10-21T22:40:36.864477Z"
     },
     {
       "id": "biz-werklund-centre",
@@ -15664,7 +15705,7 @@
       "title": "The Mercantile on 9th",
       "name": "The Mercantile on 9th",
       "summary": "Inglewood's sustainability-minded seasonal artisan market, presented by The Apothecary in Inglewood.",
-      "description": "The Mercantile brings local makers, growers, artists and bakers together at the Alexandra Centre in Inglewood. The Apothecary in Inglewood created and presents the market.",
+      "description": "The Mercantile on 9th brings seasonal, eco-minded markets to the Alexandra Centre at 922 9 Avenue SE in Inglewood. Presented by The Apothecary In Inglewood, its indoor and outdoor editions showcase local makers, growers, artists and bakers.\n\nThe organizer has confirmed two upcoming holiday dates: the Holiday Market on November 28, 2026, and Pottery Market on December 5, 2026, both 10 a.m.–5 p.m. Admission is by donation, with proceeds supporting The Alice Sanctuary. These holiday hours replace the general 11 a.m.–4 p.m. hours still shown on the website’s older seasonal FAQ. Check each edition for its specific programme.",
       "categories": [
         "markets",
         "shopping"
@@ -15691,8 +15732,8 @@
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T12:00:00.000Z",
-      "updatedAt": "2026-10-16T12:00:00.000Z",
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
       "address": "922 9 Avenue SE, Calgary, AB",
       "website": "https://www.mercantileon9th.ca/",
       "email": "mercantile@the-apothecary.ca",
@@ -15967,25 +16008,25 @@
           "name": "The New Gallery",
           "url": "https://www.thenewgallery.org/Otipemisiwak-Fantasy-Riel-Starr",
           "kind": "official",
-          "retrievedAt": "2026-10-21T22:11:13Z"
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
         }
       ],
       "sourceId": "the-new-gallery",
       "sourceRecordId": "otipemisiwak-fantasy-riel-starr-2026",
-      "fetchedAt": "2026-10-21T22:11:13Z",
-      "updatedAt": "2026-10-21T22:11:13Z",
+      "fetchedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "The New Gallery — Main Space",
       "neighbourhood": "Chinatown",
       "start": "2026-10-23T00:00:00-06:00",
-      "end": "2026-12-13T00:00:00-07:00",
+      "end": "2026-12-13T00:00:00-06:00",
       "timezone": "America/Edmonton",
       "endTimeEstimated": true,
       "pricing": "free",
       "schedulePrecision": "date",
       "cancelled": false,
-      "verifiedAt": "2026-10-21T22:11:13Z",
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
       "organizerEntityId": "biz-the-new-gallery"
     },
     {
@@ -16012,13 +16053,13 @@
           "name": "The New Gallery",
           "url": "https://www.thenewgallery.org/Otipemisiwak-Fantasy-Riel-Starr",
           "kind": "official",
-          "retrievedAt": "2026-10-21T22:11:13Z"
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
         }
       ],
       "sourceId": "the-new-gallery",
       "sourceRecordId": "otipemisiwak-fantasy-opening-2026-10-23",
-      "fetchedAt": "2026-10-21T22:11:13Z",
-      "updatedAt": "2026-10-21T22:11:13Z",
+      "fetchedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "The New Gallery — Main Space",
@@ -16028,8 +16069,273 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "cancelled": false,
-      "verifiedAt": "2026-10-21T22:11:13Z",
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
       "organizerEntityId": "biz-the-new-gallery"
+    },
+    {
+      "id": "63dbf8035b30482a6c1256fb27a4",
+      "kind": "event",
+      "slug": "the-mercantile-on-9th-pottery-market-63dbf8",
+      "title": "The Mercantile on 9th — Pottery Market",
+      "summary": "A pottery-focused edition of The Mercantile at The Alexandra Centre, December 5, 10 a.m.–5 p.m.",
+      "description": "The Mercantile on 9th’s Pottery Market takes place December 5, 2026, from 10 a.m. to 5 p.m. at The Alexandra Centre, 922 9 Avenue SE, Calgary. Presented by The Apothecary In Inglewood, this edition focuses on pottery from local makers.\n\nThe date, venue and hours were confirmed directly by the organizer. Admission is by donation, with proceeds supporting The Alice Sanctuary. Check the organizer’s website for edition-specific updates.",
+      "categories": [
+        "market",
+        "shopping",
+        "holiday"
+      ],
+      "tags": [
+        "pottery",
+        "local makers",
+        "holiday market"
+      ],
+      "address": "922 9 Avenue SE, Calgary, AB",
+      "organizer": "The Apothecary In Inglewood — The Mercantile on 9th",
+      "sources": [
+        {
+          "name": "The Mercantile on 9th",
+          "url": "https://www.mercantileon9th.ca/vendors",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        }
+      ],
+      "sourceId": "inglewood-bia",
+      "sourceRecordId": "mercantile-on-9th-pottery-2026-12-05",
+      "fetchedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "The Alexandra Centre",
+      "neighbourhood": "Inglewood",
+      "start": "2026-12-05T10:00:00-06:00",
+      "end": "2026-12-05T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "cancelled": false,
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
+      "organizerEntityId": "biz-mercantile-on-9th"
+    },
+    {
+      "id": "2756573214ee363002cf7fe3e680",
+      "kind": "event",
+      "slug": "morpheus-theatre-it-s-a-wonderful-life-275657",
+      "title": "Morpheus Theatre: It's a Wonderful Life",
+      "summary": "Morpheus Theatre's holiday show at the Pumphouse Theatre.",
+      "description": "Morpheus Theatre stages It's a Wonderful Life at the Pumphouse Theatre from December 11 to 19, 2026, as part of its 32nd season. Showtimes and tickets are on Morpheus Theatre's season page.",
+      "categories": [
+        "arts",
+        "indoor"
+      ],
+      "tags": [
+        "theatre",
+        "holiday",
+        "community theatre"
+      ],
+      "address": "2140 Pumphouse Avenue SW, Calgary, AB",
+      "organizer": "Morpheus Theatre",
+      "sources": [
+        {
+          "name": "Morpheus Theatre",
+          "url": "https://www.morpheustheatre.ca/?page_id=9264",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        }
+      ],
+      "sourceId": "morpheus-theatre",
+      "sourceRecordId": "its-a-wonderful-life-2026",
+      "fetchedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Pumphouse Theatre",
+      "start": "2026-12-11T00:00:00-06:00",
+      "end": "2026-12-20T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "endTimeEstimated": true,
+      "pricing": "paid",
+      "schedulePrecision": "date",
+      "cancelled": false,
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
+      "organizerEntityId": "biz-morpheus-theatre"
+    },
+    {
+      "id": "23e398768e1bae810b7cc495fc82",
+      "kind": "event",
+      "slug": "cine-kids-kiki-la-petite-sorcie-re-23e398",
+      "title": "Ciné Kids — Kiki la petite sorcière",
+      "summary": "A French-language family screening of Kiki’s Delivery Service at the Alliance Française library.",
+      "description": "Alliance Française de Calgary presents Kiki la petite sorcière on October 31, 2026, from 10:30 a.m. to noon in its library at cSPACE Marda Loop. The film is shown in French and is recommended for ages four and up. Halloween costumes are welcome.\n\nThe official kids-and-family programme lists the activity as free. Register through the organizer’s page. A parent or responsible adult must remain with children throughout the screening or in the hallway; this is a family activity, not a drop-off childcare programme.",
+      "categories": [
+        "arts",
+        "culture"
+      ],
+      "tags": [
+        "French",
+        "family",
+        "film",
+        "Halloween"
+      ],
+      "address": "#350, 1721 29 Avenue SW, Calgary, AB T2T 6T7",
+      "organizer": "Alliance Française de Calgary",
+      "sources": [
+        {
+          "name": "Alliance Française de Calgary",
+          "url": "https://www.afcalgary.ca/culture/activities/adults/cine-kids-kiki-la-petite-sorciere/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        }
+      ],
+      "sourceId": "alliance-francaise-reviewed",
+      "sourceRecordId": "cine-kids-kiki-2026-10-31",
+      "fetchedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Alliance Française library, cSPACE Marda Loop",
+      "neighbourhood": "South Calgary",
+      "start": "2026-10-31T10:30:00-06:00",
+      "end": "2026-10-31T12:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "tickets": "https://afcalgary.ca/event-rsvp/cine-kids-kiki-la-petite-sorciere/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
+      "organizerEntityId": "biz-alliance-francaise-calgary"
+    },
+    {
+      "id": "8b32f3d02e0ec022b544ef5b8497",
+      "kind": "event",
+      "slug": "collectif-devenir-e-volution-artist-talk-8b32f3",
+      "title": "Collectif Devenir — Évolution Artist Talk",
+      "summary": "An artist presentation and small reception with Francophone visual-art collective Devenir.",
+      "description": "Meet Collectif Devenir at Alliance Française de Calgary on November 6, 2026, from 6:15 to 8:15 p.m. The programme includes a 40-minute presentation about Évolution, followed by a small reception. The exhibition considers the individual and collective evolution of five Francophone artists over nearly a decade.\n\nThe talk is at the Alliance Française library, suite 350, 1721 29 Avenue SW. Admission is free; use the organizer’s page for registration and current availability.",
+      "categories": [
+        "arts",
+        "culture"
+      ],
+      "tags": [
+        "French",
+        "Francophone"
+      ],
+      "address": "#350, 1721 29 Avenue SW, Calgary, AB T2T 6T7",
+      "organizer": "Alliance Française de Calgary",
+      "sources": [
+        {
+          "name": "Alliance Française de Calgary",
+          "url": "https://www.afcalgary.ca/culture/activities/adults/26-11-06-artist-talk-collectif-devenir/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:40:36.864477Z"
+        }
+      ],
+      "sourceId": "alliance-francaise-reviewed",
+      "sourceRecordId": "collectif-devenir-artist-talk-2026-11-06",
+      "fetchedAt": "2026-10-21T22:40:36.864477Z",
+      "updatedAt": "2026-10-21T22:40:36.864477Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Alliance Française library, cSPACE Marda Loop",
+      "neighbourhood": "South Calgary",
+      "start": "2026-11-06T18:15:00-06:00",
+      "end": "2026-11-06T20:15:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "tickets": "https://afcalgary.ca/event-rsvp/artist-talk/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-21T22:40:36.864477Z",
+      "organizerEntityId": "biz-alliance-francaise-calgary"
+    },
+    {
+      "id": "biz-funnyfest",
+      "kind": "business",
+      "slug": "funnyfest",
+      "title": "FunnyFest Calgary Comedy Festival",
+      "name": "FunnyFest Calgary Comedy Festival",
+      "website": "https://www.funnyfest.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's long-running comedy festival and stand-up competition.",
+      "description": "FunnyFest Calgary Comedy Festival runs stand-up shows and an annual comedy competition with dozens of comedians across multiple nights in Calgary. Show dates, venues and tickets are on its own website.",
+      "categories": [
+        "arts",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "comedy",
+        "festival"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — official website",
+          "url": "https://www.funnyfest.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.funnyfest.com/"
+      },
+      "services": [
+        "Comedy festival",
+        "Stand-up shows"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "tickets@funnyfest.com",
+      "phone": "403-228-7888"
+    },
+    {
+      "id": "biz-morpheus-theatre",
+      "kind": "business",
+      "slug": "morpheus-theatre",
+      "title": "Morpheus Theatre",
+      "name": "Morpheus Theatre",
+      "website": "https://www.morpheustheatre.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary community theatre staging comedies, mysteries and Gilbert and Sullivan at the Pumphouse Theatre.",
+      "description": "Morpheus Theatre is in its 32nd season of what it calls Shows Worth Seeing, with productions at the Pumphouse Theatre and a Gilbert and Sullivan comic opera to close each season. Its own website is kept current, so check its season page for show dates, times and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "community-theatre"
+      ],
+      "sources": [
+        {
+          "name": "Morpheus Theatre — season page",
+          "url": "https://www.morpheustheatre.ca/?page_id=9264",
+          "kind": "official",
+          "retrievedAt": "2026-10-20T23:30:00Z"
+        },
+        {
+          "name": "Morpheus Theatre",
+          "url": "https://www.morpheustheatre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-20T23:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.morpheustheatre.ca/"
+      },
+      "services": [
+        "Theatre productions",
+        "Season tickets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-20T00:00:00Z",
+      "email": "tickets@morpheustheatre.ca",
+      "phone": "403-246-2999"
     }
   ],
   "occurrences": [

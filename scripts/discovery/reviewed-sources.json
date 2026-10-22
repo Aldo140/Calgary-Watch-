@@ -1284,16 +1284,43 @@
             "shopping",
             "holiday"
           ],
-          "organizer": "The Mercantile on 9th",
-          "pricing": "free",
+          "organizer": "The Apothecary In Inglewood — The Mercantile on 9th",
+          "pricing": "unknown",
           "title": "Mercantile on 9th",
-          "summary": "The Mercantile's indoor-outdoor holiday market of local makers, artists and bakers in Inglewood.",
-          "description": "A one-day holiday edition of The Mercantile, Calgary's sustainability-minded artisan market. Entry is free with a donation to a local charity.",
+          "summary": "The Mercantile’s holiday market at The Alexandra Centre, November 28, 10 a.m.–5 p.m., presented by The Apothecary In Inglewood.",
+          "description": "The Mercantile on 9th Holiday Market takes place on November 28, 2026, from 10 a.m. to 5 p.m. at The Alexandra Centre, 922 9 Avenue SE, Calgary. Presented by The Apothecary In Inglewood, the seasonal market brings together local makers, growers, artists and bakers.\n\nThe organizer has confirmed the corrected venue, presenter, dates and hours directly. Admission is by donation, with proceeds supporting The Alice Sanctuary. Holiday programming includes warm drinks and local treats, sustainable gift wrapping, a raffle, music by DJ Shaun Selects and a Santa visit; individual activity times have not been announced.\n\nThe separate Pottery Market follows on December 5, also 10 a.m.–5 p.m. The holiday hours supersede the older general market hours on the website.",
           "address": "922 9 Avenue SE, Calgary, AB",
-          "venue": "Alexandra Centre Society",
+          "venue": "The Alexandra Centre",
           "sourceUrl": "https://www.mercantileon9th.ca/vendors",
-          "start": "2026-11-28T11:00:00-07:00",
-          "end": "2026-11-28T16:00:00-07:00",
+          "start": "2026-11-28T10:00:00-06:00",
+          "end": "2026-11-28T17:00:00-06:00",
+          "neighbourhood": "Inglewood"
+        }
+      },
+      {
+        "id": "mercantile-on-9th-pottery-2026-12-05",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "pottery",
+            "local makers",
+            "holiday market"
+          ],
+          "categories": [
+            "market",
+            "shopping",
+            "holiday"
+          ],
+          "organizer": "The Apothecary In Inglewood — The Mercantile on 9th",
+          "pricing": "unknown",
+          "title": "The Mercantile on 9th — Pottery Market",
+          "summary": "A pottery-focused edition of The Mercantile at The Alexandra Centre, December 5, 10 a.m.–5 p.m.",
+          "description": "The Mercantile on 9th’s Pottery Market takes place December 5, 2026, from 10 a.m. to 5 p.m. at The Alexandra Centre, 922 9 Avenue SE, Calgary. Presented by The Apothecary In Inglewood, this edition focuses on pottery from local makers.\n\nThe date, venue and hours were confirmed directly by the organizer. Admission is by donation, with proceeds supporting The Alice Sanctuary. Check the organizer’s website for edition-specific updates.",
+          "address": "922 9 Avenue SE, Calgary, AB",
+          "venue": "The Alexandra Centre",
+          "sourceUrl": "https://www.mercantileon9th.ca/vendors",
+          "start": "2026-12-05T10:00:00-06:00",
+          "end": "2026-12-05T17:00:00-06:00",
           "neighbourhood": "Inglewood"
         }
       }
@@ -3077,8 +3104,8 @@
           "title": "Morpheus Theatre: It's a Wonderful Life",
           "summary": "Morpheus Theatre's holiday show at the Pumphouse Theatre.",
           "description": "Morpheus Theatre stages It's a Wonderful Life at the Pumphouse Theatre from December 11 to 19, 2026, as part of its 32nd season. Showtimes and tickets are on Morpheus Theatre's season page.",
-          "start": "2026-12-11T00:00:00-07:00",
-          "end": "2026-12-20T00:00:00-07:00",
+          "start": "2026-12-11T00:00:00-06:00",
+          "end": "2026-12-20T00:00:00-06:00",
           "schedulePrecision": "date",
           "endTimeEstimated": true
         }
@@ -3170,7 +3197,7 @@
           "summary": "Riel Starr explores contemporary Métis culture through an Indigiqueer and Two-Spirit perspective at The New Gallery.",
           "description": "Riel Starr’s Otipemisiwak Fantasy runs October 23–December 12, 2026 in The New Gallery’s Main Space. The exhibition brings together historical and contemporary ways of making in a boudoir-like setting to consider Métis identity, gender, spirituality and imagined futures.\n\nThis is an exhibition date range, not continuous opening hours. Regular gallery visiting hours are Wednesday–Saturday, noon–6 p.m. Admission is free. A separate opening reception takes place October 23, 6:30–9 p.m.; see its event listing and the official exhibition page for details.",
           "start": "2026-10-23T00:00:00-06:00",
-          "end": "2026-12-13T00:00:00-07:00",
+          "end": "2026-12-13T00:00:00-06:00",
           "schedulePrecision": "date",
           "endTimeEstimated": true
         }
@@ -3200,6 +3227,74 @@
           "description": "The New Gallery hosts the opening reception for Riel Starr’s Otipemisiwak Fantasy on October 23, 2026, from 6:30 to 9 p.m. at 208 Centre Street S. The exhibition explores contemporary Métis culture through an Indigiqueer and Two-Spirit perspective. Admission to the gallery is free.\n\nThe exhibition continues through December 12 during regular Wednesday–Saturday gallery hours, noon–6 p.m. Check the official exhibition page for the artist statement and any programme updates.",
           "start": "2026-10-23T18:30:00-06:00",
           "end": "2026-10-23T21:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "alliance-francaise-reviewed",
+      "name": "Alliance Française de Calgary",
+      "approved": true,
+      "hosts": [
+        "www.afcalgary.ca",
+        "afcalgary.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "cine-kids-kiki-2026-10-31",
+        "input": {
+          "kind": "event",
+          "organizer": "Alliance Française de Calgary",
+          "address": "#350, 1721 29 Avenue SW, Calgary, AB T2T 6T7",
+          "venue": "Alliance Française library, cSPACE Marda Loop",
+          "neighbourhood": "South Calgary",
+          "pricing": "free",
+          "categories": [
+            "arts",
+            "culture"
+          ],
+          "tags": [
+            "French",
+            "family",
+            "film",
+            "Halloween"
+          ],
+          "title": "Ciné Kids — Kiki la petite sorcière",
+          "summary": "A French-language family screening of Kiki’s Delivery Service at the Alliance Française library.",
+          "description": "Alliance Française de Calgary presents Kiki la petite sorcière on October 31, 2026, from 10:30 a.m. to noon in its library at cSPACE Marda Loop. The film is shown in French and is recommended for ages four and up. Halloween costumes are welcome.\n\nThe official kids-and-family programme lists the activity as free. Register through the organizer’s page. A parent or responsible adult must remain with children throughout the screening or in the hallway; this is a family activity, not a drop-off childcare programme.",
+          "start": "2026-10-31T10:30:00-06:00",
+          "end": "2026-10-31T12:00:00-06:00",
+          "sourceUrl": "https://www.afcalgary.ca/culture/activities/adults/cine-kids-kiki-la-petite-sorciere/",
+          "tickets": "https://afcalgary.ca/event-rsvp/cine-kids-kiki-la-petite-sorciere/"
+        }
+      },
+      {
+        "id": "collectif-devenir-artist-talk-2026-11-06",
+        "input": {
+          "kind": "event",
+          "organizer": "Alliance Française de Calgary",
+          "address": "#350, 1721 29 Avenue SW, Calgary, AB T2T 6T7",
+          "venue": "Alliance Française library, cSPACE Marda Loop",
+          "neighbourhood": "South Calgary",
+          "pricing": "free",
+          "categories": [
+            "arts",
+            "culture"
+          ],
+          "tags": [
+            "French",
+            "Francophone"
+          ],
+          "title": "Collectif Devenir — Évolution Artist Talk",
+          "summary": "An artist presentation and small reception with Francophone visual-art collective Devenir.",
+          "description": "Meet Collectif Devenir at Alliance Française de Calgary on November 6, 2026, from 6:15 to 8:15 p.m. The programme includes a 40-minute presentation about Évolution, followed by a small reception. The exhibition considers the individual and collective evolution of five Francophone artists over nearly a decade.\n\nThe talk is at the Alliance Française library, suite 350, 1721 29 Avenue SW. Admission is free; use the organizer’s page for registration and current availability.",
+          "start": "2026-11-06T18:15:00-06:00",
+          "end": "2026-11-06T20:15:00-06:00",
+          "sourceUrl": "https://www.afcalgary.ca/culture/activities/adults/26-11-06-artist-talk-collectif-devenir/",
+          "tickets": "https://afcalgary.ca/event-rsvp/artist-talk/"
         }
       }
     ]

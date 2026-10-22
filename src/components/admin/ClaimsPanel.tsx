@@ -248,6 +248,10 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
             const entity=entities.get(c.entityId);
             const organization=entities.get(c.approvedOrganizationId??(entity?.kind==='business'?entity.id:''));
             const needsReview=!entity||entity.kind!=='business'&&scopeReview.recommendation!=='already-set';
+            const websiteProfile=organization??((entity?.kind==='event'||entity?.kind==='market')?entities.get(entity.organizerEntityId??''):entity);
+            const officialWebsite=[...(websiteProfile?.kind==='business'?[websiteProfile.website]:[]),...(websiteProfile?.sources??entity?.sources??[]).filter(source=>source.kind==='official').map(source=>source.url)].find(value=>{
+              try { const url=new URL(value??'');return ['https:','http:'].includes(url.protocol)&&!/(^|\.)calgarywatch\.ca$/i.test(url.hostname); } catch { return false; }
+            });
             return <article key={c.entityId+c.uid} className="min-w-0 rounded-xl border p-4 sm:p-5" style={{borderColor:T.line,background:T.surface,color:T.ink}}>
               <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="min-w-0 text-base font-semibold break-words">{organization?.title??c.entityTitle}</h3><Chip tone="ok"><BadgeCheck size={13} /> Verified</Chip></div>
               <p className="mt-1 text-xs" style={{color:T.muted}}>Approved {c.reviewedAt?new Date(c.reviewedAt).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}):'— date not recorded'}</p>
@@ -260,6 +264,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <p className="mt-3 text-xs" style={{color:c.approvalEmailStatus==='failed'||c.approvalEmailStatus==='skipped'?T.critical:T.muted}}><Mail size={12} className="inline mr-1" />{approvalEmailNote(c)||'Approval email status not recorded'}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold" style={{background:T.ink,color:'#fff'}} to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
+                {officialWebsite?<a className="inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm font-semibold" style={{borderColor:T.line,color:T.signal}} href={officialWebsite} target="_blank" rel="noopener noreferrer" aria-label={`Official website for ${organization?.title??c.entityTitle} (opens in a new tab)`}>Official website <ExternalLink size={13}/></a>:null}
                 {c.entityPath?<a className="inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm font-semibold" style={{borderColor:T.line}} href={c.entityPath} target="_blank" rel="noreferrer">Public listing <ExternalLink size={13}/></a>:null}
               </div>
               <details className="mt-4 border-t pt-3 text-xs" style={{borderColor:T.line,color:T.muted}}><summary className="cursor-pointer font-semibold" style={{color:needsReview?T.critical:T.muted}}>{needsReview?'Access needs review · details & tools':'Approval details & access tools'}</summary>

@@ -1,3 +1,4 @@
+import {OrganizationDirectory} from './OrganizationDirectory';
 import {useAdminView} from '../../hooks/useAdminView';
 import {WorkspaceTabs} from './WorkspaceTabs';
 import { OwnerEditsPanel } from './OwnerEditsPanel';
@@ -207,7 +208,7 @@ function AddLead() {
 }
 
 export function PartnersWorkspace() {
-  const [workspace,setWorkspace]=useAdminView(['claims','updates','outreach','markets'] as const,'claims');
+  const [workspace,setWorkspace]=useAdminView(['directory','claims','updates','outreach','markets'] as const,'claims');
   const [leads, setLeads] = useState<PartnerLead[] | null>(null);
   const [error, setError] = useState('');
   const[attempt,setAttempt]=useState(0);
@@ -223,7 +224,8 @@ export function PartnersWorkspace() {
 
   return (
     <div className="space-y-4">
-      <WorkspaceTabs label="Organization tools" value={workspace} onChange={setWorkspace} items={[{id:'claims',label:'Claims & verification',description:'Confirm organization access'},{id:'updates',label:'Business updates',description:'Changes already published'},{id:'outreach',label:'Partner outreach',description:'Contacts, drafts and replies'},{id:'markets',label:'Market HQ',description:'Managed market requests'}]} />
+      <WorkspaceTabs label="Organization tools" value={workspace} onChange={setWorkspace} items={[{id:'directory',label:'Local partners',description:'Organizations & event counts'},{id:'claims',label:'Claims & verification',description:'Confirm organization access'},{id:'updates',label:'Business updates',description:'Changes already published'},{id:'outreach',label:'Partner outreach',description:'Contacts, drafts and replies'},{id:'markets',label:'Market HQ',description:'Managed market requests'}]} />
+      {workspace==='directory'&&<OrganizationDirectory />}
       {workspace==='updates'&&<OwnerEditsPanel />}
       {workspace==='claims'&&<ClaimsPanel leads={leads} />}
       {workspace==='markets'&&<MarketHQPanel />}

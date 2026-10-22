@@ -1,4 +1,6 @@
-import { collection, getDocs, query, where, limit } from 'firebase/firestore';
+import {memberAccountInsights,type MemberAuthRecord} from '../../lib/memberAccountInsights';
+import {calgaryDateTimeFormat} from '../../lib/calgaryTz';
+import { collection, doc, getDoc, getDocs, query, where, limit } from 'firebase/firestore';
 import { discoveryRepository } from '../../data/discovery';
 import {approvedManagementOrganization as approvedOrganization} from '../../lib/claimOrganization';
 import type { ListingClaim } from '../../lib/claims';
@@ -22,12 +24,12 @@ import { realName } from '@/src/lib/auth';
 import { AdminButton, Chip, EmptyState, FilterChip, FilterRow, Panel, SearchField, SkeletonRows, T, TimeAgo, mono } from './ui';
 
 type Row = { id: string; uid: string } & Record<string, unknown>;
-type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'no-name' | 'business' | 'new';
+type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'no-name' | 'business' | 'new' | 'google' | 'email-signin' | 'recent' | 'attention';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const num = (v: unknown) => (typeof v === 'number' ? v : 0);
 
-function shape(r: Row) {
+function shape(r: Row, auth?: MemberAuthRecord) {
   const weekly = r.weeklyDigestOptIn === true;
   const events = r.eventsDigestOptIn === true;
   const area = (str(r.neighborhood) || str(r.inferredNeighborhood)).trim();
@@ -42,7 +44,8 @@ function shape(r: Row) {
     weekly,
     events,
     interests: normalizeInterests(r.eventInterests),
-    createdAt: num(r.createdAt),
+    createdAt: auth?.createdAt ?? num(r.createdAt),
+    account: memberAccountInsights(r,auth),
     role: str(r.role),
     business: r.accountType === 'business',
     plan: emailPlan(weekly, events, Date.now()),
@@ -51,6 +54,10 @@ function shape(r: Row) {
 
 const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof shape>) => boolean }> = [
   { id: 'all', label: 'Everyone', match: () => true },
+  { id:'google',label:'Google sign-in',match:m=>m.account.providers.includes('google.com')},
+  { id:'email-signin',label:'Email sign-in',match:m=>m.account.providers.includes('password')},
+  { id:'recent',label:'Signed in this week',match:m=>m.account.recent},
+  { id:'attention',label:'Needs attention',match:m=>m.account.disabled===true||m.account.emailVerified===false||!m.account.profileSaved},
   { id: 'both', label: 'Your week (both)', match: (m) => m.weekly && m.events },
   { id: 'monday', label: 'Safety only', match: (m) => m.weekly && !m.events },
   { id: 'events', label: 'Event picks only', match: (m) => !m.weekly && m.events },
@@ -63,6 +70,19 @@ const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof s
 
 export function MembersDirectory() {
   const [directoryError,setDirectoryError]=useState('');
+  const [authRows,setAuthRows]=useState<MemberAuthRecord[]>([]),[authAt,setAuthAt]=useState<number|null>(null),[authError,setAuthError]=useState(''),[authAttempt,setAuthAttempt]=useState(0);
+  const [sort,setSort]=useState('joined');
+  const date=(value:number|null)=>value?calgaryDateTimeFormat('en-CA',{dateStyle:'medium',timeStyle:'short'}).format(value):'Not recorded';
+  useEffect(()=>{let active=true;if(!db)return;setAuthError('');void (async()=>{
+    const index=await getDoc(doc(db!,'ops_health','member_auth'));
+    if(!index.exists()){if(active)setAuthError('Historical Auth details are awaiting the first snapshot. Saved sign-in details are shown where available.');return;}
+    const data=index.data(),ids=Array.isArray(data.chunkIds)?data.chunkIds.filter((id:unknown):id is string=>typeof id==='string'&&/^member_auth_[0-9]+_[0-9]+$/.test(id)).slice(0,100):[];
+    const chunks=await Promise.all(ids.map(id=>getDoc(doc(db!,'ops_health',id))));
+    if(chunks.some(chunk=>!chunk.exists()||chunk.data()?.generation!==data.generation))throw Error('Snapshot is incomplete. Please refresh it.');
+    const records=chunks.flatMap(chunk=>Array.isArray(chunk.data()?.accounts)?chunk.data()!.accounts:[]).filter((row:any)=>typeof row?.uid==='string'&&Array.isArray(row.providers)&&row.providers.every((p:unknown)=>typeof p==='string')) as MemberAuthRecord[];
+    if(active){setAuthRows(records);setAuthAt(typeof data.at==='number'?data.at:null);}
+  })().catch(()=>{if(active)setAuthError('Historical Auth details could not load. Saved profile details are still available.');});return()=>{active=false;};},[authAttempt]);
+  const authByUid=useMemo(()=>new Map(authRows.map(row=>[row.uid,row])),[authRows]);
   const [rows, setRows] = useState<Row[] | null>(null);
   const [claims,setClaims]=useState<ListingClaim[]>([]);
   const [accessError,setAccessError]=useState('');
@@ -78,17 +98,20 @@ export function MembersDirectory() {
     return adminUsers.subscribe(db, ({ rows: r, loading, error }) => { setDirectoryError(error??'');if (!loading || r.length) setRows(r as Row[]); });
   }, []);
 
-  const members = useMemo(() => (rows ?? []).map(r=>{const member=shape(r);return {...member,business:member.business||(accessByUid.get(member.uid)?.length??0)>0};}).sort((a, b) => b.createdAt - a.createdAt), [rows,accessByUid]);
+  const members = useMemo(() => {const merged=new Map<string,Row>((rows??[]).map(row=>[row.uid||row.id,row]));for(const account of authRows)if(!merged.has(account.uid))merged.set(account.uid,{id:account.uid,uid:account.uid,email:account.email??'',displayName:account.displayName??'',createdAt:account.createdAt??0,profileSaved:false});return [...merged.values()].map(row=>{const member=shape(row,authByUid.get(row.uid||row.id));return {...member,business:member.business||(accessByUid.get(member.uid)?.length??0)>0};}).sort((a,b)=>sort==='signin'?(b.account.lastSignInAt??0)-(a.account.lastSignInAt??0):sort==='name'?a.name.localeCompare(b.name):b.createdAt-a.createdAt);}, [rows,authRows,authByUid,accessByUid,sort]);
   const counts = useMemo(() => Object.fromEntries(FILTERS.map((f) => [f.id, members.filter(f.match).length])) as Record<Filter, number>, [members]);
   const needle = q.trim().toLowerCase();
   const list = members
     .filter(FILTERS.find((f) => f.id === filter)!.match)
-    .filter((m) => !needle || `${m.name} ${m.email} ${m.area} ${(accessByUid.get(m.uid)??[]).map(c=>approvedOrganization(c,discoveryRepository.list())?.title??c.entityTitle).join(" ")}`.toLowerCase().includes(needle));
+    .filter((m) => !needle || `${m.name} ${m.email} ${m.area} ${m.account.providerLabels.join(" ")} ${m.uid} ${(accessByUid.get(m.uid)??[]).map(c=>approvedOrganization(c,discoveryRepository.list())?.title??c.entityTitle).join(" ")}`.toLowerCase().includes(needle));
 
   return (
     <Panel title="All members" subtitle="Tap someone to see what they get, then open their dashboard exactly as they see it." padded={false}>
-      <div className="px-4 pt-3 space-y-2">
-        <SearchField value={q} onChange={(v) => { setQ(v); setShown(30); }} placeholder="Name, email, organization or neighbourhood" />
+      <div className="px-4 pt-3 space-y-3">
+        <div className="flex flex-wrap gap-2"><Chip>{members.length} accounts</Chip><Chip>{members.filter(m=>m.account.recent).length} signed in this week</Chip><Chip>{members.filter(m=>m.account.emailVerified===false).length} email unverified</Chip><Chip>{members.filter(m=>m.account.disabled).length} disabled</Chip></div>
+        <div className="flex flex-wrap items-end justify-between gap-3"><p className="text-xs" style={{color:T.muted}}>Auth snapshot: {date(authAt)} · Refreshed every four hours. Sign-ins and session renewals are different from page visits.</p><label className="text-xs font-semibold">Sort accounts<select className="ml-2 rounded border p-2" value={sort} onChange={e=>setSort(e.target.value)}><option value="joined">Newest accounts</option><option value="signin">Latest sign-in</option><option value="name">Name</option></select></label><AdminButton variant="outline" onClick={()=>{setAuthAttempt(n=>n+1);if(db)void adminUsers.refresh(db);}}>Refresh saved data</AdminButton></div>
+        {authError?<p role="status" className="text-xs" style={{color:T.muted}}>{authError}</p>:null}
+        <SearchField value={q} onChange={(v) => { setQ(v); setShown(30); }} placeholder="Name, email, organization or sign-in method" />
         <FilterRow>
           {FILTERS.map((f) => <FilterChip key={f.id} active={filter === f.id} onClick={() => { setFilter(f.id); setShown(30); }} count={counts[f.id]}>{f.label}</FilterChip>)}
         </FilterRow>
@@ -110,6 +133,7 @@ export function MembersDirectory() {
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2">
                         <strong className="text-sm truncate" style={{ color: T.ink }}>{m.name}</strong>
+                        {m.account.disabled?<Chip tone="critical">Disabled</Chip>:null}
                         {m.role === 'admin' ? <Chip tone="signal">Admin</Chip> : null}
                         {m.business ? <Chip tone="ok">Business</Chip> : null}
                       </span>
@@ -117,14 +141,31 @@ export function MembersDirectory() {
                       <span className="block text-xs truncate" style={{ color: T.muted }}>
                         {m.area ? <><MapPin size={11} className="inline -mt-0.5" /> {m.area} · </> : 'No area · '}{m.plan.kind === 'none' ? 'No email' : m.plan.name}
                       </span>
+                      <span className="block text-xs mt-1" style={{color:T.muted}}>{m.account.providerLabels.join(' + ')||'Sign-in method not recorded'} · Last sign-in {m.account.lastSignInAt?<TimeAgo ts={m.account.lastSignInAt}/>: 'not recorded'}</span>
                     </span>
-                    <span className="text-[0.65rem] shrink-0" style={{ fontFamily: mono, color: T.muted }}><TimeAgo ts={m.createdAt} /></span>
+                    <span className="text-[0.65rem] shrink-0" style={{ fontFamily: mono, color: T.muted }}>{m.createdAt?<TimeAgo ts={m.createdAt} />:'Joined date unknown'}</span>
                     <ChevronDown size={16} className="shrink-0 transition-transform" style={{ color: T.muted, transform: isOpen ? 'rotate(180deg)' : undefined }} />
                   </button>
                   {isOpen ? (
                     <div className="px-4 pb-4 space-y-3">
                       <p className="font-semibold">{m.name}</p>
                       <p className="text-xs break-all" style={{ fontFamily: mono, color: T.muted }}>{m.email || 'No email on file'}</p>
+                      <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 rounded-xl border p-3 text-sm" style={{borderColor:T.line}}>
+                        {[
+                          ['Sign-in methods',m.account.providerLabels.join(' + ')||'Not recorded'],
+                          ['Original signup method',m.account.signupMethod||'Not recorded for this account'],
+                          ['Account created',date(m.account.createdAt)],
+                          ['Last sign-in',date(m.account.lastSignInAt)],
+                          ['Last session renewal',date(m.account.lastRefreshAt)],
+                          ['Email verification',m.account.emailVerified===true?'Verified':m.account.emailVerified===false?'Not verified':'Not recorded'],
+                          ['Auth account status',m.account.disabled===null?'Not recorded':m.account.disabled?'Disabled':'Enabled'],
+                          ['Profile',m.account.profileSaved?'Saved':'Account exists; profile not saved yet'],
+                          ['Data source',m.account.source],
+                        ].map(([label,value])=><div key={label} className="min-w-0"><dt className="text-xs" style={{color:T.muted}}>{label}</dt><dd className="mt-1 font-medium break-words">{value}</dd></div>)}
+                      </dl>
+                      <p className="text-xs" style={{color:T.muted}}>Linked methods show how this account can sign in today. They do not prove its original signup method. A session renewal does not mean a new sign-in.</p>
+                      {m.account.emailVerified===false?<p className="text-sm" style={{color:T.muted}}>Follow-up: email verification is incomplete. Claims and event submissions require verification.</p>:null}
+                      <details className="text-xs"><summary className="cursor-pointer">Account reference</summary><code className="block mt-2 break-all">{m.uid}</code></details>
                       <div className="flex flex-wrap gap-1.5">
                         <Chip tone={m.weekly ? 'ok' : 'neutral'}>{m.weekly ? 'Safety brief on' : 'Safety brief off'}</Chip>
                         <Chip tone={m.events ? 'ok' : 'neutral'}>{m.events ? 'Event picks on' : 'Event picks off'}</Chip>

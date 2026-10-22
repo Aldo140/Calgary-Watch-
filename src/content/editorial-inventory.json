@@ -7389,6 +7389,106 @@
           "retrievedAt": "2026-10-21T22:11:13Z"
         }
       ]
+    },
+    {
+      "sources": [
+        {
+          "name": "Calgary Underground Film Festival — official website",
+          "url": "https://calgaryundergroundfilm.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF.Docs — official festival information",
+          "url": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF.Docs — official passes and ticket information",
+          "url": "https://www.calgaryundergroundfilm.org/cuff-docs/pass-sale/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        },
+        {
+          "name": "CUFF — official visitor and 2027 festival information",
+          "url": "https://www.calgaryundergroundfilm.org/plan-your-trip/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:27:17.122Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-22T20:00:00Z",
+      "verifiedAt": "2026-10-22T19:27:17.122Z",
+      "id": "guide-cuff-docs-first-night",
+      "kind": "guide",
+      "slug": "your-first-cuff-docs-night",
+      "title": "Your first CUFF.Docs night",
+      "summary": "Choose a documentary, bring someone curious and make a night of Calgary’s November film festival.",
+      "description": "A practical advance guide to CUFF.Docs, November 18–22, 2026 at Globe Cinema.",
+      "categories": [
+        "arts",
+        "film"
+      ],
+      "tags": [
+        "documentary",
+        "first-time festivalgoers"
+      ],
+      "format": "planning",
+      "introduction": "You do not need to be a film-festival regular to try CUFF.Docs. Start with a subject you care about, choose one screening and leave time to talk about it afterwards. The 14th documentary festival runs November 18–22, 2026 at Globe Cinema.",
+      "methodology": "Prepared from Calgary Underground Film Festival’s official programme information on October 22, 2026. The lineup and individual tickets are due October 28; film recommendations will need the announced programme. No attendance, film review or ticket partnership is implied.",
+      "entries": [
+        {
+          "entityId": "biz-calgary-underground-film-festival",
+          "note": "Meet the organizer"
+        },
+        {
+          "entityId": "42bbaab50dd31676b617a197979d",
+          "note": "Plan your documentary festival visit"
+        },
+        {
+          "entityId": "860263f35da4888782608f80697b",
+          "note": "A separate October horror marathon"
+        }
+      ],
+      "relatedGuideIds": [],
+      "facts": {
+        "time": "November 18–22, 2026",
+        "distance": "Globe Cinema · 617 8 Avenue SW",
+        "cost": "Check official screening tickets or passes",
+        "season": "Lineup announced October 28"
+      },
+      "cover": {
+        "from": "#10233f",
+        "to": "#375d79",
+        "ink": "#ffffff",
+        "motif": "skyline",
+        "label": "A night at the movies"
+      },
+      "tips": [
+        "Check the official screening time before leaving; festival dates are not daily opening hours.",
+        "Use CUFF’s official ticket links to check availability and admission details.",
+        "Choose one film first. Add another only when the published schedule works for you."
+      ],
+      "sections": [
+        {
+          "title": "Start with your curiosity",
+          "body": "When the lineup arrives October 28, look for a subject you already care about: a place, a creative practice, a community or an unanswered question. Read the official film description before choosing; the documentary label covers many styles and subjects."
+        },
+        {
+          "title": "Build one good evening",
+          "body": "Pick a screening time from the official programme and invite someone who would enjoy the subject. Globe Cinema is at 617 8 Avenue SW. Allow time to arrive and check the ticket instructions; this guide does not assume reserved seating or a particular runtime."
+        },
+        {
+          "title": "Let the conversation continue",
+          "body": "After the credits, compare what surprised you and what you would like to learn more about. If a filmmaker conversation is announced for your screening, check the official programme for its timing. Talks and guests should never be assumed."
+        },
+        {
+          "title": "Before the documentaries: an overnight horror marathon",
+          "body": "Want a different introduction to CUFF? Its October 24 horror marathon runs 7 p.m. to 7 a.m. at Globe Cinema, with seven films and a costume contest. It is a separate event, not part of the November CUFF.Docs programme."
+        }
+      ]
     }
   ]
 }

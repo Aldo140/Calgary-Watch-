@@ -41,6 +41,7 @@ export interface GuideCover { from: string; to: string; ink: string; motif: 'riv
 export interface Guide extends EntityBase {
   kind: 'guide'; introduction: string; methodology: string; entries: GuideEntry[]; relatedGuideIds: string[]; sponsorshipDisclosure?: string;
   /** Editorial route. Older guides without stops fall back to introduction + methodology. */
+  sections?: {title:string;body:string}[]; format?: 'route' | 'planning';
   stops?: GuideStop[]; facts?: GuideFacts; tips?: string[]; cover?: GuideCover;
   /** True when the stops form a walkable route in order, so a single "walk it" link makes sense. */
   route?: boolean;

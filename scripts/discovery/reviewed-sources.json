@@ -3409,6 +3409,267 @@
           "schedulePrecision": "date",
           "endTimeEstimated": true
         }
+      },
+      {
+        "id": "halloween-horror-marathon-2026",
+        "input": {
+          "kind": "event",
+          "title": "CUFF 12-Hour Halloween Horror Movie Marathon",
+          "summary": "Seven horror films, a costume contest and an overnight at Globe Cinema with Calgary Underground Film Festival.",
+          "description": "Calgary Underground Film Festival takes over Globe Cinema for its 12-Hour Halloween Horror Movie Marathon on Saturday, October 24, 2026. The programme runs from 7 p.m. Saturday to 7 a.m. Sunday, October 25. One marathon ticket lets you come and go throughout the night.\n\nThe official programme includes seven films and a costume contest. CUFF lists admission at $25 regular or $23 for members, students and seniors; check the official ticket page for current availability and fees. Individual film times are approximate, so use the organizer’s running order to plan your night.",
+          "organizer": "Calgary Underground Film Festival",
+          "address": "617 8 Avenue SW, Calgary, AB",
+          "venue": "Globe Cinema",
+          "sourceUrl": "https://www.calgaryundergroundfilm.org/year-round/12-hour-halloween-horror-movie-marathon-2026/",
+          "tickets": "https://www.showpass.com/12-hour-halloween-horror-movie-marathon-2026/",
+          "categories": [
+            "arts",
+            "film"
+          ],
+          "tags": [
+            "Halloween",
+            "horror",
+            "film marathon",
+            "independent film"
+          ],
+          "pricing": "paid",
+          "priceRange": [
+            23,
+            25
+          ],
+          "start": "2026-10-24T19:00:00-06:00",
+          "end": "2026-10-25T07:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "funnyfest-major-programme",
+      "name": "FunnyFest Calgary Comedy Festival",
+      "approved": true,
+      "hosts": [
+        "www.eventbrite.ca",
+        "funnyfest.eventbrite.ca",
+        "funnyfest.com",
+        "funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "funnyfest-festival-2027",
+        "input": {
+          "kind": "event",
+          "title": "27th Annual FunnyFest Calgary Comedy Festival",
+          "summary": "FunnyFest’s official organizer page announces the 27th annual Calgary festival for May 27–June 6, 2027, with 20 shows, 70 performers and 11 themes.",
+          "description": "FunnyFest’s official organizer page announces the 27th annual Calgary festival for May 27–June 6, 2027, with 20 shows, 70 performers and 11 themes. This is an overview of the announced festival dates, not a single continuously running performance. Individual show times, venues, performers and ticket availability should be confirmed on the official schedule as they are released.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "Calgary, AB — individual venues to be announced",
+          "sourceUrl": "https://funnyfest.eventbrite.ca/",
+          "categories": [
+            "arts",
+            "comedy",
+            "festivals"
+          ],
+          "tags": [
+            "stand-up comedy",
+            "festival"
+          ],
+          "pricing": "unknown",
+          "start": "2027-05-27T00:00:00-06:00",
+          "end": "2027-06-07T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "funnyfest-competition-2027",
+        "input": {
+          "kind": "event",
+          "title": "27th Annual FunnyFest Comedy Competition",
+          "summary": "FunnyFest announces its 27th annual comedy competition for April 8–17, 2027.",
+          "description": "FunnyFest announces its 27th annual comedy competition for April 8–17, 2027. The official competition page outlines multiple rounds and a final on April 17. This date-only listing covers the competition period; individual venues, public admission and ticket availability must be checked with the organizer. It is not a ticket to every round or an announcement of continuous daily programming.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "Calgary, AB — individual venues to be announced",
+          "sourceUrl": "https://funnyfest.com/comedy-competition/",
+          "categories": [
+            "arts",
+            "comedy",
+            "festivals"
+          ],
+          "tags": [
+            "stand-up comedy",
+            "festival"
+          ],
+          "pricing": "unknown",
+          "start": "2027-04-08T00:00:00-06:00",
+          "end": "2027-04-18T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "wednesday-workshop-2026-2026-10-28",
+        "input": {
+          "kind": "event",
+          "title": "FunnyFest Wednesday Comedy Workshop — class 1 of 6",
+          "summary": "Class 1 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
+          "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 1, on 2026-10-28. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+          "venue": "Capitol Hill Community Association",
+          "sourceUrl": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "categories": [
+            "arts",
+            "comedy",
+            "learning"
+          ],
+          "tags": [
+            "workshop",
+            "stand-up comedy",
+            "comedy writing"
+          ],
+          "pricing": "paid",
+          "start": "2026-10-28T19:00:00-06:00",
+          "end": "2026-10-28T21:00:00-06:00"
+        }
+      },
+      {
+        "id": "wednesday-workshop-2026-2026-11-04",
+        "input": {
+          "kind": "event",
+          "title": "FunnyFest Wednesday Comedy Workshop — class 2 of 6",
+          "summary": "Class 2 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
+          "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 2, on 2026-11-04. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+          "venue": "Capitol Hill Community Association",
+          "sourceUrl": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "categories": [
+            "arts",
+            "comedy",
+            "learning"
+          ],
+          "tags": [
+            "workshop",
+            "stand-up comedy",
+            "comedy writing"
+          ],
+          "pricing": "paid",
+          "start": "2026-11-04T19:00:00-06:00",
+          "end": "2026-11-04T21:00:00-06:00"
+        }
+      },
+      {
+        "id": "wednesday-workshop-2026-2026-11-11",
+        "input": {
+          "kind": "event",
+          "title": "FunnyFest Wednesday Comedy Workshop — class 3 of 6",
+          "summary": "Class 3 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
+          "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 3, on 2026-11-11. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+          "venue": "Capitol Hill Community Association",
+          "sourceUrl": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "categories": [
+            "arts",
+            "comedy",
+            "learning"
+          ],
+          "tags": [
+            "workshop",
+            "stand-up comedy",
+            "comedy writing"
+          ],
+          "pricing": "paid",
+          "start": "2026-11-11T19:00:00-06:00",
+          "end": "2026-11-11T21:00:00-06:00"
+        }
+      },
+      {
+        "id": "wednesday-workshop-2026-2026-11-18",
+        "input": {
+          "kind": "event",
+          "title": "FunnyFest Wednesday Comedy Workshop — class 4 of 6",
+          "summary": "Class 4 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
+          "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 4, on 2026-11-18. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+          "venue": "Capitol Hill Community Association",
+          "sourceUrl": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "categories": [
+            "arts",
+            "comedy",
+            "learning"
+          ],
+          "tags": [
+            "workshop",
+            "stand-up comedy",
+            "comedy writing"
+          ],
+          "pricing": "paid",
+          "start": "2026-11-18T19:00:00-06:00",
+          "end": "2026-11-18T21:00:00-06:00"
+        }
+      },
+      {
+        "id": "wednesday-workshop-2026-2026-11-25",
+        "input": {
+          "kind": "event",
+          "title": "FunnyFest Wednesday Comedy Workshop — class 5 of 6",
+          "summary": "Class 5 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
+          "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 5, on 2026-11-25. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+          "venue": "Capitol Hill Community Association",
+          "sourceUrl": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "categories": [
+            "arts",
+            "comedy",
+            "learning"
+          ],
+          "tags": [
+            "workshop",
+            "stand-up comedy",
+            "comedy writing"
+          ],
+          "pricing": "paid",
+          "start": "2026-11-25T19:00:00-06:00",
+          "end": "2026-11-25T21:00:00-06:00"
+        }
+      },
+      {
+        "id": "wednesday-workshop-2026-2026-12-02",
+        "input": {
+          "kind": "event",
+          "title": "FunnyFest Wednesday Comedy Workshop — class 6 of 6",
+          "summary": "Class 6 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
+          "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 6, on 2026-12-02. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "organizer": "FunnyFest Calgary Comedy Festival",
+          "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+          "venue": "Capitol Hill Community Association",
+          "sourceUrl": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+          "categories": [
+            "arts",
+            "comedy",
+            "learning"
+          ],
+          "tags": [
+            "workshop",
+            "stand-up comedy",
+            "comedy writing"
+          ],
+          "pricing": "paid",
+          "start": "2026-12-02T19:00:00-06:00",
+          "end": "2026-12-02T21:00:00-06:00"
+        }
       }
     ]
   }

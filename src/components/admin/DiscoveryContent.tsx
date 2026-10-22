@@ -1,3 +1,4 @@
+import {SubmissionHistory} from './SubmissionHistory';
 import {moderationPublicationNote} from '../../lib/moderationPublication';
 import {adminSubmissionInput} from '../../lib/adminContentRecords';
 import {adminObject,adminText,adminTimestamp} from '../../lib/adminRecord';
@@ -37,6 +38,7 @@ const STATUS_TONE = { pending: 'attention', draft: 'neutral', published: 'ok', a
  */
 export function DiscoveryContent() {
   const[search,setSearch]=useState('');
+  const [submissionView,setSubmissionView]=useState<'pending'|'history'>('pending');
   const [records, setRecords] = useState<RecordRow[]>([]);
   const [submissions, setSubmissions] = useState<Array<EntitySubmission & {invalidInput?:boolean}>>([]);
   const [sources, setSources] = useState<Source[]>([]);
@@ -92,7 +94,7 @@ export function DiscoveryContent() {
       const r = await manageDiscovery(data);
       await load().catch((e) => setLoadError(firestoreActionError(e)));
       setMessage(r.queued
-        ? 'Decision queued. This page tracks processing automatically. GitHub schedules can be delayed; a successful website release is still required before the change is public.'
+        ? 'Decision queued. This page tracks processing automatically. The listing worker runs about every 15 minutes; GitHub schedules can be delayed; a successful website release is still required before the change is public.'
         : 'Saved. Published changes reach the public site after the next verified export and release.');
     } catch (e) {
       setError(firestoreActionError(e));
@@ -175,7 +177,8 @@ export function DiscoveryContent() {
         </Panel>
       ) : null}
 
-      <Panel title="Submissions to review" subtitle="Events and markets from organizers and residents. Check the official source, then approve for publication." action={submissions.length ? <Chip tone="attention">{submissions.length} waiting</Chip> : undefined}>
+      <div className="flex flex-wrap gap-2" aria-label="Submission views"><AdminButton variant={submissionView==='pending'?'solid':'outline'} onClick={()=>setSubmissionView('pending')}>Pending submissions ({submissions.length})</AdminButton><AdminButton variant={submissionView==='history'?'solid':'outline'} onClick={()=>setSubmissionView('history')}>Submission history</AdminButton></div>
+      {submissionView==='history'?<SubmissionHistory/>:<Panel title="Submissions to review" subtitle="Events and markets from organizers and residents. Check the official source, then approve for publication." action={submissions.length ? <Chip tone="attention">{submissions.length} waiting</Chip> : undefined}>
         {loadError?<p className="p-4">Suggestions could not be confirmed. Refresh to try again.</p>:!loaded ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
           : submissions.length ? (
             <ul className="divide-y" style={{ borderColor: T.line }}>
@@ -197,7 +200,7 @@ export function DiscoveryContent() {
               ))}
             </ul>
           ) : <EmptyState icon={<Inbox size={20} />} title="No suggestions waiting" body="When residents share an event or market from /submit, it lands here." />}
-      </Panel>
+      </Panel>}
 
       <Panel title="Listings" subtitle="Backend inventory plus published listings from this release. Published-only records link to their organization editor.">
         <div className="px-4 pt-3 space-y-2">

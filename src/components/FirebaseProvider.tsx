@@ -70,6 +70,8 @@ async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean, name
         photoURL: currentUser.photoURL || '',
         emailVerified: currentUser.emailVerified,
         authProviders: currentUser.providerData.map(provider => provider.providerId),
+        ...(currentUser.metadata.lastSignInTime ? {lastSignInAt:Date.parse(currentUser.metadata.lastSignInTime)} : {}),
+        ...(!existing.exists() && currentUser.providerData.length===1 && currentUser.metadata.creationTime && Date.now()-Date.parse(currentUser.metadata.creationTime)<300000 ? {signupProvider:currentUser.providerData[0].providerId} : {}),
         updatedAt: Date.now(),
         role: isApprovedAdmin || existing.data()?.role === 'admin' ? 'admin' : 'user',
         ...(existing.exists() && existing.data()?.createdAt ? {} : {

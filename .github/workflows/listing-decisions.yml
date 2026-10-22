@@ -1,5 +1,7 @@
 name: Apply listing decisions (no email)
 on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
     inputs:
       confirm:
@@ -14,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   apply:
-    if: ${{ inputs.confirm == 'APPLY' }}
+    if: ${{ github.event_name == 'schedule' || inputs.confirm == 'APPLY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

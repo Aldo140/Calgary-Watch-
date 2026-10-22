@@ -161,6 +161,7 @@ export function GuideDetail({ guide, all, occurrences }: { guide: Guide; all: re
 
       <div className="gd-body">
         <p className="gd-intro">{guide.introduction}</p>
+        {guide.sections?.map(section=><section key={section.title} className="gd-tips"><h2 className="gd-h2">{section.title}</h2><p>{section.body}</p></section>)}
 
         {stops.length > 0 ? (
           <section aria-labelledby="gd-stops-title">
@@ -200,7 +201,7 @@ export function GuideDetail({ guide, all, occurrences }: { guide: Guide; all: re
 
         {linked.length > 0 && (
           <section aria-labelledby="gd-linked-title">
-            <h2 id="gd-linked-title" className="gd-h2">Nearby on CalgaryWatch</h2>
+            <h2 id="gd-linked-title" className="gd-h2">{guide.format==='planning'?'Plan your visit':'Nearby on CalgaryWatch'}</h2>
             <ul className="gd-linked">{linked.map(e => <li key={e.id}><Link to={entityPath(e)}><b>{e.title}</b><span>{guide.entries.find(en => en.entityId === e.id)?.note || e.summary}</span><ArrowUpRight size={16} aria-hidden="true" /></Link></li>)}</ul>
           </section>
         )}

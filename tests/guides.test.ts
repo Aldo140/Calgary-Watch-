@@ -16,7 +16,7 @@ describe('editorial guides', () => {
     for (const g of guides) {
       assert.equal(validateEntity(g), true, g.id);
       assert.equal(g.status, 'published');
-      assert.ok(g.stops && g.stops.length >= 5, `${g.id} has stops`);
+      if(g.format==='planning'){assert.ok(g.sections&&g.sections.length>=3);assert.equal(g.route,undefined);}else assert.ok(g.stops && g.stops.length >= 5, `${g.id} has stops`);
       assert.ok(g.facts && g.cover && g.tips?.length, `${g.id} has facts, cover and tips`);
     }
   });
@@ -46,7 +46,7 @@ describe('guide helpers', () => {
   });
   it('has no route for a single stop', () => assert.equal(routeUrl(bow.stops!.slice(0, 1)), undefined));
   it('features the newest guide, the last added on a tie', () => {
-    assert.equal(featuredGuide(guides)?.id, 'guide-calgary-for-free');
+    assert.equal(featuredGuide(guides)?.id, 'guide-cuff-docs-first-night');
     assert.equal(featuredGuide([]), undefined);
   });
   it('prerenders every stop into the guide HTML', () => {

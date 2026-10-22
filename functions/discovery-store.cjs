@@ -89,7 +89,7 @@ async function reviewSubmission(db, data, uid) {
   if (!submission) throw Error('Submission missing');
   if (data.reject) {
     if (submission.status !== 'pending') throw Error('This submission was already reviewed. Refresh before changing it.');
-    await ref.update({ status: 'rejected', reviewedBy: uid });
+    await ref.update({ status: 'rejected', reviewedBy: uid, reviewedAt: Date.now() });
     return { submissionId: data.id, stage: 'rejected' };
   }
   let source;
@@ -114,7 +114,7 @@ async function reviewSubmission(db, data, uid) {
     // incorrectly reported as approved. A retry reuses the canonical event ID.
     await moderate(db, { kind: data.input.kind, id: out.id, revision: out.revision, action: 'publish', acknowledgeDuplicates: data.acknowledgeDuplicates === true }, uid);
   }
-  await ref.update({ status: 'approved', entityId: out.id, reviewedBy: uid });
+  await ref.update({ status: 'approved', entityId: out.id, publishedEntityIds: [out.id], reviewedBy: uid, reviewedAt: Date.now() });
   return { ...out, submissionId: data.id, kind: data.input.kind, stage: data.action === 'publish-submission' ? 'verified' : 'needs-review' };
 }
 

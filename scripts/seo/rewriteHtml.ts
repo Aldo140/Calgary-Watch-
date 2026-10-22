@@ -466,12 +466,13 @@ function entityBodyHtml(entity: DiscoveryEntity, pathname: string, now = new Dat
   }
   const upcoming = entity.kind === 'market' ? occurrences.filter(o => o.marketId === entity.id && Date.parse(o.end) > now.getTime()).sort((a, b) => Date.parse(a.start) - Date.parse(b.start)) : [];
   const dates = entity.kind === 'market' ? `<section><h2>Upcoming dates</h2>${upcoming.length ? `<ul>${upcoming.slice(0, 12).map(o => `<li>${escapeText(dated(o.start, o.end))}${o.cancelled ? ' — Cancelled' : ''}</li>`).join('')}</ul>${upcoming.length > 12 ? `<p>And ${upcoming.length - 12} more listed dates.</p>` : ''}` : '<p>No upcoming dates are listed yet. Check the market’s own site below.</p>'}</section>` : '';
+  const sections = entity.kind === 'guide' ? (entity.sections ?? []).map(s=>`<section><h2>${escapeText(s.title)}</h2><p>${escapeText(s.body)}</p></section>`).join('') : '';
   const stops = entity.kind === 'guide' && entity.stops?.length ? `<p>${escapeText(entity.introduction)}</p><ol>${entity.stops.map(s => `<li><h2>${escapeText(s.name)}</h2><p>${escapeText(s.area)}</p><p>${escapeText(s.note)}</p></li>`).join('')}</ol>` : '';
   const related = relatedGroups(entity, all, occurrences, now)
     .map(g => `<section><h2>${escapeText(g.heading)}</h2><ul>${g.links.map(l => `<li>${staticLink(l.path, l.title)}${l.note ? ` — ${escapeText(l.note)}` : ''}</li>`).join('')}</ul></section>`).join('');
   const sources = entity.sources.map(s => staticLink(s.url, s.name)).join(' · ');
   const description = entity.description && entity.description.trim() !== entity.summary.trim() ? `<p>${escapeText(entity.description)}</p>` : '';
-  return `<main data-prerendered-route="${escapeAttr(pathname)}">${crumbs}<article><h1>${escapeText(entity.title)}</h1>${entity.ownerVerifiedAt ? '<p>Verified: confirmed by the organization</p>' : ''}<p>${escapeText(entity.summary)}</p>${description}${facts.length ? `<dl>${facts.join('')}</dl>` : ''}${dates}${stops}<p>Last checked: ${escapeText(entity.verifiedAt || entity.updatedAt)}</p><p>Source: ${sources}</p></article>${related}</main>`;
+  return `<main data-prerendered-route="${escapeAttr(pathname)}">${crumbs}<article><h1>${escapeText(entity.title)}</h1>${entity.ownerVerifiedAt ? '<p>Verified: confirmed by the organization</p>' : ''}<p>${escapeText(entity.summary)}</p>${description}${facts.length ? `<dl>${facts.join('')}</dl>` : ''}${dates}${sections}${stops}<p>Last checked: ${escapeText(entity.verifiedAt || entity.updatedAt)}</p><p>Source: ${sources}</p></article>${related}</main>`;
 }
 
 /** Place route content inside the React mount point for the first response. */

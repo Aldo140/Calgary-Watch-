@@ -77,3 +77,18 @@ export async function inboxSince(since: number): Promise<InboundMessage[]> {
   }
   return out;
 }
+
+/** Explicitly read-only mailbox audit for owner-requested partner conversations, including Sent Items. */
+export async function readPartnerConversations(search:string){
+ const select='id,conversationId,from,toRecipients,ccRecipients,subject,body,receivedDateTime,sentDateTime,isDraft,hasAttachments';
+ const first=await call(`/users/${mailbox()}/messages?${new URLSearchParams({'$search':`"${search.replace(/["\\]/g,'')}"`,'$top':'100','$select':select})}`);
+ const conversations=[...new Set<string>((first.value??[]).filter((m:any)=>!m.isDraft).map((m:any)=>String(m.conversationId)))];
+ const messages:any[]=[];let truncated=Boolean(first['@odata.nextLink']);
+ for(const conversation of conversations.slice(0,30)){
+  let next:string|null=`/users/${mailbox()}/messages?${new URLSearchParams({'$filter':`conversationId eq '${conversation.replace(/'/g,"''")}'`,'$top':'100','$select':select})}`;
+  let pages=0;
+  while(next&&pages++<10){const page=await call(next);for(const m of page.value??[])if(!m.isDraft)messages.push(m);const link=page['@odata.nextLink'];next=typeof link==='string'&&link.startsWith(GRAPH+'/')?link.slice(GRAPH.length):null;}
+  if(next)truncated=true;
+ }
+ return {search,truncated:truncated||conversations.length>30,messages:[...new Map(messages.map(m=>[m.id,m])).values()].sort((a,b)=>Date.parse(a.sentDateTime)-Date.parse(b.sentDateTime))};
+}

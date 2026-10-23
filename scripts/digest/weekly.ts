@@ -516,7 +516,7 @@ async function run(): Promise<void> {
         } else if (result.ok) {
           sent += 1;
           await claim.set({
-            status: 'sent', sentAt: Date.now(), providerId: result.id ?? null, subject: content.subject,
+            status: 'sent', recipientEmail: profile.email!.trim(), sentAt: Date.now(), providerId: result.id ?? null, subject: content.subject,
             kind: 'combined', reportCount: summary.total, ring: summary.ringLabel,
             eventsMode: content.mode, picks: content.list.length, going: events.picks.going.length,
           }, { merge: true });
@@ -607,6 +607,7 @@ async function run(): Promise<void> {
         const welcomesBoth = isFirstEmail && profile._eventsOn && profile._eventsConsentOk;
         await claim.set({
           status: 'sent',
+          recipientEmail: email.to,
           sentAt: Date.now(),
           providerId: result.id ?? null,
           subject: email.subject,

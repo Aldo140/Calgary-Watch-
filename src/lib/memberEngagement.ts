@@ -34,3 +34,9 @@ export function acceptedEngagementSend(id:string,row:Record<string,unknown>,ledg
  const series=ledger==='thursday'?(row.first===true?'Thursday welcome':row.first===false?'Thursday event picks':'Thursday email (type not recorded)'):row.kind==='combined'?'Monday combined':row.kind==='welcome'?'Monday welcome':row.kind==='digest'?'Monday weekly digest':'Monday email (type not recorded)';
  return {uid:row.uid,at:row.sentAt,week:typeof row.weekKey==='string'&&row.weekKey?row.weekKey:new Date(row.sentAt).toISOString().slice(0,10),series};
 }
+
+/** Use the same earliest accepted send as the cohort denominator; preserve optional send-time address only when it was actually recorded. */
+export function emailCohortRecipients<T extends EngagementSend>(sends:readonly T[],key:string,now:number):T[]{
+ const byUid=new Map<string,T>();for(const send of sends)if(`${send.series}:${send.week}`===key&&Number.isFinite(send.at)&&send.at<=now&&send.uid&&(!byUid.has(send.uid)||byUid.get(send.uid)!.at>send.at))byUid.set(send.uid,send);
+ return [...byUid.values()].sort((a,b)=>a.at-b.at||a.uid.localeCompare(b.uid));
+}

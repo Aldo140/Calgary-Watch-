@@ -206,7 +206,7 @@ async function run() {
       } else if (result.ok) {
         providerAccepted = true;
         sent += 1;
-        await claim.set({ status: 'sent', sentAt: Date.now(), providerId: result.id ?? null, subject: email.subject, mode, first: shared.first, picks: content.list.length, going: picks.going.length }, { merge: true });
+        await claim.set({ status: 'sent', recipientEmail: email.to, sentAt: Date.now(), providerId: result.id ?? null, subject: email.subject, mode, first: shared.first, picks: content.list.length, going: picks.going.length }, { merge: true });
         if (!profile.eventsWelcomeSentAt) await db.collection('users').doc(profile.uid).set({ eventsWelcomeSentAt: Date.now() }, { merge: true });
         console.log(`[events] sent ${profile.uid} — ${mode}${shared.first ? ' (first)' : ''}, ${picks.going.length} going, ${content.list.length} listed`);
       } else {

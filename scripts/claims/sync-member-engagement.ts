@@ -1,6 +1,6 @@
 import type {Firestore} from 'firebase-admin/firestore';
 import type {MemberAuthRecord} from '../../src/lib/memberAccountInsights';
-import {retainObservedSignIns,correlateDigestSignIns,dailyObservedSignIns,acceptedEngagementSend,type ObservedSignIn,type EngagementSend} from '../../src/lib/memberEngagement';
+import {retainObservedSignIns,correlateDigestSignIns,dailyObservedSignIns,acceptedEngagementSend,emailCohortRecipients,type ObservedSignIn,type EngagementSend} from '../../src/lib/memberEngagement';
 /** Private read-only Auth/email analysis. Does not send email, change subscriptions or mutate authentication. */
 export async function syncMemberEngagement(db:Firestore,accounts:MemberAuthRecord[],at:number){
  const ref=db.collection('ops_health').doc('member_engagement'),previous=(await ref.get()).data();
@@ -12,11 +12,19 @@ export async function syncMemberEngagement(db:Firestore,accounts:MemberAuthRecor
  const since=typeof previous?.observedSince==='number'?previous.observedSince:at;
  const cutoff=at-90*86400000;
  const ledgers=await Promise.all(['digest_sends','events_digest_sends'].map(name=>db.collection(name).where('sentAt','>=',cutoff).orderBy('sentAt','desc').limit(5000).get()));
- const sends:EngagementSend[]=[];
- ledgers.forEach((snapshot,index)=>{for(const doc of snapshot.docs){const send=acceptedEngagementSend(doc.id,doc.data(),index===0?'monday':'thursday');if(send)sends.push(send);}});
+ const sends:(EngagementSend&{recipientEmail?:string})[]=[];
+ ledgers.forEach((snapshot,index)=>{for(const doc of snapshot.docs){const send=acceptedEngagementSend(doc.id,doc.data(),index===0?'monday':'thursday');if(send)sends.push({...send,...(typeof doc.get('recipientEmail')==='string'?{recipientEmail:doc.get('recipientEmail')}:{})});}});
  const generation=String(at),chunkIds:string[]=[];
  for(let offset=0;offset<events.length;offset+=1000){const id=`member_engagement_${generation}_${offset/1000}`;chunkIds.push(id);await db.collection('ops_health').doc(id).set({generation,events:events.slice(offset,offset+1000)});}
- await ref.set({generation,at,observedSince:since,retentionDays:90,chunkIds,previousChunkIds:previousIds,observations:events.length,days:dailyObservedSignIns(events,at),cohorts:correlateDigestSignIns(sends,events,at,since),sendRecords:sends.length,sendHistoryCapped:ledgers.some(s=>s.size===5000)});
+ const cohorts=correlateDigestSignIns(sends,events,at,since),recipientChunkIds:string[]=[];
+ const cohortRows=[];
+ for(const [index,cohort] of cohorts.entries()){
+  const recipients=emailCohortRecipients(sends,cohort.key,at),ids:string[]=[];
+  for(let offset=0;offset<recipients.length;offset+=250){const id=`member_email_recipients_${generation}_${index}_${offset/250}`;ids.push(id);recipientChunkIds.push(id);await db.collection('ops_health').doc(id).set({generation,cohortKey:cohort.key,recipients:recipients.slice(offset,offset+250).map(r=>({uid:r.uid,sentAt:r.at,...(r.recipientEmail?{emailAtSend:r.recipientEmail}:{})}))});}
+  cohortRows.push({...cohort,recipientChunkIds:ids});
+ }
+ await ref.set({generation,at,observedSince:since,retentionDays:90,chunkIds,previousChunkIds:previousIds,observations:events.length,days:dailyObservedSignIns(events,at),cohorts:cohortRows,recipientChunkIds,previousRecipientChunkIds:previous?.recipientChunkIds??[],sendRecords:sends.length,sendHistoryCapped:ledgers.some(s=>s.size===5000)});
  for(const id of previous?.previousChunkIds??[])if(typeof id==='string'&&/^member_engagement_[0-9]+_[0-9]+$/.test(id))await db.collection('ops_health').doc(id).delete();
- console.log(JSON.stringify({engagementSnapshotAt:new Date(at).toISOString(),observations:events.length,sendRecords:sends.length,cohorts:correlateDigestSignIns(sends,events,at,since).length,storage:'admin-only',emailsSent:0}));
+ for(const id of previous?.previousRecipientChunkIds??[])if(typeof id==='string'&&/^member_email_recipients_[0-9]+_[0-9]+_[0-9]+$/.test(id))await db.collection('ops_health').doc(id).delete();
+ console.log(JSON.stringify({engagementSnapshotAt:new Date(at).toISOString(),observations:events.length,sendRecords:sends.length,recipientChunks:recipientChunkIds.length,recipientRows:cohortRows.reduce((n,c)=>n+c.recipients,0),cohorts:correlateDigestSignIns(sends,events,at,since).length,storage:'admin-only',emailsSent:0}));
 }

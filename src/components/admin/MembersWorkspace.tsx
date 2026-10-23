@@ -1,3 +1,4 @@
+import {MemberActivity} from './MemberActivity';
 import {useAdminView} from '../../hooks/useAdminView';
 import {WorkspaceTabs} from './WorkspaceTabs';
 import {adminFirestoreActionError} from '../../lib/firestoreErrors';
@@ -31,7 +32,7 @@ const exported = new Map((inventory.entities as Array<{ id: string; title: strin
  * RSVP data; that stays private to each resident.
  */
 export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section: string) => void }) {
-  const [view,setView]=useAdminView(['directory','insights'] as const,'directory');
+  const [view,setView]=useAdminView(['directory','activity','insights'] as const,'directory');
   const [readErrors,setReadErrors]=useState<Record<string,string>>({});
   const fail=(name:string,e:unknown)=>setReadErrors(p=>({...p,[name]:adminFirestoreActionError(e)}));
   const [counts, setCounts] = useState<Counts>({});
@@ -88,8 +89,8 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
 
   return (
     <div className="space-y-4">
-      <WorkspaceTabs label="Member tools" value={view} onChange={setView} items={[{id:'directory',label:'Member directory',description:'Accounts, organizations and dashboards'},{id:'insights',label:'Audience insights',description:'Subscriptions, interests and plans'}]} />
-      {view==='directory'?<MembersDirectory />:<>
+      <WorkspaceTabs label="Member tools" value={view} onChange={setView} items={[{id:'directory',label:'Member directory',description:'Accounts, organizations and dashboards'},{id:'activity',label:'Sign-ins & email activity',description:'Recent logins and digest correlation'},{id:'insights',label:'Audience insights',description:'Subscriptions, interests and plans'}]} />
+      {view==='directory'?<MembersDirectory />:view==='activity'?<MemberActivity/>:<>
       {Object.entries(readErrors).map(([name,error])=><p role="alert" key={name}>{name}: {error}</p>)}
       <StatGrid>
         <StatTile label="Accounts" value={shown.accounts} hint={shown.withArea !== undefined ? `${shown.withArea} with a home area (${pct(shown.withArea)}%)` : undefined} />

@@ -1,4 +1,5 @@
 /** Authentication reads only. Private operational snapshot uses existing admin-only ops_health rules. */
+import {syncMemberEngagement} from './sync-member-engagement';
 import {getAuth} from 'firebase-admin/auth';
 import {inventoryDatabase} from '../discovery/firebase';
 import type {MemberAuthRecord} from '../../src/lib/memberAccountInsights';
@@ -11,3 +12,5 @@ for(let offset=0;offset<accounts.length;offset+=200){const id=`member_auth_${gen
 await ref.set({kind:'member-auth-index',generation,at,total:accounts.length,chunkIds,previousChunkIds:previous?.chunkIds??[]});
 for(const id of previous?.previousChunkIds??[])if(typeof id==='string'&&/^member_auth_[0-9]+_[0-9]+$/.test(id))await db.collection('ops_health').doc(id).delete();
 console.log(JSON.stringify({accounts:accounts.length,chunks:chunkIds.length,at:new Date(at).toISOString(),authChanges:0,storage:'admin-only operational snapshot'}));
+
+await syncMemberEngagement(db,accounts,at);

@@ -5188,8 +5188,8 @@
       "name": "FunnyFest Calgary Comedy Festival",
       "website": "https://www.funnyfest.com/",
       "address": "Calgary, AB",
-      "summary": "Calgary's long-running comedy festival and stand-up competition.",
-      "description": "FunnyFest Calgary Comedy Festival runs stand-up shows and an annual comedy competition with dozens of comedians across multiple nights in Calgary. Show dates, venues and tickets are on its own website.",
+      "summary": "Year-round Calgary comedy shows and workshops, including a Halloween comedy and dance party on October 31.",
+      "description": "FunnyFest Calgary Comedy Festival presents stand-up shows, comedy-writing and performance workshops, and an annual festival and competition. Its programme spans different Calgary venues, so use each event’s own location and registration page.\n\nThe October 31, 2026 Halloween comedy and dance party takes place at Offside Pub & Eatery, with the comedy show at 7 p.m. and a dance party from 9 p.m. Upcoming workshops include separate Tuesday and Wednesday six-class courses, a November 7–8 weekend course, and November sessions on emceeing and comedy writing.\n\nCalendar entries distinguish individual class dates from registrations: several classes share one course ticket. The 2027 annual festival and competition are date-only announcements; individual programme details and ticket availability must be confirmed on FunnyFest’s official pages.",
       "categories": [
         "arts",
         "nightlife"
@@ -5205,6 +5205,12 @@
           "url": "https://www.funnyfest.com/",
           "kind": "official",
           "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "FunnyFest — Halloween booking and programme",
+          "url": "https://www.eventbrite.ca/e/halloween-comedy-party-3-comedians-and-5000-prizes-costume-contest-yyc-tickets-1955746824399",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
         }
       ],
       "images": [],
@@ -5220,7 +5226,7 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "updatedAt": "2026-10-23T18:28:37Z",
       "email": "tickets@funnyfest.com",
       "phone": "403-228-7888"
     },
@@ -7419,8 +7425,8 @@
       ],
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-22T20:00:00Z",
-      "verifiedAt": "2026-10-22T19:27:17.122Z",
+      "updatedAt": "2026-10-23T18:28:37Z",
+      "verifiedAt": "2026-10-23T18:28:37Z",
       "id": "guide-cuff-docs-first-night",
       "kind": "guide",
       "slug": "your-first-cuff-docs-night",
@@ -7437,7 +7443,7 @@
       ],
       "format": "planning",
       "introduction": "You do not need to be a film-festival regular to try CUFF.Docs. Start with a subject you care about, choose one screening and leave time to talk about it afterwards. The 14th documentary festival runs November 18–22, 2026 at Globe Cinema.",
-      "methodology": "Prepared from Calgary Underground Film Festival’s official programme information on October 22, 2026. The lineup and individual tickets are due October 28; film recommendations will need the announced programme. No attendance, film review or ticket partnership is implied.",
+      "methodology": "Prepared from Calgary Underground Film Festival’s official programme and visitor information, checked October 23, 2026. The CUFF.Docs lineup and individual tickets are due October 28; film recommendations and screening links need that announced programme. This is an advance-planning guide, not a screening review.",
       "entries": [
         {
           "entityId": "biz-calgary-underground-film-festival",
@@ -7489,6 +7495,116 @@
           "body": "Want a different introduction to CUFF? Its October 24 horror marathon runs 7 p.m. to 7 a.m. at Globe Cinema, with seven films and a costume contest. It is a separate event, not part of the November CUFF.Docs programme."
         }
       ]
+    },
+    {
+      "id": "biz-jupiter-theatre",
+      "kind": "business",
+      "slug": "jupiter-theatre",
+      "title": "Jupiter Theatre Society",
+      "name": "Jupiter Theatre Society",
+      "summary": "Calgary theatre and improvised fantasy adventures, including Winging It! at Theatre 1308.",
+      "description": "Jupiter Theatre Society creates imaginative theatre in Calgary. Its Winging It! series mixes audience suggestions, improvised characters and fantasy role-playing into standalone adventures that also build a continuing story. New audiences can join at any performance.\n\nWinging It! performances take place at Theatre 1308, 1308 Edmonton Trail; it is recommended for ages 14 and older because of language and suggestive humour. The Morpheus Community Box Office hosts its Showpass tickets, but Jupiter is the presenter.\n\nJupiter also announces Macbeth with Full Circle Theatre for February 18–27, 2027 at West Village Theatre. Performance times and ticket details are still to come; that announcement is not a bookable event listing here. Use Jupiter’s official contact page for company enquiries.",
+      "website": "https://www.theatrejupiter.com/",
+      "address": "Calgary, AB",
+      "categories": [
+        "arts",
+        "theatre"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "improv"
+      ],
+      "sources": [
+        {
+          "name": "Jupiter Theatre — official company website",
+          "url": "https://www.theatrejupiter.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        },
+        {
+          "name": "Winging It! — official performance calendar",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        },
+        {
+          "name": "Jupiter Theatre — Macbeth announcement",
+          "url": "https://www.theatrejupiter.com/macbeth",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Theatre productions",
+        "Improvised fantasy comedy"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37Z",
+      "updatedAt": "2026-10-23T18:28:37Z"
+    },
+    {
+      "id": "biz-emmedia",
+      "kind": "business",
+      "slug": "emmedia",
+      "title": "EMMEDIA Gallery & Production Society",
+      "name": "EMMEDIA Gallery & Production Society",
+      "summary": "Artist-run media-art exhibitions, screenings and hands-on workshops in Calgary’s Sunalta neighbourhood.",
+      "description": "EMMEDIA Gallery & Production Society is a non-profit artist-run organization supporting the production and presentation of media art. Its Calgary space brings together exhibitions, moving-image and sound work, technical facilities and practical artist training.\n\nVisit at 2005 10 Avenue SW. Office and gallery hours are Tuesday–Saturday, noon–6 p.m.; workshop registration and event-specific times are listed separately. The current exhibitions Arboreal Intuitions by Erika Jean Lincoln and Oooooo (sing together and you will make a perfect circle) by Kat Hartog run through October 31, 2026.\n\nUpcoming learning opportunities include a three-session introduction to Blender, creative compositing in After Effects and an analog-video workshop. Register through EMMEDIA’s official event links. Equipment rental pick-up and drop-off must be arranged with its technical team; gallery hours are not a rental reservation.",
+      "website": "https://emmedia.ca/",
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "media art",
+        "workshops"
+      ],
+      "sources": [
+        {
+          "name": "EMMEDIA — official website",
+          "url": "https://emmedia.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        },
+        {
+          "name": "EMMEDIA — contact, location and gallery hours",
+          "url": "https://emmedia.ca/about-emmedia/contact-us/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Media-art exhibitions",
+        "Artist workshops",
+        "Screenings and performances",
+        "Media production facilities"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37Z",
+      "updatedAt": "2026-10-23T18:28:37Z",
+      "email": "operations@emmedia.ca",
+      "hours": {
+        "Tuesday": "12:00–18:00",
+        "Wednesday": "12:00–18:00",
+        "Thursday": "12:00–18:00",
+        "Friday": "12:00–18:00",
+        "Saturday": "12:00–18:00"
+      }
     }
   ]
 }

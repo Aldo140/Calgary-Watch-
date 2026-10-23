@@ -1,3 +1,5 @@
+import {artworkRequestUrl} from '../../lib/artworkRequest';
+import {entityPath} from '../../lib/discovery';
 import {adminListingPatch} from '../../lib/adminListingEdits';
 import {AdminImageEditor} from './AdminImageEditor';
 import {mergeOrganizationContent,type OrganizationProjection} from '../../lib/organizationWorkspace';
@@ -61,7 +63,7 @@ export function ListingManagement({claim,previewUid,initialTargetId,adminEdit=fa
   return <section className="pl-form cl-form" aria-labelledby="cl-manage">
     <div className="cl-owner"><strong id="cl-manage">Manage your listing</strong></div>
     <p>{adminEdit?'Admin edits publish immediately and do not consume the business’s weekly allowance.':OWNER_EDIT_POLICY}</p>
-    {adminEdit?<p>Admin image changes publish immediately. Use an approved image URL and artist credit; this editor does not upload image files.</p>:<p>Images are managed by CalgaryWatch. To request an image change or removal, email <a href={`mailto:${LISTING_CONTACT_EMAIL}`}>{LISTING_CONTACT_EMAIL}</a> with the listing name, exact files and artist credit. This editor does not upload image files.</p>}
+    {adminEdit?<p>Admin image changes publish immediately. Use an approved image URL and artist credit; this editor does not upload image files.</p>:<p>Images are managed by CalgaryWatch. To request an image change or removal, email <a href={`mailto:${LISTING_CONTACT_EMAIL}`}>{LISTING_CONTACT_EMAIL}</a> with the listing name, exact files and artist credit. This editor does not upload image files. <a className="pl-textbtn" href={artworkRequestUrl(target?.title??claim.entityTitle,target?entityPath(target):`/claim/${encodeURIComponent(claim.entityId)}`)}>Send approved artwork</a></p>}
     {error?<p role="alert" className="pl-error">{error}</p>:null}
     {!loaded&&!error?<p role="status">Loading your saved fields and weekly allowance…</p>:null}
     {loaded&&locked?<p role="status">Your next update is available {calgaryDateTimeFormat('en-CA',{timeZone:'America/Edmonton',dateStyle:'medium',timeStyle:'short'}).format(new Date(nextAt))} (Calgary time).</p>:null}

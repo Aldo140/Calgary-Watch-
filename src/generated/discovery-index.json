@@ -11017,479 +11017,6 @@
       "organizerEntityId": "biz-vertigo-theatre"
     },
     {
-      "id": "5a188c12dacaea0159e693df6457",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-5a188c",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-09",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-09T19:00:00-06:00",
-      "end": "2026-10-10T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "28296cf1b77723691ddae922ceba",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-28296c",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-10",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-10T19:00:00-06:00",
-      "end": "2026-10-11T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "5f2ec031c8d26c874ed09c00dda5",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-5f2ec0",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-16",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-16T19:00:00-06:00",
-      "end": "2026-10-17T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "aca7ec375a382c8871facc166292",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-aca7ec",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-17",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-17T19:00:00-06:00",
-      "end": "2026-10-18T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "195cfed5af1a3294dcefee2596c9",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-195cfe",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-22",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-22T19:00:00-06:00",
-      "end": "2026-10-23T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "205af4b04d68ee3a4dfee558bfa6",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-205af4",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-23",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-23T19:00:00-06:00",
-      "end": "2026-10-24T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "790914ebb9c21f6883aba30ddf3e",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-790914",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-24",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-24T19:00:00-06:00",
-      "end": "2026-10-25T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "79d2fede9c0d3ed18baaf8b54e85",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-79d2fe",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-25",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-25T19:00:00-06:00",
-      "end": "2026-10-26T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "1d2ab1ceef71512afd9562732105",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-1d2ab1",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-29",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-29T19:00:00-06:00",
-      "end": "2026-10-30T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "30d99dc4a5a597ecd2149ab1f0a1",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-30d99d",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-30",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-30T19:00:00-06:00",
-      "end": "2026-10-31T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
-      "id": "af23dc6cd80c40f4d88a784a440d",
-      "kind": "event",
-      "slug": "screamfest-at-stampede-park-af23dc",
-      "title": "ScreamFest at Stampede Park",
-      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
-      "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
-      "categories": [
-        "nightlife",
-        "holiday",
-        "outdoor"
-      ],
-      "tags": [
-        "halloween",
-        "haunted house",
-        "date night"
-      ],
-      "sources": [
-        {
-          "name": "ScreamFest Calgary",
-          "url": "https://screamfest.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-17T00:45:53.330Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-17T00:45:53.330Z",
-      "fetchedAt": "2026-10-17T00:45:53.330Z",
-      "updatedAt": "2026-10-17T00:45:53.330Z",
-      "sourceId": "screamfest",
-      "sourceRecordId": "screamfest-2026-10-31",
-      "neighbourhood": "Beltline",
-      "address": "2200 Stampede Trail SE, Calgary, AB",
-      "venue": "GMC Stadium, Stampede Park",
-      "start": "2026-10-31T19:00:00-06:00",
-      "end": "2026-11-01T00:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "organizer": "ScreamFest",
-      "cancelled": false,
-      "organizerEntityId": "biz-screamfest"
-    },
-    {
       "id": "d8007d0a2f41bc0e0b1044614acd",
       "kind": "event",
       "slug": "zooboo-at-the-calgary-zoo-d8007d",
@@ -16245,50 +15772,6 @@
       "organizerEntityId": "biz-alliance-francaise-calgary"
     },
     {
-      "id": "biz-funnyfest",
-      "kind": "business",
-      "slug": "funnyfest",
-      "title": "FunnyFest Calgary Comedy Festival",
-      "name": "FunnyFest Calgary Comedy Festival",
-      "website": "https://www.funnyfest.com/",
-      "address": "Calgary, AB",
-      "summary": "Calgary's long-running comedy festival and stand-up competition.",
-      "description": "FunnyFest Calgary Comedy Festival runs stand-up shows and an annual comedy competition with dozens of comedians across multiple nights in Calgary. Show dates, venues and tickets are on its own website.",
-      "categories": [
-        "arts",
-        "nightlife"
-      ],
-      "tags": [
-        "organization",
-        "comedy",
-        "festival"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — official website",
-          "url": "https://www.funnyfest.com/",
-          "kind": "official",
-          "retrievedAt": "2026-10-21T20:40:00.000Z"
-        }
-      ],
-      "images": [],
-      "socials": {
-        "website": "https://www.funnyfest.com/"
-      },
-      "services": [
-        "Comedy festival",
-        "Stand-up shows"
-      ],
-      "claimed": false,
-      "partner": false,
-      "editorialSelection": false,
-      "status": "published",
-      "verification": "source-checked",
-      "updatedAt": "2026-10-21T20:40:00.000Z",
-      "email": "tickets@funnyfest.com",
-      "phone": "403-228-7888"
-    },
-    {
       "id": "biz-morpheus-theatre",
       "kind": "business",
       "slug": "morpheus-theatre",
@@ -16681,6 +16164,806 @@
       "organizerEntityId": "biz-funnyfest"
     },
     {
+      "id": "f013d255329f233ec850eb5a5d9f",
+      "kind": "market",
+      "slug": "festive-foothills-art-market-f013d2",
+      "title": "Festive Foothills Art Market",
+      "summary": "Celebrate the season of giving at the annual Festive Foothills Art Market, running November 7 to December 20 at the Leighton Art Centre! Set against the beautiful backdrop of the Alberta Foothills, this beloved holiday tradition brings together an incredible selection of original artwork and fine craft by more than 80 Alberta artists.  Discover one-of-a-kind treasures and thoughtful gifts, including paintings, pottery, jewelry, glass, textiles, and much more.",
+      "description": "Celebrate the season of giving at the annual Festive Foothills Art Market, running November 7 to December 20 at the Leighton Art Centre! Set against the beautiful backdrop of the Alberta Foothills, this beloved holiday tradition brings together an incredible selection of original artwork and fine craft by more than 80 Alberta artists.\n\nDiscover one-of-a-kind treasures and thoughtful gifts, including paintings, pottery, jewelry, glass, textiles, and much more. Whether you’re shopping for someone special or treating yourself, you’ll find plenty of inspiration while supporting local artists and the vibrant Alberta arts community. Proceeds from the market help support Alberta artists and the Leighton Art Centre’s Art & Nature programming for all ages.\n\nGet a head start on your holiday shopping at our special Sneak Peek Event on Friday, November 6, from 3 to 6 pm! Be among the first to explore this year’s collection, connect with participating artists, and enjoy live holiday music by Band in the Corner, along with hot chocolate, coffee, and a festive atmosphere throughout the gallery and shop.\n\nThe market is open daily from 10 am to 4 pm, with admission by donation. Join us for a joyful seasonal outing, discover handmade treasures, and celebrate the creativity and community spirit that make Festive Foothills so special!",
+      "categories": [
+        "markets",
+        "arts",
+        "shopping",
+        "day-trip"
+      ],
+      "tags": [
+        "outside-calgary",
+        "holiday market",
+        "local art"
+      ],
+      "sources": [
+        {
+          "name": "Leighton Art Centre — reviewed official source",
+          "url": "https://leightoncentre.org/event/festive-foothills-art-market-2026/",
+          "kind": "official",
+          "retrievedAt": "2026-10-22T19:37:51.291Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-22T19:37:51.578Z",
+      "fetchedAt": "2026-10-22T19:37:51.291Z",
+      "updatedAt": "2026-10-22T19:37:51.578Z",
+      "sourceId": "reviewed-eee12740053a4d8fcb7f",
+      "sourceRecordId": "submission-sXQAL04ig1fCoW9mxqJZuSHc5e63_2026-10-21_1",
+      "neighbourhood": "Foothills",
+      "address": "282027 144 St West, Foothills, AB, T1S 0Y4",
+      "venue": "Leighton Art Centre",
+      "organizer": "Leighton Art Centre",
+      "amenities": [],
+      "parking": "Free parking",
+      "petFriendly": false,
+      "familyFriendly": true,
+      "vendorIds": [],
+      "images": [],
+      "organizerEntityId": "biz-leighton-art-centre",
+      "ownerVerifiedAt": "2026-10-21T15:09:55.296Z"
+    },
+    {
+      "id": "158e3c18f34a364b88d6feed759e",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-158e3c",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2026-10-31",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2026-10-31T20:00:00-06:00",
+      "end": "2026-10-31T22:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-25-10-25-20-6288/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "7ed26ca5b31879aa1586aa442c58",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-7ed26c",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2026-11-07",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2026-11-07T21:00:00-06:00",
+      "end": "2026-11-07T23:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-25-11-15-20-2006/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "73f9f5a1f11507fb95551a78cca3",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-73f9f5",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-01-16",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-01-16T21:00:00-06:00",
+      "end": "2027-01-16T23:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-25-11-29-20-9701/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "04e1efa89d08a3cae7bf33701d59",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-04e1ef",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-01-30",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-01-30T21:00:00-06:00",
+      "end": "2027-01-30T23:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-25-12-06-20-6761/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "0dc5b68ae5b7eef7ec1014656bb4",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-0dc5b6",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-02-13",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-02-13T21:00:00-06:00",
+      "end": "2027-02-13T23:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-27-02-13-20-3659/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "3f94d69e273f51d7c1d9ece01ce1",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-3f94d6",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-02-27",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-02-27T21:00:00-06:00",
+      "end": "2027-02-27T23:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-27-02-27-20-2028/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "0124afa7b964d7573ee676cfd5b7",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-0124af",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-03-06",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-03-06T21:00:00-06:00",
+      "end": "2027-03-06T23:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-27-03-06-20-2291/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "27f707189afc7488d68a63e349ae",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-27f707",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-03-20",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-03-20T20:00:00-06:00",
+      "end": "2027-03-20T22:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-27-03-20-20-4518/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "ae094d79308e4e710d11671dd029",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-ae094d",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-04-03",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-04-03T20:00:00-06:00",
+      "end": "2027-04-03T22:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-27-04-03-20-4808/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "1d80a33403450016a1d572868f59",
+      "kind": "event",
+      "slug": "winging-it-an-improvised-fantasy-comedy-1d80a3",
+      "title": "Winging It! — An Improvised Fantasy Comedy",
+      "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
+      "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+      "categories": [
+        "arts",
+        "theatre",
+        "comedy"
+      ],
+      "tags": [
+        "improv",
+        "fantasy",
+        "role-playing",
+        "Winging It!"
+      ],
+      "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
+      "organizer": "Jupiter Theatre",
+      "sources": [
+        {
+          "name": "Jupiter Theatre — Winging It!",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "jupiter-theatre",
+      "sourceRecordId": "winging-it-2027-04-17",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "Theatre 1308",
+      "start": "2027-04-17T20:00:00-06:00",
+      "end": "2027-04-17T22:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/winging-it-3-27-04-17-20-7512/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-jupiter-theatre"
+    },
+    {
+      "id": "d94ea89a2dbe5a6d70b314682e52",
+      "kind": "event",
+      "slug": "arboreal-intuitions-erika-jean-lincoln-d94ea8",
+      "title": "Arboreal Intuitions — Erika Jean Lincoln",
+      "summary": "An interactive media-art installation exploring memory and the loss of an urban elm forest.",
+      "description": "Erika Jean Lincoln’s Arboreal Intuitions brings together machine-learning-generated images, a drawing machine, sound and video. Movement through the gallery activates parts of a sensory environment reflecting on Winnipeg’s lost elm trees, remembrance and neurodivergent ways of learning.\n\nThe exhibition runs September 18–October 31, 2026, with free admission. The gallery’s regular visitor hours are Tuesday–Saturday, noon–6 p.m.; this date-only listing does not mean the space is open continuously. The September 18 opening reception has already taken place.",
+      "categories": [
+        "arts",
+        "exhibitions"
+      ],
+      "tags": [
+        "media art",
+        "interactive installation",
+        "free exhibition"
+      ],
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "organizer": "EMMEDIA Gallery & Production Society",
+      "sources": [
+        {
+          "name": "EMMEDIA Gallery & Production Society",
+          "url": "https://emmedia.ca/programming/arboreal-intuitions/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "emmedia",
+      "sourceRecordId": "arboreal-intuitions-2026",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "EMMEDIA Gallery",
+      "start": "2026-09-18T00:00:00-06:00",
+      "end": "2026-11-01T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "schedulePrecision": "date",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-emmedia"
+    },
+    {
+      "id": "9a032b07bc6aa4b37ea142c055cd",
+      "kind": "event",
+      "slug": "oooooo-sing-together-and-you-will-make-a-perfect-circle-kat-hartog-9a032b",
+      "title": "Oooooo (sing together and you will make a perfect circle) — Kat Hartog",
+      "summary": "A participatory installation turns two voices into visible patterns on a CRT television.",
+      "description": "Kat Hartog’s Oooooo (sing together and you will make a perfect circle) connects harmony, mathematics and the human body. Two participants sing into microphones whose signals are mapped onto a CRT television screen. Matching notes approximate a circle; other relationships create changing Lissajous patterns. No singing expertise is required.\n\nThe exhibition runs September 18–October 31, 2026, with free admission. The gallery’s regular visitor hours are Tuesday–Saturday, noon–6 p.m.; this date-only listing does not mean the space is open continuously. The September 18 opening reception has already taken place.",
+      "categories": [
+        "arts",
+        "exhibitions"
+      ],
+      "tags": [
+        "media art",
+        "interactive installation",
+        "free exhibition"
+      ],
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "organizer": "EMMEDIA Gallery & Production Society",
+      "sources": [
+        {
+          "name": "EMMEDIA Gallery & Production Society",
+          "url": "https://emmedia.ca/programming/oooooo/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "emmedia",
+      "sourceRecordId": "oooooo-2026",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "EMMEDIA Gallery",
+      "start": "2026-09-18T00:00:00-06:00",
+      "end": "2026-11-01T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "schedulePrecision": "date",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-emmedia"
+    },
+    {
+      "id": "0530095f2505e193cf8b7e1f428d",
+      "kind": "event",
+      "slug": "intro-to-3d-modeling-in-blender-class-1-of-3-053009",
+      "title": "Intro to 3D Modeling in Blender — class 1 of 3",
+      "summary": "Session 1 of EMMEDIA’s three-class beginner Blender course with Gene “Gomo” Cabarroguis.",
+      "description": "Learn Blender through demonstrations and hands-on exercises: interface and basic shapes in class one, refining a model in class two, and colour, textures and export in class three. No prior Blender experience is required. Bring your own laptop with Blender installed.\n\nRegistration is $100 for the complete three-class course, not $100 for each session. EMMEDIA’s detailed timetable lists November 7, 14 and 21, 2–5 p.m. each day. The Showpass page currently gives a different finish time for the first session; confirm the November 7 finish time with EMMEDIA. This calendar entry represents one class, not a continuously running course.",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "Blender",
+        "3D modeling",
+        "three-session course"
+      ],
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "organizer": "EMMEDIA Gallery & Production Society",
+      "sources": [
+        {
+          "name": "EMMEDIA Gallery & Production Society",
+          "url": "https://emmedia.ca/workshops-live-streams/3d-modeling-blender/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "emmedia",
+      "sourceRecordId": "blender-course-2026-11-07",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "EMMEDIA Gallery & Production Society",
+      "start": "2026-11-07T14:00:00-06:00",
+      "end": "2026-11-07T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/3d-modeling-in-blender-beginner-workshop/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-emmedia"
+    },
+    {
+      "id": "65cff0c761a1a1f30f6a01bcd6c9",
+      "kind": "event",
+      "slug": "intro-to-3d-modeling-in-blender-class-2-of-3-65cff0",
+      "title": "Intro to 3D Modeling in Blender — class 2 of 3",
+      "summary": "Session 2 of EMMEDIA’s three-class beginner Blender course with Gene “Gomo” Cabarroguis.",
+      "description": "Learn Blender through demonstrations and hands-on exercises: interface and basic shapes in class one, refining a model in class two, and colour, textures and export in class three. No prior Blender experience is required. Bring your own laptop with Blender installed.\n\nRegistration is $100 for the complete three-class course, not $100 for each session. EMMEDIA’s detailed timetable lists November 7, 14 and 21, 2–5 p.m. each day. The Showpass page currently gives a different finish time for the first session; confirm the November 7 finish time with EMMEDIA. This calendar entry represents one class, not a continuously running course.",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "Blender",
+        "3D modeling",
+        "three-session course"
+      ],
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "organizer": "EMMEDIA Gallery & Production Society",
+      "sources": [
+        {
+          "name": "EMMEDIA Gallery & Production Society",
+          "url": "https://emmedia.ca/workshops-live-streams/3d-modeling-blender/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "emmedia",
+      "sourceRecordId": "blender-course-2026-11-14",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "EMMEDIA Gallery & Production Society",
+      "start": "2026-11-14T14:00:00-06:00",
+      "end": "2026-11-14T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/3d-modeling-in-blender-beginner-workshop/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-emmedia"
+    },
+    {
+      "id": "b18688b59f7d1e72abe00376b9be",
+      "kind": "event",
+      "slug": "intro-to-3d-modeling-in-blender-class-3-of-3-b18688",
+      "title": "Intro to 3D Modeling in Blender — class 3 of 3",
+      "summary": "Session 3 of EMMEDIA’s three-class beginner Blender course with Gene “Gomo” Cabarroguis.",
+      "description": "Learn Blender through demonstrations and hands-on exercises: interface and basic shapes in class one, refining a model in class two, and colour, textures and export in class three. No prior Blender experience is required. Bring your own laptop with Blender installed.\n\nRegistration is $100 for the complete three-class course, not $100 for each session. EMMEDIA’s detailed timetable lists November 7, 14 and 21, 2–5 p.m. each day. The Showpass page currently gives a different finish time for the first session; confirm the November 7 finish time with EMMEDIA. This calendar entry represents one class, not a continuously running course.",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "Blender",
+        "3D modeling",
+        "three-session course"
+      ],
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "organizer": "EMMEDIA Gallery & Production Society",
+      "sources": [
+        {
+          "name": "EMMEDIA Gallery & Production Society",
+          "url": "https://emmedia.ca/workshops-live-streams/3d-modeling-blender/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "emmedia",
+      "sourceRecordId": "blender-course-2026-11-21",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "EMMEDIA Gallery & Production Society",
+      "start": "2026-11-21T14:00:00-06:00",
+      "end": "2026-11-21T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/3d-modeling-in-blender-beginner-workshop/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-emmedia"
+    },
+    {
+      "id": "106f91c77039ca9a0fa7c57988a4",
+      "kind": "event",
+      "slug": "creative-compositing-in-after-effects-106f91",
+      "title": "Creative Compositing in After Effects",
+      "summary": "A practical media-art workshop at EMMEDIA, with registration through its official Showpass page.",
+      "description": "Explore masking, rotoscoping, motion tracking, layering and combining footage with instructor Maria Munar. Basic After Effects knowledge is required. Bring a computer capable of video editing with an Adobe licence installed.\n\nEMMEDIA lists registration at $50. Check the official registration page for current availability and any fees.",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "media art"
+      ],
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "organizer": "EMMEDIA Gallery & Production Society",
+      "sources": [
+        {
+          "name": "EMMEDIA Gallery & Production Society",
+          "url": "https://emmedia.ca/workshops-live-streams/creative-compositing-after-effects/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "emmedia",
+      "sourceRecordId": "creative-compositing-2026-11-28",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "EMMEDIA Gallery & Production Society",
+      "start": "2026-11-28T12:00:00-06:00",
+      "end": "2026-11-28T16:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "priceRange": [
+        50,
+        50
+      ],
+      "tickets": "https://www.showpass.com/creative-compositing-in-after-effects/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-emmedia"
+    },
+    {
+      "id": "c76392b85f06ff11782f4bc5630d",
+      "kind": "event",
+      "slug": "the-ins-and-outs-of-analog-video-c76392",
+      "title": "The Ins and Outs of Analog Video",
+      "summary": "A practical media-art workshop at EMMEDIA, with registration through its official Showpass page.",
+      "description": "Media artist and EMMEDIA Technical Director Joe Kelly introduces analog-video production and presentation using cameras, video decks, mixers, CRT monitors, projectors and video feedback.\n\nThe workshop is free, but registration is through the official ticket page.",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "media art"
+      ],
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "organizer": "EMMEDIA Gallery & Production Society",
+      "sources": [
+        {
+          "name": "EMMEDIA Gallery & Production Society",
+          "url": "https://emmedia.ca/workshops-live-streams/ins-outs-analog-video/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "sourceId": "emmedia",
+      "sourceRecordId": "analog-video-2026-12-05",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "EMMEDIA Gallery & Production Society",
+      "start": "2026-12-05T14:00:00-06:00",
+      "end": "2026-12-05T16:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://www.showpass.com/the-ins-and-outs-of-analog-video/",
+      "cancelled": false,
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-emmedia"
+    },
+    {
       "id": "0c5705b5c451a73d9e5be4fcd484",
       "kind": "event",
       "slug": "funnyfest-wednesday-comedy-workshop-class-1-of-6-0c5705",
@@ -16702,15 +16985,15 @@
       "sources": [
         {
           "name": "FunnyFest Calgary Comedy Festival",
-          "url": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca/",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
           "kind": "official",
-          "retrievedAt": "2026-10-22T20:00:00Z"
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
         }
       ],
       "sourceId": "funnyfest-major-programme",
       "sourceRecordId": "wednesday-workshop-2026-2026-10-28",
-      "fetchedAt": "2026-10-22T20:00:00Z",
-      "updatedAt": "2026-10-22T20:00:00Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "Capitol Hill Community Association",
@@ -16718,10 +17001,11 @@
       "end": "2026-10-28T21:00:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
       "cancelled": false,
-      "verifiedAt": "2026-10-22T20:00:00Z",
-      "organizerEntityId": "biz-funnyfest"
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-funnyfest",
+      "ticketSaleStatus": "on-sale"
     },
     {
       "id": "a2aa8dd344f85af2308e827a61c9",
@@ -16745,15 +17029,15 @@
       "sources": [
         {
           "name": "FunnyFest Calgary Comedy Festival",
-          "url": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca/",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
           "kind": "official",
-          "retrievedAt": "2026-10-22T20:00:00Z"
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
         }
       ],
       "sourceId": "funnyfest-major-programme",
       "sourceRecordId": "wednesday-workshop-2026-2026-11-04",
-      "fetchedAt": "2026-10-22T20:00:00Z",
-      "updatedAt": "2026-10-22T20:00:00Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "Capitol Hill Community Association",
@@ -16761,10 +17045,11 @@
       "end": "2026-11-04T21:00:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
       "cancelled": false,
-      "verifiedAt": "2026-10-22T20:00:00Z",
-      "organizerEntityId": "biz-funnyfest"
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-funnyfest",
+      "ticketSaleStatus": "on-sale"
     },
     {
       "id": "8508ca739f61c64e61e051d2ea83",
@@ -16788,15 +17073,15 @@
       "sources": [
         {
           "name": "FunnyFest Calgary Comedy Festival",
-          "url": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca/",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
           "kind": "official",
-          "retrievedAt": "2026-10-22T20:00:00Z"
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
         }
       ],
       "sourceId": "funnyfest-major-programme",
       "sourceRecordId": "wednesday-workshop-2026-2026-11-11",
-      "fetchedAt": "2026-10-22T20:00:00Z",
-      "updatedAt": "2026-10-22T20:00:00Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "Capitol Hill Community Association",
@@ -16804,10 +17089,11 @@
       "end": "2026-11-11T21:00:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
       "cancelled": false,
-      "verifiedAt": "2026-10-22T20:00:00Z",
-      "organizerEntityId": "biz-funnyfest"
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-funnyfest",
+      "ticketSaleStatus": "on-sale"
     },
     {
       "id": "bed2a70f7784170efde4e6be70ce",
@@ -16831,15 +17117,15 @@
       "sources": [
         {
           "name": "FunnyFest Calgary Comedy Festival",
-          "url": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca/",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
           "kind": "official",
-          "retrievedAt": "2026-10-22T20:00:00Z"
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
         }
       ],
       "sourceId": "funnyfest-major-programme",
       "sourceRecordId": "wednesday-workshop-2026-2026-11-18",
-      "fetchedAt": "2026-10-22T20:00:00Z",
-      "updatedAt": "2026-10-22T20:00:00Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "Capitol Hill Community Association",
@@ -16847,10 +17133,11 @@
       "end": "2026-11-18T21:00:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
       "cancelled": false,
-      "verifiedAt": "2026-10-22T20:00:00Z",
-      "organizerEntityId": "biz-funnyfest"
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-funnyfest",
+      "ticketSaleStatus": "on-sale"
     },
     {
       "id": "358359ce053ce98ab95fc807b58f",
@@ -16874,15 +17161,15 @@
       "sources": [
         {
           "name": "FunnyFest Calgary Comedy Festival",
-          "url": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca/",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
           "kind": "official",
-          "retrievedAt": "2026-10-22T20:00:00Z"
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
         }
       ],
       "sourceId": "funnyfest-major-programme",
       "sourceRecordId": "wednesday-workshop-2026-2026-11-25",
-      "fetchedAt": "2026-10-22T20:00:00Z",
-      "updatedAt": "2026-10-22T20:00:00Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "Capitol Hill Community Association",
@@ -16890,10 +17177,11 @@
       "end": "2026-11-25T21:00:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
       "cancelled": false,
-      "verifiedAt": "2026-10-22T20:00:00Z",
-      "organizerEntityId": "biz-funnyfest"
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-funnyfest",
+      "ticketSaleStatus": "on-sale"
     },
     {
       "id": "1f937632257da1c8d25a3fc706f9",
@@ -16917,15 +17205,15 @@
       "sources": [
         {
           "name": "FunnyFest Calgary Comedy Festival",
-          "url": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca/",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
           "kind": "official",
-          "retrievedAt": "2026-10-22T20:00:00Z"
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
         }
       ],
       "sourceId": "funnyfest-major-programme",
       "sourceRecordId": "wednesday-workshop-2026-2026-12-02",
-      "fetchedAt": "2026-10-22T20:00:00Z",
-      "updatedAt": "2026-10-22T20:00:00Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
       "status": "published",
       "verification": "source-checked",
       "venue": "Capitol Hill Community Association",
@@ -16933,10 +17221,1162 @@
       "end": "2026-12-02T21:00:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-wednesdays-calgary-yyc.eventbrite.ca",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-wednesdays-october-28-2026-calgary-tickets-2001281111678",
       "cancelled": false,
-      "verifiedAt": "2026-10-22T20:00:00Z",
-      "organizerEntityId": "biz-funnyfest"
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "organizerEntityId": "biz-funnyfest",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "0e7f06070da26d52d4a10cae5c7a",
+      "kind": "event",
+      "slug": "funnyfest-weekend-comedy-workshop-day-1-of-2-0e7f06",
+      "title": "FunnyFest Weekend Comedy Workshop — day 1 of 2",
+      "summary": "Day 1 of FunnyFest’s two-day stand-up and comedy-writing workshop at Capitol Hill Community Association.",
+      "description": "FunnyFest’s weekend stand-up comedy workshop runs November 7 and 8, 2026, from 10 a.m. to 4 p.m. each day at Capitol Hill Community Association. This listing covers day 1, on 2026-11-07; the workshop is not open overnight.\n\nThe course combines comedy-writing and performance techniques, practice and course materials. Registration covers the weekend course. Check the organizer’s official ticket page for current availability, fees and any graduation showcase arrangements; no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing",
+        "weekend course"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-weekend-classes-november-7-and-8-calgaryyyc-tickets-1381380870369",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-0197d78e9bd30e4c6af8",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_3",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-11-07T10:00:00-06:00",
+      "end": "2026-11-07T16:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-weekend-classes-november-7-and-8-calgaryyyc-tickets-1381380870369",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "236a5ddee247a06ecf5b6db22385",
+      "kind": "event",
+      "slug": "funnyfest-stand-up-comedy-workshop-class-6-of-6-236a5d",
+      "title": "FunnyFest Stand Up Comedy Workshop — class 6 of 6",
+      "summary": "Class 6 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
+      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 6, on 2026-12-01, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-7f3a403c5a59a0a93070",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-12-01",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-12-01T19:00:00-06:00",
+      "end": "2026-12-01T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "357c190b1ebedc3b15146977d83e",
+      "kind": "event",
+      "slug": "funnyfest-weekend-comedy-workshop-day-2-of-2-357c19",
+      "title": "FunnyFest Weekend Comedy Workshop — day 2 of 2",
+      "summary": "Day 2 of FunnyFest’s two-day stand-up and comedy-writing workshop at Capitol Hill Community Association.",
+      "description": "FunnyFest’s weekend stand-up comedy workshop runs November 7 and 8, 2026, from 10 a.m. to 4 p.m. each day at Capitol Hill Community Association. This listing covers day 2, on 2026-11-08; the workshop is not open overnight.\n\nThe course combines comedy-writing and performance techniques, practice and course materials. Registration covers the weekend course. Check the organizer’s official ticket page for current availability, fees and any graduation showcase arrangements; no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing",
+        "weekend course"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-weekend-classes-november-7-and-8-calgaryyyc-tickets-1381380870369",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-0197d78e9bd30e4c6af8",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_3-2026-11-08",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-11-08T10:00:00-06:00",
+      "end": "2026-11-08T16:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-weekend-classes-november-7-and-8-calgaryyyc-tickets-1381380870369",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "372e4a4a516b08c8a9136de98749",
+      "kind": "event",
+      "slug": "funnyfest-stand-up-comedy-workshop-class-1-of-6-372e4a",
+      "title": "FunnyFest Stand Up Comedy Workshop — class 1 of 6",
+      "summary": "Class 1 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
+      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 1, on 2026-10-27, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-7f3a403c5a59a0a93070",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-10-27T19:00:00-06:00",
+      "end": "2026-10-27T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "48ac08cd0cafe1cb5044ffdbc95e",
+      "kind": "event",
+      "slug": "funnyfest-stand-up-comedy-workshop-class-2-of-6-48ac08",
+      "title": "FunnyFest Stand Up Comedy Workshop — class 2 of 6",
+      "summary": "Class 2 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
+      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 2, on 2026-11-03, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-7f3a403c5a59a0a93070",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-03",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-11-03T19:00:00-06:00",
+      "end": "2026-11-03T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "748854e4da5cd1be429f086f1037",
+      "kind": "event",
+      "slug": "funnyfest-comedy-writing-workshop-748854",
+      "title": "FunnyFest Comedy Writing Workshop",
+      "summary": "A three-hour Saturday comedy-writing workshop at The Canadian Brewhouse in University District.",
+      "description": "FunnyFest’s Comedy Writing Workshop takes place November 28, 2026, from 1 to 4 p.m. at The Canadian Brewhouse in University District. The interactive course focuses on comedy-writing methods and applying humour to performances, presentations and public speaking. Check the official ticket page for registration, current prices and course details.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "comedy",
+        "public speaking"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/comedy-writing-workshop-30-methods-saturday-november-28-1-pm-4-pm-tickets-2001777176421",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-fc58e4a4dd9dbc2bd231",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_5",
+      "neighbourhood": "University District",
+      "address": "#220, 3953 University Avenue NW, Calgary, AB T3B 6K3",
+      "venue": "The Canadian Brewhouse — University District",
+      "start": "2026-11-28T13:00:00-06:00",
+      "end": "2026-11-28T16:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/comedy-writing-workshop-30-methods-saturday-november-28-1-pm-4-pm-tickets-2001777176421",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "7c4659494be7d4d7678f329f3d80",
+      "kind": "event",
+      "slug": "funnyfest-halloween-comedy-and-dance-party-7c4659",
+      "title": "FunnyFest Halloween Comedy and Dance Party",
+      "summary": "Three comedians, a DJ dance party and costume prizes at Offside Pub on Halloween.",
+      "description": "FunnyFest presents a Halloween comedy and dance party at Offside Pub on October 31, 2026. The comedy show starts at 7 p.m., followed by a DJ dance party at 9 p.m. The organizer advertises three comedians and costume prizes.\n\nThe latest organizer submission lists the evening ending at 11:30 p.m. Check the official Eventbrite page for current ticket prices, entry details and any schedule changes.",
+      "categories": [
+        "arts",
+        "comedy"
+      ],
+      "tags": [
+        "Halloween",
+        "comedy",
+        "dance"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/halloween-comedy-party-3-comedians-and-5000-prizes-costume-contest-yyc-tickets-1955746824399",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-8c1668b92e0b58d839e7",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-21_1",
+      "neighbourhood": "Tuxedo Park",
+      "address": "2820 Centre Street North, Calgary, AB T2E 2V8",
+      "venue": "Offside Pub",
+      "start": "2026-10-31T19:00:00-06:00",
+      "end": "2026-10-31T23:30:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/halloween-comedy-party-3-comedians-and-5000-prizes-costume-contest-yyc-tickets-1955746824399",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "812a85bde310731af82eefaa5c1f",
+      "kind": "event",
+      "slug": "funnyfest-emcee-mc-workshop-812a85",
+      "title": "FunnyFest Emcee / MC Workshop",
+      "summary": "An evening workshop on hosting events, public speaking and engaging an audience at The Canadian Brewhouse in University District.",
+      "description": "FunnyFest’s Emcee / MC workshop takes place November 26, 2026, from 6 to 8:30 p.m. at The Canadian Brewhouse in University District. The official event page confirms a two-and-a-half-hour session covering techniques for hosting events, connecting with an audience and keeping a programme moving. Check its official ticket page for current availability, fees and course details.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "comedy",
+        "public speaking"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/emcee-mc-workshop-30-professional-methods-expert-advice-and-training-tickets-1989638059997",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-40dc1a2c668bed2ebc16",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_4",
+      "neighbourhood": "University District",
+      "address": "#220, 3953 University Avenue NW, Calgary, AB T3B 6K3",
+      "venue": "The Canadian Brewhouse — University District",
+      "start": "2026-11-26T18:00:00-06:00",
+      "end": "2026-11-26T20:30:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/emcee-mc-workshop-30-professional-methods-expert-advice-and-training-tickets-1989638059997",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "90936e4b92006d67958a4f5386ee",
+      "kind": "event",
+      "slug": "funnyfest-stand-up-comedy-workshop-class-4-of-6-90936e",
+      "title": "FunnyFest Stand Up Comedy Workshop — class 4 of 6",
+      "summary": "Class 4 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
+      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 4, on 2026-11-17, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-7f3a403c5a59a0a93070",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-17",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-11-17T19:00:00-06:00",
+      "end": "2026-11-17T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "93798960fbe2b6161244aff6e88a",
+      "kind": "event",
+      "slug": "funnyfest-stand-up-comedy-workshop-class-3-of-6-937989",
+      "title": "FunnyFest Stand Up Comedy Workshop — class 3 of 6",
+      "summary": "Class 3 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
+      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 3, on 2026-11-10, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-7f3a403c5a59a0a93070",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-10",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-11-10T19:00:00-06:00",
+      "end": "2026-11-10T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "d95bd112678eb478ff386257ded4",
+      "kind": "event",
+      "slug": "funnyfest-stand-up-comedy-workshop-class-5-of-6-d95bd1",
+      "title": "FunnyFest Stand Up Comedy Workshop — class 5 of 6",
+      "summary": "Class 5 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
+      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 5, on 2026-11-24, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+      "categories": [
+        "arts",
+        "comedy",
+        "learning"
+      ],
+      "tags": [
+        "workshop",
+        "stand-up comedy",
+        "comedy writing"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — verified event registration",
+          "url": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "reviewed-7f3a403c5a59a0a93070",
+      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-24",
+      "neighbourhood": "Capitol Hill",
+      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
+      "venue": "Capitol Hill Community Association",
+      "start": "2026-11-24T19:00:00-06:00",
+      "end": "2026-11-24T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.eventbrite.ca/e/stand-up-comedy-workshop-6-classes-tuesdays-october-27-2026-calgary-tickets-1991813933092",
+      "organizer": "FunnyFest Calgary Comedy Festival",
+      "cancelled": false,
+      "organizerEntityId": "biz-funnyfest",
+      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z",
+      "ticketSaleStatus": "on-sale"
+    },
+    {
+      "id": "5a188c12dacaea0159e693df6457",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-5a188c",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-09",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-09T19:00:00-06:00",
+      "end": "2026-10-10T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "28296cf1b77723691ddae922ceba",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-28296c",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-10",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-10T19:00:00-06:00",
+      "end": "2026-10-11T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "5f2ec031c8d26c874ed09c00dda5",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-5f2ec0",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-16",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-16T19:00:00-06:00",
+      "end": "2026-10-17T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "aca7ec375a382c8871facc166292",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-aca7ec",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-17",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-17T19:00:00-06:00",
+      "end": "2026-10-18T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "195cfed5af1a3294dcefee2596c9",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-195cfe",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-22",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-22T19:00:00-06:00",
+      "end": "2026-10-23T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "205af4b04d68ee3a4dfee558bfa6",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-205af4",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-23",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-23T19:00:00-06:00",
+      "end": "2026-10-24T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "790914ebb9c21f6883aba30ddf3e",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-790914",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-24",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-24T19:00:00-06:00",
+      "end": "2026-10-25T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "79d2fede9c0d3ed18baaf8b54e85",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-79d2fe",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-25",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-25T19:00:00-06:00",
+      "end": "2026-10-26T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "1d2ab1ceef71512afd9562732105",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-1d2ab1",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-29",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-29T19:00:00-06:00",
+      "end": "2026-10-30T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "30d99dc4a5a597ecd2149ab1f0a1",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-30d99d",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-30",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-30T19:00:00-06:00",
+      "end": "2026-10-31T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "af23dc6cd80c40f4d88a784a440d",
+      "kind": "event",
+      "slug": "screamfest-at-stampede-park-af23dc",
+      "title": "ScreamFest at Stampede Park",
+      "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+      "description": "ScreamFest runs at GMC Stadium, Stampede Park, from 7 p.m. to midnight on the operating date shown. Its 2026 schedule is October 9, 10, 16, 17, 22, 23, 24, 25, 29, 30 and 31. October 22 is adults-only; the organizer otherwise recommends the event for ages 12 and older. The evening includes haunted houses and additional attractions; check the booking page for package inclusions.\n\nHex After Dark has advised CalgaryWatch that its films are playing on ScreamFest operating nights. Individual film titles, screening start times and whether admission includes the screenings have not been confirmed here. Check with ScreamFest before booking specifically for a film; this listing is the ScreamFest operating night, not a separate timed film screening.",
+      "categories": [
+        "nightlife",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "halloween",
+        "haunted house",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest Calgary",
+          "url": "https://screamfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37.474Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37.474Z",
+      "fetchedAt": "2026-10-23T18:28:37.474Z",
+      "updatedAt": "2026-10-23T18:28:37.474Z",
+      "sourceId": "screamfest",
+      "sourceRecordId": "screamfest-2026-10-31",
+      "neighbourhood": "Beltline",
+      "address": "2200 Stampede Trail SE, Calgary, AB",
+      "venue": "GMC Stadium, Stampede Park",
+      "start": "2026-10-31T19:00:00-06:00",
+      "end": "2026-11-01T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "ScreamFest",
+      "cancelled": false,
+      "organizerEntityId": "biz-screamfest",
+      "tickets": "https://www.showpass.com/screamfest-28/"
+    },
+    {
+      "id": "biz-jupiter-theatre",
+      "kind": "business",
+      "slug": "jupiter-theatre",
+      "title": "Jupiter Theatre Society",
+      "name": "Jupiter Theatre Society",
+      "summary": "Calgary theatre and improvised fantasy adventures, including Winging It! at Theatre 1308.",
+      "description": "Jupiter Theatre Society creates imaginative theatre in Calgary. Its Winging It! series mixes audience suggestions, improvised characters and fantasy role-playing into standalone adventures that also build a continuing story. New audiences can join at any performance.\n\nWinging It! performances take place at Theatre 1308, 1308 Edmonton Trail; it is recommended for ages 14 and older because of language and suggestive humour. The Morpheus Community Box Office hosts its Showpass tickets, but Jupiter is the presenter.\n\nJupiter also announces Macbeth with Full Circle Theatre for February 18–27, 2027 at West Village Theatre. Performance times and ticket details are still to come; that announcement is not a bookable event listing here. Use Jupiter’s official contact page for company enquiries.",
+      "website": "https://www.theatrejupiter.com/",
+      "address": "Calgary, AB",
+      "categories": [
+        "arts",
+        "theatre"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "improv"
+      ],
+      "sources": [
+        {
+          "name": "Jupiter Theatre — official company website",
+          "url": "https://www.theatrejupiter.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        },
+        {
+          "name": "Winging It! — official performance calendar",
+          "url": "https://www.wingingit.ca/shows",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        },
+        {
+          "name": "Jupiter Theatre — Macbeth announcement",
+          "url": "https://www.theatrejupiter.com/macbeth",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Theatre productions",
+        "Improvised fantasy comedy"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37Z",
+      "updatedAt": "2026-10-23T18:28:37Z"
+    },
+    {
+      "id": "biz-emmedia",
+      "kind": "business",
+      "slug": "emmedia",
+      "title": "EMMEDIA Gallery & Production Society",
+      "name": "EMMEDIA Gallery & Production Society",
+      "summary": "Artist-run media-art exhibitions, screenings and hands-on workshops in Calgary’s Sunalta neighbourhood.",
+      "description": "EMMEDIA Gallery & Production Society is a non-profit artist-run organization supporting the production and presentation of media art. Its Calgary space brings together exhibitions, moving-image and sound work, technical facilities and practical artist training.\n\nVisit at 2005 10 Avenue SW. Office and gallery hours are Tuesday–Saturday, noon–6 p.m.; workshop registration and event-specific times are listed separately. The current exhibitions Arboreal Intuitions by Erika Jean Lincoln and Oooooo (sing together and you will make a perfect circle) by Kat Hartog run through October 31, 2026.\n\nUpcoming learning opportunities include a three-session introduction to Blender, creative compositing in After Effects and an analog-video workshop. Register through EMMEDIA’s official event links. Equipment rental pick-up and drop-off must be arranged with its technical team; gallery hours are not a rental reservation.",
+      "website": "https://emmedia.ca/",
+      "address": "2005 10 Avenue SW, Calgary, AB T3C 0K4",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "media art",
+        "workshops"
+      ],
+      "sources": [
+        {
+          "name": "EMMEDIA — official website",
+          "url": "https://emmedia.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        },
+        {
+          "name": "EMMEDIA — contact, location and gallery hours",
+          "url": "https://emmedia.ca/about-emmedia/contact-us/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Media-art exhibitions",
+        "Artist workshops",
+        "Screenings and performances",
+        "Media production facilities"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T18:28:37Z",
+      "updatedAt": "2026-10-23T18:28:37Z",
+      "email": "operations@emmedia.ca",
+      "hours": {
+        "Tuesday": "12:00–18:00",
+        "Wednesday": "12:00–18:00",
+        "Thursday": "12:00–18:00",
+        "Friday": "12:00–18:00",
+        "Saturday": "12:00–18:00"
+      }
+    },
+    {
+      "id": "biz-funnyfest",
+      "kind": "business",
+      "slug": "funnyfest",
+      "title": "FunnyFest Calgary Comedy Festival",
+      "name": "FunnyFest Calgary Comedy Festival",
+      "website": "https://www.funnyfest.com/",
+      "address": "Calgary, AB",
+      "summary": "Year-round Calgary comedy shows and workshops, including a Halloween comedy and dance party on October 31.",
+      "description": "FunnyFest Calgary Comedy Festival presents stand-up shows, comedy-writing and performance workshops, and an annual festival and competition. Its programme spans different Calgary venues, so use each event’s own location and registration page.\n\nThe October 31, 2026 Halloween comedy and dance party takes place at Offside Pub & Eatery, with the comedy show at 7 p.m. and a dance party from 9 p.m. Upcoming workshops include separate Tuesday and Wednesday six-class courses, a November 7–8 weekend course, and November sessions on emceeing and comedy writing.\n\nCalendar entries distinguish individual class dates from registrations: several classes share one course ticket. The 2027 annual festival and competition are date-only announcements; individual programme details and ticket availability must be confirmed on FunnyFest’s official pages.",
+      "categories": [
+        "arts",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "comedy",
+        "festival"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — official website",
+          "url": "https://www.funnyfest.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "FunnyFest — Halloween booking and programme",
+          "url": "https://www.eventbrite.ca/e/halloween-comedy-party-3-comedians-and-5000-prizes-costume-contest-yyc-tickets-1955746824399",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T18:28:37Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.funnyfest.com/"
+      },
+      "services": [
+        "Comedy festival",
+        "Stand-up shows"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-23T18:28:37Z",
+      "email": "tickets@funnyfest.com",
+      "phone": "403-228-7888"
     },
     {
       "sources": [
@@ -16967,8 +18407,8 @@
       ],
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-22T20:00:00Z",
-      "verifiedAt": "2026-10-22T19:27:17.122Z",
+      "updatedAt": "2026-10-23T18:28:37Z",
+      "verifiedAt": "2026-10-23T18:28:37Z",
       "id": "guide-cuff-docs-first-night",
       "kind": "guide",
       "slug": "your-first-cuff-docs-night",
@@ -16985,7 +18425,7 @@
       ],
       "format": "planning",
       "introduction": "You do not need to be a film-festival regular to try CUFF.Docs. Start with a subject you care about, choose one screening and leave time to talk about it afterwards. The 14th documentary festival runs November 18–22, 2026 at Globe Cinema.",
-      "methodology": "Prepared from Calgary Underground Film Festival’s official programme information on October 22, 2026. The lineup and individual tickets are due October 28; film recommendations will need the announced programme. No attendance, film review or ticket partnership is implied.",
+      "methodology": "Prepared from Calgary Underground Film Festival’s official programme and visitor information, checked October 23, 2026. The CUFF.Docs lineup and individual tickets are due October 28; film recommendations and screening links need that announced programme. This is an advance-planning guide, not a screening review.",
       "entries": [
         {
           "entityId": "biz-calgary-underground-film-festival",
@@ -17037,548 +18477,6 @@
           "body": "Want a different introduction to CUFF? Its October 24 horror marathon runs 7 p.m. to 7 a.m. at Globe Cinema, with seven films and a costume contest. It is a separate event, not part of the November CUFF.Docs programme."
         }
       ]
-    },
-    {
-      "id": "0e7f06070da26d52d4a10cae5c7a",
-      "kind": "event",
-      "slug": "funnyfest-weekend-comedy-workshop-day-1-of-2-0e7f06",
-      "title": "FunnyFest Weekend Comedy Workshop — day 1 of 2",
-      "summary": "Day 1 of FunnyFest’s two-day stand-up and comedy-writing workshop at Capitol Hill Community Association.",
-      "description": "FunnyFest’s weekend stand-up comedy workshop runs November 7 and 8, 2026, from 10 a.m. to 4 p.m. each day at Capitol Hill Community Association. This listing covers day 1, on 2026-11-07; the workshop is not open overnight.\n\nThe course combines comedy-writing and performance techniques, practice and course materials. Registration covers the weekend course. Check the organizer’s official ticket page for current availability, fees and any graduation showcase arrangements; no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing",
-        "weekend course"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-comedy-workshop-weekend-calgary-yyc.eventbrite.ca/?discount=100off",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:49:06.129Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:49:06.412Z",
-      "fetchedAt": "2026-10-22T19:49:06.129Z",
-      "updatedAt": "2026-10-22T19:49:06.412Z",
-      "sourceId": "reviewed-0197d78e9bd30e4c6af8",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_3",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-11-07T10:00:00-06:00",
-      "end": "2026-11-07T16:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-comedy-workshop-weekend-calgary-yyc.eventbrite.ca/?discount=100off",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "236a5ddee247a06ecf5b6db22385",
-      "kind": "event",
-      "slug": "funnyfest-stand-up-comedy-workshop-class-6-of-6-236a5d",
-      "title": "FunnyFest Stand Up Comedy Workshop — class 6 of 6",
-      "summary": "Class 6 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
-      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 6, on 2026-12-01, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:50.931Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:51.097Z",
-      "fetchedAt": "2026-10-22T19:37:50.931Z",
-      "updatedAt": "2026-10-22T19:37:51.097Z",
-      "sourceId": "reviewed-7f3a403c5a59a0a93070",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-12-01",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-12-01T19:00:00-06:00",
-      "end": "2026-12-01T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "357c190b1ebedc3b15146977d83e",
-      "kind": "event",
-      "slug": "funnyfest-weekend-comedy-workshop-day-2-of-2-357c19",
-      "title": "FunnyFest Weekend Comedy Workshop — day 2 of 2",
-      "summary": "Day 2 of FunnyFest’s two-day stand-up and comedy-writing workshop at Capitol Hill Community Association.",
-      "description": "FunnyFest’s weekend stand-up comedy workshop runs November 7 and 8, 2026, from 10 a.m. to 4 p.m. each day at Capitol Hill Community Association. This listing covers day 2, on 2026-11-08; the workshop is not open overnight.\n\nThe course combines comedy-writing and performance techniques, practice and course materials. Registration covers the weekend course. Check the organizer’s official ticket page for current availability, fees and any graduation showcase arrangements; no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing",
-        "weekend course"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-comedy-workshop-weekend-calgary-yyc.eventbrite.ca/?discount=100off",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:49:06.557Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:49:06.778Z",
-      "fetchedAt": "2026-10-22T19:49:06.557Z",
-      "updatedAt": "2026-10-22T19:49:06.778Z",
-      "sourceId": "reviewed-0197d78e9bd30e4c6af8",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_3-2026-11-08",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-11-08T10:00:00-06:00",
-      "end": "2026-11-08T16:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-comedy-workshop-weekend-calgary-yyc.eventbrite.ca/?discount=100off",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "372e4a4a516b08c8a9136de98749",
-      "kind": "event",
-      "slug": "funnyfest-stand-up-comedy-workshop-class-1-of-6-372e4a",
-      "title": "FunnyFest Stand Up Comedy Workshop — class 1 of 6",
-      "summary": "Class 1 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
-      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 1, on 2026-10-27, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:49.425Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:49.641Z",
-      "fetchedAt": "2026-10-22T19:37:49.425Z",
-      "updatedAt": "2026-10-22T19:37:49.641Z",
-      "sourceId": "reviewed-7f3a403c5a59a0a93070",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-10-27T19:00:00-06:00",
-      "end": "2026-10-27T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "48ac08cd0cafe1cb5044ffdbc95e",
-      "kind": "event",
-      "slug": "funnyfest-stand-up-comedy-workshop-class-2-of-6-48ac08",
-      "title": "FunnyFest Stand Up Comedy Workshop — class 2 of 6",
-      "summary": "Class 2 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
-      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 2, on 2026-11-03, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:49.769Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:49.977Z",
-      "fetchedAt": "2026-10-22T19:37:49.769Z",
-      "updatedAt": "2026-10-22T19:37:49.977Z",
-      "sourceId": "reviewed-7f3a403c5a59a0a93070",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-03",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-11-03T19:00:00-06:00",
-      "end": "2026-11-03T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "748854e4da5cd1be429f086f1037",
-      "kind": "event",
-      "slug": "funnyfest-comedy-writing-workshop-748854",
-      "title": "FunnyFest Comedy Writing Workshop",
-      "summary": "A three-hour Saturday comedy-writing workshop at The Canadian Brewhouse in University District.",
-      "description": "FunnyFest’s Comedy Writing Workshop takes place November 28, 2026, from 1 to 4 p.m. at The Canadian Brewhouse in University District. The interactive course focuses on comedy-writing methods and applying humour to performances, presentations and public speaking. Check the official ticket page for registration, current prices and course details.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "comedy",
-        "public speaking"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-comedy-writing-workshop-yyc-calgary.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:57:44.852Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:57:45.158Z",
-      "fetchedAt": "2026-10-22T19:57:44.852Z",
-      "updatedAt": "2026-10-22T19:57:45.158Z",
-      "sourceId": "reviewed-fc58e4a4dd9dbc2bd231",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_5",
-      "neighbourhood": "University District",
-      "address": "#220, 3953 University Avenue NW, Calgary, AB T3B 6K3",
-      "venue": "The Canadian Brewhouse — University District",
-      "start": "2026-11-28T13:00:00-06:00",
-      "end": "2026-11-28T16:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-comedy-writing-workshop-yyc-calgary.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "7c4659494be7d4d7678f329f3d80",
-      "kind": "event",
-      "slug": "funnyfest-halloween-comedy-and-dance-party-7c4659",
-      "title": "FunnyFest Halloween Comedy and Dance Party",
-      "summary": "Three comedians, a DJ dance party and costume prizes at Offside Pub on Halloween.",
-      "description": "FunnyFest presents a Halloween comedy and dance party at Offside Pub on October 31, 2026. The comedy show starts at 7 p.m., followed by a DJ dance party at 9 p.m. The organizer advertises three comedians and costume prizes.\n\nThe latest organizer submission lists the evening ending at 11:30 p.m. Check the official Eventbrite page for current ticket prices, entry details and any schedule changes.",
-      "categories": [
-        "arts",
-        "comedy"
-      ],
-      "tags": [
-        "Halloween",
-        "comedy",
-        "dance"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-comedy-halloween-show-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:48.909Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:49.151Z",
-      "fetchedAt": "2026-10-22T19:37:48.909Z",
-      "updatedAt": "2026-10-22T19:37:49.151Z",
-      "sourceId": "reviewed-8c1668b92e0b58d839e7",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-21_1",
-      "neighbourhood": "Tuxedo Park",
-      "address": "2820 Centre Street North, Calgary, AB T2E 2V8",
-      "venue": "Offside Pub",
-      "start": "2026-10-31T19:00:00-06:00",
-      "end": "2026-10-31T23:30:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-comedy-halloween-show-calgary-yyc.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "812a85bde310731af82eefaa5c1f",
-      "kind": "event",
-      "slug": "funnyfest-emcee-mc-workshop-812a85",
-      "title": "FunnyFest Emcee / MC Workshop",
-      "summary": "An evening workshop on hosting events, public speaking and engaging an audience at The Canadian Brewhouse in University District.",
-      "description": "FunnyFest’s Emcee / MC workshop takes place November 26, 2026, from 6 to 8:30 p.m. at The Canadian Brewhouse in University District. The official event page confirms a two-and-a-half-hour session covering techniques for hosting events, connecting with an audience and keeping a programme moving. Check its official ticket page for current availability, fees and course details.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "comedy",
-        "public speaking"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-comedy-emcee-workshop-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:57:44.034Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:57:44.492Z",
-      "fetchedAt": "2026-10-22T19:57:44.034Z",
-      "updatedAt": "2026-10-22T19:57:44.492Z",
-      "sourceId": "reviewed-40dc1a2c668bed2ebc16",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_4",
-      "neighbourhood": "University District",
-      "address": "#220, 3953 University Avenue NW, Calgary, AB T3B 6K3",
-      "venue": "The Canadian Brewhouse — University District",
-      "start": "2026-11-26T18:00:00-06:00",
-      "end": "2026-11-26T20:30:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://FunnyFest-Comedy-Emcee-Workshop-Calgary-YYC.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "90936e4b92006d67958a4f5386ee",
-      "kind": "event",
-      "slug": "funnyfest-stand-up-comedy-workshop-class-4-of-6-90936e",
-      "title": "FunnyFest Stand Up Comedy Workshop — class 4 of 6",
-      "summary": "Class 4 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
-      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 4, on 2026-11-17, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:50.382Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:50.545Z",
-      "fetchedAt": "2026-10-22T19:37:50.382Z",
-      "updatedAt": "2026-10-22T19:37:50.545Z",
-      "sourceId": "reviewed-7f3a403c5a59a0a93070",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-17",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-11-17T19:00:00-06:00",
-      "end": "2026-11-17T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "93798960fbe2b6161244aff6e88a",
-      "kind": "event",
-      "slug": "funnyfest-stand-up-comedy-workshop-class-3-of-6-937989",
-      "title": "FunnyFest Stand Up Comedy Workshop — class 3 of 6",
-      "summary": "Class 3 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
-      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 3, on 2026-11-10, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:50.089Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:50.270Z",
-      "fetchedAt": "2026-10-22T19:37:50.089Z",
-      "updatedAt": "2026-10-22T19:37:50.270Z",
-      "sourceId": "reviewed-7f3a403c5a59a0a93070",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-10",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-11-10T19:00:00-06:00",
-      "end": "2026-11-10T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "d95bd112678eb478ff386257ded4",
-      "kind": "event",
-      "slug": "funnyfest-stand-up-comedy-workshop-class-5-of-6-d95bd1",
-      "title": "FunnyFest Stand Up Comedy Workshop — class 5 of 6",
-      "summary": "Class 5 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
-      "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 5, on 2026-11-24, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
-      "categories": [
-        "arts",
-        "comedy",
-        "learning"
-      ],
-      "tags": [
-        "workshop",
-        "stand-up comedy",
-        "comedy writing"
-      ],
-      "sources": [
-        {
-          "name": "FunnyFest Calgary Comedy Festival — reviewed official source",
-          "url": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:50.655Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:50.821Z",
-      "fetchedAt": "2026-10-22T19:37:50.655Z",
-      "updatedAt": "2026-10-22T19:37:50.821Z",
-      "sourceId": "reviewed-7f3a403c5a59a0a93070",
-      "sourceRecordId": "submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-24",
-      "neighbourhood": "Capitol Hill",
-      "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
-      "venue": "Capitol Hill Community Association",
-      "start": "2026-11-24T19:00:00-06:00",
-      "end": "2026-11-24T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "pricing": "paid",
-      "tickets": "https://funnyfest-stand-up-comedy-workshop-tuesdays-calgary-yyc.eventbrite.ca",
-      "organizer": "FunnyFest Calgary Comedy Festival",
-      "cancelled": false,
-      "organizerEntityId": "biz-funnyfest",
-      "ownerVerifiedAt": "2026-10-21T21:57:17.908Z"
-    },
-    {
-      "id": "f013d255329f233ec850eb5a5d9f",
-      "kind": "market",
-      "slug": "festive-foothills-art-market-f013d2",
-      "title": "Festive Foothills Art Market",
-      "summary": "Celebrate the season of giving at the annual Festive Foothills Art Market, running November 7 to December 20 at the Leighton Art Centre! Set against the beautiful backdrop of the Alberta Foothills, this beloved holiday tradition brings together an incredible selection of original artwork and fine craft by more than 80 Alberta artists.  Discover one-of-a-kind treasures and thoughtful gifts, including paintings, pottery, jewelry, glass, textiles, and much more.",
-      "description": "Celebrate the season of giving at the annual Festive Foothills Art Market, running November 7 to December 20 at the Leighton Art Centre! Set against the beautiful backdrop of the Alberta Foothills, this beloved holiday tradition brings together an incredible selection of original artwork and fine craft by more than 80 Alberta artists.\n\nDiscover one-of-a-kind treasures and thoughtful gifts, including paintings, pottery, jewelry, glass, textiles, and much more. Whether you’re shopping for someone special or treating yourself, you’ll find plenty of inspiration while supporting local artists and the vibrant Alberta arts community. Proceeds from the market help support Alberta artists and the Leighton Art Centre’s Art & Nature programming for all ages.\n\nGet a head start on your holiday shopping at our special Sneak Peek Event on Friday, November 6, from 3 to 6 pm! Be among the first to explore this year’s collection, connect with participating artists, and enjoy live holiday music by Band in the Corner, along with hot chocolate, coffee, and a festive atmosphere throughout the gallery and shop.\n\nThe market is open daily from 10 am to 4 pm, with admission by donation. Join us for a joyful seasonal outing, discover handmade treasures, and celebrate the creativity and community spirit that make Festive Foothills so special!",
-      "categories": [
-        "markets",
-        "arts",
-        "shopping",
-        "day-trip"
-      ],
-      "tags": [
-        "outside-calgary",
-        "holiday market",
-        "local art"
-      ],
-      "sources": [
-        {
-          "name": "Leighton Art Centre — reviewed official source",
-          "url": "https://leightoncentre.org/event/festive-foothills-art-market-2026/",
-          "kind": "official",
-          "retrievedAt": "2026-10-22T19:37:51.291Z"
-        }
-      ],
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-10-22T19:37:51.578Z",
-      "fetchedAt": "2026-10-22T19:37:51.291Z",
-      "updatedAt": "2026-10-22T19:37:51.578Z",
-      "sourceId": "reviewed-eee12740053a4d8fcb7f",
-      "sourceRecordId": "submission-sXQAL04ig1fCoW9mxqJZuSHc5e63_2026-10-21_1",
-      "neighbourhood": "Foothills",
-      "address": "282027 144 St West, Foothills, AB, T1S 0Y4",
-      "venue": "Leighton Art Centre",
-      "organizer": "Leighton Art Centre",
-      "amenities": [],
-      "parking": "Free parking",
-      "petFriendly": false,
-      "familyFriendly": true,
-      "vendorIds": [],
-      "images": [],
-      "organizerEntityId": "biz-leighton-art-centre",
-      "ownerVerifiedAt": "2026-10-21T15:09:55.296Z"
     }
   ],
   "occurrences": [

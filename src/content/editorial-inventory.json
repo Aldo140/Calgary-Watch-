@@ -7605,6 +7605,123 @@
         "Friday": "12:00–18:00",
         "Saturday": "12:00–18:00"
       }
+    },
+    {
+      "id": "biz-herringer-kiss-gallery",
+      "kind": "business",
+      "slug": "herringer-kiss-gallery",
+      "title": "Herringer Kiss Gallery",
+      "name": "Herringer Kiss Gallery",
+      "summary": "Contemporary Canadian and American art in Sunalta, with solo, duo and group exhibitions across media.",
+      "description": "Founded in 2002, Herringer Kiss Gallery presents contemporary fine art by emerging, mid-career and established artists from Canada and the United States. Its Sunalta exhibition space hosts solo, duo, group and thematic shows, alongside services for people building art collections.\n\nThe Magnificent Nothings brings together wood sculptures by Blake Senini and clay vessels by Kristine Zingeler, October 17–November 21, 2026. Next is Yekta Tarki’s Visualizing the Pyrocene: The Wildfire Timeline, November 28, 2026–January 16, 2027. The gallery’s upcoming-exhibitions page is the reference for new programming.\n\nRegular gallery hours are Tuesday–Saturday, 11 am–5 pm, with closures on long weekends and statutory holidays; private appointments are available by request. Exhibition date ranges do not mean the gallery is open every day. Check with the gallery for holiday visits and any reception announcements.",
+      "website": "https://www.herringerkissgallery.com/",
+      "address": "101, 1615 10 Avenue SW, Calgary, AB T3C 0J7",
+      "email": "info@herringerkissgallery.com",
+      "phone": "403-228-4889",
+      "categories": [
+        "arts",
+        "exhibitions"
+      ],
+      "tags": [
+        "organization",
+        "arts",
+        "exhibitions"
+      ],
+      "sources": [
+        {
+          "name": "Herringer Kiss Gallery — upcoming exhibitions",
+          "url": "https://www.herringerkissgallery.com/upcoming-exhibitions",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T19:12:09.037Z"
+        },
+        {
+          "name": "Herringer Kiss Gallery — about",
+          "url": "https://www.herringerkissgallery.com/gallery",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T19:12:09.037Z"
+        },
+        {
+          "name": "Herringer Kiss Gallery — contact and hours",
+          "url": "https://www.herringerkissgallery.com/contact",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T19:12:09.037Z"
+        },
+        {
+          "name": "Herringer Kiss Gallery — current exhibition",
+          "url": "https://www.herringerkissgallery.com/current-exhibition",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T19:12:09.037Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Contemporary art exhibitions",
+        "Art collection advice"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T19:12:09.037Z",
+      "updatedAt": "2026-10-23T19:12:09.037Z"
+    },
+    {
+      "id": "biz-calgary-pro-musica",
+      "kind": "business",
+      "slug": "calgary-pro-musica",
+      "title": "Calgary Pro Musica",
+      "name": "Calgary Pro Musica",
+      "summary": "Chamber music at the Rozsa Centre, from visiting string quartets to family concerts and young Calgary musicians.",
+      "description": "Calgary Pro Musica is a nonprofit registered charity presenting chamber music, with visiting ensembles, family programming and opportunities for emerging Calgary musicians. Its Masters and Horizons series explore music for small ensembles across different eras and instrumental combinations.\n\nThe 2026–27 season marks its 50th season. Upcoming programs include Poiesis Quartet with pianist Anastasia Vorotnaya, Chamber Music Society of Lincoln Center, Attacca Quartet with Caroline Shaw, Quartetto di Cremona, Galvin Cello Quartet and New Orford String Quartet. The family concert Jack and the Beanstalk pairs live music with Green Fools Theatre puppetry, while the Dick Matthews Young Artist Development Program debut concert showcases local talent.\n\nConcert venue: Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary, 206 University Court NW, Calgary, AB T2N 4V8. The mailing address is separate: PO Box 45059 Brentwood PO, Calgary, AB T2L 1Y4. Official concert pages and Calgary Pro Musica’s ticket portal carry current programs and ticket availability.",
+      "website": "https://calgarypromusica.ca/",
+      "address": "Calgary, AB",
+      "email": "info@calgarypromusica.ca",
+      "phone": "403-244-8277",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "arts",
+        "music"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Pro Musica — official concert season",
+          "url": "https://calgarypromusica.ca/2026-2027-concert-season/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T19:12:09.037Z"
+        },
+        {
+          "name": "Calgary Pro Musica — about and contacts",
+          "url": "https://calgarypromusica.ca/about/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T19:12:09.037Z"
+        },
+        {
+          "name": "Calgary Pro Musica — official tickets",
+          "url": "https://calgarypromusica.my.salesforce-sites.com/ticket#/",
+          "kind": "official",
+          "retrievedAt": "2026-10-23T19:12:09.037Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Chamber music concerts",
+        "Family concerts",
+        "Young artist development"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-23T19:12:09.037Z",
+      "updatedAt": "2026-10-23T19:12:09.037Z"
     }
   ]
 }

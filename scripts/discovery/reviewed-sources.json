@@ -4591,5 +4591,437 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "herringer-kiss-gallery",
+      "name": "Herringer Kiss Gallery — official exhibitions",
+      "approved": true,
+      "hosts": [
+        "www.herringerkissgallery.com",
+        "herringerkissgallery.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "magnificent-nothings-2026",
+        "input": {
+          "kind": "event",
+          "title": "The Magnificent Nothings — Blake Senini and Kristine Zingeler",
+          "summary": "Calgary artists Blake Senini and Kristine Zingeler explore nature, material and the significance of small moments through sculptural vessels. Senini carves in wood; Zingeler builds in clay. Their duo exhibition runs October 17–November 21, 2026.",
+          "description": "Calgary artists Blake Senini and Kristine Zingeler explore nature, material and the significance of small moments through sculptural vessels. Senini carves in wood; Zingeler builds in clay. Their duo exhibition runs October 17–November 21, 2026.\n\nGallery hours: Tuesday–Saturday, 11 am–5 pm; closed long weekends and statutory holidays. These are exhibition run dates, not daily opening hours. Reception times and admission pricing have not been announced on the source page.",
+          "organizer": "Herringer Kiss Gallery",
+          "address": "101, 1615 10 Avenue SW, Calgary, AB T3C 0J7",
+          "venue": "Herringer Kiss Gallery",
+          "sourceUrl": "https://www.herringerkissgallery.com/upcoming-exhibitions",
+          "categories": [
+            "arts",
+            "exhibitions"
+          ],
+          "tags": [
+            "visual art",
+            "Sunalta",
+            "gallery"
+          ],
+          "start": "2026-10-17T00:00:00-06:00",
+          "end": "2026-11-22T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "visualizing-pyrocene-2026",
+        "input": {
+          "kind": "event",
+          "title": "Yekta Tarki — Visualizing the Pyrocene: The Wildfire Timeline",
+          "summary": "Herringer Kiss Gallery presents Yekta Tarki’s Visualizing the Pyrocene: The Wildfire Timeline, November 28, 2026–January 16, 2027. Consult the gallery’s upcoming-exhibitions page for exhibition updates and any additional opening announcements.",
+          "description": "Herringer Kiss Gallery presents Yekta Tarki’s Visualizing the Pyrocene: The Wildfire Timeline, November 28, 2026–January 16, 2027. Consult the gallery’s upcoming-exhibitions page for exhibition updates and any additional opening announcements.\n\nGallery hours: Tuesday–Saturday, 11 am–5 pm; closed long weekends and statutory holidays. These are exhibition run dates, not daily opening hours. Reception times and admission pricing have not been announced on the source page.",
+          "organizer": "Herringer Kiss Gallery",
+          "address": "101, 1615 10 Avenue SW, Calgary, AB T3C 0J7",
+          "venue": "Herringer Kiss Gallery",
+          "sourceUrl": "https://www.herringerkissgallery.com/upcoming-exhibitions",
+          "categories": [
+            "arts",
+            "exhibitions"
+          ],
+          "tags": [
+            "visual art",
+            "Sunalta",
+            "gallery"
+          ],
+          "start": "2026-11-28T00:00:00-06:00",
+          "end": "2027-01-17T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-pro-musica",
+      "name": "Calgary Pro Musica — official concert season",
+      "approved": true,
+      "hosts": [
+        "calgarypromusica.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "poiesis-2026-11-22-1900",
+        "input": {
+          "kind": "event",
+          "title": "Poiesis Quartet with Anastasia Vorotnaya",
+          "summary": "The Banff International String Quartet Competition-winning Poiesis Quartet joins pianist Anastasia Vorotnaya for Calgary Pro Musica’s Masters Series. The program includes new quartet works and Dohnányi’s Piano Quintet No. 1 in C minor.",
+          "description": "The Banff International String Quartet Competition-winning Poiesis Quartet joins pianist Anastasia Vorotnaya for Calgary Pro Musica’s Masters Series. The program includes new quartet works and Dohnányi’s Piano Quintet No. 1 in C minor.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:00 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-2/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2026-11-22T19:00:00-06:00",
+          "end": "2026-11-23T03:00:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087ipJ2AQ"
+        }
+      },
+      {
+        "id": "poiesis-2026-11-23-1930",
+        "input": {
+          "kind": "event",
+          "title": "Poiesis Quartet with Anastasia Vorotnaya",
+          "summary": "The Banff International String Quartet Competition-winning Poiesis Quartet joins pianist Anastasia Vorotnaya for Calgary Pro Musica’s Masters Series. The program includes new quartet works and Dohnányi’s Piano Quintet No. 1 in C minor.",
+          "description": "The Banff International String Quartet Competition-winning Poiesis Quartet joins pianist Anastasia Vorotnaya for Calgary Pro Musica’s Masters Series. The program includes new quartet works and Dohnányi’s Piano Quintet No. 1 in C minor.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:30 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-2/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2026-11-23T19:30:00-06:00",
+          "end": "2026-11-24T03:30:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087ipJ2AQ"
+        }
+      },
+      {
+        "id": "lincoln-center-2027-01-17-1900",
+        "input": {
+          "kind": "event",
+          "title": "Chamber Music Society of Lincoln Center",
+          "summary": "Wu Han, Arnaud Sussmann, Matthew Lipman and David Finckel perform piano quartets by Mahler, Brahms and Schumann in Calgary Pro Musica’s Masters Series.",
+          "description": "Wu Han, Arnaud Sussmann, Matthew Lipman and David Finckel perform piano quartets by Mahler, Brahms and Schumann in Calgary Pro Musica’s Masters Series.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:00 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-3/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-01-17T19:00:00-06:00",
+          "end": "2027-01-18T03:00:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087ixN2AQ"
+        }
+      },
+      {
+        "id": "lincoln-center-2027-01-18-1930",
+        "input": {
+          "kind": "event",
+          "title": "Chamber Music Society of Lincoln Center",
+          "summary": "Wu Han, Arnaud Sussmann, Matthew Lipman and David Finckel perform piano quartets by Mahler, Brahms and Schumann in Calgary Pro Musica’s Masters Series.",
+          "description": "Wu Han, Arnaud Sussmann, Matthew Lipman and David Finckel perform piano quartets by Mahler, Brahms and Schumann in Calgary Pro Musica’s Masters Series.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:30 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-3/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-01-18T19:30:00-06:00",
+          "end": "2027-01-19T03:30:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087ixN2AQ"
+        }
+      },
+      {
+        "id": "attacca-shaw-2027-02-07-1900",
+        "input": {
+          "kind": "event",
+          "title": "Attacca Quartet with Caroline Shaw",
+          "summary": "Attacca Quartet joins composer, vocalist and violist Caroline Shaw for Calgary Pro Musica’s Horizons Series. The announced program pairs works by Shaw with Mendelssohn’s String Quintet No. 2 in B-flat major.",
+          "description": "Attacca Quartet joins composer, vocalist and violist Caroline Shaw for Calgary Pro Musica’s Horizons Series. The announced program pairs works by Shaw with Mendelssohn’s String Quintet No. 2 in B-flat major.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:00 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/horizons-series-2/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-02-07T19:00:00-06:00",
+          "end": "2027-02-08T03:00:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000088uy62AA"
+        }
+      },
+      {
+        "id": "cremona-2027-03-07-1900",
+        "input": {
+          "kind": "event",
+          "title": "Quartetto di Cremona",
+          "summary": "Italy’s Quartetto di Cremona performs Haydn’s Quartet in G major, Op. 77 No. 1, Verdi’s Quartet in E minor and Grieg’s Quartet in G minor as part of Calgary Pro Musica’s Masters Series.",
+          "description": "Italy’s Quartetto di Cremona performs Haydn’s Quartet in G major, Op. 77 No. 1, Verdi’s Quartet in E minor and Grieg’s Quartet in G minor as part of Calgary Pro Musica’s Masters Series.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:00 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-4/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-03-07T19:00:00-06:00",
+          "end": "2027-03-08T03:00:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087j8f2AA"
+        }
+      },
+      {
+        "id": "cremona-2027-03-08-1930",
+        "input": {
+          "kind": "event",
+          "title": "Quartetto di Cremona",
+          "summary": "Italy’s Quartetto di Cremona performs Haydn’s Quartet in G major, Op. 77 No. 1, Verdi’s Quartet in E minor and Grieg’s Quartet in G minor as part of Calgary Pro Musica’s Masters Series.",
+          "description": "Italy’s Quartetto di Cremona performs Haydn’s Quartet in G major, Op. 77 No. 1, Verdi’s Quartet in E minor and Grieg’s Quartet in G minor as part of Calgary Pro Musica’s Masters Series.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:30 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-4/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-03-08T19:30:00-06:00",
+          "end": "2027-03-09T03:30:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087j8f2AA"
+        }
+      },
+      {
+        "id": "galvin-2027-04-04-1900",
+        "input": {
+          "kind": "event",
+          "title": "Galvin Cello Quartet — A Night at the Opera",
+          "summary": "Four cellists bring Calgary Pro Musica’s Horizons Series a program titled A Night at the Opera, with music by Mozart, Massenet, Beethoven, Paganini, Bizet and more.",
+          "description": "Four cellists bring Calgary Pro Musica’s Horizons Series a program titled A Night at the Opera, with music by Mozart, Massenet, Beethoven, Paganini, Bizet and more.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:00 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/horizons-series-3/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-04-04T19:00:00-06:00",
+          "end": "2027-04-05T03:00:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000088vHR2AY"
+        }
+      },
+      {
+        "id": "jack-beanstalk-2027-04-11-1300",
+        "input": {
+          "kind": "event",
+          "title": "Jack and the Beanstalk — Calgary Pro Musica Family Concert — 1 pm",
+          "summary": "Live music and puppetry by Dean Bareham and Green Fools Theatre retell Jack and the Beanstalk. Samantha Whelan Kotkas adapts and narrates the story, with music composed and conducted by Claude Lapalme and performed by the Pro Musica Ensemble. Recommended for ages 5–12 and created with families in mind. Pre-concert arts and crafts and a chance to meet the musicians and puppeteers are also announced.",
+          "description": "Live music and puppetry by Dean Bareham and Green Fools Theatre retell Jack and the Beanstalk. Samantha Whelan Kotkas adapts and narrates the story, with music composed and conducted by Claude Lapalme and performed by the Pro Musica Ensemble. Recommended for ages 5–12 and created with families in mind. Pre-concert arts and crafts and a chance to meet the musicians and puppeteers are also announced.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 13:00 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/family/",
+          "categories": [
+            "arts",
+            "music",
+            "family"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-04-11T13:00:00-06:00",
+          "end": "2027-04-11T21:00:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000088vZB2AY"
+        }
+      },
+      {
+        "id": "jack-beanstalk-2027-04-11-1530",
+        "input": {
+          "kind": "event",
+          "title": "Jack and the Beanstalk — Calgary Pro Musica Family Concert — 3:30 pm",
+          "summary": "Live music and puppetry by Dean Bareham and Green Fools Theatre retell Jack and the Beanstalk. Samantha Whelan Kotkas adapts and narrates the story, with music composed and conducted by Claude Lapalme and performed by the Pro Musica Ensemble. Recommended for ages 5–12 and created with families in mind. Pre-concert arts and crafts and a chance to meet the musicians and puppeteers are also announced.",
+          "description": "Live music and puppetry by Dean Bareham and Green Fools Theatre retell Jack and the Beanstalk. Samantha Whelan Kotkas adapts and narrates the story, with music composed and conducted by Claude Lapalme and performed by the Pro Musica Ensemble. Recommended for ages 5–12 and created with families in mind. Pre-concert arts and crafts and a chance to meet the musicians and puppeteers are also announced.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 15:30 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/family/",
+          "categories": [
+            "arts",
+            "music",
+            "family"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-04-11T15:30:00-06:00",
+          "end": "2027-04-11T23:30:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000088vZB2AY"
+        }
+      },
+      {
+        "id": "young-artists-2027-05-03-1930",
+        "input": {
+          "kind": "event",
+          "title": "Dick Matthews Young Artist Development Program Debut Concert",
+          "summary": "Calgary Pro Musica showcases emerging Calgary musicians Aedan Lowry, violin; Gabrielle Marquis, flute; and the Aurelia Piano Trio: Derek Lee, piano, Daryna Friesen, violin, and Porter Allred, cello.",
+          "description": "Calgary Pro Musica showcases emerging Calgary musicians Aedan Lowry, violin; Gabrielle Marquis, flute; and the Aurelia Piano Trio: Derek Lee, piano, Daryna Friesen, violin, and Porter Allred, cello.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:30 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/young-artists/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-05-03T19:30:00-06:00",
+          "end": "2027-05-04T03:30:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000088w5R2AQ"
+        }
+      },
+      {
+        "id": "new-orford-2027-05-09-1900",
+        "input": {
+          "kind": "event",
+          "title": "New Orford String Quartet",
+          "summary": "The New Orford String Quartet performs Haydn’s Quartet in D major, Op. 76 No. 5, a new Kevin Lau quartet commissioned for Calgary Pro Musica’s 50th season, and Beethoven’s Quartet No. 15 in A minor, Op. 132.",
+          "description": "The New Orford String Quartet performs Haydn’s Quartet in D major, Op. 76 No. 5, a new Kevin Lau quartet commissioned for Calgary Pro Musica’s 50th season, and Beethoven’s Quartet No. 15 in A minor, Op. 132.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:00 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-5/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-05-09T19:00:00-06:00",
+          "end": "2027-05-10T03:00:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087jF72AI"
+        }
+      },
+      {
+        "id": "new-orford-2027-05-10-1930",
+        "input": {
+          "kind": "event",
+          "title": "New Orford String Quartet",
+          "summary": "The New Orford String Quartet performs Haydn’s Quartet in D major, Op. 76 No. 5, a new Kevin Lau quartet commissioned for Calgary Pro Musica’s 50th season, and Beethoven’s Quartet No. 15 in A minor, Op. 132.",
+          "description": "The New Orford String Quartet performs Haydn’s Quartet in D major, Op. 76 No. 5, a new Kevin Lau quartet commissioned for Calgary Pro Musica’s 50th season, and Beethoven’s Quartet No. 15 in A minor, Op. 132.\n\nPresented by Calgary Pro Musica at Eckhardt-Gramatté Hall in the University of Calgary’s Rozsa Centre. The performance starts at 19:30 Calgary time. The official page does not publish a finish time; the calendar uses an estimated end, not a confirmed running time. Follow the official ticket link for performance selection, current availability and prices.",
+          "organizer": "Calgary Pro Musica",
+          "address": "206 University Court NW, Calgary, AB T2N 4V8",
+          "venue": "Eckhardt-Gramatté Hall, Rozsa Centre, University of Calgary",
+          "sourceUrl": "https://calgarypromusica.ca/master-series-5/",
+          "categories": [
+            "arts",
+            "music"
+          ],
+          "tags": [
+            "chamber music",
+            "concert",
+            "2026–27 season"
+          ],
+          "start": "2027-05-10T19:30:00-06:00",
+          "end": "2027-05-11T03:30:00.000Z",
+          "endTimeEstimated": true,
+          "pricing": "paid",
+          "tickets": "https://calgarypromusica.my.salesforce-sites.com/ticket#/events/a0SOJ0000087jF72AI"
+        }
+      }
+    ]
   }
 ]

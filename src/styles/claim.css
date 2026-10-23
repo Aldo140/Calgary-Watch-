@@ -174,3 +174,7 @@ a.cl-verified-by { color: inherit; text-decoration: underline; text-underline-of
 .cl-cta .cl-cta-title { font: 800 19px/1.2 var(--pl-display, inherit); letter-spacing: -.01em; }
 .cl-cta-copy p:not(.cl-cta-title) { color: #3d4046; font-size: 14.5px; }
 @media (max-width: 640px) { .cw-site .cl-cta-open a { width: 100%; justify-content: center; } }
+
+/* Native option text must not widen the listing editor on a phone. */
+.cl-form, .cl-form .pl-field { min-width: 0; max-width: 100%; }
+.cl-form .pl-field > select { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }

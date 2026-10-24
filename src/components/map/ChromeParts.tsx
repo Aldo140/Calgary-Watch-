@@ -150,3 +150,97 @@ export function AvatarFace({ user }: { user: { photoURL?: string | null; display
   }
   return <span className="lv-sq-initial">{(user.displayName?.[0] ?? user.email?.[0] ?? 'U').toUpperCase()}</span>;
 }
+
+/**
+ * Phone time switch: one glass track, a yellow thumb that slides to the
+ * chosen window. Replaces the search field that used to sit here (the list
+ * sheet has its own search), so the most-used control gets the top spot.
+ */
+export function WhenTrack({
+  value,
+  onChange,
+}: {
+  value: MapTimeWindow;
+  onChange: (w: MapTimeWindow) => void;
+}) {
+  return (
+    <div className="lv-track" role="radiogroup" aria-label="Time window for the map and the feed">
+      {MAP_TIME_WINDOWS.map((o, i) => {
+        const on = value === o.id;
+        return (
+          <button
+            key={o.id}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            title={o.hint}
+            className="lv-track-opt"
+            style={{ ['--i' as string]: i }}
+            onClick={() => onChange(o.id)}
+          >
+            {on && (
+              <motion.span
+                layoutId="lv-track-thumb"
+                className="lv-track-thumb"
+                transition={{ type: 'spring', stiffness: 520, damping: 38 }}
+                aria-hidden="true"
+              />
+            )}
+            <span className="lv-track-label">{o.short}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export interface CategoryChipOption {
+  id: string;
+  label: string;
+  color: string;
+  count: number;
+  icon?: ReactNode;
+}
+
+/**
+ * Category filter row under the time switch. Counts are the reports in the
+ * current window, so a chip never promises more than tapping it shows.
+ */
+export function CategoryRail({
+  options,
+  value,
+  onChange,
+  total,
+}: {
+  options: CategoryChipOption[];
+  value: string;
+  onChange: (id: string) => void;
+  total: number;
+}) {
+  return (
+    <div className="lv-cats" role="group" aria-label="Filter by report type">
+      <button
+        type="button"
+        className="lv-cat"
+        aria-pressed={value === 'all'}
+        style={{ ['--i' as string]: 0, ['--c' as string]: '#ffdf4f' }}
+        onClick={() => onChange('all')}
+      >
+        All <b>{total}</b>
+      </button>
+      {options.map((o, i) => (
+        <button
+          key={o.id}
+          type="button"
+          className="lv-cat"
+          aria-pressed={value === o.id}
+          style={{ ['--i' as string]: i + 1, ['--c' as string]: o.color }}
+          onClick={() => onChange(value === o.id ? 'all' : o.id)}
+        >
+          <span className="lv-cat-dot" aria-hidden="true">{o.icon}</span>
+          {o.label} <b>{o.count}</b>
+        </button>
+      ))}
+    </div>
+  );
+}

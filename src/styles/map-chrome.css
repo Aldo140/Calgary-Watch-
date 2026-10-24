@@ -406,3 +406,99 @@
   .cw-map .lv-pulse, .cw-map .lv-near-dot::before, .cw-map .lv-loading-spin { animation: none; }
   .cw-map .lv-sq, .cw-map .lv-post, .cw-map .lv-sos, .cw-map .lv-btn, .cw-map .lv-chip { transition: none; }
 }
+
+/* ── Phone top bar v2: count, sliding time track, category rail ─────────────
+   The search field moved out (the list sheet owns search). The bar now holds
+   the two filters people reach for most, and plays a one-time entrance. */
+.cw-map .lv-mtop { overflow: visible; isolation: isolate; }
+.cw-map .lv-mtop-row { position: relative; z-index: 1; }
+
+/* Report count: taps raise the list. */
+.cw-map .lv-mcount {
+  display: inline-flex; align-items: baseline; gap: 5px; height: 32px; padding: 0 12px; border-radius: 999px;
+  background: rgba(255, 255, 255, .08); border: 1.5px solid rgba(255, 255, 255, .3); color: var(--lv-on-navy-muted, #a9b8d0);
+  font: 600 12px/30px var(--lv-mono); letter-spacing: .04em; cursor: pointer; white-space: nowrap;
+  transition: background .15s, border-color .15s;
+}
+.cw-map .lv-mcount b { font: 800 15px/30px var(--lv-display); color: #fff; letter-spacing: 0; animation: lv-count-pop .45s cubic-bezier(.2, 1.4, .4, 1); }
+.cw-map .lv-mcount:hover, .cw-map .lv-mcount:active { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .6); }
+.cw-map .lv-mcount:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+@keyframes lv-count-pop { 0% { transform: translateY(6px) scale(.8); opacity: 0; } 100% { transform: none; opacity: 1; } }
+
+/* Time track: glass rail, yellow thumb slides between options. */
+.cw-map .lv-track {
+  position: relative; z-index: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 12px; padding: 4px; border-radius: 16px;
+  background: rgba(255, 255, 255, .07); border: 1.5px solid rgba(255, 255, 255, .22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 6px 18px rgba(0, 0, 0, .18);
+}
+.cw-map .lv-track-opt {
+  position: relative; height: 38px; padding: 0 2px; border: 0; border-radius: 12px; background: transparent;
+  color: rgba(255, 255, 255, .78); font: 700 13px/1 var(--lv-sans); cursor: pointer; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.cw-map .lv-track-opt:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 1px; }
+.cw-map .lv-track-opt[aria-checked='true'] { color: var(--lv-ink); }
+.cw-map .lv-track-thumb {
+  position: absolute; inset: 0; border-radius: 12px; background: var(--lv-yellow);
+  border: 2px solid var(--lv-ink); box-shadow: 0 3px 0 var(--lv-cyan);
+}
+.cw-map .lv-track-label { position: relative; z-index: 1; }
+
+/* Category rail: scrolls sideways, bleeds to the screen edge. */
+.cw-map .lv-cats {
+  position: relative; z-index: 1; display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none;
+  margin: 10px -14px 0; padding: 2px 14px 4px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%);
+}
+.cw-map .lv-cats::-webkit-scrollbar { display: none; }
+.cw-map .lv-cat {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 6px; border-radius: 999px;
+  background: rgba(255, 255, 255, .06); border: 1.5px solid rgba(255, 255, 255, .3); color: #fff;
+  font: 650 13px/1 var(--lv-sans); white-space: nowrap; cursor: pointer;
+  transition: background .18s, border-color .18s, color .18s, transform .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.cw-map .lv-cat:first-child { padding-left: 13px; }
+.cw-map .lv-cat b { font: 700 11.5px/1 var(--lv-mono); opacity: .75; }
+.cw-map .lv-cat-dot {
+  display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--c); color: #fff; border: 1.5px solid var(--lv-ink);
+}
+.cw-map .lv-cat:active { transform: scale(.96); }
+.cw-map .lv-cat:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+.cw-map .lv-cat[aria-pressed='true'] { background: #fff; color: var(--lv-ink); border-color: var(--lv-ink); box-shadow: 0 3px 0 var(--c); }
+.cw-map .lv-cat[aria-pressed='true'] b { opacity: 1; }
+
+/* One sweep of light across the bar after it lands. */
+.cw-map .lv-mtop-sheen {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.cw-map .lv-mtop-sheen::before {
+  content: ''; position: absolute; top: -20%; bottom: -20%; left: -40%; width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(159, 233, 245, .16), rgba(255, 223, 79, .10), transparent);
+  transform: translateX(-60%) skewX(-18deg); animation: lv-sheen 1.6s .55s cubic-bezier(.3, .6, .2, 1) both;
+}
+@keyframes lv-sheen { to { transform: translateX(380%) skewX(-18deg); } }
+
+/* Entrance: the bar drops in, then its rows and chips cascade. */
+@keyframes lv-drop { from { transform: translateY(-104%); } to { transform: none; } }
+@keyframes lv-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes lv-chip-in { from { opacity: 0; transform: translateX(14px) scale(.92); } to { opacity: 1; transform: none; } }
+.cw-map .lv-mtop:not([data-hidden='true']) { animation: lv-drop .55s cubic-bezier(.2, .9, .25, 1) both; }
+.cw-map .lv-mtop .lv-mtop-row > * { animation: lv-rise .45s .18s cubic-bezier(.2, .9, .25, 1) both; }
+.cw-map .lv-mtop .lv-mtop-row > :nth-child(3) { animation-delay: .26s; }
+.cw-map .lv-mtop .lv-mtop-row > :nth-child(4) { animation-delay: .32s; }
+.cw-map .lv-mtop .lv-track { animation: lv-rise .5s .3s cubic-bezier(.2, .9, .25, 1) both; }
+.cw-map .lv-mtop .lv-cat { animation: lv-chip-in .42s cubic-bezier(.2, .9, .25, 1) both; animation-delay: calc(.42s + var(--i, 0) * 55ms); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-map .lv-mtop, .cw-map .lv-mtop .lv-mtop-row > *, .cw-map .lv-mtop .lv-track,
+  .cw-map .lv-mtop .lv-cat, .cw-map .lv-mcount b { animation: none !important; }
+  .cw-map .lv-mtop-sheen { display: none; }
+}
+/* Live and the count share one pill so the row fits a 360px screen. */
+.cw-map .lv-mcount { align-items: center; gap: 6px; }
+.cw-map .lv-mcount .lv-pulse { align-self: center; }
+.cw-map .lv-mcount-live { font: 700 11px/1 var(--lv-mono); letter-spacing: .12em; text-transform: uppercase; color: #fff; padding-right: 6px; margin-right: 1px; border-right: 1px solid rgba(255, 255, 255, .3); }

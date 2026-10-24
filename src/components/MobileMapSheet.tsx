@@ -74,6 +74,8 @@ export interface MapSheetRef {
    * rendered.
    */
   raiseAndFocusSearch: () => void;
+  /** Raise the list without opening the keyboard (the chrome's report count). */
+  raise: () => void;
 }
 
 export interface MobileMapSheetProps {
@@ -211,6 +213,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       inputRef.current?.focus({ preventScroll: true });
       onStateChange('raised');
     },
+    raise: () => onStateChange('raised'),
   }), [onStateChange]);
 
   // The raw persisted value, kept current rather than re-read: set once from

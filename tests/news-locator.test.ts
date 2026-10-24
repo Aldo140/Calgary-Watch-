@@ -37,7 +37,13 @@ describe('news and police locator', () => {
   it('does not mistake Sherwood Park for Sherwood', () => {
     assert.equal(locateInText('Robbery in Sherwood Park', POINTS), null);
     assert.ok(isSetElsewhere('Sherwood Park man charged', 'Sherwood Park man charged after an RCMP investigation'));
-    assert.ok(!isSetElsewhere('Calgary man charged in Edmonton fraud', 'Calgary police said'));
+    assert.ok(!isSetElsewhere('Edmonton man charged in Calgary robbery', 'Calgary police said'));
+  });
+
+  it('refuses a story the headline sets elsewhere, even when it names Calgary', () => {
+    assert.ok(isSetElsewhere('Calgary tourists attacked after Bruno Mars show in Vancouver, police say', ''));
+    assert.ok(isSetElsewhere('Calgary man charged in Edmonton fraud', 'Calgary police said'));
+    assert.ok(!isSetElsewhere('Man charged after stabbing during fight outside NE Calgary home', 'Calgary police said'));
   });
 
   it('falls back to a named quadrant and never invents one', () => {

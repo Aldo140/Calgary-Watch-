@@ -14,7 +14,9 @@ import type { NormalizedIncident } from '../types.js';
 import { loadCommunityPoints, locateInText, shortlistPoints, type CommunityPoint, type PlacedLocation } from './community-locator.js';
 
 const FEED_URL = 'https://newsroom.calgary.ca/tagfeed/en/tags/police';
-const RETENTION_MS = 35 * 24 * 60 * 60 * 1000;
+// Kept 60 days so the map's "All" view holds two months of releases; the feed
+// itself only lists the newest ~20, so retention is what builds the history.
+const RETENTION_MS = 60 * 24 * 60 * 60 * 1000;
 const MAX_AGE_MS = 35 * 24 * 60 * 60 * 1000;
 
 interface FeedItem {

@@ -1,0 +1,27 @@
+name: Crime feed audit
+# Reads every crime source and prints what the map would keep, and why it
+# drops the rest. Read-only: no secrets, no Firestore. Runs when the ingest
+# rules change, so a pull request shows real feed results before it merges.
+on:
+  pull_request:
+    paths:
+      - scripts/ingest/**
+      - src/lib/crimeBoard.ts
+      - src/lib/cleanText.ts
+      - src/content/newsFeeds.ts
+      - .github/workflows/crime-feed-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/ingest/audit-feeds.ts

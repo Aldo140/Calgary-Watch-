@@ -86,7 +86,8 @@ describe('source health contract', () => {
   });
 
   it('reports a broken news transport as an error instead of a healthy empty feed', () => {
-    assert.match(rss, /if \(!res\.ok\)[\s\S]*failures\.push\(message\)/);
+    assert.match(rss, /if \(!res\.ok\) return \{ feed, items: \[\], error:/);
+    assert.match(rss, /if \(read\.error\) \{\s*failures\.push\(read\.error\)/);
     assert.match(rss, /failures\.length === FEEDS\.length[\s\S]*throw new Error/);
   });
 

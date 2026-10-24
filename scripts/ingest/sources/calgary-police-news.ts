@@ -80,7 +80,12 @@ const LOCATION_ALIASES: CommunityPoint[] = [
  * City's full community list.
  */
 export function locateCalgaryPoliceRelease(text: string, points: CommunityPoint[] = shortlistPoints()): PlacedLocation | null {
-  return locateInText(text, [...LOCATION_ALIASES, ...points]);
+  const placed = locateInText(text, [...LOCATION_ALIASES, ...points]);
+  if (placed) return placed;
+  // Police releases are Calgary by definition, so a bare quadrant is enough:
+  // "suspects in southwest commercial robbery", "series of northeast break-ins".
+  const bare = /\b(northwest|northeast|southwest|southeast)\b/i.exec(text.slice(0, 600))?.[1].toLowerCase();
+  return bare ? locateInText(`${bare} Calgary`, []) : null;
 }
 
 function classify(title: string, description: string): IncidentCategory {

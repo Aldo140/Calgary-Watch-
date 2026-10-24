@@ -32,6 +32,7 @@ describe('Calgary Police newsroom source', () => {
   it('uses named Calgary areas and does not invent a location', () => {
     assert.equal(locateCalgaryPoliceRelease('Incident in Saddle Ridge')?.neighborhood, 'Saddle Ridge');
     assert.equal(locateCalgaryPoliceRelease('A city-wide policy announcement'), null);
+    assert.equal(locateCalgaryPoliceRelease('Police seek to identify two suspects in southwest commercial robbery and assault')?.neighborhood, 'Southwest Calgary');
   });
 
   it('creates attributed, timestamped, long-lived police incidents', () => {

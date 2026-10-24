@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
 import IncidentRow from '@/src/components/IncidentRow';
 import NowBriefing from '@/src/components/map/NowBriefing';
+import type { Quadrant } from '@/src/lib/cityQuadrants';
 import { Incident, IncidentCategory, isCommunityFacingIncident } from '@/src/types';
 import { Search, Layers, AlertCircle, Car, Construction, CloudRain, Siren, Activity, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { cn, publicAsset } from '@/src/lib/utils';
@@ -30,6 +31,8 @@ interface SidebarProps {
   areaName?: string;
   /** Reports inside that neighbourhood, so "near <area>" counts only them. */
   briefingIncidents?: Incident[];
+  /** Flies the map to a quadrant from the briefing's Across Calgary board. */
+  onQuadrant?: (q: Quadrant) => void;
 }
 
 export default function Sidebar({
@@ -45,6 +48,7 @@ export default function Sidebar({
   onLoadMore,
   areaName,
   briefingIncidents,
+  onQuadrant,
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -240,6 +244,7 @@ export default function Sidebar({
           incidents={briefingIncidents ?? incidents}
           window={timeWindow ?? 'all'}
           areaName={briefingIncidents ? areaName : undefined}
+          onQuadrant={onQuadrant}
           /* No onSelectCategory here: the category chips right below are
              the filter, so the briefing lists its categories as plain text. */
         />

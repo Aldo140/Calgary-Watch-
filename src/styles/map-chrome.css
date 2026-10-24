@@ -502,3 +502,55 @@
 .cw-map .lv-mcount { align-items: center; gap: 6px; }
 .cw-map .lv-mcount .lv-pulse { align-self: center; }
 .cw-map .lv-mcount-live { font: 700 11px/1 var(--lv-mono); letter-spacing: .12em; text-transform: uppercase; color: #fff; padding-right: 6px; margin-right: 1px; border-right: 1px solid rgba(255, 255, 255, .3); }
+
+/* ── Phone frame v3: one bar, one rail, one bottom row ─────────────────────
+   Account moved into the bar, zoom buttons went (pinch zooms), SOS joined the
+   rail and Post shares a row with the map-view pill, so on a 360 × 640 phone
+   nothing floats over anything else. */
+.cw-map .lv-mcount-live { padding: 0 0 0 1px; margin: 0; border: 0; color: var(--lv-cyan-on-navy); }
+.cw-map .lv-mcount b { order: 0; }
+.cw-map .lv-mavatar {
+  position: relative; display: grid; place-items: center; flex: none; width: 34px; height: 34px; padding: 0; overflow: hidden;
+  border-radius: 999px; background: var(--lv-yellow); color: var(--lv-ink); border: 2px solid var(--lv-ink);
+  box-shadow: 2px 2px 0 var(--lv-cyan); cursor: pointer;
+}
+.cw-map .lv-mavatar img { width: 100%; height: 100%; object-fit: cover; }
+.cw-map .lv-mavatar .lv-sq-initial { font-size: 13px; }
+.cw-map .lv-mavatar:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--lv-cyan); }
+.cw-map .lv-mavatar:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+.cw-map .lv-mtop .lv-mtop-row > :nth-child(4) { animation-delay: .32s; }
+@media (max-width: 374px) {
+  .cw-map .lv-mtop { padding-left: 12px; padding-right: 12px; }
+  .cw-map .lv-mtop .lv-wordmark { font-size: 15px; gap: 6px; }
+  .cw-map .lv-mtop .lv-wordmark-logo { width: 26px; height: 26px; }
+}
+
+.cw-map .lv-rail { right: 12px; top: calc(var(--cw-chrome-h, 160px) + 14px); gap: 10px; }
+.cw-map .lv-rail-group {
+  display: flex; flex-direction: column; overflow: hidden; pointer-events: auto;
+  background: #fff; border: 2px solid var(--lv-ink); border-radius: 16px; box-shadow: 3px 3px 0 var(--lv-ink);
+}
+.cw-map .lv-rail .lv-rail-group .lv-sq { width: 44px; height: 44px; border: 0; border-radius: 0; box-shadow: none; }
+.cw-map .lv-rail .lv-rail-group .lv-sq + .lv-sq { border-top: 2px solid var(--lv-line); }
+.cw-map .lv-rail .lv-rail-group .lv-sq:active { transform: none; background: var(--lv-yellow-soft); }
+.cw-map .lv-sos-rail { width: 48px; height: 48px; border-radius: 16px; }
+.cw-map .lv-sos-desk { display: none; }
+@media (min-width: 1024px) { .cw-map .lv-sos-desk { display: inline-flex; } }
+
+/* Post: right end of the bottom row on phones. */
+@media (max-width: 1023px) {
+  .cw-map .lv-actions { right: 12px; }
+  .cw-map .lv-post { height: 50px; padding: 0 18px 0 14px; box-shadow: 3px 3px 0 var(--lv-ink); font-size: 15px; }
+  /* Pinch zooms on a phone; the buttons only covered pins. */
+  .cw-map .lv-canvas .leaflet-control-zoom { display: none; }
+}
+
+/* Sheet peek: count, window, and the newest crime headline. */
+.cw-map .lv-sheet-count small { margin-left: 8px; font: 600 11px/1 var(--lv-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lv-cyan-on-navy); vertical-align: 3px; }
+.cw-map .lv-sheet-lead {
+  display: flex; align-items: center; gap: 7px; margin-top: 7px; min-width: 0;
+  font: 600 13px/1.2 var(--lv-sans); color: #fff; opacity: .92;
+}
+.cw-map .lv-sheet-lead { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.cw-map .lv-sheet-lead i { display: inline-block; width: 8px; height: 8px; margin-right: 7px; border-radius: 999px; border: 1.5px solid #fff; vertical-align: 1px; }
+.cw-map .lv-sheet-window { text-transform: none; letter-spacing: 0; font: 500 12.5px/1.2 var(--lv-sans); }

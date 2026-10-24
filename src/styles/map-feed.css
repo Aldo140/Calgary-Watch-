@@ -386,3 +386,34 @@
   .cw-map .lv-feed-row, .cw-map .lv-feed-chip, .cw-map .lv-tw-opt, .cw-map .lv-feed-more,
   .cw-map .lv-brief-cats button, .cw-map .lv-feed-controls-chev { transition: none; }
 }
+
+/* ── Across Calgary: four quadrant tiles laid out like the city ─────────── */
+.cw-map .lv-quads { margin-top: 14px; }
+.cw-map .lv-quads-head { display: flex; align-items: baseline; justify-content: space-between; font: 600 12px/1 var(--lvf-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lvf-cyan-on-navy); }
+.cw-map .lv-quads-head span { font-size: 10.5px; color: var(--lvf-on-navy-muted); letter-spacing: .06em; }
+.cw-map .lv-quads-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 9px; }
+.cw-map .lv-quads-grid::before, .cw-map .lv-quads-grid::after { /* Centre St and the Bow, as crosshairs */
+  content: ""; position: absolute; z-index: 1; pointer-events: none; background: var(--lvf-yellow);
+}
+.cw-map .lv-quads-grid::before { left: 50%; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; }
+.cw-map .lv-quads-grid::after { top: 50%; left: -4px; right: -4px; height: 2px; margin-top: -1px; }
+.cw-map .lv-quad {
+  display: grid; gap: 6px; min-width: 0; padding: 10px 11px 10px; text-align: left; cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, .28); border-radius: 14px; background: rgba(255, 255, 255, .07); color: #fff;
+  transition: background-color .15s, border-color .15s, transform .12s;
+}
+.cw-map .lv-quad:hover { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .7); }
+.cw-map .lv-quad:active { transform: scale(.97); }
+.cw-map .lv-quad:focus-visible { outline: 3px solid var(--lvf-cyan); outline-offset: 2px; }
+.cw-map .lv-quad[data-q='NW'] { border-top-left-radius: 22px; }
+.cw-map .lv-quad[data-q='NE'] { border-top-right-radius: 22px; }
+.cw-map .lv-quad[data-q='SW'] { border-bottom-left-radius: 22px; }
+.cw-map .lv-quad[data-q='SE'] { border-bottom-right-radius: 22px; }
+.cw-map .lv-quad-top { display: flex; align-items: baseline; justify-content: space-between; }
+.cw-map .lv-quad-top b { font: 800 20px/1 var(--lvf-display); letter-spacing: -.03em; color: var(--lvf-yellow); }
+.cw-map .lv-quad-top span { font: 800 22px/1 var(--lvf-display); font-variant-numeric: tabular-nums; }
+.cw-map .lv-quad-bar { display: block; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, .14); overflow: hidden; }
+.cw-map .lv-quad-bar i { display: block; height: 100%; border-radius: 99px; background: var(--lvf-cyan); }
+.cw-map .lv-quad-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 11.5px/1.2 var(--lvf-sans); color: var(--lvf-on-navy); }
+.cw-map .lv-quad[data-empty='true'] .lv-quad-top span, .cw-map .lv-quad[data-empty='true'] .lv-quad-sub { opacity: .6; }
+.cw-map .lv-quads-note { margin-top: 9px !important; font: 500 11.5px/1.35 var(--lvf-sans); color: var(--lvf-on-navy-muted); }

@@ -13,6 +13,9 @@ import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
 import { useCrimeBoard } from '@/src/hooks/useCrimeBoard';
 import { isCitySignal, memberMapLifetimeMs, MEMBER_OTHER_MAP_MS, tidyIncidentText } from '@/src/lib/crimeBoard';
+import { buildAlertDeck, splitCityAlerts } from '@/src/lib/mapAlerts';
+import { QUADRANT_VIEW } from '@/src/lib/cityQuadrants';
+import { AlertSheet, AlertStrip } from '@/src/components/map/CityAlerts';
 import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
@@ -592,12 +595,14 @@ function useWeatherAlerts(isAuthReady: boolean) {
               lat, lng,
               timestamp: now,
               email: 'alerts@open-meteo.com',
-              name: 'Environment Canada (via Open-Meteo)',
+              // A forecast model's reading of current conditions, not an
+              // Environment Canada warning; the alert card says so.
+              name: 'Open-Meteo forecast model',
               anonymous: false,
               verified_status: 'community_confirmed' as const,
               report_count: 1,
               data_source: 'official' as const,
-              source_name: 'Environment Canada',
+              source_name: 'Open-Meteo forecast model',
               source_url: 'https://weather.gc.ca/',
               expires_at: now + 2 * 60 * 60 * 1000,
             };
@@ -1281,7 +1286,7 @@ export default function MapPage() {
    */
 
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
-  const incidents = useMemo(() => {
+  const mergedIncidents = useMemo(() => {
     const now = Date.now();
     // Browser-derived civic records are rebuilt from their upstream APIs on
     // every load, so a moderator's decision about them can only live in the
@@ -1343,6 +1348,19 @@ export default function MapPage() {
     }
     return kept;
   }, [crimeBoardIncidents, firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, riverIncidents, suppressedIds]);
+
+  /**
+   * Weather warnings, emergency alerts, smoke and river readings cover an
+   * area, not a street, so they leave the pins, the feed and every count and
+   * become the city alert strip (src/lib/mapAlerts.ts). Neighbours' own
+   * weather posts stay reports.
+   */
+  const { reports: incidents, alertRecords: cityAlertRecords } = useMemo(
+    () => splitCityAlerts(mergedIncidents),
+    [mergedIncidents],
+  );
+  const cityAlerts = useMemo(() => buildAlertDeck(cityAlertRecords, clock), [cityAlertRecords, clock]);
+  const [alertIndex, setAlertIndex] = useState<number | null>(null);
 
   // ── My Watch ────────────────────────────────────────────────────────────────
   // The reader's persisted "last checked" mark, radius and categories. The
@@ -3295,6 +3313,15 @@ export default function MapPage() {
         )}
       </AnimatePresence>
 
+      {/* City alerts card, opened from the alert strip. */}
+      <AlertSheet
+        alerts={cityAlerts}
+        index={alertIndex}
+        onIndex={setAlertIndex}
+        onClose={() => setAlertIndex(null)}
+        onReport={() => requestReport(null)}
+      />
+
       {/* First-run coach-mark tour */}
       <MapTour open={tourOpen} onFinish={finishTour} onStepChange={handleTourStepChange} />
 
@@ -3303,6 +3330,7 @@ export default function MapPage() {
         <Sidebar
           incidents={feedIncidents}
           briefingIncidents={nearArea ? briefingIncidents : undefined}
+          onQuadrant={(q) => { const v = QUADRANT_VIEW[q]; mapRef.current?.flyTo(v.lat, v.lng, 12); }}
           areaName={nearArea?.name}
           timeWindow={timeWindow}
           onTimeWindowChange={setTimeWindow}
@@ -3399,6 +3427,11 @@ export default function MapPage() {
               areaName={nearArea?.name}
               selectedCategory={selectedCategory}
               onSelectCategory={(c) => setSelectedCategory(c as IncidentCategory | 'all')}
+              onQuadrant={(q) => {
+                const v = QUADRANT_VIEW[q];
+                setSheetState('rail');
+                mapRef.current?.flyTo(v.lat, v.lng, 12);
+              }}
               />
             </>
           }
@@ -3423,11 +3456,43 @@ export default function MapPage() {
               data-tour="m-feed"
               onClick={() => sheetRef.current?.raise()}
               className="lv-mcount"
+              aria-label={`${feedCount} ${feedCount === 1 ? 'report' : 'reports'} live: open the list`}
             >
               <span className="lv-pulse" aria-hidden="true" />
+              <b key={feedCount}>{feedCount}</b>
               <span className="lv-mcount-live">Live</span>
-              <b key={feedCount}>{feedCount}</b> {feedCount === 1 ? 'report' : 'reports'}
             </button>
+            {/* Account lives in the bar, so the right rail only holds map
+                actions and nothing stacks over the pins on a short phone. */}
+            <div className="relative">
+              {user ? (
+                <button type="button" onClick={toggleUserMenu} className="lv-mavatar" aria-label="Account menu" aria-expanded={showUserMenu}>
+                  <AvatarFace user={user} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openAuthPanel('signin')}
+                  aria-label="Sign up or sign in"
+                  title="Sign up or sign in"
+                  className="lv-mavatar"
+                >
+                  <LogIn size={17} strokeWidth={2.4} />
+                </button>
+              )}
+              {user && (
+                <UserMenu
+                  open={showUserMenu}
+                  user={user}
+                  isAdmin={isAdmin}
+                  className="!top-[calc(100%+10px)] !right-0 z-[60]"
+                  onAdmin={() => { navigate('/admin'); setShowUserMenu(false); }}
+                  onSettings={() => openAuthPanel('settings')}
+                  onTour={replayTour}
+                  onSignOut={() => { logout(); setShowUserMenu(false); }}
+                />
+              )}
+            </div>
           </div>
           <WhenTrack value={timeWindow} onChange={setTimeWindow} />
           <CategoryRail
@@ -3436,64 +3501,54 @@ export default function MapPage() {
             value={selectedCategory}
             onChange={(c) => setSelectedCategory(c as IncidentCategory | 'all')}
           />
+          <AlertStrip alerts={cityAlerts} onOpen={setAlertIndex} now={clock} />
         </div>
 
-        {/* Phone action rail (right edge): locate, alerts, account. z-[51]
-            keeps it above the tap-to-close scrim (z-[49]) and below the raised
-            sheet (z-[52]). The column itself ignores pointer events so the
-            scrim still catches taps on the map around the buttons. */}
+        {/* Phone action rail (right edge): near me, alerts, and SOS at the
+            foot, apart from the yellow Post. z-[51] keeps it above the
+            tap-to-close scrim (z-[49]) and below the raised sheet (z-[52]).
+            The column ignores pointer events so the scrim still catches taps
+            on the map around the buttons. */}
         <div className="lv-rail lg:hidden" data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}>
-          <button
-            type="button"
-            onClick={handleLocate}
-            data-tour="near-me"
-            data-on={nearMeOpen ? 'true' : undefined}
-            className="lv-sq"
-            aria-label="What's near me"
-            aria-pressed={nearMeOpen}
-          >
-            <Navigation size={20} strokeWidth={2.2} />
-          </button>
-          <button
-            type="button"
-            onClick={toggleNotifications}
-            data-tour="m-alerts"
-            className="lv-sq"
-            aria-label={bellLabel(unreadNotifications)}
-          >
-            <Bell size={20} strokeWidth={2.2} />
-            <UnreadBadge count={unreadNotifications} />
-          </button>
-          <div className="relative">
-            {user ? (
-              <button type="button" onClick={toggleUserMenu} className="lv-sq" aria-label="Account menu" aria-expanded={showUserMenu}>
-                <AvatarFace user={user} />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => openAuthPanel('signin')}
-                aria-label="Sign up or sign in"
-                title="Sign up or sign in"
-                className="lv-sq"
-              >
-                <LogIn size={19} strokeWidth={2.2} />
-              </button>
-            )}
-            {user && (
-              <UserMenu
-                open={showUserMenu}
-                user={user}
-                isAdmin={isAdmin}
-                motionFrom="side"
-                className="!top-0 !right-[calc(100%+12px)] z-[60]"
-                onAdmin={() => { navigate('/admin'); setShowUserMenu(false); }}
-                onSettings={() => openAuthPanel('settings')}
-                onTour={replayTour}
-                onSignOut={() => { logout(); setShowUserMenu(false); }}
-              />
-            )}
+          <div className="lv-rail-group">
+            <button
+              type="button"
+              onClick={handleLocate}
+              data-tour="near-me"
+              data-on={nearMeOpen ? 'true' : undefined}
+              className="lv-sq"
+              aria-label="What's near me"
+              aria-pressed={nearMeOpen}
+            >
+              <Navigation size={19} strokeWidth={2.3} />
+            </button>
+            <button
+              type="button"
+              onClick={toggleNotifications}
+              data-tour="m-alerts"
+              className="lv-sq"
+              aria-label={bellLabel(unreadNotifications)}
+            >
+              <Bell size={19} strokeWidth={2.3} />
+              <UnreadBadge count={unreadNotifications} />
+            </button>
           </div>
+          <button
+            type="button"
+            data-tour="sos"
+            className="lv-sos lv-sos-rail"
+            aria-label="SOS: report an emergency"
+            title="Emergency report"
+            onClick={() => {
+              const now = Date.now();
+              if (now - buttonClickDebounceRef.current < 300) return;
+              buttonClickDebounceRef.current = now;
+              if (!user) { openAuthPanel('signin'); return; }
+              setIsEmergencyOpen(true);
+            }}
+          >
+            <Siren size={20} className="shrink-0" />
+          </button>
         </div>
 
         {/* Near Me Panel — card above the sheet rail (phone), bottom-left card (desktop) */}
@@ -3774,6 +3829,7 @@ export default function MapPage() {
             <span className="lv-stamp" title="Time of the newest neighbour report or City record on the map">
               <b>{freshness}</b>
             </span>
+            <AlertStrip alerts={cityAlerts} onOpen={setAlertIndex} variant="desk" now={clock} />
             {nearArea && (
               <button
                 type="button"
@@ -3888,17 +3944,17 @@ export default function MapPage() {
           guidedPreview={tourOpen && tourTarget === 'camera-viewer'}
         />
 
-        {/* Emergency and report actions. On a phone the column sits above the
-            layer bar, which sits above the sheet rail. */}
+        {/* Emergency and report actions. On a phone Post shares one row with
+            the map-view pill, just above the sheet rail; SOS is on the rail. */}
         <div
-          className="lv-actions bottom-[calc(var(--cw-rail-h,66px)+1.375rem+var(--cw-layerbar-h,3.25rem)+0.75rem+env(safe-area-inset-bottom))] lg:bottom-[5.5rem]"
+          className="lv-actions bottom-[calc(var(--cw-rail-h,66px)+0.875rem+env(safe-area-inset-bottom))] lg:bottom-[5.5rem]"
           data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}
         >
           {/* SOS stays visually separate from standard reporting. */}
           <button
             type="button"
             data-tour="sos"
-            className="lv-sos"
+            className="lv-sos lv-sos-desk"
             aria-label="SOS: report an emergency"
             title="Emergency report"
             onClick={() => {

@@ -112,13 +112,16 @@ const MOBILE_STEPS: TourStep[] = [
 type Rect = { top: number; left: number; width: number; height: number };
 
 function measure(target: string): Rect | null {
-  const el = document.querySelector<HTMLElement>(`[data-tour="${target}"]`);
-  if (!el) return null;
-  const r = el.getBoundingClientRect();
-  if (r.width < 2 || r.height < 2) return null;
-  const style = window.getComputedStyle(el);
-  if (style.visibility === 'hidden' || style.opacity === '0') return null;
-  return { top: r.top, left: r.left, width: r.width, height: r.height };
+  // A target can exist twice (SOS sits on the phone rail and in the desktop
+  // column); use the one that is showing.
+  for (const el of document.querySelectorAll<HTMLElement>(`[data-tour="${target}"]`)) {
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) continue;
+    const style = window.getComputedStyle(el);
+    if (style.visibility === 'hidden' || style.opacity === '0') continue;
+    return { top: r.top, left: r.left, width: r.width, height: r.height };
+  }
+  return null;
 }
 
 const DYNAMIC_TARGETS = new Set(['traffic-cameras', 'camera-viewer']);

@@ -64,6 +64,10 @@ export type UserProfile = {
   digestUnsubscribeSource?: string | null;
   /** Set by an admin when a listing claim is approved (businessAccount.ts). */
   accountType?: 'personal' | 'business';
+  /** Written once when the account was made on a claim page (src/lib/claimInvite.ts). */
+  signupAs?: 'organizer';
+  signupEntityId?: string;
+  signupVia?: string;
   businessListings?: string[];
   businessSince?: number;
 };

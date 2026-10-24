@@ -13,12 +13,16 @@ import {profileIdentityProblems} from './profileIdentity';
  *    prospects, service-directory invitations, or an organizer whose only
  *    listing is one of its events.
  *  - A verified (approved-claim) listing is never asked to claim again.
+ *  - The claim link is personal when the lead has a contact address: the claim
+ *    page greets them and makes their organizer account with that email
+ *    (src/lib/claimInvite.ts). The plain link for the same listing stays valid.
  */
 
 import { createHash } from 'node:crypto';
 import type { PartnerLead } from '../../../src/types/ops';
 import { VERIFICATION_PRIORITY_ENABLED } from '../../../src/lib/verified';
 import { LEAD_KINDS } from './leads';
+import { INVITE_PARAM, decodeInvite, personalClaimUrl } from '../../../src/lib/claimInvite';
 import type { Entity } from './posts';
 
 export const CLAIM_BASE = 'https://calgarywatch.ca/claim/';
@@ -35,7 +39,7 @@ export interface ClaimFacts {
   organizationListed: boolean;
   /** There is a direct claim page and nobody has been approved for it yet. */
   claimable: boolean;
-  /** The direct claim page, only when claimable. */
+  /** The direct claim page, only when claimable; personal (`?invite=`) when we know who it's for. */
   claimUrl: string | null;
   claimStatus: 'verified' | 'unclaimed' | 'not-claimable';
   /** An admin approved a claim for this listing. */
@@ -52,8 +56,29 @@ export const NO_CLAIM: ClaimFacts = {
 
 export const claimUrlFor = (entityId: string) => `${CLAIM_BASE}${encodeURIComponent(entityId)}`;
 
+/**
+ * The listing's claim page, carrying who the email goes to. A role inbox
+ * (info@) still gets the address; only a real contact name turns into a
+ * first-name greeting. The page already knows the organization, so the
+ * link leaves it out and stays shorter.
+ */
+export function personalClaimUrlFor(entityId: string, lead: { contactEmail?: string | null; contactName?: string | null }, via = 'outreach'): string {
+  if (!lead.contactEmail) return claimUrlFor(entityId);
+  return personalClaimUrl(entityId, { email: lead.contactEmail, name: lead.contactName ?? undefined, via });
+}
+
+/** A link is this listing's claim page: the plain URL, or it with a well-formed invitation and nothing else. */
+export function isClaimPageFor(link: string, claimUrl: string): boolean {
+  try {
+    const url = new URL(link); const want = new URL(claimUrl);
+    if (url.origin !== want.origin || url.pathname !== want.pathname || url.hash || url.username || url.password) return false;
+    const keys = [...url.searchParams.keys()];
+    return !keys.length || (keys.length === 1 && keys[0] === INVITE_PARAM && decodeInvite(url.searchParams.get(INVITE_PARAM)) !== null);
+  } catch { return false; }
+}
+
 export function claimFactsFor(
-  lead: Pick<PartnerLead, 'entityId' | 'entityKind' | 'status'> & {businessName?:string},
+  lead: Pick<PartnerLead, 'entityId' | 'entityKind' | 'status'> & {businessName?:string;contactEmail?:string|null;contactName?:string|null},
   entity: Entity | undefined,
   verifiedIds: ReadonlySet<string> = new Set(),
 ): ClaimFacts {
@@ -71,7 +96,7 @@ export function claimFactsFor(
     hasPublishedEntity,
     organizationListed,
     claimable,
-    claimUrl: claimable ? claimUrlFor(entity!.id) : null,
+    claimUrl: claimable ? personalClaimUrlFor(entity!.id, lead) : null,
     claimStatus: verified ? 'verified' : claimable ? 'unclaimed' : 'not-claimable',
     verified,
     verificationBenefitEnabled: claimable && organizationListed && VERIFICATION_PRIORITY_ENABLED,
@@ -151,7 +176,7 @@ export function claimLanguageProblems(body: string, f: ClaimFacts): string[] {
   if (f.hasPublishedEntity && !f.organizationListed && /\byour (?:organization|company|business) (?:listing|profile)\b|\byour profile is live\b/i.test(body)) problems.push('An event listing is not an organization profile.');
   const links = [...body.matchAll(CLAIM_LINK)].map(m => `https://${m[0].replace(/[.,;:!?]+$/, '')}`);
   if (links.length && !f.claimable) problems.push('Offers a claim link for a listing that is not claimable.');
-  else if (links.some(l => l !== f.claimUrl)) problems.push('Uses a claim link other than the listing’s own claim page.');
+  else if (links.some(l => !isClaimPageFor(l, f.claimUrl!))) problems.push('Uses a claim link other than the listing’s own claim page.');
   if (BENEFIT.test(body) && !f.verificationBenefitEnabled) problems.push('Mentions verified priority where it does not apply.');
   if (SAYS_VERIFIED.test(body) && !f.verified) problems.push('Says the listing is verified when it is not.');
   return problems;

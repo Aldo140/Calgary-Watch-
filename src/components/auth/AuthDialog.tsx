@@ -80,7 +80,7 @@ export function AuthDialog({ open, request, user, busy, onClose, onGoogle, onSig
         <button className="auth-secondary" type="button" disabled={busy||cooldown>0} onClick={resend}>{cooldown?`Resend in ${cooldown}s`:'Resend verification email'}</button>
         <div className="auth-switch"><button type="button" onClick={onClose}>Keep browsing for now</button><button type="button" onClick={()=>void onLogout()}>Use a different account</button></div>
       </section> : <section>
-        <p className="auth-kicker">CalgaryWatch account</p><h2 id="auth-title">{title}</h2>
+        <p className="auth-kicker">{request.organizer ? 'Organizer account' : 'CalgaryWatch account'}</p><h2 id="auth-title">{title}</h2>
         <p className="auth-intro">{intro}</p>
         {mode!=='reset'?<>
           <button className="auth-google" type="button" disabled={busy} onClick={()=>void run(onGoogle)}><GoogleMark/>Continue with Google{last?.method==='google'?<span className="auth-last">Last used</span>:null}</button>
@@ -96,6 +96,7 @@ export function AuthDialog({ open, request, user, busy, onClose, onGoogle, onSig
           <button className="auth-primary" type="submit" disabled={busy}>{busy?'Please wait…':mode==='signup'?'Create free account':mode==='reset'?'Send reset link':'Sign in'}</button>
         </form>
         <div className="auth-switch">{mode==='signin'?<><button type="button" onClick={()=>switchMode('reset')}>Forgot password?</button><button type="button" onClick={()=>switchMode('signup')}>New here? Create an account</button></>:<button type="button" onClick={()=>switchMode('signin')}>{mode==='signup'?'I already have an account':'Back to sign in'}</button>}</div>
+        {mode==='signup'&&!request.organizer&&!request.title?<p className="auth-organizer">Run a venue, market or business? <a href="/claim">Start from your organization’s page</a> and your account is set up to manage it.</p>:null}
         <p className="auth-trust"><ShieldCheck size={15}/> Protected by Firebase Authentication. CalgaryWatch never sees or stores your password.</p>
       </section>}
     </div>

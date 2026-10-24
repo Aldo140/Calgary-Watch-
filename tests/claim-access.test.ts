@@ -32,6 +32,7 @@ async function render({admin=false,user=true,emailVerified=true,claim=null,path=
   '../lib/organizationWorkspace':moduleUrl('export const approvedOrganization=()=>undefined;'),
   '../components/entity/ListingManagement':moduleUrl('export const ListingManagement=()=>null;'),
   '../lib/claimDraft':compile('../src/lib/claimDraft.ts'),
+  '../lib/claimInvite':compile('../src/lib/claimInvite.ts'),
   '../lib/claimsApi':moduleUrl(`export const useVerifiedListing=()=>${verified};export const useClaimLoadError=()=>${failed};export const useMyClaims=()=>${loading?'null':JSON.stringify(claim?[claim]:[])};export const submitClaim=()=>{throw Error('Rendering must not submit a claim')};`),
   '../components/entity/VerifiedBadge':compile('../src/components/entity/VerifiedBadge.tsx'),
   '../components/site/SiteLayout':moduleUrl('export const SiteLayout=({children})=>children;'),
@@ -47,7 +48,7 @@ async function render({admin=false,user=true,emailVerified=true,claim=null,path=
  return renderToStaticMarkup(createElement(MemoryRouter,{initialEntries:[path]},createElement(Routes,null,createElement(Route,{path:'/claim/:id',element:createElement(component.default)}))));
 }
 test('new visitors get a claim form with email and Google account choices',async()=>{
- const html=await render({user:false});assert.match(html,/<form/);assert.match(html,/Sign in or create an account/);assert.match(html,/create a free account with email or Google/);assert.doesNotMatch(html,/Administrator listing access|Admin preview/);
+ const html=await render({user:false});assert.match(html,/<form/);assert.match(html,/Your details and a password/);assert.match(html,/creates your free organizer account and sends your claim in one go/);assert.match(html,/Choose a password/);assert.match(html,/I already have an account, or use Google/);assert.match(html,/Create account and send claim/);assert.doesNotMatch(html,/Administrator listing access|Admin preview/);
 });
 test('an existing personal or business account can apply without signing out or onboarding',async()=>{
  for(const path of ['/claim/festival','/claim/biz-festival','/claim/biz-festival?listing=linked-event']){
@@ -112,4 +113,10 @@ test('the submission API requires verified sign-in and a known listing before an
  await assert.rejects(claimApi.submitClaim({uid:'bad',email:'bad@gmail.com',emailVerified:false},{id:event.id,title:event.title,path:'/events/festival-2027'},{}),/[Vv]erif.*email/);
  await assert.rejects(claimApi.submitClaim({uid:'good',email:'good@gmail.com',emailVerified:true},{id:'missing',title:'Missing',path:'/local/missing'},{}),/not published/);
  assert.equal(writes.length,before);
+});
+test('an outreach invitation greets the organizer and fills in the email they were sent',async()=>{
+ const invite=Buffer.from(JSON.stringify({n:'Kendra Hutchinson',e:'kendra@festival.ca',v:'outlook'})).toString('base64url');
+ const html=await render({user:false,path:`/claim/biz-festival?invite=${invite}`});
+ assert.match(html,/Kendra, claim <em>Festival\.<\/em>/);assert.match(html,/value="kendra@festival\.ca"/);assert.match(html,/value="Kendra Hutchinson"/);assert.match(html,/Your invitation/);
+ const plain=await render({user:false,path:'/claim/biz-festival?invite=garbage!'});assert.match(plain,/>Claim <em>/);assert.doesNotMatch(plain,/Your invitation/);
 });

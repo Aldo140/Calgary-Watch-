@@ -178,3 +178,23 @@ a.cl-verified-by { color: inherit; text-decoration: underline; text-underline-of
 /* Native option text must not widen the listing editor on a phone. */
 .cl-form, .cl-form .pl-field { min-width: 0; max-width: 100%; }
 .cl-form .pl-field > select { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+
+/* Organizer account step: the password lives in the claim form itself. */
+.cl-password { position: relative; display: block; }
+.cl-password input { width: 100%; padding-right: 48px; }
+.cl-password button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 36px; height: 36px; border: 0; background: transparent; color: #4a5562; cursor: pointer; }
+.cl-link { padding: 0; border: 0; background: transparent; color: #1554d1; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.cl-invite-note { margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: #f3f6f8; font-size: 13.5px; line-height: 1.5; }
+/* /claim finder */
+.cl-finder { display: grid; gap: 14px; max-width: 720px; }
+.cl-finder-search { position: relative; display: block; }
+.cl-finder-search svg { z-index: 1; pointer-events: none; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #52606b; }
+.cw-plans .cl-finder .cl-finder-search input { width: 100%; padding-left: 44px; box-sizing: border-box; }
+.cl-finder-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cl-finder-hit { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border: 1.5px solid var(--cw-border); border-radius: 14px; background: #fff; color: inherit; text-decoration: none; }
+.cl-finder-hit:hover, .cl-finder-hit:focus-visible { border-color: #06162f; }
+.cl-finder-hit span { display: grid; gap: 2px; min-width: 0; }
+.cl-finder-hit small { color: #52606b; font: 600 11px/1.2 var(--pl-mono); letter-spacing: .08em; text-transform: uppercase; }
+.cl-finder-hit strong { font-size: 16px; overflow-wrap: anywhere; }
+.cl-finder-hit[data-suggested='true'] { border-color: #a9d9c8; background: #f1faf6; }
+.pl-field > .cl-password, .pl-field > .cl-finder-search { font: inherit; text-transform: none; letter-spacing: 0; color: inherit; }

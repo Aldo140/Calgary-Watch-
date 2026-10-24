@@ -87,8 +87,8 @@ Partner replies kept asking for the same things, so organizers now get a self-se
 
 **How it works**
 
-1. Every event, market and business listing ends with "Is this yours? Claim this listing" (`/claim/:entityId`).
-2. The organizer registers with Google, then gives their name, role, work email, an optional phone number and anything to fix straight away.
+1. Every event, market and business listing ends with "Is this yours? Claim this listing" (`/claim/:entityId`). Organizers who didn't get an email start at `/claim`, which finds their page. The resident sign-up dialog points organizers there too.
+2. The claim page is where organizer accounts are made. In one form the organizer gives their name, role, work email, a password, an optional phone number and anything to fix straight away. That creates the account with the work email, labels it an organizer sign-up (`users/{uid}.signupAs = 'organizer'`, plus `signupEntityId` and `signupVia`), and holds the claim until the email is verified. Then it sends by itself. Google, or an account they already have, is one link away.
 3. Admin sees the claim under **Local partners → Claimed listings**, with evidence recomputed from the listing's own site:
    - A Google account at the organization's domain is the strongest evidence.
    - A matching work email needs a one-click "Confirm by email" first.
@@ -101,7 +101,7 @@ Partner replies kept asking for the same things, so organizers now get a self-se
 
 For photo changes, encourage organizers to email the original files to `aldo@calgarywatch.ca` with the listing name. The claim form can record the request and an optional image link, but email preserves the original quality and is the preferred route for future partner replies.
 
-Every outreach email, follow-up and drafted reply to an organization with a claimable listing ends with the claim link, placed just above the signature (`withClaimLink` in `scripts/ops/jobs/outreach.ts`). Where the listing is the organization itself, that line also says what verification brings; rules and permitted wording are in [verified-listings.md](verified-listings.md).
+Every outreach email, follow-up and drafted reply to an organization with a claimable listing ends with the claim link (a personal one; see below), placed just above the signature (`withClaimLink` in `scripts/ops/jobs/outreach.ts`). Where the listing is the organization itself, that line also says what verification brings; rules and permitted wording are in [verified-listings.md](verified-listings.md).
 
 Data:
 - `listing_claims/{uid}_{entityId}`: written by the claimant, decided by admin.
@@ -164,6 +164,39 @@ Before sending profile/claim links: check for the canonical entity, deploy/reuse
 - The four existing Downstage event records remain canonical: Dreaming Climate Consciousness on Oct 23 and Oct 24, Creative Stretch (free, as Dylan confirmed), and A Study of Choices. Canonical organizerEntityId links them to biz-downstage. From Scratch has no scheduled record; do not invent dates.
 - Before replying: review/deploy the pending code, install the actual approved image file, verify live public/manage routes and inspect Clare's existing production claim/account/email status. Approval is a separate admin decision. No email was sent by this task.
 
+
+## Personal claim links (from 2026-10-24)
+
+Outreach links to a personal claim page: `https://calgarywatch.ca/claim/{entityId}?invite=…`. The `invite` value carries the address we wrote to, the contact's name when we know it, and the batch (`via`). When the organizer opens it, the page:
+
+- greets them by first name ("Kendra, claim Vertigo Theatre."), but never a role inbox like info@ or Media Relations;
+- fills in their name and work email, so the account is created with the address we wrote to and the domain check passes by itself;
+- asks only for a role and a password, then makes the organizer account and queues the claim in one step;
+- takes the invite out of the address bar on load, and keeps it for the tab so the return from the verification email still works.
+
+The invite is encoded, not signed, so it proves nothing about who opened it. Admin review still decides every claim from the listing's own sources. The plain `/claim/{entityId}` link keeps working everywhere. Code: `src/lib/claimInvite.ts`.
+
+**Automated outreach.** `claimFactsFor` builds the personal link from the lead's `contactEmail` and `contactName` (with `via=outreach`). Drafts written earlier with the plain link still pass the claim-language check (`isClaimPageFor`).
+
+**Manual (Outlook) batches.** Make the links offline before sending. No Firestore access is needed:
+
+```
+npm run claims:invite -- --entity biz-vertigo-theatre --email kendra.hutchinson@vertigotheatre.com --name "Kendra Hutchinson"
+npm run claims:invite -- --csv batch.csv --via outlook-oct24   # columns: entityId,email,name; prints entityId,email,link
+```
+
+Steps for each manual email:
+
+1. Publish or reuse the profile and confirm its `/local/…` page is live (unchanged).
+2. Generate the personal link for the exact address you're sending to. Leave `--name` out for a role inbox.
+3. Use the claim paragraph below in place of the old one, with the personal link. Keep the profile link, the grant / local-network paragraph and the "reply stop" line.
+4. Record the link in the batch file next to the profile link.
+
+Claim paragraph for invitations:
+
+> If you'd like to keep it up to date yourself, this link is set up for you: {personal link}. It already has your email filled in, so it takes about a minute. Choose a password and your free organizer account and claim go in together. Once we've confirmed it's you, you can send dates, links and changes directly, and the profile shows it's verified by your organization.
+
+Admin: **Members → Organizer sign-ups** lists accounts made this way, with the listing they signed up to claim, so they no longer read as residents.
 
 ## Outlook outreach batch (2026-10-21)
 

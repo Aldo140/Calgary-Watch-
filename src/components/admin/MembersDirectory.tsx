@@ -24,7 +24,7 @@ import { realName } from '@/src/lib/auth';
 import { AdminButton, Chip, EmptyState, FilterChip, FilterRow, Panel, SearchField, SkeletonRows, T, TimeAgo, mono } from './ui';
 
 type Row = { id: string; uid: string } & Record<string, unknown>;
-type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'no-name' | 'business' | 'new' | 'google' | 'email-signin' | 'recent' | 'attention';
+type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'no-name' | 'business' | 'organizer' | 'new' | 'google' | 'email-signin' | 'recent' | 'attention';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const num = (v: unknown) => (typeof v === 'number' ? v : 0);
@@ -48,6 +48,9 @@ function shape(r: Row, auth?: MemberAuthRecord) {
     account: memberAccountInsights(r,auth),
     role: str(r.role),
     business: r.accountType === 'business',
+    // Made on a claim page (FirebaseProvider → signupFields): an organizer, not a resident reader.
+    organizer: r.signupAs === 'organizer',
+    signupEntityId: str(r.signupEntityId),
     plan: emailPlan(weekly, events, Date.now()),
   };
 }
@@ -65,6 +68,7 @@ const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof s
   { id: 'no-area', label: 'No home area', match: (m) => !m.area },
   { id: 'no-name', label: 'No name', match: (m) => !m.named },
   { id: 'business', label: 'Business accounts', match: (m) => m.business },
+  { id: 'organizer', label: 'Organizer sign-ups', match: (m) => m.organizer },
   { id: 'new', label: 'New this week', match: (m) => m.createdAt > Date.now() - 7 * 86_400_000 },
 ];
 
@@ -135,9 +139,9 @@ export function MembersDirectory() {
                         <strong className="text-sm truncate" style={{ color: T.ink }}>{m.name}</strong>
                         {m.account.disabled?<Chip tone="critical">Disabled</Chip>:null}
                         {m.role === 'admin' ? <Chip tone="signal">Admin</Chip> : null}
-                        {m.business ? <Chip tone="ok">Business</Chip> : null}
+                        {m.business ? <Chip tone="ok">Business</Chip> : m.organizer ? <Chip tone="signal">Organizer</Chip> : null}
                       </span>
-                      {organizationNames.length?<span className="block text-xs font-semibold truncate" style={{color:T.ok}}>Manages {organizationNames.join(' · ')}</span>:m.business?<span className="block text-xs" style={{color:T.muted}}>Organization authority needs review</span>:null}
+                      {organizationNames.length?<span className="block text-xs font-semibold truncate" style={{color:T.ok}}>Manages {organizationNames.join(' · ')}</span>:m.organizer&&!m.business?<span className="block text-xs truncate" style={{color:T.muted}}>Signed up to claim {discoveryRepository.list().find(e=>e.id===m.signupEntityId)?.title??m.signupEntityId}</span>:m.business?<span className="block text-xs" style={{color:T.muted}}>Organization authority needs review</span>:null}
                       <span className="block text-xs truncate" style={{ color: T.muted }}>
                         {m.area ? <><MapPin size={11} className="inline -mt-0.5" /> {m.area} · </> : 'No area · '}{m.plan.kind === 'none' ? 'No email' : m.plan.name}
                       </span>

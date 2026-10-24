@@ -63,7 +63,7 @@ describe('Vertigo Theatre organization listing', () => {
 
   it('uses the existing claim CTA and route', () => {
     assert.match(read('src/App.tsx'), /path="\/claim\/:id"/);
-    assert.match(read('src/pages/ClaimListingPage.tsx'), /Claim <em>\{profile\?\.title\?\?entity.title\}/);
+    assert.match(read('src/pages/ClaimListingPage.tsx'), /'Claim '\}<em>\{profile\?\.title\?\?entity.title\}/);
     assert.match(read('src/components/discovery/LocalPlace.tsx'), /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" verifiedAt=\{place\.ownerVerifiedAt\} \/>/);
     assert.match(read('src/components/entity/ClaimCta.tsx'), /to=\{organizationClaimPath\(listing,discoveryRepository.list\(\)\)\}/);
   });

@@ -42,7 +42,8 @@
     "discovery:export": "tsx scripts/discovery/export.ts",
     "news:crime": "tsx scripts/news/export-crime-news.ts",
     "discovery:actions": "tsx scripts/discovery/actions.ts",
-    "discovery:preview": "tsx scripts/discovery/preview.ts"
+    "discovery:preview": "tsx scripts/discovery/preview.ts",
+    "claims:invite": "tsx scripts/claims/invite-links.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

@@ -20,7 +20,7 @@ describe('member names', () => {
     assert.match(dialog, /nameProblem\(name\)/);
     const provider = readFileSync('src/components/FirebaseProvider.tsx', 'utf8');
     assert.match(provider, /realName\(currentUser\.displayName\) \|\| realName\(nameHint\) \|\| realName\(existing\.data\(\)\?\.displayName\) \|\| 'Anonymous'/);
-    assert.match(provider, /syncUserProfile\(currentUser, isApprovedAdmin, signupName\.current\)/);
+    assert.match(provider, /syncUserProfile\(currentUser, isApprovedAdmin, signupName\.current, signupIntent\.current\)/);
   });
   it('only keeps the dialog on "check your inbox" for pages that need a verified email', () => {
     assert.match(readFileSync('src/components/FirebaseProvider.tsx', 'utf8'), /if \(!authRequest\.verify && auth\?\.currentUser\) \{ setAuthOpen\(false\)/);
@@ -73,7 +73,7 @@ describe('email authentication', () => {
   });
   it('holds unverified claims and vendor applications, and sends them once verified', () => {
     const claim = readFileSync('src/pages/ClaimListingPage.tsx', 'utf8');
-    assert.match(claim, /signIn\(\{ mode: 'signup', email: draft\.workEmail,/);
+    assert.match(claim, /await signUpWithEmail\(draft\.workEmail\.trim\(\), password, draft\.name\.trim\(\), intent\)/);
     assert.match(claim, /pending\.current && user\?\.emailVerified && claims/);
     const vendor = readFileSync('src/pages/VendorApplyPage.tsx', 'utf8');
     assert.match(vendor, /<VerifyEmailNotice action="send your application"/);
@@ -98,7 +98,7 @@ describe('email authentication', () => {
   it('remembers the last sign-in method and gives every entry point its own reason', () => {
     assert.match(readFileSync('src/components/FirebaseProvider.tsx', 'utf8'), /rememberSignIn\(currentUser\.providerData\.some/);
     assert.match(readFileSync('src/components/auth/AuthDialog.tsx', 'utf8'), /Last used/);
-    for (const [file, title] of [['src/components/plans/GoingButton.tsx', 'Save it to your plans.'], ['src/pages/PlansPage.tsx', 'Last step: save it.'], ['src/pages/ClaimListingPage.tsx', 'title: `Claim ${entity.title}.`'], ['src/pages/VendorApplyPage.tsx', 'title: `Apply to ${market.title}.`'], ['src/pages/MarketHQPage.tsx', 'Open Market HQ.']]) assert.ok(readFileSync(file, 'utf8').includes(title), file);
+    for (const [file, title] of [['src/components/plans/GoingButton.tsx', 'Save it to your plans.'], ['src/pages/PlansPage.tsx', 'Last step: save it.'], ['src/pages/ClaimListingPage.tsx', 'Your organizer account for ${profile?.title ?? entity.title}.'], ['src/pages/VendorApplyPage.tsx', 'title: `Apply to ${market.title}.`'], ['src/pages/MarketHQPage.tsx', 'Open Market HQ.']]) assert.ok(readFileSync(file, 'utf8').includes(title), file);
   });
   it('suggests the organization a sign-in email belongs to, organizer profile first', () => {
     const site = [{ url: 'https://www.thebarnartisanmarket.ca/' }];

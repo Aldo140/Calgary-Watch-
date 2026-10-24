@@ -15,6 +15,7 @@ import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 import { AuthDialog } from './auth/AuthDialog';
 import { continueUriRefused, realName, rememberSignIn, returnLink, syncVerifiedToken, type AuthRequest } from '../lib/auth';
+import { signupFields, type SignupIntent } from '../lib/claimInvite';
 
 interface AuthContextType {
   user: User | null;
@@ -22,7 +23,8 @@ interface AuthContextType {
   /** Opens the sign-in dialog and resolves once someone is signed in or the dialog is closed. */
   signIn: (request?: AuthRequest) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
+  /** `intent` marks an account made on a claim page as an organizer sign-up. */
+  signUpWithEmail: (email: string, password: string, displayName: string, intent?: SignupIntent) => Promise<void>;
   /** Sets the signed-in account's name, on the Auth profile and the member record. */
   saveName: (name: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
@@ -52,7 +54,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  * or data subscriptions on this — it is bookkeeping, not something the UI reads
  * before it can show the map.
  */
-async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean, nameHint?: string): Promise<void> {
+async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean, nameHint?: string, intent?: SignupIntent | null): Promise<void> {
   if (!db) return;
   const userRef = doc(db, 'users', currentUser.uid);
   try {
@@ -61,11 +63,16 @@ async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean, name
     // name, so the name typed in the form comes in as a hint. Never trade a real name
     // already on the record for the placeholder.
     const displayName = realName(currentUser.displayName) || realName(nameHint) || realName(existing.data()?.displayName) || 'Anonymous';
+    // Organizer sign-ups are labelled once, and only for an account made just now:
+    // a resident who signs in on a claim page stays a resident.
+    const created = currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime).getTime() : 0;
+    const signup = intent && !existing.data()?.signupAs && Date.now() - created < 30 * 60_000 ? signupFields(intent) : {};
     await setDoc(
       userRef,
       {
         uid: currentUser.uid,
         displayName,
+        ...signup,
         email: currentUser.email || '',
         photoURL: currentUser.photoURL || '',
         emailVerified: currentUser.emailVerified,
@@ -103,6 +110,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [, setAuthRevision] = useState(0);
   const pendingAuth = useRef<(() => void) | null>(null);
   const signupName = useRef('');
+  const signupIntent = useRef<SignupIntent | null>(null);
 
   useEffect(() => {
     if (!auth || !db) {
@@ -149,7 +157,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       if (currentUser) rememberSignIn(currentUser.providerData.some(p => p.providerId === 'google.com') ? { method: 'google' } : { method: 'email', email: currentUser.email ?? undefined });
       if (currentUser) void syncVerifiedToken(currentUser).catch(error => console.error('Token refresh error:', error));
       if (currentUser && db) {
-        void syncUserProfile(currentUser, isApprovedAdmin, signupName.current);
+        void syncUserProfile(currentUser, isApprovedAdmin, signupName.current, signupIntent.current);
       }
     });
 
@@ -160,7 +168,8 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     if (auth?.currentUser) return;
     // Guard against an event object when signIn is passed straight to onClick.
     const text = (value: unknown) => typeof value === 'string' && value.trim() ? value : undefined;
-    setAuthRequest({ mode: request?.mode, email: text(request?.email), name: text(request?.name), title: text(request?.title), intro: text(request?.intro), verify: request?.verify === true });
+    setAuthRequest({ mode: request?.mode, email: text(request?.email), name: text(request?.name), title: text(request?.title), intro: text(request?.intro), verify: request?.verify === true, organizer: request?.signupAs?.as === 'organizer' });
+    signupIntent.current = request?.signupAs?.as === 'organizer' ? request.signupAs : null;
     setAuthOpen(true);
     await new Promise<void>(resolve => { pendingAuth.current = resolve; });
     pendingAuth.current = null;
@@ -218,16 +227,18 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     try { await sendEmailVerification(account, settings); }
     catch (error) { if (!settings || !continueUriRefused(error)) throw error; await sendEmailVerification(account); }
   };
-  const signUpWithEmail = (email: string, password: string, displayName: string) => withAuthAction(async () => {
+  const signUpWithEmail = (email: string, password: string, displayName: string, intent?: SignupIntent) => withAuthAction(async () => {
     const name = realName(displayName);
     signupName.current = name;
+    if (intent) signupIntent.current = intent;
     const credential = await createUserWithEmailAndPassword(auth!, email, password);
     if (name) await updateProfile(credential.user, { displayName: name }).catch(error => console.error('Display name error:', error));
     // The account exists now; a failed email is offered again from the verify screen.
     await sendVerificationTo(credential.user).catch(error => console.error('Verification email error:', error));
     setUser(credential.user);
-    await syncUserProfile(credential.user, false, name);
+    await syncUserProfile(credential.user, false, name, signupIntent.current);
     signupName.current = '';
+    signupIntent.current = null;
   });
   const saveName = async (value: string) => {
     const name = realName(value);

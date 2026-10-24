@@ -42,7 +42,7 @@ The admin UI keeps manual scope selection behind **Review or change scope** for 
 
 ## Business accounts
 
-Claiming needs a CalgaryWatch account: the claim page asks for a Google sign-in, and the rules accept a claim only from a signed-in account with a verified email. When the claim is approved, that account becomes a **business account**: `accountType: 'business'`, the listings it manages (`businessListings`) and `businessSince` on `users/{uid}` (`src/lib/businessAccount.ts`).
+Claiming needs a CalgaryWatch account: the claim page creates one in the same form (email and password, or Google), and the rules accept a claim only from a signed-in account with a verified email. When the claim is approved, that account becomes a **business account**: `accountType: 'business'`, the listings it manages (`businessListings`) and `businessSince` on `users/{uid}` (`src/lib/businessAccount.ts`).
 
 - Only an admin can set these fields. A member can't add, change or remove them on their own profile (firestore.rules, `users`).
 - The member sees "Business account" on their dashboard's listings card and on the claim page. Admin sees a Business chip and a "Business accounts" filter in Members.

@@ -1,4 +1,5 @@
 import type { ActionCodeSettings, User } from 'firebase/auth';
+import type { SignupIntent } from './claimInvite';
 
 export type AuthMode = 'signin' | 'signup' | 'reset';
 
@@ -7,7 +8,9 @@ export type AuthMode = 'signin' | 'signup' | 'reset';
  * it already knows, and why the person is being asked (a headline and a line
  * under it), so the dialog reads as the next step of what they were doing.
  */
-export type AuthRequest = { mode?: AuthMode; email?: string; name?: string; title?: string; intro?: string; verify?: boolean };
+export type AuthRequest = { mode?: AuthMode; email?: string; name?: string; title?: string; intro?: string; verify?: boolean; signupAs?: SignupIntent; organizer?: boolean };
+// `signupAs`: only claim pages pass it. A new account made from that dialog is labelled
+// an organizer sign-up; `organizer` is what the dialog itself sees, to word itself for one.
 // `verify`: the page needs a verified email (claims, applications, submissions), so the
 // dialog stays on "Check your inbox" after sign-up. Everywhere else it closes and the
 // account companion nudges later, so saving a plan never waits on an inbox.

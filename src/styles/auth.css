@@ -38,3 +38,4 @@ a.auth-primary,a.auth-secondary{text-decoration:none;box-sizing:border-box}
 @keyframes cw-companion-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.cw-companion{animation:none}}
 @media(max-width:520px){.cw-companion{left:12px;right:12px;width:auto;bottom:calc(12px + env(safe-area-inset-bottom))}}
+.auth-organizer{margin:16px 0 0;padding:12px 14px;border-radius:10px;background:#f3f6f8;color:#33424f;font:500 13px/1.45 Inter,sans-serif}.auth-organizer a{color:#1554d1;font-weight:700}

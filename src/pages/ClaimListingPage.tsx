@@ -5,16 +5,17 @@ import {useAdminEditMode} from '../hooks/useAdminEditMode';
 import { approvedOrganization } from '../lib/organizationWorkspace';
 import { ListingManagement } from '../components/entity/ListingManagement';
 import { restoreClaimDraft } from '../lib/claimDraft';
+import { INVITE_PARAM, decodeInvite, inviteGreetingName, normalizeInvite, type ClaimInvite, type SignupIntent } from '../lib/claimInvite';
 import { useVerifiedListing } from '../lib/claimsApi';
 import { VerifiedBadge } from '../components/entity/VerifiedBadge';
 import { VerifyEmailNotice } from '../components/auth/VerifyEmailNotice';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowUpRight, BadgeCheck, CalendarClock, CalendarDays, Check, Clock, Link2, Lock, Mail, MapPinned, ShieldCheck, Store, Theater, Music, Palette, Building2, UtensilsCrossed, Users } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, CalendarClock, CalendarDays, Check, Clock, Eye, EyeOff, Link2, Lock, Mail, MapPinned, ShieldCheck, Store, Theater, Music, Palette, Building2, UtensilsCrossed, Users } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
-import { realName } from '../lib/auth';
+import { authCode, authErrorMessage, passwordProblem, realName } from '../lib/auth';
 import { discoveryRepository } from '../data/discovery';
 import { entityPath } from '../lib/discovery';
 import { CLAIM_ROLES, claimEvidence, claimProblem, claimTimeline, emailDomain, sourceDomains, type ClaimDraft } from '../lib/claims';
@@ -55,9 +56,30 @@ export default function ClaimListingPage() {
   return <ClaimForm key={id} id={id} />;
 }
 
+/**
+ * The invitation this tab arrived with: from the link the first time, then
+ * from the tab's storage, so a reload or the return from a verification
+ * email still greets the same person.
+ */
+function readInvite(id: string, raw: string | null): ClaimInvite | null {
+  const fromLink = decodeInvite(raw);
+  try {
+    if (fromLink) { sessionStorage.setItem(`claim-invite:${id}`, JSON.stringify(fromLink)); return fromLink; }
+    return normalizeInvite(JSON.parse(sessionStorage.getItem(`claim-invite:${id}`) ?? 'null'));
+  } catch { return fromLink; }
+}
+
 function ClaimForm({ id }: { id: string }) {
-  const { user, signIn, saveName, sendVerificationEmail, refreshCurrentUser, isAuthActionLoading, isFirebaseConfigured, isAdmin } = useAuth();
-  const [params] = useSearchParams();
+  const { user, signIn, signUpWithEmail, saveName, refreshCurrentUser, isAuthActionLoading, isFirebaseConfigured, isAdmin } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const [invite] = useState(() => readInvite(id, params.get(INVITE_PARAM)));
+  // The invitation is read once; the address bar (and anything that records it) drops it.
+  useEffect(() => {
+    if (!params.has(INVITE_PARAM)) return;
+    const next = new URLSearchParams(params); next.delete(INVITE_PARAM);
+    setParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
   const adminView = isAdmin && (!!previewUid || params.get('view') === 'admin');
   const claimParams = new URLSearchParams(params);
@@ -88,7 +110,14 @@ function ClaimForm({ id }: { id: string }) {
   const management=(claim?approvedManagementOrganization(claim,discoveryRepository.list()):undefined)??(adminView&&entity?claimOrganization(entity,discoveryRepository.list())?.profile:undefined);
   const profile=management??(legacyClaim&&entity&&(entity.kind==='event'||entity.kind==='market')?standaloneOrganization(entity):organization?.profile);
   const sites = entity ? sourceDomains(entity.sources) : [];
-  const [draft, setDraft] = useState<ClaimDraft>(() => { try { return restoreClaimDraft(sessionStorage.getItem(`claim-draft:${id}`)); } catch { return restoreClaimDraft(null); } });
+  const [draft, setDraft] = useState<ClaimDraft>(() => {
+    let d: ClaimDraft;
+    try { d = restoreClaimDraft(sessionStorage.getItem(`claim-draft:${id}`)); } catch { d = restoreClaimDraft(null); }
+    // An invitation fills in who we wrote to; anything already typed wins.
+    return { ...d, name: d.name || invite?.name || '', workEmail: d.workEmail || invite?.email || '' };
+  });
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [tried, setTried] = useState(false);
@@ -107,6 +136,15 @@ function ClaimForm({ id }: { id: string }) {
   const workDomain = emailDomain(draft.workEmail);
   const domainMatch = !!workDomain && sites.some((s) => workDomain === s || workDomain.endsWith(`.${s}`));
 
+  const intent: SignupIntent | undefined = entity ? { as: 'organizer', entityId: entity.id, via: invite?.via ?? (invite ? 'invite' : 'claim') } : undefined;
+  const accountTitle = entity ? `Your organizer account for ${profile?.title ?? entity.title}.` : '';
+  /** Google, or an account that already exists: the shared dialog, worded for an organizer. */
+  const useOtherAccount = async () => {
+    pending.current = true;
+    await signIn({ mode: 'signin', email: draft.workEmail, name: draft.name, verify: true, signupAs: intent, title: accountTitle, intro: 'Sign in, or continue with Google. Your claim answers stay on this page and send once your email is verified.' });
+    if (!auth?.currentUser) pending.current = false;
+  };
+
   const send = async () => {
     if (!entity || previewUid || adminView || busy) return;
     const current = auth?.currentUser;
@@ -121,9 +159,23 @@ function ClaimForm({ id }: { id: string }) {
       if (first) document.getElementById(`cl-${first}`)?.focus();
       return;
     }
-    // Most claimants are new here: open on "Create account" with their work email, so
-    // the account email matches the organization's domain and the claim checks itself.
-    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: draft.workEmail, name: draft.name, verify: true, title: `Claim ${entity.title}.`, intro: 'Create a free account to send your claim. Your work email is filled in: using it lets us confirm you faster.' }); if (!auth?.currentUser) pending.current = false; return; }
+    // Organizer accounts are made here, in the same form: the contact email becomes the
+    // account email (so a matching domain checks itself), and the claim waits for verification.
+    if (!current) {
+      const pp = passwordProblem(password);
+      if (pp) { setTried(true); setError(pp === 'Enter your password.' ? 'Choose a password for your organizer account.' : pp); document.getElementById('cl-password')?.focus(); return; }
+      setBusy(true); setError('');
+      try {
+        pending.current = true;
+        await signUpWithEmail(draft.workEmail.trim(), password, draft.name.trim(), intent);
+        setPassword('');
+      } catch (e) {
+        pending.current = false;
+        if (authCode(e) === 'auth/email-already-in-use') { setError(`${draft.workEmail.trim()} already has a CalgaryWatch account. Sign in with it and your claim sends from there.`); void useOtherAccount(); }
+        else setError(authErrorMessage(e));
+      } finally { setBusy(false); }
+      return;
+    }
     // Accounts made before names were asked for take the name typed on the claim.
     if (!realName(current.displayName)) void saveName(draft.name).catch(() => {});
     // Unverified: keep the claim queued and send it the moment verification lands.
@@ -139,6 +191,13 @@ function ClaimForm({ id }: { id: string }) {
       setBusy(false);
     }
   };
+  // Organizers verify in their mail app and come back: check again whenever this tab is in view.
+  useEffect(() => {
+    if (!user || user.emailVerified || previewUid) return;
+    const check = () => { if (document.visibilityState === 'visible') void refreshCurrentUser().catch(() => {}); };
+    window.addEventListener('focus', check); document.addEventListener('visibilitychange', check);
+    return () => { window.removeEventListener('focus', check); document.removeEventListener('visibilitychange', check); };
+  }, [user, user?.emailVerified, previewUid, refreshCurrentUser]);
   useEffect(() => {
     if (!previewUid && pending.current && user?.emailVerified && claims) { pending.current = false; setError(''); if (!claim) void send(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -157,6 +216,9 @@ function ClaimForm({ id }: { id: string }) {
   }
 
   const bad = (f: ClaimField) => tried && !!fieldProblem(draft, f);
+  const greeting = inviteGreetingName(invite);
+  const invited = Boolean(invite) && !claim && !adminView && !previewUid;
+  const otherAccount = invited && user?.email && invite?.email && user.email.toLowerCase() !== invite.email;
   const presentation = claimPresentation(listing ?? entity, profile);
   const CategoryIcon = { market: Store, stage: Theater, music: Music, arts: Palette, food: UtensilsCrossed, community: Users, business: Building2, event: CalendarDays }[presentation.key];
   const benefits = PERKS.map(perk => perk.icon === CalendarClock ? { ...perk, title: presentation.dates } : perk.icon === Link2 ? { ...perk, title: presentation.link } : perk);
@@ -174,7 +236,7 @@ function ClaimForm({ id }: { id: string }) {
         <header className="cw-wrap cl-head">
           <div className="cl-hero-copy">
           <motion.p className="pl-eyebrow" {...rise(0)}><CategoryIcon size={17} aria-hidden="true" /> {presentation.label} · free</motion.p>
-          <motion.h1 className="cl-title" {...rise(1)}>{claim?.status==='approved'||adminView?<>Manage <em>{entity.title}.</em></>:<>Claim <em>{profile?.title??entity.title}.</em></>}</motion.h1>
+          <motion.h1 className="cl-title" {...rise(1)}>{claim?.status==='approved'||adminView?<>Manage <em>{entity.title}.</em></>:<>{invited&&greeting?`${greeting}, claim `:'Claim '}<em>{profile?.title??entity.title}.</em></>}</motion.h1>
           <motion.p className="cl-lead" {...rise(2)}><strong>{presentation.intro}</strong> {presentation.detail}</motion.p>
           <ul className="cl-assurances" aria-label="Free organizer access"><li><Check size={15} aria-hidden="true" />Free, no paid plan</li><li><Check size={15} aria-hidden="true" />About a minute to fill in</li><li><ShieldCheck size={15} aria-hidden="true" />Checked by a person before editing</li></ul>
           </div>
@@ -188,8 +250,8 @@ function ClaimForm({ id }: { id: string }) {
             <Link to={entityPath(listing ?? entity)} className="cl-listing-go">See the listing <ArrowUpRight size={16} aria-hidden="true" /></Link>
           </motion.section>
           <motion.ol className="cl-steps" aria-label="How claiming works" {...rise(4)}>
-            <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Sign in or create an account</li>
-            <li data-done={!!claim}><span>{claim ? <Check size={14} strokeWidth={3} /> : 2}</span> Tell us who you are</li>
+            <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Your details and a password</li>
+            <li data-done={!!user?.emailVerified}><span>{user?.emailVerified ? <Check size={14} strokeWidth={3} /> : 2}</span> Verify your email</li>
             <li data-done={claim?.status === 'approved'}><span>{claim?.status === 'approved' ? <Check size={14} strokeWidth={3} /> : 3}</span> We confirm, then it’s yours</li>
           </motion.ol>
         </header>
@@ -197,7 +259,7 @@ function ClaimForm({ id }: { id: string }) {
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
             {claimLoadError ? <div role="alert" className="pl-error"><p>We couldn’t check existing claims. Your form is still here; this does not mean your account cannot claim this organization.</p><button type="button" className="pl-btn" onClick={() => window.location.reload()}>Reload and try again</button></div> : null}
-            {!claim&&!adminView&&!previewUid?<VerifyEmailNotice action="submit this claim" />:null}
+            {!claim&&!adminView&&!previewUid?<VerifyEmailNotice action={pending.current ? 'we send your claim. It goes the moment you do' : 'submit this claim'} />:null}
             {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved'||adminView ? (
               <>
                 {entity.kind === 'market' ? (
@@ -228,7 +290,8 @@ function ClaimForm({ id }: { id: string }) {
               </section>
             ) : previewUid ? <p>This member has not claimed this listing.</p> : (
               <motion.form aria-label="Organization claim application" className="pl-form cl-form" onSubmit={(e) => { e.preventDefault(); void send(); }} noValidate {...rise(4)}>
-                <div className="cl-form-intro"><p className="pl-kicker">Your organization access</p><h2>Tell us who you are.</h2><p>{user ? 'Use this account to request access—no new account or paid plan is needed.' : 'Fill this in first. When you send it, you’ll sign in or create a free account with email or Google, and your answers are kept.'}</p></div>
+                <div className="cl-form-intro"><p className="pl-kicker">{invited?'Your invitation':'Your organization access'}</p><h2>{invited&&!user?'Check your details, choose a password.':'Tell us who you are.'}</h2><p>{user ? 'Use this account to request access—no new account or paid plan is needed.' : invited ? `We filled in what we know from our email to ${invite?.org ?? profile?.title ?? entity.title}. Fix anything that’s off: this creates your free organizer account and sends your claim in one go.` : 'This creates your free organizer account and sends your claim in one go. Already have an account, or prefer Google? There’s a link below.'}</p></div>
+                {otherAccount?<p className="cl-invite-note">Our invitation went to {invite!.email}. You’re signed in as {user!.email}, which is fine: the claim goes in from this account. <button type="button" className="cl-link" onClick={()=>setDraft(d=>({...d,workEmail:invite!.email!}))}>Use {invite!.email} as the contact email</button></p>:null}
                 <>{verifiedListing?<p role="status"><VerifiedBadge /> This organization is already claimed. You can request access as another representative; existing managers keep their access while we review your request.</p>:null}</>
                 <fieldset className="pl-step">
                   <legend><span className="pl-num">01</span> Who are you?</legend>
@@ -246,7 +309,7 @@ function ClaimForm({ id }: { id: string }) {
                 <fieldset className="pl-step">
                   <legend><span className="pl-num">02</span> How do we reach you?</legend>
                   <label className="pl-field">
-                    <span>Contact email <small>{sites[0] ? `@${sites[0]} is helpful, but not required` : 'Personal or work email'}</small></span>
+                    <span>{user?'Contact email':'Work email'} <small>{user?'':'Also your sign-in. '}{sites[0] ? `@${sites[0]} is helpful, but not required` : 'Personal or work email'}</small></span>
                     <input id="cl-email" aria-invalid={bad('email')} type="email" inputMode="email" value={draft.workEmail} onChange={(e) => setDraft((d) => ({ ...d, workEmail: e.target.value }))} autoComplete="email" placeholder={sites[0] ? `you@${sites[0]}` : 'you@yourorganization.ca'} />
                     {bad('email')?<small className="cl-field-error">Add an email we can reach you at.</small>:null}
                   </label>
@@ -262,13 +325,20 @@ function ClaimForm({ id }: { id: string }) {
                     <span><strong>I’m allowed to manage this listing</strong> for {profile?.title??entity.title}. CalgaryWatch keeps the listing free and independent: claiming doesn’t buy placement, and our picks stay our own. <Link to="/partners">How we work with organizers</Link></span>
                   </label>
                 </fieldset>
+                {!user?<fieldset className="pl-step">
+                  <legend><span className="pl-num">03</span> Your organizer account</legend>
+                  <label className="pl-field"><span>Choose a password <small>at least 6 characters</small></span>
+                    <span className="cl-password"><input id="cl-password" type={showPassword?'text':'password'} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} aria-invalid={tried&&!!passwordProblem(password)} /><button type="button" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?'Hide password':'Show password'}>{showPassword?<EyeOff size={18}/>:<Eye size={18}/>}</button></span>
+                  </label>
+                  <p className="pl-fine">You’ll sign in as <strong>{draft.workEmail.trim()||'the work email above'}</strong>. It’s set up as an organizer account, kept apart from resident sign-ups. <button type="button" className="cl-link" onClick={()=>{const problem=claimProblem(draft);if(problem){setTried(true);setError(problem);return;}void useOtherAccount();}}>I already have an account, or use Google</button></p>
+                </fieldset>:null}
                 {error&&!(tried&&claimProblem(draft)) ? <p className="pl-error" role="alert">{error}</p> : null}
                 {tried&&claimProblem(draft) ? <p className="pl-error" role="alert">{missingSummary(draft)}</p> : null}
                 <div className="pl-actions">
                   <button type="submit" className="pl-btn" data-ready={!claimProblem(draft)} disabled={busy || !isFirebaseConfigured || Boolean(user&&!claims) || Boolean(user&&!user.emailVerified)}>
-                    {busy ? 'Sending…' : claimLoadError ? 'Claim check unavailable' : user && !claims ? 'Checking your claims…' : user&&!user.emailVerified?'Verify email to continue':verifiedListing?'Request organization access':'Claim organization profile'} <ArrowUpRight size={18} aria-hidden="true" />
+                    {busy ? 'Sending…' : claimLoadError ? 'Claim check unavailable' : user && !claims ? 'Checking your claims…' : user&&!user.emailVerified?'Verify email to continue':!user?'Create account and send claim':verifiedListing?'Request organization access':'Claim organization profile'} <ArrowUpRight size={18} aria-hidden="true" />
                   </button>
-                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'Next, sign in or create a free account. Your answers stay on this page.'}</p>
+                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'We email you a link to verify, then your claim sends by itself. A person checks it before you can edit.'}</p>
                 </div>
               </motion.form>
             )}

@@ -29,6 +29,9 @@ import { DATA_SOURCE_BY_ID, type DataSourceId } from '../../src/config/dataSourc
 import { exitForQuota, isQuotaExhausted } from '../lib/quota.js';
 import { buildPulseSnapshot, PULSE_DOC, PULSE_SAMPLE } from '../../src/lib/livePulseSnapshot.js';
 import type { Incident } from '../../src/types/index.js';
+import {
+  buildCrimeBoard, CRIME_BOARD_DOC, CRIME_BOARD_REFRESH_MS, CRIME_BOARD_WINDOW_MS, isBoardIncident,
+} from '../../src/lib/crimeBoard.js';
 
 // ---------------------------------------------------------------------------
 // Firebase Admin init
@@ -259,6 +262,7 @@ async function run(): Promise<void> {
   if (allIncidents.length === 0) {
     console.log('[ingest] No incidents to process. Done.');
     await writePulseSnapshot(db);
+    await writeCrimeBoard(db, []);
     return;
   }
 
@@ -279,6 +283,47 @@ async function run(): Promise<void> {
       `skipped ${skipped} suppressed.`,
   );
   await writePulseSnapshot(db);
+  await writeCrimeBoard(db, allIncidents);
+}
+
+/**
+ * The map's crime board (src/lib/crimeBoard.ts): police releases, news crime,
+ * emergency alerts and neighbours' crime reports from the last 35 days, so the
+ * City's 311 volume can't push them out of the map's newest-60 window.
+ *
+ * Reads are what this costs, so it rebuilds only when this run brought crime
+ * a story newer than the board or the board is two hours old. Member reports
+ * posted in between still reach the map through its newest-60 query. Equality filters only, so no composite
+ * index is needed. Best effort, like the pulse.
+ */
+async function writeCrimeBoard(db: Firestore, fetched: NormalizedIncident[]): Promise<void> {
+  try {
+    const ref = db.collection(CRIME_BOARD_DOC.collection).doc(CRIME_BOARD_DOC.id);
+    const now = Date.now();
+    const current = await ref.get();
+    const checkedAt = current.exists ? Number(current.get('checkedAt')) : 0;
+    // Feeds repeat a week of items every run; only a story newer than the board counts as news.
+    const crimeArrived = fetched.some((i) => isBoardIncident(i) && (i.timestamp ?? 0) > checkedAt);
+    if (!crimeArrived && Number.isFinite(checkedAt) && now - checkedAt < CRIME_BOARD_REFRESH_MS) {
+      console.log('[ingest] Crime board is fresh; skipped.');
+      return;
+    }
+    const snap = await db.collection('incidents')
+      .where('visibility', '==', 'public')
+      .where('category', 'in', ['crime', 'emergency'])
+      .limit(1500)
+      .get();
+    const cutoff = now - CRIME_BOARD_WINDOW_MS;
+    const incidents = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as Incident)
+      .filter((i) => Number(i.timestamp) >= cutoff);
+    const board = buildCrimeBoard(incidents, now);
+    await ref.set(board);
+    const members = board.entries.filter((e) => e.member).length;
+    console.log(`[ingest] Crime board: ${board.entries.length} record(s), ${members} from neighbours (read ${snap.size}).`);
+  } catch (error) {
+    console.warn('[ingest] Crime board skipped:', error instanceof Error ? error.message : error);
+  }
 }
 
 /**

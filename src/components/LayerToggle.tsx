@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CrimeStatEntry } from '@/src/hooks/useCrimeStats';
-import { Layers, Activity, Map as MapIcon, Building2, Video, Camera, Gauge, X } from 'lucide-react';
+import { Layers, Activity, Map as MapIcon, Building2, Video, Camera, Gauge, X, Construction } from 'lucide-react';
 import type { TrafficFlowMode } from '@/src/types/trafficFlow';
 import { TRAFFIC_FLOW } from '@/src/lib/tokens';
 import {
@@ -19,6 +19,9 @@ interface LayerToggleProps {
   setShowHeatmap: (show: boolean) => void;
   showCrimeLayer: boolean;
   setShowCrimeLayer: (show: boolean) => void;
+  /** 311 requests, roads, outages, water and weather pins. Off by default so crime leads. */
+  showCitySignals?: boolean;
+  setShowCitySignals?: (show: boolean) => void;
   showCameras: boolean;
   setShowCameras: (show: boolean) => void;
   showSafetyCameras: boolean;
@@ -140,6 +143,8 @@ export default function LayerToggle({
   setShowHeatmap,
   showCrimeLayer,
   setShowCrimeLayer,
+  showCitySignals = false,
+  setShowCitySignals,
   showCameras,
   setShowCameras,
   showSafetyCameras,
@@ -215,7 +220,7 @@ export default function LayerToggle({
   if (isPinMode) return null;
 
   /** Count of supplementary layers currently on, surfaced on the Layers chip. */
-  const extrasOn = (showCameras ? 1 : 0) + (showSafetyCameras ? 1 : 0) + (showTrafficFlow ? 1 : 0);
+  const extrasOn = (showCitySignals ? 1 : 0) + (showCameras ? 1 : 0) + (showSafetyCameras ? 1 : 0) + (showTrafficFlow ? 1 : 0);
   const closeMenuOnTouch = () => {
     if (window.matchMedia('(max-width: 767px), (pointer: coarse)').matches) setMenuOpen(false);
   };
@@ -338,6 +343,15 @@ export default function LayerToggle({
           <div className="lv-mlayers__scroll">
             <p className="lv-mlayers__section">More layers</p>
             <div className="space-y-0.5">
+              {setShowCitySignals && (
+                <OverlayRow
+                  icon={<Construction size={18} strokeWidth={2} />}
+                  label="City signals"
+                  meta="311 requests, roads, outages, weather"
+                  on={showCitySignals}
+                  onToggle={() => { setShowCitySignals(!showCitySignals); closeMenuOnTouch(); }}
+                />
+              )}
               <OverlayRow
                 icon={<Gauge size={18} strokeWidth={2} />}
                 label="Traffic flow"

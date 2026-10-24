@@ -52,6 +52,22 @@ export const NEWS_FEEDS: NewsFeed[] = [
     site: 'https://calgary.citynews.ca/',
     urls: ['https://calgary.citynews.ca/feed/'],
   },
+  // Postmedia's crime sections: every item is a crime story, which is what
+  // the map is short of. Added 2026-10-24 without a live check (this cloud
+  // container can't reach news hosts); /crime-news.json feeds[] shows whether
+  // they answer after the next deploy.
+  {
+    id: 'herald',
+    name: 'Calgary Herald',
+    site: 'https://calgaryherald.com/category/news/crime/',
+    urls: ['https://calgaryherald.com/category/news/crime/feed/'],
+  },
+  {
+    id: 'sun',
+    name: 'Calgary Sun',
+    site: 'https://calgarysun.com/category/news/crime/',
+    urls: ['https://calgarysun.com/category/news/crime/feed/'],
+  },
   {
     id: 'livewire',
     name: 'LiveWire Calgary',

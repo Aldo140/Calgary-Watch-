@@ -529,3 +529,15 @@
 }
 .lv-mlayers--float { position: absolute; left: 4px; right: 4px; bottom: 100%; }
 @media (min-width: 1024px) { .lv-mlayers--float { left: auto; width: 26rem; } }
+
+/* City signals (311, roads, outages, weather): smaller and quieter, so crime reads first. */
+.lv-pin--signal .lv-pin__art { transform: scale(0.72); opacity: 0.82; }
+.lv-pin--signal .lv-pin__tab { transform: scale(0.8); }
+
+/* Desktop status bar: the "signals hidden" prompt is the one clickable pill. */
+.cw-map .lv-status-signals {
+  pointer-events: auto; cursor: pointer;
+  text-transform: none; letter-spacing: 0; font: 600 12.5px/1 var(--lv-sans);
+}
+.cw-map .lv-status-signals:hover { background: var(--lv-yellow-soft); }
+.cw-map .lv-status-signals:focus-visible { outline: 3px solid var(--lv-blue); outline-offset: 2px; }

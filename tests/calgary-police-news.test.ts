@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+  isIncidentRelease,
   locateCalgaryPoliceRelease,
   normalizeCalgaryPoliceFeed,
   parseCalgaryPoliceFeed,
@@ -41,5 +42,13 @@ describe('Calgary Police newsroom source', () => {
     assert.equal(incidents[0].timestamp, Date.parse('Wed, 19 Aug 2026 13:05:06 -0600'));
     assert.ok(incidents[0].expires_at - incidents[0].timestamp! >= 28 * 86_400_000);
     assert.equal(incidents[1].category, 'traffic');
+  });
+  });
+
+  it('counts the releases the 2026-10-24 audit found refused, and still skips programmes', () => {
+    for (const title of ['Charge laid in Falconridge stabbing', 'Seeking public assistance in series of northeast break-ins',
+      'Police respond to serious bus fire', 'Four men charged in fraudulent courier scam']) assert.ok(isIncidentRelease(title), title);
+    for (const title of ['October 2026 Photo Enforcement Locations', 'Calgary Police Service begins Drone as First Responder trial',
+      'Calgary police release results of commercial vehicle inspection']) assert.ok(!isIncidentRelease(title), title);
   });
 });

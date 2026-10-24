@@ -17,7 +17,8 @@ const FEED_URL = 'https://newsroom.calgary.ca/tagfeed/en/tags/police';
 // Kept 60 days so the map's "All" view holds two months of releases; the feed
 // itself only lists the newest ~20, so retention is what builds the history.
 const RETENTION_MS = 60 * 24 * 60 * 60 * 1000;
-const MAX_AGE_MS = 35 * 24 * 60 * 60 * 1000;
+// The feed lists ~50 releases (about two months); all of them count.
+const MAX_AGE_MS = RETENTION_MS;
 
 interface FeedItem {
   title: string;
@@ -85,13 +86,20 @@ export function locateCalgaryPoliceRelease(text: string, points: CommunityPoint[
 function classify(title: string, description: string): IncidentCategory {
   if (/\b(active shooter|evacuat|public safety emergency|missing child|amber alert)\b/i.test(title)) return 'emergency';
   if (/\b(collision|crash|traffic enforcement|traffic safety|vehicle chase|dirt bike chase)\b/i.test(title)) return 'traffic';
+  if (/\b(fire|blaze|explosion)\b/i.test(title) && !/\barson\b/i.test(title)) return 'emergency';
   if (/\b(active shooter|evacuat|amber alert)\b/i.test(description.slice(0, 500))) return 'emergency';
   return 'crime';
 }
 
-function isIncidentRelease(title: string): boolean {
-  if (/photo enforcement locations|beyond the badge|recruit|award|annual report/i.test(title)) return false;
-  return /\b(want(?:ed)?|charg(?:ed|es)|warrants?|arrest(?:ed)?|investigat(?:e|ion|ing)|shoot(?:ing)?|collisions?|crash|rob(?:bery|bed)?|assault(?:ed)?|vandalis(?:m|ed)|missing|body|seiz(?:ed|ure)|crime|fraud|homicide|stol(?:en|e)|theft|chase)\b/i.test(title);
+/**
+ * A release about something that happened somewhere, not a programme or a
+ * report. The 2026-10-24 audit found "Charge laid in Falconridge stabbing",
+ * "Seeking public assistance in series of northeast break-ins" and "Police
+ * respond to serious bus fire" all refused for missing a word here.
+ */
+export function isIncidentRelease(title: string): boolean {
+  if (/photo enforcement|beyond the badge|recruit|award|annual report|drone|trial|begins|launch|vehicle inspection|recommendations|review|survey|town hall|community (meeting|event)|safety tips?|reminds|campaign/i.test(title)) return false;
+  return /\b(want(?:ed)?|charg(?:e|ed|es)|laid|warrants?|arrest(?:ed|s)?|investigat(?:e|ion|ing)|shoot(?:ing)?|shot|stabb(?:ing|ed)?|collisions?|crash|rob(?:bery|beries|bed)?|assault(?:ed)?|vandalis(?:m|ed)|missing|body|seiz(?:ed|ure)|crime|fraud(?:ulent)?|scam|extortion|homicide|stol(?:en|e)|theft|chase|break.?ins?|burglar(?:y|ies)|fire|arson|trafficking|weapons?|firearms?|offender|suspects?|identify|public assistance|dashcam|hate.motivated|sexual|drugging|carjack(?:ing|ings)?)\b/i.test(title);
 }
 
 function storyKey(title: string): string {

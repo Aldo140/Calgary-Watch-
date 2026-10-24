@@ -11,7 +11,7 @@
 
 import { appendFileSync } from 'node:fs';
 import { fetchCalgary311Crime } from './sources/calgary-311.js';
-import { normalizeCalgaryPoliceFeed, parseCalgaryPoliceFeed } from './sources/calgary-police-news.js';
+import { isIncidentRelease, normalizeCalgaryPoliceFeed, parseCalgaryPoliceFeed } from './sources/calgary-police-news.js';
 import { loadCommunityPoints } from './sources/community-locator.js';
 import { judgeNewsItem, placeWithPolice, readNewsFeeds } from './sources/rss.js';
 import type { NormalizedIncident } from './types.js';
@@ -76,7 +76,11 @@ async function auditPolice(points: Awaited<ReturnType<typeof loadCommunityPoints
     kept.forEach((k) => out(`- **${k.category}** · ${k.neighborhood} · ${k.title}`));
     out('');
     out('Not placed:');
-    items.filter((i) => !keptLinks.has(i.link)).forEach((i) => out(`- ${i.title}`));
+    items.filter((i) => !keptLinks.has(i.link)).forEach((i) => {
+      const age = Math.round((Date.now() - Date.parse(i.pubDate)) / 86_400_000);
+      const why = !isIncidentRelease(i.title) ? 'not an incident' : age > 60 ? `${age} days old` : 'no place named, or an update to a placed release';
+      out(`- ${why}: ${i.title} (${age}d)`);
+    });
     out('');
     const placed = placeWithPolice([...unplaced.values()], kept);
     out(`News stories placed by their police release: ${placed.length} of ${unplaced.size} unplaced`);

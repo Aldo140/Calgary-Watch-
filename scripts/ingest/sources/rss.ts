@@ -13,8 +13,8 @@
 import { createHash } from 'crypto';
 import type { IncidentCategory } from '../../../src/types/index.js';
 import type { NormalizedIncident } from '../types.js';
-import { NEIGHBOURHOOD_COORDS } from '../../../src/data/neighbourhoodCoords.js';
 import { NEWS_FEEDS } from '../../../src/content/newsFeeds.js';
+import { isSetElsewhere, loadCommunityPoints, locateInText } from './community-locator.js';
 
 // ---------------------------------------------------------------------------
 // Feed definitions
@@ -27,32 +27,49 @@ const FEEDS = NEWS_FEEDS.filter((feed) => !feed.police);
 // Keyword → category (ordered: first match wins)
 // ---------------------------------------------------------------------------
 
+// Stories are read for a week, not a day: a feed lists its last 20-50 items,
+// and a 24-hour window threw most of a story's life away whenever a run was
+// delayed. Re-reading an old item is harmless; it upserts by link.
+const LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000;
+
+
+/**
+ * Specific crime words first, then serious collisions, then fires and
+ * hazards, and only then the generic police vocabulary. The generic words used
+ * to come first, so "Calgary police say a pick-up struck a man on Deerfoot"
+ * was filed as a crime because the story quoted the police.
+ */
 const RULES: { patterns: RegExp[]; category: IncidentCategory }[] = [
   {
     category: 'crime',
     patterns: [
-      /\b(shooting|gunshot|firearms?|shots? fired)\b/i,
-      /\b(stabbing|knife attack|homicide|murder|manslaughter|killed|death investigation)\b/i,
-      /\b(robbery|break.?in|theft|stolen|carjacking|fraud|sexual assault|sex assault)\b/i,
-      /\b(arrest(ed)?|charged|suspect|police seek|RCMP|Calgary Police|CPS)\b/i,
-      /\b(missing (person|child|woman|man|teen)|amber alert)\b/i,
-      /\b(drug (bust|seizure|trafficking)|fentanyl|overdose|poisoning)\b/i,
-    ],
-  },
-  {
-    category: 'emergency',
-    patterns: [
-      /\b(structure fire|house fire|apartment fire|building fire|blaze|arson)\b/i,
-      /\b(explosion|blast|gas leak|evacuate|evacuation order|hazmat|chemical)\b/i,
-      /\b(flood(ing| warning| watch| advisory)?|wildfire|emergency declaration)\b/i,
+      /\b(shooting|shot (dead|and killed)|gunshot|firearms?|shots? fired|gunfire)\b/i,
+      /\b(stabb(ing|ed)|knife attack|homicide|murder|manslaughter|death investigation|suspicious death)\b/i,
+      /\b(robbery|robbed|break.?ins?|broke into|theft|thefts|stolen|carjack(ing|ed)?|fraud|scam(med)?|extortion|sexual assault|sex assault|assault(ed)?|kidnap(ping|ped)?|abduct(ion|ed)|arson|vandal(ism|ized)|hate crime|human trafficking)\b/i,
+      /\b(missing (person|child|woman|man|teen|girl|boy|senior)|amber alert)\b/i,
+      /\b(drug (bust|seizure|trafficking)|fentanyl|cocaine|meth(amphetamine)?)\b/i,
     ],
   },
   {
     category: 'traffic',
     patterns: [
-      /\b(fatal crash|fatal collision|fatal accident|deadly crash)\b/i,
-      /\b(multi.?vehicle|serious collision|pedestrian (struck|hit|killed)|cyclist (struck|hit|killed))\b/i,
+      /\b(fatal (crash|collision|accident)|deadly crash|killed in (a )?(crash|collision))\b/i,
+      /\b(struck and killed|hit and run|hit-and-run|multi.?vehicle|serious (collision|crash)|pedestrian (struck|hit|killed)|cyclist (struck|hit|killed))\b/i,
       /\b(road closed|highway (closure|blocked)|Deerfoot|Crowchild|Glenmore|Stoney Trail)\b/i,
+    ],
+  },
+  {
+    category: 'emergency',
+    patterns: [
+      /\b(structure fire|house fire|apartment fire|building fire|blaze|fire crews|firefighters)\b/i,
+      /\b(explosion|blast|gas leak|evacuate|evacuation order|hazmat|chemical)\b/i,
+      /\b(flood(ing| warning| watch| advisory)?|wildfire|emergency declaration)\b/i,
+    ],
+  },
+  {
+    category: 'crime',
+    patterns: [
+      /\b(arrest(ed)?|charged|charges laid|suspects?|police seek|wanted|warrants?)\b/i,
     ],
   },
   {
@@ -73,37 +90,11 @@ const RULES: { patterns: RegExp[]; category: IncidentCategory }[] = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Location extraction
-// ---------------------------------------------------------------------------
+/** Court, policy and opinion pieces use crime words without being an incident on a street. */
+const NOT_AN_INCIDENT = /\b(opinion|editorial|column|podcast|letters?:|sentenc(ed|ing)|trial|pleads? guilty|appeal|parole|inquiry|budget|study finds|report finds|statistics|crime rate|crime severity index|year in review)\b/i;
 
-function extractLocationFromText(text: string): { neighborhood: string; lat: number; lng: number } | null {
-  const lower = text.toLowerCase();
-  for (const [name, coords] of Object.entries(NEIGHBOURHOOD_COORDS)) {
-    if (lower.includes(name)) {
-      return {
-        neighborhood: name.replace(/\b\w/g, (c) => c.toUpperCase()),
-        lat: coords[0],
-        lng: coords[1],
-      };
-    }
-  }
-  if (/\bnw\s+calgary|\bcalgary[,\s]+nw\b|\bnorthwest\s+calgary|\bcalgary[,\s]+northwest\b/i.test(text)) {
-    return { neighborhood: 'Northwest Calgary', lat: 51.128, lng: -114.190 };
-  }
-  if (/\bne\s+calgary|\bcalgary[,\s]+ne\b|\bnortheast\s+calgary|\bcalgary[,\s]+northeast\b/i.test(text)) {
-    return { neighborhood: 'Northeast Calgary', lat: 51.128, lng: -113.980 };
-  }
-  if (/\bsw\s+calgary|\bcalgary[,\s]+sw\b|\bsouthwest\s+calgary|\bcalgary[,\s]+southwest\b/i.test(text)) {
-    return { neighborhood: 'Southwest Calgary', lat: 50.975, lng: -114.180 };
-  }
-  if (/\bse\s+calgary|\bcalgary[,\s]+se\b|\bsoutheast\s+calgary|\bcalgary[,\s]+southeast\b/i.test(text)) {
-    return { neighborhood: 'Southeast Calgary', lat: 50.975, lng: -113.980 };
-  }
-  return null;
-}
-
-function classifyText(title: string, description: string): IncidentCategory | null {
+export function classifyText(title: string, description: string): IncidentCategory | null {
+  if (NOT_AN_INCIDENT.test(title)) return null;
   const combined = `${title} ${description}`;
   for (const rule of RULES) {
     if (rule.patterns.some((re) => re.test(combined))) return rule.category;
@@ -174,6 +165,7 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
   const now = Date.now();
   const results: NormalizedIncident[] = [];
   const failures: string[] = [];
+  const points = await loadCommunityPoints();
 
   await Promise.allSettled(
     FEEDS.map(async (feed) => {
@@ -207,14 +199,15 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
         const items = parseRssItems(xml);
 
         for (const item of items) {
-          // Only look at items from the last 24 hours
           const pubMs = item.pubDate ? new Date(item.pubDate).getTime() : now;
-          if (isNaN(pubMs) || now - pubMs > 24 * 60 * 60 * 1000) continue;
+          if (isNaN(pubMs) || now - pubMs > LOOKBACK_MS || pubMs > now + 60 * 60 * 1000) continue;
 
           const category = classifyText(item.title, item.description);
           if (!category) continue;
 
-          const location = extractLocationFromText(`${item.title} ${item.description}`);
+          const text = `${item.title} ${item.description}`;
+          if (isSetElsewhere(item.title, text)) continue;
+          const location = locateInText(text, points);
           if (!location) continue;
 
           // Build a clean description from the RSS snippet (strip HTML noise)

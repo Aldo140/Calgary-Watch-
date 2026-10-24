@@ -208,7 +208,7 @@ for (const c of BEST_CATEGORIES) {
 // Calgary safety news (experiment, 2026-10-21): one page per crime people search for.
 ROUTE_SEO[SAFETY_PATH] = {
   title: 'Calgary Crime News Today: Police & Safety Headlines | CalgaryWatch',
-  description: 'Recent Calgary crime and safety headlines from CTV, CBC, Global, CityNews, LiveWire and Calgary Police, sorted by topic, with who to call and what neighbours can do.',
+  description: 'Recent Calgary crime and safety headlines from CTV, CBC, Global, CityNews, LiveWire, the Herald, the Sun and Calgary Police, sorted by topic, with who to call and what neighbours can do.',
   index: true,
   pageType: 'CollectionPage',
   dateModified: SAFETY_UPDATED,

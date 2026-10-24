@@ -9,9 +9,9 @@
  */
 
 import { createHash } from 'node:crypto';
-import { NEIGHBOURHOOD_COORDS } from '../../../src/data/neighbourhoodCoords.js';
 import type { IncidentCategory } from '../../../src/types/index.js';
 import type { NormalizedIncident } from '../types.js';
+import { loadCommunityPoints, locateInText, shortlistPoints, type CommunityPoint, type PlacedLocation } from './community-locator.js';
 
 const FEED_URL = 'https://newsroom.calgary.ca/tagfeed/en/tags/police';
 const RETENTION_MS = 35 * 24 * 60 * 60 * 1000;
@@ -62,46 +62,22 @@ export function parseCalgaryPoliceFeed(xml: string): FeedItem[] {
     .filter((item) => Boolean(item.title && item.link && item.pubDate));
 }
 
-function titleCase(value: string): string {
-  return value.replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
+const LOCATION_ALIASES: CommunityPoint[] = [
+  { phrase: 'saddle ridge', neighborhood: 'Saddle Ridge', lat: 51.1494, lng: -113.9670 },
+  { phrase: 'spruce cliff', neighborhood: 'Spruce Cliff', lat: 51.0451, lng: -114.1342 },
+  { phrase: 'edworthy park', neighborhood: 'Spruce Cliff', lat: 51.0610, lng: -114.1550 },
+  { phrase: 'somerset-bridlewood', neighborhood: 'Somerset-Bridlewood', lat: 50.8980, lng: -114.1160 },
+  { phrase: 'somerset', neighborhood: 'Somerset', lat: 50.8980, lng: -114.1360 },
+  { phrase: 'bridlewood', neighborhood: 'Bridlewood', lat: 50.8990, lng: -114.1120 },
+];
 
-const LOCATION_ALIASES: Record<string, { neighborhood: string; lat: number; lng: number }> = {
-  'saddle ridge': { neighborhood: 'Saddle Ridge', lat: 51.1494, lng: -113.9670 },
-  'spruce cliff': { neighborhood: 'Spruce Cliff', lat: 51.0451, lng: -114.1342 },
-  'edworthy park': { neighborhood: 'Spruce Cliff', lat: 51.0610, lng: -114.1550 },
-  'somerset-bridlewood': { neighborhood: 'Somerset-Bridlewood', lat: 50.8980, lng: -114.1160 },
-  'somerset': { neighborhood: 'Somerset', lat: 50.8980, lng: -114.1360 },
-  'bridlewood': { neighborhood: 'Bridlewood', lat: 50.8990, lng: -114.1120 },
-};
-
-export function locateCalgaryPoliceRelease(text: string): { neighborhood: string; lat: number; lng: number } | null {
-  const lower = text.toLowerCase();
-  const matches: Array<{ index: number; location: { neighborhood: string; lat: number; lng: number } }> = [];
-  for (const [phrase, location] of Object.entries(LOCATION_ALIASES)) {
-    const index = lower.indexOf(phrase);
-    if (index >= 0) matches.push({ index, location });
-  }
-  for (const name of Object.keys(NEIGHBOURHOOD_COORDS)) {
-    const index = lower.indexOf(name);
-    if (index < 0) continue;
-    const [lat, lng] = NEIGHBOURHOOD_COORDS[name];
-    matches.push({ index, location: { neighborhood: titleCase(name), lat, lng } });
-  }
-  if (matches.length > 0) return matches.sort((a, b) => a.index - b.index)[0].location;
-  if (/\b(?:southwest|s\.?w\.?)\s+(?:calgary|community|area)|\bcalgary'?s southwest\b/i.test(text)) {
-    return { neighborhood: 'Southwest Calgary', lat: 50.975, lng: -114.180 };
-  }
-  if (/\b(?:southeast|s\.?e\.?)\s+(?:calgary|community|area)|\bcalgary'?s southeast\b/i.test(text)) {
-    return { neighborhood: 'Southeast Calgary', lat: 50.975, lng: -113.980 };
-  }
-  if (/\b(?:northwest|n\.?w\.?)\s+(?:calgary|community|area)|\bcalgary'?s northwest\b/i.test(text)) {
-    return { neighborhood: 'Northwest Calgary', lat: 51.128, lng: -114.190 };
-  }
-  if (/\b(?:northeast|n\.?e\.?)\s+(?:calgary|community|area)|\bcalgary'?s northeast\b/i.test(text)) {
-    return { neighborhood: 'Northeast Calgary', lat: 51.128, lng: -113.980 };
-  }
-  return null;
+/**
+ * The community a release names (via the shared locator), else its quadrant,
+ * else null. `points` defaults to the bundled shortlist; a run passes the
+ * City's full community list.
+ */
+export function locateCalgaryPoliceRelease(text: string, points: CommunityPoint[] = shortlistPoints()): PlacedLocation | null {
+  return locateInText(text, [...LOCATION_ALIASES, ...points]);
 }
 
 function classify(title: string, description: string): IncidentCategory {
@@ -128,7 +104,7 @@ function conciseDescription(value: string): string {
   return firstTwoSentences.replace(/\s+/g, ' ').trim().slice(0, 600);
 }
 
-export function normalizeCalgaryPoliceFeed(xml: string, now = Date.now()): NormalizedIncident[] {
+export function normalizeCalgaryPoliceFeed(xml: string, now = Date.now(), points: CommunityPoint[] = shortlistPoints()): NormalizedIncident[] {
   const results: NormalizedIncident[] = [];
   const stories = new Set<string>();
   for (const item of parseCalgaryPoliceFeed(xml)) {
@@ -137,7 +113,7 @@ export function normalizeCalgaryPoliceFeed(xml: string, now = Date.now()): Norma
     if (!isIncidentRelease(item.title)) continue;
     const story = storyKey(item.title);
     if (stories.has(story)) continue;
-    const location = locateCalgaryPoliceRelease(`${item.title} ${item.description.slice(0, 1_200)}`);
+    const location = locateCalgaryPoliceRelease(`${item.title} ${item.description.slice(0, 1_200)}`, points);
     if (!location) continue;
     const category = classify(item.title, item.description);
     const key = createHash('sha256').update(item.link).digest('hex').slice(0, 24);
@@ -173,5 +149,5 @@ export async function fetchCalgaryPoliceNews(): Promise<NormalizedIncident[]> {
     signal: AbortSignal.timeout(20_000),
   });
   if (!response.ok) throw new Error(`Calgary Police newsroom returned HTTP ${response.status}`);
-  return normalizeCalgaryPoliceFeed(await response.text());
+  return normalizeCalgaryPoliceFeed(await response.text(), Date.now(), await loadCommunityPoints());
 }

@@ -11,6 +11,8 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
+import { useCrimeBoard } from '@/src/hooks/useCrimeBoard';
+import { isCitySignal, memberMapLifetimeMs, MEMBER_OTHER_MAP_MS } from '@/src/lib/crimeBoard';
 import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
@@ -658,6 +660,9 @@ export default function MapPage() {
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
   const officialOpenData = useOfficialOpenData(isAuthReady);
+  // Police, news crime, alerts and neighbours' crime reports from the last 35
+  // days, which the newest-60 query loses behind the City's 311 volume.
+  const crimeBoardIncidents = useCrimeBoard(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
   const edmontonOpenData = useEdmontonOpenData(isAuthReady);
   // ENMAX outages arrive already adapted into infrastructure incidents.
@@ -685,6 +690,13 @@ export default function MapPage() {
   const [activeIncidentId, setActiveIncidentId] = useState<string | null>(null);
   
   const [showLiveReports, setShowLiveReports] = useState(true);
+  /**
+   * City signals (311 requests, roads, outages, water, weather) start hidden.
+   * They were 53 of the newest 60 records and buried every crime report under
+   * debris and signal faults. Picking Traffic, City or Weather shows them
+   * anyway; this switch brings them back alongside crime.
+   */
+  const [showCitySignals, setShowCitySignals] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showCameras, setShowCameras] = useState(false);
   const [showSafetyCameras, setShowSafetyCameras] = useState(false);
@@ -1251,17 +1263,14 @@ export default function MapPage() {
   }, [requestReport]);
 
   /**
-   * How long a community report stays on the map.
-   *
-   * Was 24 hours, which emptied the map faster than neighbours could fill it —
-   * a report vanished the day after it was filed, so the map read as quieter
-   * than the neighbourhood actually was. Five days lets real reports accumulate
-   * into something worth opening.
+   * How long a community report stays on the map: memberMapLifetimeMs in
+   * src/lib/crimeBoard.ts. A neighbour's crime or safety report stays 30 days
+   * (it was 5, so a stolen-car report was gone before most people saw it);
+   * anything else they post, and the example pulse, stays 5.
    *
    * Official records are unaffected: their lifetime comes from `expires_at`,
    * set by the source, so a cleared road closure still disappears on time.
    */
-  const MAP_DECAY_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
 
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
   const incidents = useMemo(() => {
@@ -1271,7 +1280,8 @@ export default function MapPage() {
     // suppression list. Applied here, after the merge, so it covers every
     // source uniformly.
     const combined = applySuppression(
-      [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents, ...airQualityIncidents, ...riverIncidents],
+      // Board copies first, so a record the live query also returned wins the merge below.
+      [...crimeBoardIncidents, ...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents, ...airQualityIncidents, ...riverIncidents],
       suppressedIds,
     );
     // Reduce API-sourced traffic by exactly 15% after every source is merged,
@@ -1309,7 +1319,7 @@ export default function MapPage() {
       if (!isDup) kept.push(inc);
     }
     return kept;
-  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, riverIncidents, suppressedIds]);
+  }, [crimeBoardIncidents, firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, riverIncidents, suppressedIds]);
 
   // ── My Watch ────────────────────────────────────────────────────────────────
   // The reader's persisted "last checked" mark, radius and categories. The
@@ -1890,6 +1900,17 @@ export default function MapPage() {
     setIsEmergencyOpen(false);
   }, []);
 
+  /** Signals hide only while the reader is looking at everything or at crime. */
+  const hidesCitySignals = !showCitySignals && (selectedCategory === 'all' || selectedCategory === 'crime');
+  /** How many signals the switch is holding back, for the "Show" prompt. */
+  const hiddenSignalCount = useMemo(() => {
+    if (!hidesCitySignals) return 0;
+    const now = Date.now();
+    return incidents.filter((i) => isCitySignal(i) && (!i.expires_at || i.expires_at > now)
+      && inMapTimeWindow(i.timestamp, timeWindow, now)
+      && (selectedCategory === 'all' || i.category === selectedCategory)).length;
+  }, [incidents, hidesCitySignals, timeWindow, selectedCategory, clock]);
+
   // Map shows all incidents: official API data (traffic, 311) + community posts.
   // Official incidents use expires_at for decay; community posts use 24h rolling decay.
   const mapIncidents = useMemo(() => {
@@ -1898,11 +1919,12 @@ export default function MapPage() {
       if (i.data_source === 'official') {
         return !i.expires_at || i.expires_at > now;         // expires_at controls official lifetime
       }
-      return now - i.timestamp < MAP_DECAY_MS;              // community reports linger 5 days
-    }).filter((i) => inMapTimeWindow(i.timestamp, timeWindow, now)); // same window as the feed
+      return now - i.timestamp < (memberMapLifetimeMs(i) ?? MEMBER_OTHER_MAP_MS); // neighbours' crime 30 days, the rest 5
+    }).filter((i) => inMapTimeWindow(i.timestamp, timeWindow, now)) // same window as the feed
+      .filter((i) => !hidesCitySignals || !isCitySignal(i));
     if (selectedCategory === 'all') return visible;
     return visible.filter(i => i.category === selectedCategory || i.category === 'emergency');
-  }, [incidents, selectedCategory, timeWindow, clock]);
+  }, [incidents, selectedCategory, timeWindow, clock, hidesCitySignals]);
 
   /**
    * The report feed is Calgary-focused. Edmonton Open Data can still render as
@@ -1910,11 +1932,12 @@ export default function MapPage() {
    * mobile sheet where noisy records could outrank local reports.
    */
   const feedIncidents = useMemo(() => {
-    const localFeed = incidents.filter((incident) => incident.source_type !== 'edmonton_open_data');
+    const localFeed = incidents.filter((incident) => incident.source_type !== 'edmonton_open_data')
+      .filter((incident) => !hidesCitySignals || !isCitySignal(incident));
     if (timeWindow === 'all') return localFeed;
     const now = Date.now();
     return localFeed.filter((incident) => inMapTimeWindow(incident.timestamp, timeWindow, now));
-  }, [incidents, timeWindow, clock]);
+  }, [incidents, timeWindow, clock, hidesCitySignals]);
 
   /** The feed scoped to the community a ?near= link named, for the briefing. */
   const briefingIncidents = useMemo(() => {
@@ -3894,6 +3917,8 @@ export default function MapPage() {
           trafficFlowError={trafficFlow.error}
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
+          showCitySignals={showCitySignals}
+          setShowCitySignals={setShowCitySignals}
           crimeStats={crimeStats}
           tourTarget={tourOpen ? tourTarget : undefined}
           isPinMode={isPinMode || isEmergencyPinMode}
@@ -3906,6 +3931,11 @@ export default function MapPage() {
             <span className="lv-status-dot" data-empty={mapIncidents.length === 0 ? 'true' : undefined} aria-hidden="true" />
             <b>{mapIncidents.length}</b> on the map · {windowWord(timeWindow)}
           </span>
+          {hiddenSignalCount > 0 && (
+            <button type="button" className="lv-status-pill lv-status-signals" onClick={() => setShowCitySignals(true)}>
+              {hiddenSignalCount} City 311 and road signals hidden · <u>Show</u>
+            </button>
+          )}
           <span className="lv-status-pill lv-status-note">
             <ShieldAlert size={14} aria-hidden="true" />
             Check the source before you act

@@ -16,7 +16,7 @@ import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible, isCommunityFacingIncident } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, Bell, Search, X, LogIn, Home, Siren, Check, ArrowRight, MapPin } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, Bell, Search, X, LogIn, Home, Siren, Check, ArrowRight, MapPin, Car, Construction, CloudRain } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -54,9 +54,17 @@ import { classify311Service } from '@/src/lib/three11';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 import NowBriefing from '@/src/components/map/NowBriefing';
-import { LivePill, WhenChips, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
+import { LivePill, WhenChips, WhenTrack, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
 import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
 import { inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
+
+const PHONE_CATEGORIES = [
+  { id: 'emergency', label: 'Emergency', Icon: Siren },
+  { id: 'crime', label: 'Crime', Icon: ShieldAlert },
+  { id: 'traffic', label: 'Traffic', Icon: Car },
+  { id: 'infrastructure', label: 'Infrastructure', Icon: Construction },
+  { id: 'weather', label: 'Weather', Icon: CloudRain },
+] as const;
 
 function getCalgaryQuadrant(lat: number, lng: number) {
   const northSouth = lat >= CALGARY_CENTER.lat ? 'N' : 'S';
@@ -1959,6 +1967,20 @@ export default function MapPage() {
     [feedIncidents, selectedCategory],
   );
 
+  /** Phone category chips: per-type counts inside the current time window. */
+  const { phoneCategoryOptions, phoneCategoryTotal } = useMemo(() => {
+    const counts = new globalThis.Map<string, number>();
+    for (const i of feedIncidents) counts.set(i.category, (counts.get(i.category) ?? 0) + 1);
+    const options = PHONE_CATEGORIES.map(({ id, label, Icon }) => ({
+      id,
+      label,
+      color: categoryColor(id),
+      count: counts.get(id) ?? 0,
+      icon: <Icon size={12} strokeWidth={2.5} />,
+    }));
+    return { phoneCategoryOptions: options, phoneCategoryTotal: feedIncidents.length };
+  }, [feedIncidents]);
+
   // Incidents sorted by distance from user for the Near Me panel
   const nearMeIncidents = useMemo(() => {
     const loc = userLocation || CALGARY_CENTER;
@@ -3344,37 +3366,38 @@ export default function MapPage() {
           }
         />
 
-        {/* ── Phone chrome: navy live-sky bar. Wordmark + Live, a search entry
-            that raises the sheet with the caret in its field, and the time
-            chips, which drive the map and the feed together. Measured into
+        {/* ── Phone chrome: navy live-sky bar. Wordmark, the report count (taps
+            raise the list, which owns search) and Live; then the time switch
+            and the category filters, which drive the map and the feed
+            together. Plays a one-time entrance on load. Measured into
             --cw-chrome-h. ──────────────────────────────────────────────── */}
         <div
           ref={chromeRef}
           className="lv-mtop lv-sky lv-tear lg:hidden"
           data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}
         >
+          <span className="lv-mtop-sheen" aria-hidden="true" />
           <div className="lv-mtop-row">
             <DesktopMapBrandMark compact />
             <span className="ml-auto" />
-            <LivePill />
+            <button
+              type="button"
+              data-tour="m-feed"
+              onClick={() => sheetRef.current?.raise()}
+              className="lv-mcount"
+            >
+              <span className="lv-pulse" aria-hidden="true" />
+              <span className="lv-mcount-live">Live</span>
+              <b key={feedCount}>{feedCount}</b> {feedCount === 1 ? 'report' : 'reports'}
+            </button>
           </div>
-          {/* No aria-label: the visible text and count are the accessible
-              name (WCAG 2.5.3, Label in Name). */}
-          <button
-            type="button"
-            data-tour="m-feed"
-            onClick={() => sheetRef.current?.raiseAndFocusSearch()}
-            className="lv-search"
-          >
-            <Search size={18} className="shrink-0" />
-            <span className="lv-search-label">
-              Search reports or areas
-            </span>
-            <span className="lv-search-count">
-              {feedCount} {feedCount === 1 ? 'report' : 'reports'}
-            </span>
-          </button>
-          <WhenChips value={timeWindow} onChange={setTimeWindow} />
+          <WhenTrack value={timeWindow} onChange={setTimeWindow} />
+          <CategoryRail
+            options={phoneCategoryOptions}
+            total={phoneCategoryTotal}
+            value={selectedCategory}
+            onChange={(c) => setSelectedCategory(c as IncidentCategory | 'all')}
+          />
         </div>
 
         {/* Phone action rail (right edge): locate, alerts, account. z-[51]

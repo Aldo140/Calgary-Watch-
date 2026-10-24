@@ -97,7 +97,7 @@ const DESKTOP_STEPS: TourStep[] = [
 
 const MOBILE_STEPS: TourStep[] = [
   STORY_STEPS[0],
-  { target: 'm-feed', title: 'The city feed', body: 'Raise the sheet for every live report, newest first. Filter with the category chips.' },
+  { target: 'm-feed', title: 'The city feed', body: 'Tap the report count for the full list, newest first, with its own search. The chips up top filter by time and type.' },
   STORY_STEPS[1],
   STORY_STEPS[2],
   { target: 'near-me', title: 'Near me', body: 'See reports within 3 km, nearest first and emergencies on top.' },

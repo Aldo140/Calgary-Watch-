@@ -12,7 +12,7 @@ import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
 import { useCrimeBoard } from '@/src/hooks/useCrimeBoard';
-import { isCitySignal, memberMapLifetimeMs, MEMBER_OTHER_MAP_MS } from '@/src/lib/crimeBoard';
+import { isCitySignal, memberMapLifetimeMs, MEMBER_OTHER_MAP_MS, tidyIncidentText } from '@/src/lib/crimeBoard';
 import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
@@ -1304,7 +1304,20 @@ export default function MapPage() {
       || incident.data_source !== 'official'
       || keptTrafficIds.has(incident.id)
     );
-    const unique = new globalThis.Map(densityCurated.map((i: Incident) => [i.id, i]));
+    // The board folds updates and repeat coverage of one event into a single
+    // record; the live query can still return the others, so they are left out,
+    // and the lead keeps the board's count when the live copy replaces it.
+    const boardById = new globalThis.Map(crimeBoardIncidents.map((i) => [i.id, i]));
+    const folded = new Set(crimeBoardIncidents.flatMap((i) => i.related_ids ?? []));
+    const unique = new globalThis.Map(densityCurated
+      .filter((i: Incident) => !folded.has(i.id))
+      .map((i: Incident) => {
+        const board = boardById.get(i.id);
+        const merged = board && board !== i && board.related_count
+          ? { ...i, related_count: board.related_count, related_sources: board.related_sources }
+          : i;
+        return [i.id, tidyIncidentText(merged)] as const;
+      }));
     const filtered = [...unique.values()]
       .filter((i) => {
         if (i.expires_at) return i.expires_at > now;
@@ -1316,12 +1329,14 @@ export default function MapPage() {
     // Community reports (no data_source field) always show — never merged.
     const kept: Incident[] = [];
     for (const inc of filtered) {
-      if (inc.data_source !== 'official') {
+      // Police releases and news are placed at a community's centre, so two
+      // stories from one community share a point; only City signals are thinned.
+      if (inc.data_source !== 'official' || !isCitySignal(inc)) {
         kept.push(inc);
         continue;
       }
       const isDup = kept.some(
-        (k) => k.data_source === 'official' &&
+        (k) => k.data_source === 'official' && isCitySignal(k) &&
           getDistance(k.lat, k.lng, inc.lat, inc.lng) < 0.03
       );
       if (!isDup) kept.push(inc);

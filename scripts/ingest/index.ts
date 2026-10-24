@@ -21,7 +21,9 @@ import type { Firestore } from 'firebase-admin/firestore';
 import { fetchEnvironmentCanadaAlerts } from './sources/environment-canada.js';
 import { fetch511AlbertaEvents } from './sources/511-alberta.js';
 import { fetchAlbertaEmergencyAlerts } from './sources/alberta-emergency-alert.js';
-import { fetchNewsFeedsCalgary } from './sources/rss.js';
+import { classifyText, fetchNewsFeedsCalgary, placeWithPolice, takeUnplacedNews } from './sources/rss.js';
+import { isSetElsewhere } from './sources/community-locator.js';
+import { cleanText } from '../../src/lib/cleanText.js';
 import { fetchCalgary311Crime } from './sources/calgary-311.js';
 import { fetchCalgaryPoliceNews } from './sources/calgary-police-news.js';
 import type { NormalizedIncident } from './types.js';
@@ -254,6 +256,11 @@ async function run(): Promise<void> {
   }
 
   const allIncidents = sourceResults.flatMap((result) => result.incidents);
+  // Calgary stories that named no place, placed by the police release they report on.
+  const viaPolice = placeWithPolice(takeUnplacedNews(),
+    sourceResults.find((r) => r.id === 'calgary_police_news')?.incidents ?? []);
+  if (viaPolice.length) console.log(`[ingest] Placed ${viaPolice.length} news stor(ies) by their police release.`);
+  allIncidents.push(...viaPolice);
 
   // 3. Prune expired system incidents (targeted query, not a full-collection scan).
   const pruned = await pruneExpired(db);
@@ -314,9 +321,10 @@ async function writeCrimeBoard(db: Firestore, fetched: NormalizedIncident[]): Pr
       .limit(1500)
       .get();
     const cutoff = now - CRIME_BOARD_WINDOW_MS;
-    const incidents = snap.docs
+    const incidents = (await repairNewsRows(db, snap.docs
       .map((d) => ({ id: d.id, ...d.data() }) as Incident)
-      .filter((i) => Number(i.timestamp) >= cutoff);
+      .filter((i) => Number(i.timestamp) >= cutoff), now))
+      .filter((i) => i.category === 'crime' || i.category === 'emergency');
     const board = buildCrimeBoard(incidents, now);
     await ref.set(board);
     const members = board.entries.filter((e) => e.member).length;
@@ -324,6 +332,39 @@ async function writeCrimeBoard(db: Firestore, fetched: NormalizedIncident[]): Pr
   } catch (error) {
     console.warn('[ingest] Crime board skipped:', error instanceof Error ? error.message : error);
   }
+}
+
+/**
+ * Stories stored before the news rules were fixed keep their old mistakes:
+ * "&#8216;" in a headline, a Vancouver assault pinned downtown because the
+ * victims were from Calgary, a pedestrian death filed as crime. Each run
+ * re-reads the stored news rows against today's rules and fixes them in
+ * place; a story set elsewhere is expired, so the usual prune removes it.
+ * Only `news_rss` rows are touched, and only fields the feed itself set.
+ */
+async function repairNewsRows(db: Firestore, incidents: Incident[], now: number): Promise<Incident[]> {
+  const out: Incident[] = [];
+  let fixed = 0;
+  let retired = 0;
+  for (const incident of incidents) {
+    if (incident.source_type !== 'news_rss') { out.push(incident); continue; }
+    const title = cleanText(incident.title ?? '');
+    const description = cleanText(incident.description ?? '');
+    const ref = db.collection('incidents').doc(incident.id);
+    if (isSetElsewhere(title, `${title} ${description}`)) {
+      await ref.update({ expires_at: now - 1 }).catch(() => undefined);
+      retired++;
+      continue;
+    }
+    const category = classifyText(title, description) ?? incident.category;
+    if (title !== incident.title || description !== incident.description || category !== incident.category) {
+      await ref.update({ title, description, category }).catch(() => undefined);
+      fixed++;
+    }
+    out.push({ ...incident, title, description, category });
+  }
+  if (fixed || retired) console.log(`[ingest] News rows repaired: ${fixed} fixed, ${retired} set elsewhere and expired.`);
+  return out;
 }
 
 /**

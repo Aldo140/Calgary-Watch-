@@ -16,7 +16,7 @@ if (typeof window !== 'undefined') {
 }
 import { CALGARY_CENTER } from '@/src/constants';
 import { Incident } from '@/src/types';
-import { isCitySignal } from '@/src/lib/crimeBoard';
+import { isCitySignal, isSafety311 } from '@/src/lib/crimeBoard';
 import { LIVE, TRAFFIC_FLOW } from '@/src/lib/tokens';
 import { createCalgaryWatchPositronStyle, OPENFREEMAP_POSITRON_STYLE_URL } from '@/src/lib/mapBasemap';
 import {
@@ -680,7 +680,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         // Divicon pins are focusable (Leaflet sets tabindex and role=button);
         // Enter or Space opens the report like a tap does.
         // Crime and safety pins draw above City signals where they overlap.
-        const marker = L.marker([lat, lng], { icon, keyboard: true, riseOnHover: true, zIndexOffset: isCitySignal(incident) ? 0 : 400 })
+        const marker = L.marker([lat, lng], { icon, keyboard: true, riseOnHover: true, zIndexOffset: isCitySignal(incident) ? 0 : isSafety311(incident) ? 200 : 400 })
           .on('click', activate)
           .on('keypress', (e: any) => {
             const key = e.originalEvent?.key;

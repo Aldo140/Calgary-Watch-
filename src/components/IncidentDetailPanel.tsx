@@ -314,7 +314,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                       <span>
                         {isDemo
                           ? 'Illustrative anonymous example — not a real incident'
-                          : 'Official / synced feed'}
+                          : coverageLine(incident)}
                       </span>
                     </span>
                     {safeSourceUrl && (
@@ -481,4 +481,13 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
       )}
     </AnimatePresence>
   );
+}
+
+/** The subtitle under an official source: what kind of record, and who else covered it. */
+function coverageLine(incident: Incident): string {
+  const others = (incident.related_sources ?? []).filter((s) => s !== incident.source_name);
+  if (others.length > 0) return `Also covered by ${others.join(', ')}`;
+  if ((incident.related_count ?? 0) > 1) return `${incident.related_count} releases and updates on this, newest shown`;
+  if (incident.source_type === 'calgary_open_data' && incident.category === 'crime') return 'A neighbour’s report to 311 · not police-confirmed';
+  return 'Official / synced feed';
 }

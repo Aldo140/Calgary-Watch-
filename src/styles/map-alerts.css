@@ -1,0 +1,185 @@
+/*
+ * City alerts: the alert strip (phone chrome, desktop command bar) and the
+ * alert card. Weather warnings, emergency alerts, smoke and river readings
+ * cover an area, so they are shown here rather than as report pins.
+ */
+
+/* ── Strip ─────────────────────────────────────────────────────────────── */
+.cw-map .lv-alert {
+  --a-bg: var(--lv-yellow); --a-ink: var(--lv-ink); --a-tag-bg: var(--lv-ink); --a-tag-ink: var(--lv-yellow);
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0;
+  height: 40px; margin-top: 10px; padding: 0 10px 0 5px;
+  border: 2px solid var(--lv-ink); border-radius: 999px; cursor: pointer;
+  background: var(--a-bg); color: var(--a-ink); box-shadow: 3px 3px 0 var(--lv-cyan);
+  text-align: left; overflow: hidden;
+  animation: lv-alert-in .5s .55s cubic-bezier(.2, .9, .25, 1) both;
+}
+.cw-map .lv-alert::after { /* slow sheen so it reads as live without blinking */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .45) 50%, transparent 70%);
+  transform: translateX(-120%); animation: lv-alert-sheen 5.5s 1.4s ease-in-out infinite;
+}
+.cw-map .lv-alert:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--lv-cyan); }
+.cw-map .lv-alert:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+.cw-map .lv-alert[data-kind='emergency'] { --a-bg: var(--lv-red); --a-ink: #fff; --a-tag-bg: #fff; --a-tag-ink: var(--lv-red); box-shadow: 3px 3px 0 var(--lv-yellow); }
+.cw-map .lv-alert[data-kind='watch'] { --a-bg: #ffb547; }
+.cw-map .lv-alert[data-kind='advisory'],
+.cw-map .lv-alert[data-kind='air'],
+.cw-map .lv-alert[data-kind='river'] { --a-bg: #fff; --a-tag-bg: var(--lv-navy); --a-tag-ink: var(--lv-cyan-on-navy); }
+.cw-map .lv-alert[data-kind='conditions'] {
+  --a-bg: rgba(255, 255, 255, .1); --a-ink: #fff; --a-tag-bg: rgba(159, 233, 245, .18); --a-tag-ink: var(--lv-cyan-on-navy);
+  border-color: rgba(255, 255, 255, .38); box-shadow: none;
+}
+.cw-map .lv-alert[data-kind='conditions']::after { display: none; }
+.cw-map .lv-alert-ico {
+  flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px;
+  background: var(--a-tag-bg); color: var(--a-tag-ink);
+}
+.cw-map .lv-alert[data-kind='emergency'] .lv-alert-ico { animation: lv-alert-ring 1.6s ease-out infinite; }
+.cw-map .lv-alert-tag {
+  flex: none; font: 700 10.5px/1 var(--lv-mono); letter-spacing: .1em; text-transform: uppercase;
+}
+.cw-map .lv-alert-title {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: 800 13.5px/1 var(--lv-sans); letter-spacing: -.005em;
+}
+.cw-map .lv-alert-title em { font-style: normal; font-weight: 600; opacity: .78; }
+.cw-map .lv-alert-more {
+  flex: none; display: grid; place-items: center; min-width: 24px; height: 22px; padding: 0 6px; border-radius: 999px;
+  background: var(--a-tag-bg); color: var(--a-tag-ink); font: 700 11px/1 var(--lv-mono);
+}
+.cw-map .lv-alert-go { flex: none; }
+@media (max-width: 379px) { .cw-map .lv-alert-tag { display: none; } }
+
+/* Desktop: a pill in the command bar's middle. */
+.cw-map .lv-alert[data-variant='desk'] { width: auto; max-width: min(30rem, 38vw); height: 36px; margin: 0; animation: none; }
+
+@keyframes lv-alert-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes lv-alert-sheen { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@keyframes lv-alert-ring { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .7); } 100% { box-shadow: 0 0 0 9px rgba(255, 255, 255, 0); } }
+
+/* ── Card ──────────────────────────────────────────────────────────────── */
+.cw-map .lv-asheet-wrap { position: fixed; inset: 0; z-index: 90; display: flex; align-items: flex-end; justify-content: center; }
+.cw-map .lv-asheet-scrim { position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(6, 22, 47, .55); backdrop-filter: blur(2px); cursor: default; }
+.cw-map .lv-asheet {
+  --sky-a: #0b2348; --sky-b: #123a7a; --sky-fx: rgba(255, 255, 255, .9);
+  position: relative; display: flex; flex-direction: column; width: 100%; max-height: 90dvh; overflow: hidden;
+  background: var(--lv-paper); color: var(--lv-ink);
+  border: 2px solid var(--lv-ink); border-bottom: 0; border-radius: 26px 26px 0 0;
+  box-shadow: 0 -6px 0 var(--lv-yellow);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@media (min-width: 768px) {
+  .cw-map .lv-asheet-wrap { align-items: center; padding: 24px; }
+  .cw-map .lv-asheet { max-width: 30rem; border-bottom: 2px solid var(--lv-ink); border-radius: 26px; box-shadow: 8px 8px 0 var(--lv-yellow), 8px 8px 0 2px var(--lv-ink); }
+}
+.cw-map .lv-asheet[data-hazard='snow'], .cw-map .lv-asheet[data-hazard='cold'], .cw-map .lv-asheet[data-hazard='ice'] { --sky-a: #0d2f5e; --sky-b: #5d8fd1; }
+.cw-map .lv-asheet[data-hazard='rain'], .cw-map .lv-asheet[data-hazard='flood'] { --sky-a: #0a2540; --sky-b: #2f6f8f; --sky-fx: rgba(159, 233, 245, .8); }
+.cw-map .lv-asheet[data-hazard='storm'] { --sky-a: #120f2e; --sky-b: #4b3a8c; }
+.cw-map .lv-asheet[data-hazard='wind'], .cw-map .lv-asheet[data-hazard='fog'] { --sky-a: #1c2a3d; --sky-b: #6c7f96; }
+.cw-map .lv-asheet[data-hazard='heat'] { --sky-a: #5a1a0c; --sky-b: #ff8a3d; --sky-fx: rgba(255, 223, 79, .7); }
+.cw-map .lv-asheet[data-hazard='smoke'] { --sky-a: #3a2a1d; --sky-b: #c08a4a; --sky-fx: rgba(255, 240, 220, .5); }
+.cw-map .lv-asheet[data-kind='emergency'] { --sky-a: #4a0a08; --sky-b: #d7261e; --sky-fx: rgba(255, 255, 255, .5); }
+
+.cw-map .lv-asky {
+  position: relative; flex: none; height: 132px; overflow: hidden;
+  background:
+    radial-gradient(120% 140% at 85% -10%, var(--sky-b) 0%, transparent 60%),
+    linear-gradient(180deg, var(--sky-a), color-mix(in srgb, var(--sky-a) 70%, var(--sky-b)));
+  border-bottom: 2px solid var(--lv-ink);
+}
+.cw-map .lv-asky::after { /* Calgary skyline silhouette along the bottom edge */
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 34px;
+  background: var(--lv-ink);
+  clip-path: polygon(0 100%, 0 70%, 6% 70%, 6% 52%, 10% 52%, 10% 64%, 15% 64%, 15% 40%, 18% 40%, 18% 62%, 24% 62%, 24% 48%, 28% 48%, 28% 30%, 30% 30%, 30% 18%, 31% 0, 32% 18%, 32% 30%, 34% 30%, 34% 56%, 40% 56%, 40% 36%, 44% 36%, 44% 60%, 50% 60%, 50% 44%, 53% 44%, 53% 26%, 56% 26%, 56% 58%, 62% 58%, 62% 66%, 68% 66%, 68% 50%, 72% 50%, 72% 68%, 80% 68%, 80% 56%, 84% 56%, 84% 72%, 92% 72%, 92% 62%, 100% 62%, 100% 100%);
+}
+.cw-map .lv-asky-fx { position: absolute; inset: -40px 0 0; pointer-events: none; opacity: .9; }
+/* Snow and ice: drifting flakes. */
+.cw-map .lv-asheet:is([data-hazard='snow'], [data-hazard='cold'], [data-hazard='ice']) .lv-asky-fx {
+  background:
+    radial-gradient(circle, var(--sky-fx) 1.6px, transparent 2.2px) 0 0 / 26px 26px,
+    radial-gradient(circle, var(--sky-fx) 1px, transparent 1.6px) 13px 9px / 19px 19px;
+  animation: lv-sky-fall 6s linear infinite;
+}
+.cw-map .lv-asheet:is([data-hazard='snow'], [data-hazard='cold'], [data-hazard='ice']) .lv-asky-fx2 { opacity: .5; animation-duration: 9s; transform: scale(1.6); }
+/* Rain, storm, flood: slanted streaks. */
+.cw-map .lv-asheet:is([data-hazard='rain'], [data-hazard='storm'], [data-hazard='flood']) .lv-asky-fx {
+  background: repeating-linear-gradient(105deg, transparent 0 14px, var(--sky-fx) 14px 15.5px, transparent 15.5px 31px);
+  opacity: .35; animation: lv-sky-rain .7s linear infinite;
+}
+.cw-map .lv-asheet[data-hazard='storm'] .lv-asky-fx2 { background: #fff; opacity: 0; animation: lv-sky-flash 5s 1s infinite; inset: 0; }
+/* Wind, fog, smoke, heat, general: soft drifting bands. */
+.cw-map .lv-asheet:is([data-hazard='wind'], [data-hazard='fog'], [data-hazard='smoke'], [data-hazard='heat'], [data-hazard='general']) .lv-asky-fx {
+  background:
+    radial-gradient(60% 30% at 20% 50%, var(--sky-fx), transparent 70%),
+    radial-gradient(50% 24% at 70% 30%, var(--sky-fx), transparent 70%);
+  opacity: .28; animation: lv-sky-drift 7s ease-in-out infinite alternate;
+}
+.cw-map .lv-asky-fx2 { animation-delay: -3s; }
+.cw-map .lv-asky-badge {
+  position: absolute; left: 18px; bottom: 16px; z-index: 1;
+  display: grid; place-items: center; width: 74px; height: 74px; border-radius: 22px;
+  background: var(--lv-yellow); color: var(--lv-ink); border: 2px solid var(--lv-ink);
+  box-shadow: 5px 5px 0 var(--lv-ink); transform: rotate(-6deg);
+}
+.cw-map .lv-asheet[data-kind='emergency'] .lv-asky-badge { background: #fff; color: var(--lv-red); }
+.cw-map .lv-asheet[data-kind='conditions'] .lv-asky-badge { background: #fff; color: var(--lv-blue); }
+.cw-map .lv-asheet-x {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 999px; cursor: pointer;
+  background: #fff; color: var(--lv-ink); border: 2px solid var(--lv-ink); box-shadow: 2px 2px 0 var(--lv-ink);
+}
+.cw-map .lv-asheet-x:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+
+.cw-map .lv-apager { display: flex; align-items: center; gap: 6px; padding: 12px 12px 0; }
+.cw-map .lv-apager-step {
+  flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--lv-ink); background: #fff; color: var(--lv-ink);
+}
+.cw-map .lv-apager-chips { flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 4px; }
+.cw-map .lv-apager-chips::-webkit-scrollbar { display: none; }
+.cw-map .lv-apager-chip {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; height: 32px; max-width: 13rem; padding: 0 12px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--lv-line); background: #fff; color: var(--lv-ink); font: 700 12.5px/1 var(--lv-sans);
+}
+.cw-map .lv-apager-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cw-map .lv-apager-chip[aria-selected='true'] { border-color: var(--lv-ink); background: var(--lv-navy); color: #fff; box-shadow: 2px 2px 0 var(--lv-yellow); }
+
+.cw-map .lv-asheet-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 18px 20px; }
+.cw-map .lv-asheet-eyebrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font: 600 11.5px/1.2 var(--lv-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lv-muted); }
+.cw-map .lv-asheet-tag { padding: 4px 8px; border-radius: 999px; background: var(--lv-yellow); color: var(--lv-ink); border: 1.5px solid var(--lv-ink); font-weight: 700; }
+.cw-map .lv-asheet-tag[data-kind='emergency'] { background: var(--lv-red); color: #fff; }
+.cw-map .lv-asheet-tag[data-kind='watch'] { background: #ffb547; }
+.cw-map .lv-asheet-tag:is([data-kind='advisory'], [data-kind='air'], [data-kind='river'], [data-kind='conditions']) { background: #d7f3f9; }
+.cw-map .lv-asheet-title { margin-top: 10px !important; font: 800 clamp(26px, 7.4vw, 32px)/1.02 var(--lv-display); letter-spacing: -.035em; }
+.cw-map .lv-asheet-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.cw-map .lv-asheet-meta li { padding: 6px 10px; border-radius: 999px; background: #fff; border: 1.5px solid var(--lv-line); font: 600 12.5px/1 var(--lv-sans); color: var(--lv-ink); }
+.cw-map .lv-asheet-text { margin-top: 14px; display: grid; gap: 8px; font: 500 14.5px/1.5 var(--lv-sans); color: #2e3238; }
+.cw-map .lv-asheet-h { margin-top: 18px !important; font: 600 11.5px/1 var(--lv-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--lv-muted); }
+.cw-map .lv-asheet-tips { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.cw-map .lv-asheet-tips li { display: flex; gap: 10px; align-items: flex-start; font: 600 14px/1.4 var(--lv-sans); }
+.cw-map .lv-asheet-tips li > span { flex: none; display: grid; place-items: center; width: 22px; height: 22px; margin-top: -1px; border-radius: 999px; background: var(--lv-navy); color: var(--lv-yellow); }
+.cw-map .lv-asheet-fine { margin-top: 14px !important; padding: 10px 12px; border-radius: 14px; background: #eef6fb; font: 500 12.5px/1.45 var(--lv-sans); color: #2e3238; }
+.cw-map .lv-asheet-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+.cw-map .lv-asheet-report {
+  flex: 1 1 15rem; display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 0 16px; cursor: pointer; text-align: left;
+  border: 2px solid var(--lv-ink); border-radius: 18px; background: var(--lv-yellow); color: var(--lv-ink); box-shadow: 4px 4px 0 var(--lv-ink);
+}
+.cw-map .lv-asheet-report:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--lv-ink); }
+.cw-map .lv-asheet-report b { display: block; font: 800 14.5px/1.15 var(--lv-sans); }
+.cw-map .lv-asheet-report small { display: block; margin-top: 2px; font: 500 12px/1.2 var(--lv-sans); color: #3b3f45; }
+.cw-map .lv-asheet-src { display: inline-flex; align-items: center; gap: 6px; padding: 10px 2px; font: 700 13.5px/1 var(--lv-sans); color: var(--lv-blue); text-decoration: none; }
+.cw-map .lv-asheet-why { margin-top: 16px !important; padding-top: 12px; border-top: 2px dashed var(--lv-line); font: 500 12px/1.45 var(--lv-sans); color: var(--lv-muted); }
+
+@keyframes lv-sky-fall { to { transform: translateY(40px); } }
+@keyframes lv-sky-rain { to { background-position: -12px 31px; } }
+@keyframes lv-sky-flash { 0%, 92%, 100% { opacity: 0; } 94% { opacity: .5; } 96% { opacity: .1; } 97% { opacity: .35; } }
+@keyframes lv-sky-drift { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-map .lv-alert, .cw-map .lv-alert::after, .cw-map .lv-alert-ico, .cw-map .lv-asky-fx { animation: none !important; }
+}
+/* In the command bar the alert outranks the freshness stamp for space. */
+.cw-map .lv-cmd-mid:has(.lv-alert) .lv-stamp { display: none; }
+@media (min-width: 1440px) { .cw-map .lv-cmd-mid:has(.lv-alert) .lv-stamp { display: inline-flex; } }

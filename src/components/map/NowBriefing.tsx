@@ -9,6 +9,7 @@ import {
   summarizeNowBriefing,
 } from '@/src/lib/nowBriefing';
 import { cn } from '@/src/lib/utils';
+import { QUADRANT_VIEW, summarizeQuadrants, type Quadrant } from '@/src/lib/cityQuadrants';
 import '@/src/styles/map-feed.css';
 
 export interface NowBriefingProps {
@@ -22,6 +23,8 @@ export interface NowBriefingProps {
   /** The category currently filtering the feed, so its row reads as pressed. */
   selectedCategory?: string;
   className?: string;
+  /** Shows the "Across Calgary" board; tapping a quadrant flies the map there. */
+  onQuadrant?: (q: Quadrant) => void;
 }
 
 /**
@@ -40,6 +43,7 @@ export default function NowBriefing({
   onSelectCategory,
   selectedCategory,
   className,
+  onQuadrant,
 }: NowBriefingProps) {
   const [tick, setTick] = useState(() => Date.now());
   useEffect(() => {
@@ -55,6 +59,8 @@ export default function NowBriefing({
   const headingId = useId();
   const { total, community, official } = summary;
   const communityPct = total ? Math.round((community / total) * 100) : 0;
+  const quadrants = useMemo(() => summarizeQuadrants(incidents), [incidents]);
+  const quadMax = Math.max(1, ...quadrants.map((q) => q.total));
 
   return (
     <section className={cn('lv-brief', className)} aria-labelledby={headingId}>
@@ -120,6 +126,35 @@ export default function NowBriefing({
         </>
       ) : (
         <p className="lv-brief-empty" aria-live="polite">{emptyBriefingLine(window)}</p>
+      )}
+
+      {onQuadrant && !areaName && total > 0 && (
+        <div className="lv-quads">
+          <p className="lv-quads-head">Across Calgary <span>tap to look</span></p>
+          <div className="lv-quads-grid">
+            {quadrants.map((q) => (
+              <button
+                key={q.quadrant}
+                type="button"
+                className="lv-quad"
+                data-q={q.quadrant}
+                data-empty={q.total === 0 ? 'true' : undefined}
+                onClick={() => onQuadrant(q.quadrant)}
+                aria-label={`${QUADRANT_VIEW[q.quadrant].name}: ${q.total} ${q.total === 1 ? 'report' : 'reports'}, ${q.crime} crime. Show on the map`}
+              >
+                <span className="lv-quad-top" aria-hidden="true">
+                  <b>{q.quadrant}</b>
+                  <span>{q.total}</span>
+                </span>
+                <span className="lv-quad-bar" aria-hidden="true"><i style={{ width: `${(q.total / quadMax) * 100}%` }} /></span>
+                <span className="lv-quad-sub" aria-hidden="true">
+                  {q.total === 0 ? 'Nothing posted' : `${q.crime} crime · ${q.latest}`}
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="lv-quads-note">More people, more posts: a busier quadrant isn't a less safe one.</p>
+        </div>
       )}
 
       <p className="lv-brief-note">

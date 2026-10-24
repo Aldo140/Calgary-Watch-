@@ -254,9 +254,14 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
     try {
       // Initialize Leaflet map
+      // A phone at zoom 11 shows only the inner city, so Seton, Tuscany and
+      // Saddle Ridge open off-screen and every pin seems to be downtown. Zoom
+      // 10 fits the whole city between the phone bar and the sheet; the
+      // centre sits a little north because the bar covers more than the sheet.
+      const narrow = containerEl.clientWidth < 640;
       map.current = L.map(containerEl, {
-        center: [CALGARY_CENTER.lat, CALGARY_CENTER.lng],
-        zoom: 11,
+        center: [CALGARY_CENTER.lat + (narrow ? 0.035 : 0), CALGARY_CENTER.lng],
+        zoom: narrow ? 10 : 11,
         zoomControl: true,
         // @ts-expect-error tap is a valid Leaflet MapOptions at runtime but missing from typedefs
         tap: false,
@@ -459,7 +464,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         const { el, size } = buildClusterElement(children.map((m: any) => String(m.cwCategory ?? '')));
         return L.divIcon({ html: el, className: 'lv-cluster-icon', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
       },
-      maxClusterRadius: 48,
+      // Tighter on phones, where the whole city is on screen at zoom 10.
+      maxClusterRadius: (zoom: number) => (zoom <= 10 ? 34 : 48),
       zoomToBoundsOnClick: true,
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,

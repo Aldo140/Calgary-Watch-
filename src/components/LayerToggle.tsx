@@ -224,6 +224,7 @@ export default function LayerToggle({
   const closeMenuOnTouch = () => {
     if (window.matchMedia('(max-width: 767px), (pointer: coarse)').matches) setMenuOpen(false);
   };
+  const viewName = [showLiveReports && 'Reports', showHeatmap && 'Heat', showCrimeLayer && '311'].filter(Boolean).join(' + ') || 'Map only';
   const statsYear = crimeStats && crimeStats.size > 0 ? Math.max(...Array.from(crimeStats.values(), (e) => e.year || 0)) : null;
 
   return (
@@ -233,7 +234,9 @@ export default function LayerToggle({
       // rail + 1.375rem keeps the bar just above the sheet at any rail height.
       // While the layers menu is open it lifts above the floating map buttons
       // so the panel is never half-covered on a phone.
-      className={`absolute bottom-8 left-1/2 ${menuOpen ? 'z-[52]' : 'z-30'} w-auto max-w-[min(94vw,36rem)] -translate-x-1/2 px-1 max-lg:bottom-[calc(var(--cw-rail-h,66px)+1.375rem+env(safe-area-inset-bottom))] max-lg:w-[min(94vw,23rem)]`}
+      // Phones: bottom-left, sharing one row with Post just above the sheet
+      // rail. Desktop: the centred segmented bar.
+      className={`lv-layerdock absolute bottom-8 left-1/2 ${menuOpen ? 'z-[52]' : 'z-30'} w-auto max-w-[min(94vw,36rem)] -translate-x-1/2 px-1 max-lg:left-3 max-lg:translate-x-0 max-lg:px-0 max-lg:bottom-[calc(var(--cw-rail-h,66px)+0.875rem+env(safe-area-inset-bottom))]`}
     >
       {/*
         The neighbourhood 311 key, docked to the control that turns it on, so
@@ -341,6 +344,27 @@ export default function LayerToggle({
           </div>
 
           <div className="lv-mlayers__scroll">
+            {/* Phones: the three views as big toggles, since the bar is one pill there. */}
+            <p className="lv-mlayers__section lg:hidden">Show on the map</p>
+            <div className="lv-views lg:hidden">
+              <button type="button" aria-pressed={showLiveReports} onClick={() => setShowLiveReports(!showLiveReports)} className="lv-view" data-view="reports">
+                <span className="lv-view__art" aria-hidden="true"><i /><i /><i /><i /></span>
+                <span className="lv-view__label"><Activity size={15} strokeWidth={2.4} aria-hidden="true" />Reports</span>
+                <span className="lv-view__meta">Every pin</span>
+              </button>
+              <button type="button" aria-pressed={showHeatmap} onClick={() => setShowHeatmap(!showHeatmap)} className="lv-view" data-view="heat">
+                <span className="lv-view__art" aria-hidden="true" style={{ background: HEAT_CSS }} />
+                <span className="lv-view__label"><MapIcon size={15} strokeWidth={2.4} aria-hidden="true" />Heat</span>
+                <span className="lv-view__meta">Where they cluster</span>
+              </button>
+              <button type="button" aria-pressed={showCrimeLayer} onClick={() => setShowCrimeLayer(!showCrimeLayer)} className="lv-view" data-view="311" aria-label="Neighbourhood 311 requests layer">
+                <span className="lv-view__art" aria-hidden="true">
+                  {COMMUNITY_311_RAMP.slice(0, 4).map((c) => <i key={c} style={{ background: c }} />)}
+                </span>
+                <span className="lv-view__label"><Building2 size={15} strokeWidth={2.4} aria-hidden="true" />311</span>
+                <span className="lv-view__meta">By community</span>
+              </button>
+            </div>
             <p className="lv-mlayers__section">More layers</p>
             <div className="space-y-0.5">
               {setShowCitySignals && (
@@ -382,7 +406,25 @@ export default function LayerToggle({
         </div>
       )}
 
-      <div className="lv-layerbar">
+      {/* Phone: one pill that names what the map shows and opens the views. */}
+      <button
+        type="button"
+        data-tour="layers"
+        onClick={() => setMenuOpen((v) => !v)}
+        aria-expanded={menuOpen}
+        aria-label={`Map view: ${viewName}. Change map view and layers`}
+        className="lv-viewpill lg:hidden"
+        data-active={menuOpen ? 'true' : undefined}
+      >
+        <span className="lv-viewpill__ico" aria-hidden="true"><Layers size={17} strokeWidth={2.3} /></span>
+        <span className="lv-viewpill__text" aria-hidden="true">
+          <small>Map view</small>
+          <b>{viewName}</b>
+        </span>
+        {extrasOn > 0 && <span className="lv-seg__badge lv-viewpill__badge" aria-hidden="true">+{extrasOn}</span>}
+      </button>
+
+      <div className="lv-layerbar max-lg:hidden">
         {/* The Layers chip opens the extra layers and the map key. */}
         <button
           type="button"

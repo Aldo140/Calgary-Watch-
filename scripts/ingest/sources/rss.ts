@@ -77,7 +77,8 @@ const RULES: { patterns: RegExp[]; category: IncidentCategory }[] = [
     category: 'traffic',
     patterns: [
       /\b(fatal (crash|collision|accident)|deadly crash|killed in (a )?(crash|collision))\b/i,
-      /\b(struck and killed|hit and run|hit-and-run|multi.?vehicle|serious (collision|crash)|pedestrian (struck|hit|killed)|cyclist (struck|hit|killed))\b/i,
+      /\b(struck and killed|hit and killed|hit and run|hit-and-run|multi.?vehicle|serious (collision|crash)|pedestrian (struck|hit|killed)|cyclist (struck|hit|killed))\b/i,
+      /\b(bus|vehicle|car|truck|semi|motorcycle|pedestrian|cyclist|e-?scooter)\b.{0,40}\b(crash|collision|hit by)\b|\b(crash|collision)\b/i,
       /\b(road closed|highway (closure|blocked)|Deerfoot|Crowchild|Glenmore|Stoney Trail)\b/i,
     ],
   },
@@ -198,11 +199,11 @@ export function headlineKey(title: string): string {
 }
 
 /** Outlets an aggregator item may be credited to: Calgary and national newsrooms, not blogs or wires of wires. */
-const TRUSTED_OUTLET = /\b(calgary herald|calgary sun|ctv|cbc|global news|citynews|livewire calgary|calgary journal|the canadian press|cp24|toronto star|national post|the globe and mail|edmonton journal|rdnewsnow|calgary city news|660 news|cityline|the weather network)\b/i;
+const TRUSTED_OUTLET = /\b(calgary herald|calgary sun|calgary citizen|ctv|cbc|global news|citynews|livewire calgary|calgary journal|the canadian press|cp24|toronto star|national post|the globe and mail|edmonton journal|rdnewsnow|calgary city news|660 news|cityline|the weather network)\b/i;
 
 export type NewsDecision =
   | { keep: true; incident: NormalizedIncident }
-  | { keep: false; reason: string };
+  | { keep: false; reason: string; unplaced?: NormalizedIncident };
 
 /** One feed item in, one decision out (kept, or the reason it was dropped). Shared by the ingest and the audit. */
 export function judgeNewsItem(feed: IngestFeed, item: RssItem, points: CommunityPoint[], now = Date.now()): NewsDecision {
@@ -219,23 +220,20 @@ export function judgeNewsItem(feed: IngestFeed, item: RssItem, points: Community
   const text = `${title} ${item.description}`;
   if (isSetElsewhere(title, text)) return { keep: false, reason: 'set outside Calgary' };
   const location = locateInText(text, points);
-  if (!location) return { keep: false, reason: 'names no Calgary community or quadrant' };
 
   const source = feed.aggregator ? item.outlet! : feed.name;
   const description = item.description && headlineKey(item.description) !== headlineKey(title) && !item.description.startsWith(title)
     ? item.description.slice(0, 400).trim()
     : `${source} reported this story. Open the article for details.`;
 
-  return {
-    keep: true,
-    incident: {
+  const incident: NormalizedIncident = {
       title: title.slice(0, 100),
       description,
       timestamp: pubMs,
       category,
-      neighborhood: location.neighborhood,
-      lat: location.lat,
-      lng: location.lng,
+      neighborhood: location?.neighborhood ?? 'Calgary',
+      lat: location?.lat ?? NaN,
+      lng: location?.lng ?? NaN,
       source_name: source,
       source_url: item.link,
       source_type: 'news_rss',
@@ -253,8 +251,60 @@ export function judgeNewsItem(feed: IngestFeed, item: RssItem, points: Community
       email: 'ingest@calgarywatch.app',
       name: source,
       anonymous: false,
-    },
   };
+  if (!location) {
+    // A Calgary story with no place in its text. It may still be placed by
+    // the police release it reports on (placeWithPolice).
+    return { keep: false, reason: 'names no Calgary community or quadrant', unplaced: incident };
+  }
+  return { keep: true, incident };
+}
+
+const EVENT_WORD = /\b(stab\w*|shoot\w*|shot|robber\w*|robbed|carjack\w*|homicide|murder|assault\w*|fraud|missing|collision|crash|fire|firearms?|weapons?|drugs?|cocaine|fentanyl|theft|stolen|break.?ins?|arson|kidnap\w*|bear.?spray\w*|sexual)\b/gi;
+const PLAIN = new Set(['calgary', 'police', 'charged', 'charges', 'man', 'woman', 'after', 'with', 'following', 'investigate', 'investigation', 'update', 'says', 'say', 'seek', 'sought', 'arrested', 'two', 'three', 'teen', 'youth']);
+function eventWords(title: string): Set<string> {
+  return new Set([...title.toLowerCase().matchAll(EVENT_WORD)].map((m) => m[1].replace(/(ing|ed|ies|y|s)$/, '')));
+}
+function plainWords(title: string): Set<string> {
+  return new Set(title.toLowerCase().split(/[^a-z0-9$]+/).filter((w) => w.length > 3 && !PLAIN.has(w)));
+}
+
+/**
+ * Place a news story by the police release it reports on. "Teen charged in
+ * Calgary armed robberies" names no community; the release it follows
+ * ("Youth charged, two additional suspects sought in armed robberies",
+ * Woodbine) does. A story is placed only when it shares the kind of event and
+ * another distinctive word with exactly one release from the three days
+ * around it, and it takes that release's place, never a guess. The board then
+ * shows them as one pin, covered by both.
+ */
+export function placeWithPolice(unplaced: NormalizedIncident[], releases: NormalizedIncident[]): NormalizedIncident[] {
+  const placed: NormalizedIncident[] = [];
+  for (const story of unplaced) {
+    if (story.category !== 'crime' && story.category !== 'emergency' && story.category !== 'traffic') continue;
+    const events = eventWords(story.title);
+    if (events.size === 0) continue;
+    const words = plainWords(story.title);
+    const matches = releases.filter((r) => {
+      if (r.source_type !== 'calgary_police_crime' || !Number.isFinite(r.lat)) return false;
+      if (Math.abs((r.timestamp ?? 0) - (story.timestamp ?? 0)) > 3 * 24 * 60 * 60 * 1000) return false;
+      const sharedEvent = [...eventWords(r.title)].some((e) => events.has(e));
+      const sharedWord = [...plainWords(r.title)].some((w) => words.has(w) && !events.has(w.replace(/(ing|ed|ies|y|s)$/, '')));
+      return sharedEvent && sharedWord;
+    });
+    if (matches.length !== 1) continue;
+    const [release] = matches;
+    placed.push({ ...story, category: release.category, neighborhood: release.neighborhood, lat: release.lat, lng: release.lng });
+  }
+  return placed;
+}
+
+let unplacedLastRun: NormalizedIncident[] = [];
+/** Calgary stories from the last fetch that named no place, for placeWithPolice. */
+export function takeUnplacedNews(): NormalizedIncident[] {
+  const out = unplacedLastRun;
+  unplacedLastRun = [];
+  return out;
 }
 
 /** News crime stays 45 days, so "All" on the map holds a month and a half of stories. */
@@ -295,6 +345,7 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
   const points = await loadCommunityPoints();
   const reads = await readNewsFeeds();
   const byKey = new Map<string, NormalizedIncident>();
+  const unplaced = new Map<string, NormalizedIncident>();
   const failures: string[] = [];
 
   // Newsroom feeds first, so a story both carry is credited with the outlet's own link.
@@ -307,7 +358,11 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
     let kept = 0;
     for (const item of read.items) {
       const decision = judgeNewsItem(read.feed, item, points, now);
-      if (!decision.keep || byKey.has(decision.incident.dedup_key)) continue;
+      if (!decision.keep) {
+        if (decision.unplaced) unplaced.set(decision.unplaced.dedup_key, decision.unplaced);
+        continue;
+      }
+      if (byKey.has(decision.incident.dedup_key)) continue;
       byKey.set(decision.incident.dedup_key, decision.incident);
       kept++;
     }
@@ -317,5 +372,6 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
   if (failures.length === FEEDS.length) {
     throw new Error(`Every configured news feed failed: ${failures.join('; ')}`);
   }
+  unplacedLastRun = [...unplaced.values()].filter((i) => !byKey.has(i.dedup_key));
   return [...byKey.values()];
 }

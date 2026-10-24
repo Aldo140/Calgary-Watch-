@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { shortlistPoints } from '../scripts/ingest/sources/community-locator.js';
-import { headlineKey, judgeNewsItem, parseRssItems, tidyFeedText } from '../scripts/ingest/sources/rss.js';
+import { headlineKey, judgeNewsItem, parseRssItems, placeWithPolice, tidyFeedText } from '../scripts/ingest/sources/rss.js';
 
 const NOW = Date.parse('2026-10-24T08:00:00Z');
 const POINTS = shortlistPoints();
@@ -52,5 +52,39 @@ describe('news items', () => {
     assert.equal(reason(newsroom, 'Calgary man arrested'), 'names no Calgary community or quadrant');
     assert.equal(reason(search, 'Robbery in Forest Lawn - Some Blog', { outlet: 'Some Blog' }), 'outlet not on the list (Some Blog)');
     assert.equal(reason(newsroom, 'Robbery in Forest Lawn', { pubDate: new Date(NOW - 9 * 86_400_000).toUTCString() }), 'older than a week');
+  });
+});
+
+describe('placing a story by its police release', () => {
+  const release = (title: string, neighborhood: string, hoursAgo: number) => ({
+    title, description: '', category: 'crime' as const, neighborhood, lat: 51, lng: -114, timestamp: NOW - hoursAgo * 3600_000,
+    source_name: 'Calgary Police Service', source_url: 'x', source_type: 'calgary_police_crime' as const, data_source: 'official' as const,
+    dedup_key: `cps:${title}`, expires_at: NOW + 1, verified_status: 'community_confirmed' as const, report_count: 1 as const,
+    email: '', name: '', anonymous: false as const,
+  });
+  const story = (title: string) => {
+    const d = judgeNewsItem(search, item(`${title} - CTV News`, { outlet: 'CTV News' }), POINTS, NOW);
+    assert.ok(!d.keep && d.unplaced, `${title} should be an unplaced Calgary story`);
+    return (d as { unplaced: NonNullable<Parameters<typeof placeWithPolice>[0][number]> }).unplaced;
+  };
+
+  it('takes the place of the one release about the same event', () => {
+    const placed = placeWithPolice([story('Teen charged in Calgary armed robberies; more suspects sought')], [
+      release('Youth charged, two additional suspects sought in armed robberies', 'Woodbine', 30),
+      release('Teen charged in southeast stabbing', 'Copperfield', 20),
+    ]);
+    assert.equal(placed.length, 1);
+    assert.equal(placed[0].neighborhood, 'Woodbine');
+    assert.equal(placed[0].source_name, 'CTV News');
+  });
+
+  it('leaves a story unplaced when no release, or more than one, fits', () => {
+    assert.equal(placeWithPolice([story('Dozens arrested in 2-day blitz between Calgary police, Alberta Sheriffs')], [
+      release('Youth charged, two additional suspects sought in armed robberies', 'Woodbine', 30),
+    ]).length, 0);
+    assert.equal(placeWithPolice([story('Calgary police investigate stabbing downtown overnight')], [
+      release('Police investigate stabbing downtown', 'Downtown', 10),
+      release('Second stabbing downtown under investigation', 'Beltline', 12),
+    ]).length, 0);
   });
 });

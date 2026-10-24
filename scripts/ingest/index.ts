@@ -21,7 +21,7 @@ import type { Firestore } from 'firebase-admin/firestore';
 import { fetchEnvironmentCanadaAlerts } from './sources/environment-canada.js';
 import { fetch511AlbertaEvents } from './sources/511-alberta.js';
 import { fetchAlbertaEmergencyAlerts } from './sources/alberta-emergency-alert.js';
-import { classifyText, fetchNewsFeedsCalgary } from './sources/rss.js';
+import { classifyText, fetchNewsFeedsCalgary, placeWithPolice, takeUnplacedNews } from './sources/rss.js';
 import { isSetElsewhere } from './sources/community-locator.js';
 import { cleanText } from '../../src/lib/cleanText.js';
 import { fetchCalgary311Crime } from './sources/calgary-311.js';
@@ -256,6 +256,11 @@ async function run(): Promise<void> {
   }
 
   const allIncidents = sourceResults.flatMap((result) => result.incidents);
+  // Calgary stories that named no place, placed by the police release they report on.
+  const viaPolice = placeWithPolice(takeUnplacedNews(),
+    sourceResults.find((r) => r.id === 'calgary_police_news')?.incidents ?? []);
+  if (viaPolice.length) console.log(`[ingest] Placed ${viaPolice.length} news stor(ies) by their police release.`);
+  allIncidents.push(...viaPolice);
 
   // 3. Prune expired system incidents (targeted query, not a full-collection scan).
   const pruned = await pruneExpired(db);

@@ -13,10 +13,13 @@ import { appendFileSync } from 'node:fs';
 import { fetchCalgary311Crime } from './sources/calgary-311.js';
 import { normalizeCalgaryPoliceFeed, parseCalgaryPoliceFeed } from './sources/calgary-police-news.js';
 import { loadCommunityPoints } from './sources/community-locator.js';
-import { judgeNewsItem, readNewsFeeds } from './sources/rss.js';
+import { judgeNewsItem, placeWithPolice, readNewsFeeds } from './sources/rss.js';
+import type { NormalizedIncident } from './types.js';
 
 const lines: string[] = [];
 const out = (line = '') => { console.log(line); lines.push(line); };
+
+const unplaced = new Map<string, NormalizedIncident>();
 
 async function auditNews(points: Awaited<ReturnType<typeof loadCommunityPoints>>): Promise<void> {
   out('## News feeds');
@@ -40,6 +43,7 @@ async function auditNews(points: Awaited<ReturnType<typeof loadCommunityPoints>>
         }
       } else {
         reasons.set(d.reason, (reasons.get(d.reason) ?? 0) + 1);
+        if (d.unplaced) unplaced.set(d.unplaced.dedup_key, d.unplaced);
         if (d.reason !== 'not an incident' && d.reason !== 'older than a week') dropped.push(`- ${d.reason}: ${item.title}`);
       }
     }
@@ -58,7 +62,11 @@ async function auditNews(points: Awaited<ReturnType<typeof loadCommunityPoints>>
 async function auditPolice(points: Awaited<ReturnType<typeof loadCommunityPoints>>): Promise<void> {
   out('## Calgary Police newsroom');
   try {
-    const res = await fetch('https://newsroom.calgary.ca/tagfeed/en/tags/police', { signal: AbortSignal.timeout(20_000) });
+    const res = await fetch('https://newsroom.calgary.ca/tagfeed/en/tags/police', {
+      headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety aggregator)', Accept: 'application/rss+xml, application/xml, text/xml' },
+      signal: AbortSignal.timeout(20_000),
+    });
+    out(`HTTP ${res.status}`);
     const xml = await res.text();
     const items = parseCalgaryPoliceFeed(xml);
     const kept = normalizeCalgaryPoliceFeed(xml, Date.now(), points);
@@ -69,6 +77,10 @@ async function auditPolice(points: Awaited<ReturnType<typeof loadCommunityPoints
     out('');
     out('Not placed:');
     items.filter((i) => !keptLinks.has(i.link)).forEach((i) => out(`- ${i.title}`));
+    out('');
+    const placed = placeWithPolice([...unplaced.values()], kept);
+    out(`News stories placed by their police release: ${placed.length} of ${unplaced.size} unplaced`);
+    placed.forEach((p) => out(`- ${p.neighborhood} · ${p.title} _(${p.source_name})_`));
   } catch (err) {
     out(`Failed: ${err instanceof Error ? err.message : String(err)}`);
   }

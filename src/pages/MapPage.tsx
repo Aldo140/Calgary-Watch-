@@ -60,6 +60,8 @@ import { classify311Service } from '@/src/lib/three11';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 import NowBriefing from '@/src/components/map/NowBriefing';
+import NearMeSheet from '@/src/components/map/NearMeSheet';
+import { nearbyReports, NEAR_ME_RADIUS_KM } from '@/src/lib/nearMe';
 import { LivePill, WhenChips, WhenTrack, WhenDial, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
 import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
 import { inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
@@ -738,21 +740,9 @@ export default function MapPage() {
   );
   // Also loaded for the personal briefing, which counts them near a saved address.
   const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
-  const [nearMeIndex, setNearMeIndex] = useState(0);
-  // Radar-scan moment before results reveal — the pause builds anticipation
-  // and makes the reveal land (Duolingo-style feedback loop).
-  const [nearMeScanning, setNearMeScanning] = useState(false);
-  /**
-   * The locate button used to do three things on one press: fly, drop a pin,
-   * and jump straight to the nearest incident — which moved the map away from
-   * the thing the person had just asked to see. It now stops on arrival and
-   * asks before going anywhere.
-   */
-  const [nearMeStage, setNearMeStage] = useState<'arrived' | 'results'>('arrived');
   /** Once shown, the "you are here" pin stays for the whole session. */
   const userPinShown = useRef(false);
-  const nearMeScanTimer = useRef<number | null>(null);
-  const NEAR_ME_RADIUS_KM = 3;
+  const nearSheetRef = useRef<HTMLElement>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [sheetState, setSheetState] = useState<SheetState>('rail');
   const sheetRef = useRef<MapSheetRef>(null);
@@ -2041,23 +2031,14 @@ export default function MapPage() {
     return { phoneCategoryOptions: options, phoneCategoryTotal: feedIncidents.length };
   }, [feedIncidents]);
 
-  // Incidents sorted by distance from user for the Near Me panel
-  const nearMeIncidents = useMemo(() => {
-    const loc = userLocation || CALGARY_CENTER;
-    return incidents
-      .map(i => ({ i, dist: getDistance(loc.lat, loc.lng, i.lat, i.lng) }))
-      .filter(x => x.dist <= NEAR_ME_RADIUS_KM)
-      .sort((a, b) => {
-        if (a.i.category === 'emergency' && b.i.category !== 'emergency') return -1;
-        if (b.i.category === 'emergency' && a.i.category !== 'emergency') return 1;
-        return a.dist - b.dist;
-      })
-      .map(x => ({ ...x.i, _dist: x.dist })) as (Incident & { _dist: number })[];
-  }, [incidents, userLocation]);
-
-  /** Latest nearby list, for callbacks that fire after a delay. */
-  const nearMeIncidentsRef = useRef<(Incident & { _dist: number })[]>([]);
-  useEffect(() => { nearMeIncidentsRef.current = nearMeIncidents; }, [nearMeIncidents]);
+  /**
+   * Near me counts what the map shows: the same time window and type chip, so
+   * its number never disagrees with the chips and the count pill above it.
+   */
+  const nearMeIncidents = useMemo(
+    () => nearbyReports(feedIncidents, userLocation || CALGARY_CENTER, selectedCategory),
+    [feedIncidents, userLocation, selectedCategory],
+  );
 
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
@@ -2225,39 +2206,49 @@ export default function MapPage() {
   }, [user, preferredAddress, preferredNeighborhood, preferredInferredNeighborhood, profileNeedsSetup]);
 
   /**
-   * Locate: show them where they are, and stop there.
+   * Locate: open "What's near me". The map frames a ring around the reader's
+   * pin and stops there; it only moves to a report when they open one.
    *
    * The pin is deliberately never cleared once placed. Losing your own
    * position the moment you close a panel is disorienting on a map whose whole
    * subject is distance from you.
    */
-  const handleLocate = useCallback(() => {
-    const loc = userLocation || CALGARY_CENTER;
-    if (nearMeOpen) { setNearMeOpen(false); return; }
-    mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 15 : 11);
+  const openNearMe = useCallback(() => {
     if (userLocation) {
       mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
       userPinShown.current = true;
     }
-    setNearMeIndex(0);
-    setNearMeStage('arrived');
-    setNearMeScanning(false);
-    if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
+    setSheetState('rail');
     setNearMeOpen(true);
-  }, [userLocation, nearMeOpen]);
+  }, [userLocation]);
 
-  /** They said yes to the scan: run the radar beat, then reveal. */
-  const startNearMeScan = useCallback(() => {
-    setNearMeStage('results');
-    setNearMeIndex(0);
-    setNearMeScanning(true);
-    if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
-    nearMeScanTimer.current = window.setTimeout(() => {
-      setNearMeScanning(false);
-      const first = nearMeIncidentsRef.current[0];
-      if (first) mapRef.current?.flyTo(first.lat, first.lng, 15);
-    }, 450);
-  }, []);
+  const handleLocate = useCallback(() => {
+    if (nearMeOpen) { setNearMeOpen(false); return; }
+    openNearMe();
+  }, [nearMeOpen, openNearMe]);
+
+  // Frame the ring once the sheet has laid out, and again if the location
+  // arrives while it is open. Closing clears the ring and the marker.
+  useEffect(() => {
+    if (!nearMeOpen) { mapRef.current?.clearNearRing(); return; }
+    const loc = userLocation || CALGARY_CENTER;
+    const t = window.setTimeout(() => {
+      mapRef.current?.showNearRing(loc, NEAR_ME_RADIUS_KM, [chromeRef.current, nearSheetRef.current]);
+    }, 120);
+    return () => window.clearTimeout(t);
+  }, [nearMeOpen, userLocation]);
+
+  // Opening a report (from a card or a pin) hands the screen to the report.
+  useEffect(() => { if (selectedIncident) setNearMeOpen(false); }, [selectedIncident]);
+
+  const handleNearFocus = useCallback((index: number) => {
+    const inc = nearMeIncidents[index];
+    if (!inc) { mapRef.current?.setNearFocus(null); return; }
+    mapRef.current?.setNearFocus(
+      { lat: inc.lat, lng: inc.lng, color: categoryColor(inc.category) },
+      userLocation || CALGARY_CENTER,
+    );
+  }, [nearMeIncidents, userLocation]);
 
   const handleNotificationClick = useCallback((notification: MapNotification) => {
     // The neighbourhood report is this person's own briefing. Sending it to the
@@ -2477,7 +2468,7 @@ export default function MapPage() {
       if (showUserMenu) { setShowUserMenu(false); return; }
       if (selectedIncident) { setSelectedIncident(null); return; }
       if (selectedArea) { setSelectedArea(null); return; }
-      if (nearMeOpen) { setNearMeOpen(false); setNearMeScanning(false); return; }
+      if (nearMeOpen) { setNearMeOpen(false); return; }
       if (sheetState === 'raised') setSheetState('rail');
     };
     window.addEventListener('keydown', onKey);
@@ -2535,7 +2526,7 @@ export default function MapPage() {
   }, [user, updateAlertPrefs]);
 
   return (
-    <div className="map-shell cw-map lv-root relative flex h-dvh w-full overflow-hidden bg-[#FAF8F3] font-sans text-[#151515]">
+    <div data-near={nearMeOpen || undefined} className="map-shell cw-map lv-root relative flex h-dvh w-full overflow-hidden bg-[#FAF8F3] font-sans text-[#151515]">
       <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
       <AnimatePresence>
         {isLoading && (
@@ -3411,7 +3402,7 @@ export default function MapPage() {
           onReportPress={() => requestReport(null)}
           compact={compactPhone}
           activeIncidentId={activeIncidentId}
-          hidden={isFormOpen || isPinMode || isEmergencyPinMode}
+          hidden={isFormOpen || isPinMode || isEmergencyPinMode || nearMeOpen}
           briefing={
             /* ── NowBriefing slot (feed worker's component) ── */
             <>
@@ -3572,215 +3563,29 @@ export default function MapPage() {
           </button>
         </div>
 
-        {/* Near Me Panel — card above the sheet rail (phone), bottom-left card (desktop) */}
+        {/* What's near me: the bottom sheet on phones, a card at the bottom
+            left on desktop. */}
         <AnimatePresence>
           {nearMeOpen && (
-            <motion.div
-              key="near-me-panel"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-              className={cn(
-                'absolute z-40 pointer-events-auto',
-                // Clears the sheet's measured rail rather than sitting under it.
-                'bottom-[calc(var(--cw-rail-h,66px)+1.5rem)] left-3 right-3',
-                'lg:left-6 lg:right-auto lg:bottom-24 lg:w-[24rem]',
-              )}
-              role="dialog"
-              aria-label="Near me"
-            >
-              <div className="lv-card lv-card-shadow lv-near">
-                <div className="lv-near-head">
-                  <span className="lv-eyebrow lv-eyebrow-blue flex items-center gap-1.5">
-                    <Navigation size={13} />
-                    {nearMeStage === 'arrived' ? 'Your location' : `Within ${NEAR_ME_RADIUS_KM} km`}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => { setNearMeOpen(false); setNearMeScanning(false); }}
-                    className="lv-close"
-                    style={{ width: 34, height: 34, borderRadius: 10 }}
-                    aria-label="Close near me panel"
-                  >
-                    <X size={15} />
-                  </button>
-                </div>
-
-                {nearMeStage === 'arrived' ? (
-                  /* Arrival: show them where they are and ask before moving
-                     the map somewhere else. */
-                  <div className="px-4 pb-4">
-                    <div className="flex items-start gap-3">
-                      <span className="lv-near-dot mt-0.5" aria-hidden="true"><i /></span>
-                      <div className="min-w-0 flex-1">
-                        <p className="lv-h-sm">
-                          {userLocation ? 'This is where you are' : 'Showing central Calgary'}
-                        </p>
-                        <p className="lv-small mt-1">
-                          {userLocation
-                            ? 'Your pin stays on the map while you look around.'
-                            : 'Turn on location in your browser to centre the map on you.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 space-y-2.5">
-                      <button type="button" onClick={startNearMeScan} className="lv-btn lv-btn-primary lv-btn-block justify-between" style={{ minHeight: 54, borderRadius: 16 }}>
-                        <span className="min-w-0 text-left">
-                          <span className="block text-[14.5px] font-extrabold leading-tight">See what is near me</span>
-                          <span className="block text-[12px] font-medium opacity-80 mt-0.5">
-                            {nearMeIncidents.length > 0
-                              ? `${nearMeIncidents.length} report${nearMeIncidents.length === 1 ? '' : 's'} within ${NEAR_ME_RADIUS_KM} km`
-                              : `Look ${NEAR_ME_RADIUS_KM} km around this pin`}
-                          </span>
-                        </span>
-                        <ArrowRight size={17} className="shrink-0" />
-                      </button>
-
-                      {/* The deeper version of the same question, for people
-                          who have given us an address to measure from. */}
-                      {user && preferredAddress && (
-                        <button
-                          type="button"
-                          onClick={() => { setNearMeOpen(false); setBriefingOpen(true); }}
-                          className="lv-btn lv-btn-ghost lv-btn-block justify-between"
-                          style={{ minHeight: 54, borderRadius: 16 }}
-                        >
-                          <span className="min-w-0 text-left">
-                            <span className="block text-[14px] font-extrabold leading-tight">Open my full briefing</span>
-                            <span className="block truncate text-[12px] font-medium mt-0.5" style={{ color: '#565a61' }}>
-                              Measured from {preferredAddress}
-                            </span>
-                          </span>
-                          <ArrowRight size={17} className="shrink-0" style={{ color: '#1554D1' }} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ) : nearMeScanning ? (
-                  <div className="px-4 pb-6 pt-2 flex flex-col items-center text-center">
-                    <span className="lv-loading-spin" style={{ borderColor: 'rgba(21,21,21,0.15)', borderTopColor: '#1554D1' }} aria-hidden="true" />
-                    <p className="mt-3 lv-eyebrow lv-eyebrow-blue">Looking within 3 km…</p>
-                    <p className="lv-small mt-1">Reports already on the map around your pin</p>
-                  </div>
-                ) : nearMeIncidents.length === 0 ? (
-                  <div className="px-4 pb-5 pt-1">
-                    <p className="lv-h-sm">Nothing posted within {NEAR_ME_RADIUS_KM} km</p>
-                    <p className="lv-small mt-1.5">
-                      No reports on the map around you right now. Quiet maps are normal, and an empty map isn&rsquo;t proof nothing happened.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="px-4 pb-2.5 lv-h-sm">
-                      {nearMeIncidents.length === 1
-                        ? '1 report nearby'
-                        : `${nearMeIncidents.length} reports nearby`}
-                    </p>
-
-                    {(() => {
-                      const inc = nearMeIncidents[nearMeIndex];
-                      if (!inc) return null;
-                      const catInk = categoryColor(inc.category);
-                      const age = Date.now() - inc.timestamp;
-                      const ageStr = age < 60_000 ? 'Just now'
-                        : age < 3_600_000 ? `${Math.round(age / 60_000)} min ago`
-                        : age < 86_400_000 ? `${Math.round(age / 3_600_000)} h ago`
-                        : `${Math.round(age / 86_400_000)} d ago`;
-                      return (
-                        <div className="px-4 pb-3">
-                          <button
-                            type="button"
-                            className="lv-near-card"
-                            style={{ borderLeft: `8px solid ${catInk}` }}
-                            onClick={() => {
-                              handleMarkerClick(inc);
-                              setNearMeOpen(false);
-                            }}
-                          >
-                            <span className="flex items-center justify-between gap-2">
-                              <span className="lv-eyebrow" style={{ color: '#151515' }}>{inc.category}</span>
-                              <span className="font-mono text-[11px] text-[#565a61] shrink-0">{ageStr}</span>
-                            </span>
-                            <span className="mt-1.5 block text-[15px] font-bold leading-snug text-[#151515]">{inc.title}</span>
-                            <span className="mt-1 block text-[12.5px] leading-relaxed text-[#565a61] line-clamp-2">{inc.description}</span>
-                            <span className="mt-2 block text-[12px] font-semibold text-[#151515]">
-                              {inc._dist < 1 ? `${Math.round(inc._dist * 1000)} m` : `${inc._dist.toFixed(1)} km`} away{inc.neighborhood ? ` · ${inc.neighborhood}` : ''}
-                            </span>
-                          </button>
-                        </div>
-                      );
-                    })()}
-
-                    <div className="flex items-center justify-between gap-2 px-4 pb-4 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = Math.max(0, nearMeIndex - 1);
-                          setNearMeIndex(next);
-                          const inc = nearMeIncidents[next];
-                          if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
-                        }}
-                        disabled={nearMeIndex === 0}
-                        className="lv-near-nav"
-                      >
-                        ← Prev
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setNearMeStage('arrived');
-                          const loc = userLocation || CALGARY_CENTER;
-                          mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 15 : 11);
-                        }}
-                        className="lv-link text-[12px]"
-                        style={{ color: '#565a61' }}
-                      >
-                        {nearMeIndex + 1} of {nearMeIncidents.length} · back to me
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = Math.min(nearMeIncidents.length - 1, nearMeIndex + 1);
-                          setNearMeIndex(next);
-                          const inc = nearMeIncidents[next];
-                          if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
-                        }}
-                        disabled={nearMeIndex === nearMeIncidents.length - 1}
-                        className="lv-near-nav"
-                      >
-                        Next →
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {/* Weekly digest opt-in — wired to the existing profile setting */}
-                {nearMeStage === 'results' && !nearMeScanning && (!user || userProfile?.weeklyDigestOptIn !== true) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNearMeOpen(false);
-                      openAuthPanel(user ? 'settings' : 'signin');
-                    }}
-                    className="lv-digest-row"
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[13px] font-extrabold leading-tight text-[#151515]">
-                        Want this weekly, without opening the map?
-                      </span>
-                      <span className="block text-[12px] text-[#565a61] font-medium mt-0.5">
-                        What was reported near you plus community news, by email. Free, opt out any time.
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-[12.5px] font-extrabold text-[#1554d1]">
-                      {user ? 'Turn on' : 'Sign up'} →
-                    </span>
-                  </button>
-                )}
-              </div>
-            </motion.div>
+            <NearMeSheet
+              key="near-me"
+              ref={nearSheetRef}
+              reports={nearMeIncidents}
+              located={Boolean(userLocation)}
+              windowLabel={windowWord(timeWindow)}
+              category={selectedCategory}
+              now={clock}
+              onClose={() => setNearMeOpen(false)}
+              onFocus={handleNearFocus}
+              onOpenReport={(inc) => handleMarkerClick(inc)}
+              onPost={() => { setNearMeOpen(false); requestReport(null); }}
+              briefing={user && preferredAddress
+                ? { address: preferredAddress, onOpen: () => { setNearMeOpen(false); setBriefingOpen(true); } }
+                : undefined}
+              digest={!user || userProfile?.weeklyDigestOptIn !== true
+                ? { action: user ? 'Turn on' : 'Sign up', onOpen: () => { setNearMeOpen(false); openAuthPanel(user ? 'settings' : 'signin'); } }
+                : undefined}
+            />
           )}
         </AnimatePresence>
 
@@ -4176,16 +3981,7 @@ export default function MapPage() {
             }}
             onOpenSettings={() => openAuthPanel('settings')}
             photoURL={user.photoURL ?? undefined}
-            onOpenNearby={() => {
-              const loc = userLocation || CALGARY_CENTER;
-              mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 14 : 11);
-              if (userLocation) {
-                mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
-                userPinShown.current = true;
-              }
-              setNearMeOpen(true);
-              startNearMeScan();
-            }}
+            onOpenNearby={openNearMe}
             onSelectIncident={(incident) => startTransition(() => setSelectedIncident(incident))}
             onOpenCamera={(camera) => {
               setViewerCamera(camera);

@@ -71,6 +71,15 @@ export interface MapRef {
   showUserLocation: (lat: number, lng: number) => void;
   /** Remove the user location marker */
   clearUserLocation: () => void;
+  /**
+   * Near me: a dashed ring of `radiusKm` around the reader's pin, fitted into
+   * the part of the map the `avoid` elements (top bar, near-me sheet) leave
+   * clear, so the whole circle shows between them.
+   */
+  showNearRing: (center: { lat: number; lng: number }, radiusKm: number, avoid: (Element | null | undefined)[]) => void;
+  clearNearRing: () => void;
+  /** Near me: marks one report with a dashed thread from the reader's pin. Null clears. */
+  setNearFocus: (focus: { lat: number; lng: number; color: string } | null, from?: { lat: number; lng: number }) => void;
 }
 
 const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, safetyCameras, trafficSegments, selectedTrafficSegmentId, crimeStats, onCameraSelect, onTrafficSegmentSelect, isMapInteractive = true }, ref) => {
@@ -90,6 +99,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const choroplethLayer = useRef<L.GeoJSON | null>(null);
   const communityGeoJson = useRef<any>(null);
   const userLocationMarker = useRef<L.Marker | null>(null);
+  const nearRingLayer = useRef<L.LayerGroup | null>(null);
+  const nearFocusLayer = useRef<L.LayerGroup | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isHeatPluginReady, setIsHeatPluginReady] = useState(false);
   const [isOutsideServiceArea, setIsOutsideServiceArea] = useState(false);
@@ -189,6 +200,62 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         userLocationMarker.current.remove();
         userLocationMarker.current = null;
       }
+    },
+    showNearRing: (center, radiusKm, avoid) => {
+      const m = map.current;
+      if (!m) return;
+      nearRingLayer.current?.remove();
+      const ring = L.circle([center.lat, center.lng], {
+        radius: radiusKm * 1000, color: '#1554d1', weight: 2, dashArray: '6 7',
+        fillColor: '#1554d1', fillOpacity: 0.06, interactive: false,
+      });
+      nearRingLayer.current = L.layerGroup([ring]).addTo(m);
+      // Padding from whatever covers the map: a band across most of the width
+      // pads the top or bottom, a narrower panel pads its side.
+      const box = m.getContainer().getBoundingClientRect();
+      const pad = { top: 12, bottom: 12, left: 12, right: 12 };
+      for (const el of avoid) {
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        const w = Math.min(r.right, box.right) - Math.max(r.left, box.left);
+        const h = Math.min(r.bottom, box.bottom) - Math.max(r.top, box.top);
+        if (w <= 0 || h <= 0) continue;
+        if (w > box.width * 0.6) {
+          if (r.top + r.height / 2 < box.top + box.height / 2) pad.top = Math.max(pad.top, r.bottom - box.top + 12);
+          else pad.bottom = Math.max(pad.bottom, box.bottom - r.top + 12);
+        } else if (r.left + r.width / 2 < box.left + box.width / 2) pad.left = Math.max(pad.left, r.right - box.left + 12);
+        else pad.right = Math.max(pad.right, box.right - r.left + 12);
+      }
+      // Leaflet's circle bounds need the circle on the map to be measured.
+      m.flyToBounds(ring.getBounds(), {
+        paddingTopLeft: [pad.left, pad.top], paddingBottomRight: [pad.right, pad.bottom],
+        duration: 0.6, maxZoom: 15,
+      });
+    },
+    clearNearRing: () => {
+      nearRingLayer.current?.remove();
+      nearRingLayer.current = null;
+      nearFocusLayer.current?.remove();
+      nearFocusLayer.current = null;
+    },
+    setNearFocus: (focus, from) => {
+      const m = map.current;
+      if (!m) return;
+      nearFocusLayer.current?.remove();
+      nearFocusLayer.current = null;
+      if (!focus) return;
+      const el = document.createElement('div');
+      el.className = 'lv-nearfocus';
+      el.style.setProperty('--c', focus.color);
+      el.append(document.createElement('i'), document.createElement('b'));
+      const icon = L.divIcon({ html: el, className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
+      const layers: L.Layer[] = [L.marker([focus.lat, focus.lng], { icon, zIndexOffset: 1200, interactive: false })];
+      if (from) {
+        layers.unshift(L.polyline([[from.lat, from.lng], [focus.lat, focus.lng]], {
+          color: '#151515', weight: 2.5, dashArray: '2 7', lineCap: 'round', interactive: false,
+        }));
+      }
+      nearFocusLayer.current = L.layerGroup(layers).addTo(m);
     },
 
     showPopup: (incident: Incident) => {

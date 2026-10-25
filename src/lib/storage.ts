@@ -1,68 +1,101 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from '@/src/firebase';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_BYTES = 5 * 1024 * 1024;
-const MAX_DIMENSION = 2000;
 
-/**
- * Re-encode a picked photo to JPEG when it is not already a web-safe size and
- * format.
- *
- * Two real failures motivated this. iPhone photos are usually HEIC, which the
- * Storage rule rejects outright and which Chrome and Firefox cannot display
- * even if it were stored — but Safari, where HEIC actually comes from, can
- * decode it, so converting on the client turns a hard rejection into a normal
- * upload. Second, a modern phone photo routinely exceeds the 5 MB ceiling;
- * refusing it lost the report rather than the megabytes.
- *
- * Anything the browser cannot decode still throws, with a message a reporter
- * can act on rather than a raw MIME type.
- */
-export async function prepareIncidentImage(file: File): Promise<File> {
-  if (ALLOWED_TYPES.includes(file.type) && file.size <= MAX_BYTES) return file;
-
-  let bitmap: ImageBitmap;
-  try {
-    bitmap = await createImageBitmap(file);
-  } catch {
-    throw new Error('That photo could not be read on this device. Try a JPEG or PNG.');
-  }
-
-  const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
-  const width = Math.max(1, Math.round(bitmap.width * scale));
-  const height = Math.max(1, Math.round(bitmap.height * scale));
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext('2d');
-  if (!context) {
-    bitmap.close?.();
-    throw new Error('That photo could not be processed on this device.');
-  }
-  context.drawImage(bitmap, 0, 0, width, height);
-  bitmap.close?.();
-
-  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-  if (!blob) throw new Error('That photo could not be processed on this device.');
-  if (blob.size > MAX_BYTES) throw new Error('That photo is too large even after compression. Try a smaller one.');
-
-  const base = file.name.replace(/\.[^.]+$/, '') || 'photo';
-  return new File([blob], `${base}.jpg`, { type: 'image/jpeg' });
+export interface PhotoUploadOptions {
+  /** 0..1 as bytes reach the bucket. */
+  onProgress?: (fraction: number) => void;
+  /** Aborting cancels the upload task; the promise rejects with an AbortError. */
+  signal?: AbortSignal;
 }
 
-export async function uploadIncidentImage(uid: string, file: File): Promise<string> {
-  if (!storage) throw new Error('Photo uploads are unavailable right now.');
-  const prepared = await prepareIncidentImage(file);
-  if (!ALLOWED_TYPES.includes(prepared.type))
-    throw new Error(`Unsupported file type: ${prepared.type}. Use JPEG, PNG, or WebP.`);
-  if (prepared.size > MAX_BYTES)
+function abortError(): Error {
+  const error = new Error('Photo upload cancelled.');
+  error.name = 'AbortError';
+  return error;
+}
+
+/**
+ * Upload a photo that has already been through photoPrep (re-encoded JPEG,
+ * metadata stripped, blur patches applied).
+ *
+ * Resumable rather than a single PUT so a reporter on mobile data sees real
+ * progress, and so a slow or stalled upload can be cancelled from the form
+ * instead of holding the Post button on a spinner with no way out.
+ */
+export async function uploadIncidentPhoto(uid: string, file: Blob, options: PhotoUploadOptions = {}): Promise<string> {
+  const { onProgress, signal } = options;
+  if (!uid) throw new Error('Sign in again to attach a photo.');
+  if (!ALLOWED_TYPES.includes(file.type))
+    throw new Error(`Unsupported file type: ${file.type || 'unknown'}. Use JPEG, PNG, or WebP.`);
+  if (file.size > MAX_BYTES)
     throw new Error('Image must be smaller than 5 MB.');
-  const ext = prepared.type.split('/')[1]; // jpeg | png | webp
+  if (signal?.aborted) throw abortError();
+
+  // Local screenshot harness only: simulates a slow, failing or hanging upload
+  // without Firebase. `import.meta.env.DEV` is false in every production build.
+  if (import.meta.env.DEV) {
+    const fx = (window as { __CW_UPLOAD_FIXTURE__?: { ms?: number; fail?: string; hang?: boolean } }).__CW_UPLOAD_FIXTURE__;
+    if (fx) return fakeUpload(file, fx, options);
+  }
+
+  if (!storage) throw new Error('Photo uploads are unavailable right now.');
+  const ext = file.type.split('/')[1]; // jpeg | png | webp
   const path = `incidents/${uid}/${Date.now()}.${ext}`;
   const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, prepared);
+  const task = uploadBytesResumable(storageRef, file, {
+    contentType: file.type,
+    cacheControl: 'public, max-age=31536000, immutable',
+  });
+  const onAbort = () => task.cancel();
+  signal?.addEventListener('abort', onAbort, { once: true });
+  try {
+    await new Promise<void>((resolve, reject) => {
+      task.on(
+        'state_changed',
+        (snap) => onProgress?.(snap.totalBytes ? snap.bytesTransferred / snap.totalBytes : 0),
+        (error) => reject(signal?.aborted ? abortError() : new Error(uploadErrorMessage((error as { code?: string }).code))),
+        () => resolve(),
+      );
+    });
+  } finally {
+    signal?.removeEventListener('abort', onAbort);
+  }
+  onProgress?.(1);
   return getDownloadURL(storageRef);
+}
+
+function uploadErrorMessage(code?: string): string {
+  switch (code) {
+    case 'storage/unauthorized':
+    case 'storage/unauthenticated':
+      return 'Your sign-in expired, so the photo was refused. Sign in again, or post without it.';
+    case 'storage/retry-limit-exceeded':
+      return 'The connection dropped for too long. Try again when you have signal.';
+    case 'storage/quota-exceeded':
+      return 'Photo uploads are paused right now. Post without the photo.';
+    default:
+      return 'The photo could not be uploaded.';
+  }
+}
+
+async function fakeUpload(file: Blob, fx: { ms?: number; fail?: string; hang?: boolean }, { onProgress, signal }: PhotoUploadOptions): Promise<string> {
+  const total = fx.ms ?? 1500;
+  const started = Date.now();
+  return new Promise<string>((resolve, reject) => {
+    const timer = setInterval(() => {
+      const t = Math.min(1, (Date.now() - started) / total);
+      onProgress?.(fx.hang ? Math.min(t, 0.37) : t);
+      if (t >= 1 && !fx.hang) {
+        clearInterval(timer);
+        if (fx.fail) reject(new Error(uploadErrorMessage(fx.fail)));
+        else resolve(URL.createObjectURL(file));
+      }
+    }, 100);
+    signal?.addEventListener('abort', () => { clearInterval(timer); reject(abortError()); }, { once: true });
+  });
 }
 
 /**

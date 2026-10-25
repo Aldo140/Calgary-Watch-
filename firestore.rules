@@ -121,6 +121,18 @@ service cloud.firestore {
              data.authorUid is string;
     }
 
+    // A resident photo must be a download URL for the reporter's own folder in
+    // our bucket (storage.rules checks type and size there). Without this any
+    // URL could be written, so a report could hotlink an image that never
+    // passed those checks, or a tracking pixel. Mirrors isOwnIncidentPhotoUrl
+    // in src/lib/photoPrep.ts.
+    function isOwnIncidentPhoto(data) {
+      return !('image_url' in data) ||
+             (data.image_url is string &&
+              data.image_url.size() <= 600 &&
+              data.image_url.matches('^https://firebasestorage[.]googleapis[.]com/v0/b/[^/]+/o/incidents%2F' + request.auth.uid + '%2F[^/?]+([?].*)?$'));
+    }
+
     function isValidAuthorIncidentPatch(data) {
       return data.title is string && data.title.size() >= 5 && data.title.size() <= 100 &&
              data.description is string && data.description.size() >= 10 && data.description.size() <= 1000 &&
@@ -220,6 +232,7 @@ service cloud.firestore {
                       'image_url', 'visibility', 'flag_count', 'flagged_by'
                     ]) &&
                     isValidIncident(request.resource.data) &&
+                    isOwnIncidentPhoto(request.resource.data) &&
                     request.resource.data.authorUid == request.auth.uid &&
                     request.resource.data.verified_status in ['unverified', 'pending_review'] &&
                     request.resource.data.report_count == 1 &&

@@ -1,11 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { X, Loader2, Navigation, MapPin, ExternalLink, Image, Siren, AlertCircle, Car, Construction, CloudRain, ArrowRight, ArrowLeft, Check, Phone } from 'lucide-react';
+import { X, Loader2, Navigation, MapPin, ExternalLink, WifiOff, Siren, AlertCircle, Car, Construction, CloudRain, ArrowRight, ArrowLeft, Check, Phone } from 'lucide-react';
 import { INCIDENT_CATEGORY_VALUES } from '@/src/constants';
-import { uploadIncidentImage } from '@/src/lib/storage';
+import { uploadIncidentPhoto } from '@/src/lib/storage';
+import ReportPhoto, { releasePhoto, type PreparedPhoto } from '@/src/components/map/ReportPhoto';
 import { motion, AnimatePresence } from 'motion/react';
-import { MAP, CATEGORY, LIVE } from '@/src/lib/tokens';
+import { CATEGORY, LIVE } from '@/src/lib/tokens';
 import { cn } from '@/src/lib/utils';
 import '@/src/styles/map-overlays.css';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -102,6 +103,21 @@ function useLgUp() {
   return lg;
 }
 
+/** No upload progress for this long counts as stalled. */
+const STALL_MS = 8000;
+
+function useOnline() {
+  const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
+  useEffect(() => {
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, []);
+  return online;
+}
+
 function FieldLabel({ children, hint, htmlFor }: { children: React.ReactNode; hint?: string; htmlFor?: string }) {
   return (
     <label className="lv-o-label" htmlFor={htmlFor}>
@@ -153,9 +169,16 @@ export default function IncidentForm({
   userUid,
 }: IncidentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<PreparedPhoto | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  // Upload progress (0..1) while the photo is on its way; null otherwise.
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  // Set when the upload has stopped moving or the device is offline, so the
+  // reporter gets a way out instead of a spinner with no end.
+  const [uploadStalled, setUploadStalled] = useState(false);
+  const uploadAbortRef = useRef<AbortController | null>(null);
+  const postWithoutPhotoRef = useRef(false);
+  const online = useOnline();
   // Set when the photo upload fails. The written report is the valuable part,
   // so a failed photo offers an explicit way through instead of trapping the
   // reporter behind an error they cannot clear.
@@ -244,12 +267,20 @@ export default function IncidentForm({
     }
   }, [activeLocation?.lat, activeLocation?.lng, setValue]);
 
-  // Revoke blob URL to prevent memory leak when image changes
-  useEffect(() => {
-    return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-    };
-  }, [imagePreview]);
+  // Free the decoded photo when the form goes away with one still attached.
+  const photoRef = useRef(photo);
+  photoRef.current = photo;
+  useEffect(() => () => { uploadAbortRef.current?.abort(); releasePhoto(photoRef.current); }, []);
+
+  const clearPhoto = () => {
+    uploadAbortRef.current?.abort();
+    releasePhoto(photoRef.current);
+    setPhoto(null);
+    setImageError(null);
+    setPhotoUploadFailed(false);
+    setUploadProgress(null);
+    setUploadStalled(false);
+  };
 
   const handleFormSubmit = useCallback(
     async (data: IncidentFormData, options: { skipPhoto?: boolean } = {}) => {
@@ -263,26 +294,52 @@ export default function IncidentForm({
       setIsSubmitting(true);
       try {
         let image_url: string | undefined;
-        if (imageFile && !options.skipPhoto) {
+        if (photo && !options.skipPhoto) {
+          const controller = new AbortController();
+          uploadAbortRef.current = controller;
+          postWithoutPhotoRef.current = false;
+          setImageError(null);
+          setPhotoUploadFailed(false);
+          setUploadStalled(false);
+          setUploadProgress(0);
+          // Stall watch: no progress for STALL_MS (or no connection at all)
+          // offers "post without the photo" while the upload keeps trying.
+          let last = 0;
+          let lastMove = Date.now();
+          const watch = window.setInterval(() => {
+            if (!navigator.onLine || Date.now() - lastMove > STALL_MS) setUploadStalled(true);
+          }, 1000);
           try {
-            image_url = await uploadIncidentImage(userUid, imageFile);
+            image_url = await uploadIncidentPhoto(userUid, photo.blob, {
+              signal: controller.signal,
+              onProgress: (p) => {
+                setUploadProgress(p);
+                if (p > last) { last = p; lastMove = Date.now(); setUploadStalled(false); }
+              },
+            });
           } catch (uploadError) {
-            // The photo failed, but the report itself is still good. Stop here
-            // with the typed report intact and offer a way past it, rather than
-            // discarding everything the reporter wrote over an attachment.
-            const msg = uploadError instanceof Error ? uploadError.message : 'The photo could not be uploaded.';
-            setImageError(msg);
-            setPhotoUploadFailed(true);
-            setError('root', { type: 'manual', message: 'Your report is ready, but the photo could not be attached.' });
-            return;
+            if (!postWithoutPhotoRef.current) {
+              if (controller.signal.aborted) return;
+              // The photo failed, but the report itself is still good. Stop here
+              // with the typed report intact and offer a way past it, rather than
+              // discarding everything the reporter wrote over an attachment.
+              const msg = uploadError instanceof Error ? uploadError.message : 'The photo could not be uploaded.';
+              setImageError(msg);
+              setPhotoUploadFailed(true);
+              setError('root', { type: 'manual', message: 'Your report is ready, but the photo could not be attached.' });
+              return;
+            }
+            // The reporter chose to post without it mid-upload: carry on.
+          } finally {
+            window.clearInterval(watch);
+            uploadAbortRef.current = null;
+            setUploadProgress(null);
+            setUploadStalled(false);
           }
         }
         onSubmit({ ...data, ...activeLocation, ...(image_url ? { image_url } : {}) });
         reset({ category: 'crime', anonymous: false, title: '', description: '', neighborhood: '' });
-        setImageFile(null);
-        setImagePreview(null);
-        setImageError(null);
-        setPhotoUploadFailed(false);
+        clearPhoto();
         setStep('what');
         setUsingGPS(false);
         onClose();
@@ -294,7 +351,8 @@ export default function IncidentForm({
         setIsSubmitting(false);
       }
     },
-    [activeLocation, clearErrors, imageFile, onClose, onSubmit, reset, setError, userUid]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeLocation, clearErrors, photo, onClose, onSubmit, reset, setError, userUid]
   );
 
   const handleClose = () => {
@@ -306,10 +364,7 @@ export default function IncidentForm({
       description: '',
       neighborhood: '',
     });
-    setImageFile(null);
-    setImagePreview(null);
-    setImageError(null);
-    setPhotoUploadFailed(false);
+    clearPhoto();
     setStep('what');
     setUsingGPS(false);
     onClose();
@@ -326,6 +381,11 @@ export default function IncidentForm({
     setStep('pinning');
     onRequestMapPin?.();
   };
+
+  // Each step starts at its top; the details step left the photo step
+  // scrolled half way down on short phones.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [step]);
 
   // ── Step navigation ───────────────────────────────────────────────────────
   const visibleStep: Exclude<ReportStep, 'pinning'> = step === 'pinning' ? 'choose' : step;
@@ -536,62 +596,47 @@ export default function IncidentForm({
 
       {step === 'photo' && (
         <motion.div key="photo" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="lv-rf-step">
-          {/* Photo */}
+          {/* Photo: optional, and never allowed to cost the reporter their report. */}
           <div>
-            <FieldLabel hint="Optional">Photo</FieldLabel>
-            {imagePreview ? (
-              <div className="lv-rf-preview">
-                <img src={imagePreview} alt="Preview" />
+            <FieldLabel hint="Optional, public">Photo</FieldLabel>
+            <ReportPhoto
+              category={watchedCategory}
+              photo={photo}
+              onChange={(next) => { setPhoto(next); setImageError(null); setPhotoUploadFailed(false); clearErrors('root'); }}
+              uploadProgress={uploadProgress}
+              disabled={isSubmitting}
+            />
+            {/* Photos are published on a public map. People do not think about
+                what is in the frame until it is already up there, so the
+                guidance sits at the point of choosing rather than in a policy
+                page nobody opens. */}
+            <p className="mt-2 text-[13px] text-[#565a61]">Anyone can see this photo. Blur faces, licence plates and house numbers before you post.</p>
+          </div>
+
+          {!online && photo && uploadProgress === null && (
+            <p className="lv-ph-offline" role="status">
+              <WifiOff size={17} className="mt-0.5 shrink-0" aria-hidden="true" />
+              <span>No connection right now. The photo needs signal to upload, so post when you are back online or post without it.</span>
+            </p>
+          )}
+
+          {uploadProgress !== null && uploadStalled && (
+            <div className="lv-ph-status" role="status" ref={(el) => el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })}>
+              <span>
+                <b>{online ? 'Slow connection' : 'Waiting for a connection'}</b>
+                <p>The photo is {Math.round(uploadProgress * 100)}% up. It keeps trying in the background, or your report can go now without it.</p>
+              </span>
+              <div className="lv-ph-status-actions">
                 <button
                   type="button"
-                  onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); setPhotoUploadFailed(false); }}
-                  className="lv-o-iconbtn"
-                  aria-label="Remove photo"
+                  className="lv-o-btn lv-o-btn-navy"
+                  onClick={() => { postWithoutPhotoRef.current = true; uploadAbortRef.current?.abort(); }}
                 >
-                  <X size={18} />
+                  Post now without the photo
                 </button>
               </div>
-            ) : (
-              <label className="lv-rf-drop">
-                <Image size={28} aria-hidden="true" />
-                <b>Attach a photo</b>
-                {/* Photos are published on a public map. People do not think about
-                    what is in the frame until it is already up there, so the
-                    guidance sits at the point of choosing rather than in a policy
-                    page nobody opens. */}
-                <small>Anyone can see this. Avoid faces, licence plates and house numbers.</small>
-                <input
-                  type="file"
-                  // Broad accept on purpose: HEIC and oversized phone photos
-                  // are converted to JPEG before upload, so filtering them out
-                  // of the picker would reject photos we can actually handle.
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] ?? null;
-                    setImageError(null);
-                    setPhotoUploadFailed(false);
-                    if (!file) { setImageFile(null); setImagePreview(null); return; }
-                    // Generous gate: anything past here is downscaled and
-                    // re-encoded to fit the 5 MB upload ceiling, so rejecting
-                    // at 5 MB here would turn ordinary phone photos away.
-                    if (file.size > 25 * 1024 * 1024) {
-                      setImageError('Photo must be under 25 MB.');
-                      setImageFile(null);
-                      setImagePreview(null);
-                      return;
-                    }
-                    setImageFile(file);
-                    setImagePreview(URL.createObjectURL(file));
-                  }}
-                />
-              </label>
-            )}
-            {imagePreview && (
-              <p className="mt-2 text-[13px]" style={{ color: MAP.muted }}>Anyone can see this. Avoid faces, licence plates and house numbers.</p>
-            )}
-            {fieldError(imageError ?? undefined)}
-          </div>
+            </div>
+          )}
 
           {/* Anonymous toggle */}
           <label className="lv-rf-toggle">
@@ -624,19 +669,29 @@ export default function IncidentForm({
           </div>
 
           {errors.root && (
-            <div className="space-y-3" role="alert">
-              <p className="lv-o-err">{errors.root.message}</p>
-              {photoUploadFailed && (
-                <button
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={handleSubmit((data) => handleFormSubmit(data, { skipPhoto: true }), onInvalid)}
-                  className="lv-o-btn lv-o-btn-navy w-full"
-                >
-                  Post the report without the photo
-                </button>
-              )}
-            </div>
+            photoUploadFailed ? (
+              <div className="lv-ph-status is-fail" role="alert">
+                <span>
+                  <b>{errors.root.message}</b>
+                  {imageError && <p>{imageError}</p>}
+                </span>
+                <div className="lv-ph-status-actions">
+                  <button type="button" onClick={() => void submitReport()} disabled={isSubmitting} className="lv-o-btn">
+                    Try the photo again
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={handleSubmit((data) => handleFormSubmit(data, { skipPhoto: true }), onInvalid)}
+                    className="lv-o-btn lv-o-btn-navy"
+                  >
+                    Post without it
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="lv-o-err" role="alert">{errors.root.message}</p>
+            )
           )}
 
           {emergencyNote}
@@ -650,20 +705,35 @@ export default function IncidentForm({
       {step === 'what' ? (
         <button type="button" onClick={handleClose} className="lv-o-btn lv-o-btn-ghost">Cancel</button>
       ) : (
-        <button type="button" onClick={goBack} className="lv-o-btn lv-o-btn-ghost">
+        <button type="button" onClick={goBack} disabled={isSubmitting} className="lv-o-btn lv-o-btn-ghost">
           <ArrowLeft size={18} /> Back
         </button>
       )}
       {step === 'photo' ? (
-        <button type="submit" disabled={isSubmitting} className="lv-o-btn lv-o-btn-yellow">
-          {isSubmitting ? (
+        // Keyed and type="button" on purpose. Continue on the details step and
+        // Post sit in the same slot; unkeyed, React reused one <button> and
+        // turned it into the submit button while the Continue tap was still being
+        // dispatched, so the browser submitted the form and the report posted
+        // straight from the details step without ever showing the photo step.
+        <button
+          key="post"
+          type="button"
+          onClick={() => void submitReport()}
+          disabled={isSubmitting}
+          className={cn('lv-o-btn lv-o-btn-yellow', uploadProgress !== null && 'lv-ph-progress')}
+          style={uploadProgress !== null ? { ['--p' as string]: `${Math.round(uploadProgress * 100)}%` } : undefined}
+          aria-live="polite"
+        >
+          {uploadProgress !== null ? (
+            <><Loader2 size={18} className="animate-spin" /> Photo {Math.round(uploadProgress * 100)}%</>
+          ) : isSubmitting ? (
             <><Loader2 size={18} className="animate-spin" /> Posting…</>
           ) : (
-            <>Post report <ArrowRight size={18} /></>
+            <>{photo ? 'Post with photo' : 'Post report'} <ArrowRight size={18} /></>
           )}
         </button>
       ) : step === 'what' || step === 'details' ? (
-        <button type="button" onClick={() => void goNext()} className="lv-o-btn lv-o-btn-blue">
+        <button key="next" type="button" onClick={() => void goNext()} className="lv-o-btn lv-o-btn-blue">
           Continue <ArrowRight size={18} />
         </button>
       ) : null}
@@ -675,7 +745,7 @@ export default function IncidentForm({
   const body = (
     <form
       onSubmit={(e) => {
-        if (step === 'photo') { void submitReport(e); return; }
+        // Enter moves forward; posting is only ever an explicit tap on Post.
         e.preventDefault();
         void goNext();
       }}
@@ -683,7 +753,7 @@ export default function IncidentForm({
       className="flex min-h-0 flex-1 flex-col"
       noValidate
     >
-      <div className="lv-rf-scroll no-scrollbar">{reportSteps}</div>
+      <div ref={scrollRef} className="lv-rf-scroll no-scrollbar">{reportSteps}</div>
       {footer}
     </form>
   );

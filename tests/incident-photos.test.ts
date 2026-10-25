@@ -28,6 +28,7 @@ const emergencyModal = read('src/components/EmergencyModal.tsx');
 const detailPanel = read('src/components/IncidentDetailPanel.tsx');
 const sidebar = read('src/components/Sidebar.tsx');
 const storageLib = read('src/lib/storage.ts');
+const photoPrep = read('src/lib/photoPrep.ts');
 const storageRules = read('storage.rules');
 const firestoreRules = read('firestore.rules');
 
@@ -70,13 +71,33 @@ describe('a failed photo never costs the reporter their report', () => {
     assert.ok(incidentForm.includes('photoUploadFailed'), 'the failed-photo state drives that affordance');
   });
 
-  it('an emergency report still sends when its photo fails', () => {
+  it('an emergency report still sends when its photo fails or is slow', () => {
     const submit = emergencyModal.slice(emergencyModal.indexOf('const handleSubmit'));
-    const upload = submit.indexOf('uploadIncidentImage');
+    const upload = submit.indexOf('uploadIncidentPhoto');
     const send = submit.indexOf('onSubmit({');
     assert.ok(upload !== -1 && send !== -1, 'emergency submit must support photos');
     assert.ok(upload < send, 'the upload must be attempted before the report is sent');
     assert.match(submit.slice(upload, send), /catch/, 'an SOS must not be blocked by a failed upload');
+    assert.match(submit.slice(0, upload), /SOS_PHOTO_WAIT_MS/, 'an SOS must not wait on a slow upload');
+  });
+
+  it('a slow upload can be cancelled and the report posted without it', () => {
+    assert.match(storageLib, /uploadBytesResumable/, 'uploads report progress');
+    assert.match(storageLib, /task\.cancel\(\)/, 'an aborted upload cancels the task');
+    assert.ok(incidentForm.includes('postWithoutPhotoRef'), 'the form offers to post without a stalled photo');
+    assert.ok(incidentForm.includes('STALL_MS'), 'a stall is detected, not waited out');
+  });
+});
+
+describe('the photo step is reachable', () => {
+  it('Continue on the details step cannot post the report', () => {
+    // Unkeyed, Continue and Post shared one <button>; React flipped it to
+    // type="submit" mid-tap and the report posted from the details step,
+    // so nobody ever saw the photo step.
+    const foot = incidentForm.slice(incidentForm.indexOf('const footer'));
+    assert.match(foot, /key="post"/, 'Post must be its own element');
+    assert.match(foot, /key="next"/, 'Continue must be its own element');
+    assert.doesNotMatch(foot.slice(0, foot.indexOf('const body')), /type="submit"/, 'no submit button in the footer');
   });
 });
 
@@ -84,9 +105,15 @@ describe('photo format handling', () => {
   it('converts what the browser can decode instead of rejecting it', () => {
     // iPhone photos are HEIC, which the Storage rule rejects and which Chrome
     // and Firefox cannot render; Safari can decode it, so it is converted.
-    assert.ok(storageLib.includes('prepareIncidentImage'), 'a conversion step must exist');
-    assert.ok(storageLib.includes("'image/jpeg'"), 'conversion target must be a web-safe format');
-    assert.match(storageLib, /createImageBitmap/, 'conversion decodes via the browser');
+    assert.match(photoPrep, /createImageBitmap/, 'conversion decodes via the browser');
+    assert.ok(photoPrep.includes("'image/jpeg'"), 'conversion target must be a web-safe format');
+  });
+
+  it('every photo is re-encoded, so EXIF location never reaches the public bucket', () => {
+    // An early return for "already a small JPEG" published the GPS position
+    // the photo was taken at. Nothing may skip renderPhoto.
+    assert.doesNotMatch(photoPrep, /ALLOWED_TYPES\.includes\(file\.type\)\s*&&/, 'no pass-through for small JPEGs');
+    assert.match(read('src/components/map/ReportPhoto.tsx'), /renderPhoto\(decoded\)/, 'picked photos go through renderPhoto');
   });
 
   it('the client allowlist and the storage rule agree on accepted types', () => {

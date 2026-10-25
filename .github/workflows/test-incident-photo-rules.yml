@@ -1,0 +1,35 @@
+name: Test incident photo rules
+on:
+  push:
+    branches: [main]
+    paths:
+      - firestore.rules
+      - storage.rules
+      - tests/emulator/**
+      - .github/workflows/test-incident-photo-rules.yml
+  pull_request:
+    paths:
+      - firestore.rules
+      - storage.rules
+      - tests/emulator/**
+      - .github/workflows/test-incident-photo-rules.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Validate photo uploads and photo links against Storage and Firestore
+        run: npx --yes firebase-tools@14.22.0 emulators:exec --only firestore,storage --project demo-calgary-photos "node --import tsx --test tests/emulator/incident-photos.test.ts"

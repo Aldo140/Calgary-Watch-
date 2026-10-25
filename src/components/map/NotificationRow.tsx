@@ -69,7 +69,7 @@ export function NotificationRow({
             <span className="lv-note-compare block">
               <span className="block text-[13px] font-semibold leading-snug" style={{ color: '#fff' }}>
                 {stats.total.toLocaleString('en-CA')} 311 requests in {stats.year}
-                {stats.comparison ? `, ${stats.comparison} most Calgary communities` : ''}.
+                {stats.comparison ? `, ${stats.comparison === 'about the same as' ? stats.comparison : `${stats.comparison} than`} most Calgary communities` : ''}.
               </span>
               <span className="mt-1 block text-[11.5px]" style={{ color: '#a9b8d0' }}>
                 Counts follow population and foot traffic. Not a crime rate.

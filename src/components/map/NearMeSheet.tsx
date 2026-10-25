@@ -37,8 +37,10 @@ const NearMeSheet = forwardRef<HTMLElement, {
   briefing?: { address: string; onOpen: () => void };
   digest?: { action: string; onOpen: () => void };
   now: number;
+  /** Reports are still loading (slow connection): don't call the area quiet yet. */
+  loading?: boolean;
 }>(function NearMeSheet({
-  reports, located, windowLabel, category, onClose, onOpenReport, onFocus, onPost, briefing, digest, now,
+  reports, located, windowLabel, category, onClose, onOpenReport, onFocus, onPost, briefing, digest, now, loading = false,
 }, ref) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -89,7 +91,7 @@ const NearMeSheet = forwardRef<HTMLElement, {
             <span>{windowLabel}</span>
           </p>
           <h2 className="lv-nearsheet-title">
-            {total === 0 ? `No ${kind}reports nearby` : `${total} ${kind}report${total === 1 ? '' : 's'} nearby`}
+            {total === 0 && loading ? 'Checking nearby…' : total === 0 ? `No ${kind}reports nearby` : `${total} ${kind}report${total === 1 ? '' : 's'} nearby`}
           </h2>
         </div>
         <button type="button" className="lv-nearsheet-x" onClick={onClose} aria-label="Close what's near me">
@@ -116,7 +118,9 @@ const NearMeSheet = forwardRef<HTMLElement, {
         <p className="lv-nearsheet-note">Location is off, so this measures from downtown. Allow location in your browser to measure from you.</p>
       )}
 
-      {total === 0 ? (
+      {total === 0 && loading ? (
+        <div className="lv-nearsheet-empty"><p>Reports are still loading. This fills in as soon as they arrive.</p></div>
+      ) : total === 0 ? (
         <div className="lv-nearsheet-empty">
           <p>Nothing on the map within {NEAR_ME_RADIUS_KM} km{kind ? ` for ${kind.trim()}` : ''} in this window. A quiet map is normal, and it isn&rsquo;t proof nothing happened.</p>
           <button type="button" className="lv-nearsheet-cta" onClick={onPost}>

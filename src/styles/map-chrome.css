@@ -617,5 +617,13 @@
   .cw-map .lv-sheet-count small { display: none; } /* the time dial already says it */
 }
 /* The open time list sits above the category rail and the right rail. */
-.cw-map .lv-mtop:has(.lv-dial-list) { z-index: 53; }
-.cw-map .lv-mtop-row:has(.lv-dial-list) { z-index: 5; }
+/* So does the open account menu, which drew under the chips, the alert
+   strip and the rail for signed-in readers. */
+.cw-map .lv-mtop:has(.lv-dial-list), .cw-map .lv-mtop:has(.lv-menu) { z-index: 53; }
+.cw-map .lv-mtop-row:has(.lv-dial-list), .cw-map .lv-mtop-row:has(.lv-menu) { z-index: 5; }
+/* 320-340px phones: the count pill drops its "Live" word so the account
+   button isn't pushed off the right edge. */
+@media (max-width: 340px) {
+  .cw-map .lv-mcount-live { display: none; }
+  .cw-map .lv-mtop-row { gap: 6px; }
+}

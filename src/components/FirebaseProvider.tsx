@@ -113,6 +113,18 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const signupIntent = useRef<SignupIntent | null>(null);
 
   useEffect(() => {
+    // Local screenshot harness only: a signed-in look without Firebase.
+    // `import.meta.env.DEV` is false in every production build.
+    if (import.meta.env.DEV) {
+      const fx = (window as { __CW_AUTH_FIXTURE__?: { uid: string; email: string; displayName: string | null; photoURL?: string | null; admin?: boolean } }).__CW_AUTH_FIXTURE__;
+      if (fx) {
+        setUser({ ...fx, emailVerified: true, isAnonymous: false, providerData: [] } as unknown as User);
+        setIsAdmin(Boolean(fx.admin));
+        setLoading(false);
+        setIsAuthReady(true);
+        return;
+      }
+    }
     if (!auth || !db) {
       setLoading(false);
       setIsAuthReady(true);

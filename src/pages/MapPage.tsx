@@ -922,12 +922,26 @@ export default function MapPage() {
   }, []);
 
   useEffect(() => {
+    // Local screenshot harness only (removed from production builds).
+    const profileFixture = import.meta.env.DEV
+      ? (window as { __CW_PROFILE_FIXTURE__?: UserProfileSettings }).__CW_PROFILE_FIXTURE__
+      : undefined;
+    if (user && profileFixture) {
+      setUserProfile(profileFixture);
+      setProfileDraft({
+        neighborhood: profileFixture.neighborhood || '', address: profileFixture.address || '',
+        inferredNeighborhood: profileFixture.inferredNeighborhood || '', piiConsent: Boolean(profileFixture.piiConsentAt),
+        weeklyDigestOptIn: profileFixture.weeklyDigestOptIn === true, digestCategories: profileFixture.digestCategories || [],
+      });
+      return;
+    }
     if (!user || !db) {
       setUserProfile(null);
       setProfileDraft({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false, digestCategories: [] as IncidentCategory[] });
       if (!user) lastNeighborhoodReportUidRef.current = null;
       return;
     }
+
 
     const unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
       const profile = (snapshot.exists() ? snapshot.data() : {}) as UserProfileSettings;
@@ -3657,6 +3671,7 @@ export default function MapPage() {
               located={Boolean(userLocation)}
               windowLabel={windowWord(timeWindow)}
               category={selectedCategory}
+              loading={isLoading}
               now={clock}
               onClose={() => setNearMeOpen(false)}
               onFocus={handleNearFocus}
@@ -3707,7 +3722,10 @@ export default function MapPage() {
                   <div className="min-w-0">
                     <h3 id="mobile-notifications-title" className="lv-h">Notifications</h3>
                     <p className="lv-small mt-0.5">
-                      {watchFeed.sinceSummary
+                      {/* Only when the list below has what it counts: on a
+                          first visit the list starts empty, and "since you
+                          last checked" over "All caught up" contradicted itself. */}
+                      {watchFeed.sinceSummary && watchState.lastSeenAt !== null && notifications.length > 0
                         ? `Since you last checked: ${watchFeed.sinceSummary}`
                         : 'Your neighbourhood report and new reports for your saved area'}
                     </p>
@@ -3804,7 +3822,7 @@ export default function MapPage() {
                       <h3>Notifications</h3>
                       <LivePill />
                     </div>
-                    {watchFeed.sinceSummary && (
+                    {watchFeed.sinceSummary && watchState.lastSeenAt !== null && notifications.length > 0 && (
                       <p className="lv-note-since">Since you last checked: {watchFeed.sinceSummary}</p>
                     )}
                     <div className="max-h-[min(70dvh,34rem)] overflow-y-auto overscroll-contain">

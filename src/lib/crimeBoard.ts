@@ -133,7 +133,8 @@ export function sameStory(a: Incident, b: Incident): boolean {
 
 /** Text as people should read it: entities decoded, mojibake repaired. */
 export function tidyIncidentText<T extends Pick<Incident, 'title' | 'description'>>(incident: T): T {
-  const title = cleanText(incident.title ?? '');
+  // Stored 311 rows from before the label fix say "Disturbance reported reported in".
+  const title = cleanText(incident.title ?? '').replace(/\breported reported\b/gi, 'reported');
   const description = cleanText(incident.description ?? '');
   return title === incident.title && description === incident.description ? incident : { ...incident, title, description };
 }

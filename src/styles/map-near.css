@@ -86,12 +86,12 @@
   background: none; border: 0; color: #fff; font: 700 12.5px/1 var(--lv-sans); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, .4);
 }
 
-/* While near me is open on a phone, the bottom belongs to it. */
+/* While near me or a tapped report is docked on a phone, the bottom belongs to it. */
 @media (max-width: 1023px) {
-  .cw-map[data-near] .lv-actions,
-  .cw-map[data-near] .lv-layerdock { opacity: 0; visibility: hidden; pointer-events: none; }
+  .cw-map[data-dock] .lv-actions,
+  .cw-map[data-dock] .lv-layerdock { opacity: 0; visibility: hidden; pointer-events: none; }
   /* SOS stays, alone at the top of the rail. */
-  .cw-map[data-near] .lv-rail-group { display: none; }
+  .cw-map[data-dock] .lv-rail-group { display: none; }
 }
 
 /* Small phones: tighter sheet so the ring keeps room above it. */
@@ -117,4 +117,32 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cw-map .lv-nearsheet-you::before, .lv-nearfocus i { animation: none; }
+}
+
+/* ── Report peek: the tapped report, docked like near me ─────────────────── */
+.cw-map .lv-peek { padding-top: 12px; }
+.cw-map .lv-peek-head { display: flex; align-items: center; gap: 8px; padding: 0 12px 0 18px; }
+.cw-map .lv-peek-head .lv-nearsheet-eyebrow { flex: 1; min-width: 0; }
+.cw-map .lv-peek-away { color: var(--lv-yellow); }
+.cw-map .lv-peek-steps { display: flex; gap: 6px; }
+.cw-map .lv-peek-head .lv-nearsheet-x { width: 38px; height: 38px; }
+.cw-map .lv-peek-head .lv-nearsheet-x:disabled { opacity: .3; }
+.cw-map .lv-peek-card { padding: 12px 16px 4px; touch-action: pan-y; cursor: grab; }
+.cw-map .lv-peek-card .lv-popup { width: 100%; box-shadow: 4px 4px 0 var(--lv-yellow); }
+.cw-map .lv-peek-card .lv-popup p, .cw-map .lv-peek-card .lv-popup h3 { margin: 0; }
+.cw-map .lv-peek-card .lv-popup__photo { height: 120px; }
+.cw-map .lv-peek-card .lv-popup__title { font-size: 20px; line-height: 1.12; }
+.cw-map .lv-peek-card .lv-popup__desc { -webkit-line-clamp: 3; }
+.cw-map .lv-peek-card .lv-popup__btn { min-height: 44px; }
+.cw-map .lv-peek-hint { margin: 6px 0 0; text-align: center; font: 600 11px/1 var(--lv-mono); letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+@media (min-width: 1024px) { .cw-map .lv-peek { display: none; } }
+@media (max-width: 1023px) and ((max-width: 380px) or (max-height: 700px)) {
+  .cw-map .lv-peek { padding-top: 10px; }
+  .cw-map .lv-peek-head { padding: 0 10px 0 14px; gap: 6px; }
+  .cw-map .lv-peek-head .lv-nearsheet-x { width: 34px; height: 34px; }
+  .cw-map .lv-peek-card { padding: 10px 12px 2px; }
+  .cw-map .lv-peek-card .lv-popup__photo { height: 96px; }
+  .cw-map .lv-peek-card .lv-popup__body { padding: 12px 14px 14px; gap: 6px; }
+  .cw-map .lv-peek-card .lv-popup__title { font-size: 18px; }
+  .cw-map .lv-peek-card .lv-popup__desc { -webkit-line-clamp: 2; }
 }

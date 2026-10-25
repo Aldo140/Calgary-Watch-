@@ -28,11 +28,13 @@ import {
   COMMUNITY_311_STEPS,
   HEAT_GRADIENT,
 } from '@/src/components/map/canvas/markerKit';
+import { stackByPoint, type PinStack } from '@/src/lib/pinStacks';
 import '../styles/map-canvas.css';
 
 interface MapProps {
   incidents: Incident[];
-  onMarkerClick: (incident: Incident) => void;
+  /** `stack` is every report on the tapped pin's point, lead first, when there is more than one. */
+  onMarkerClick: (incident: Incident, stack?: Incident[]) => void;
   onMapClick?: (lat: number, lng: number) => void;
   onViewNeighborhood?: (neighborhood: string) => void;
   onViewIncident?: (incident: Incident) => void;
@@ -527,8 +529,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       // A cluster that holds an emergency shows it in the ring and says so to
       // screen readers, without turning the whole bubble into an alarm.
       iconCreateFunction: (cluster: any) => {
+        // A stacked pin counts every report on it, so the cluster's number
+        // matches what the pins show once zoomed in.
         const children = cluster.getAllChildMarkers();
-        const { el, size } = buildClusterElement(children.map((m: any) => String(m.cwCategory ?? '')));
+        const { el, size } = buildClusterElement(children.flatMap((m: any) => (m.cwCategories as string[] | undefined) ?? [String(m.cwCategory ?? '')]));
         return L.divIcon({ html: el, className: 'lv-cluster-icon', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
       },
       // Tighter on phones, where the whole city is on screen at zoom 10.
@@ -700,27 +704,45 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   useEffect(() => {
     if (!map.current || !isMapLoaded) return;
 
-    // Remove old markers
-    Object.keys(markers.current).forEach((id) => {
-      if (!incidents.find((i) => i.id === id) || !showLiveReports) {
+    // One marker per point: reports that share a point draw as one pin with
+    // their count (src/lib/pinStacks.ts). A marker is rebuilt when the
+    // reports on its point change.
+    const stacks = showLiveReports ? stackByPoint(incidents) : [];
+    const wanted = new globalThis.Map(stacks.map((st) => [st.key, st]));
+    const sigOf = (st: PinStack) => st.members.map((i) => i.id).join('|');
+
+    Object.keys(markers.current).forEach((key) => {
+      const st = wanted.get(key);
+      if (!st || (markers.current[key] as any).cwSig !== sigOf(st)) {
         if (clusterGroup.current) {
-          clusterGroup.current.removeLayer(markers.current[id]);
+          clusterGroup.current.removeLayer(markers.current[key]);
         } else {
-          markers.current[id].remove();
+          markers.current[key].remove();
         }
-        delete markers.current[id];
+        delete markers.current[key];
       }
     });
 
-    // Add new markers when the live reports layer is active.
-    if (showLiveReports) incidents.forEach((incident) => {
-      if (markers.current[incident.id]) return;
+    stacks.forEach((st) => {
+      if (markers.current[st.key]) return;
+      const incident = st.lead;
+      const count = st.members.length;
 
       // One palette (tokens CATEGORY), one shape per category, an ink
       // outline with a white halo, and provenance as a second channel. See
       // map/canvas/markerKit.ts. Only emergencies pulse red; fresh reports
       // get one quiet cyan ring.
       const { el, size } = buildPinElement(incident);
+      if (count > 1) {
+        el.classList.add('lv-pin--stack');
+        const badge = document.createElement('span');
+        badge.className = 'lv-pin__count';
+        badge.setAttribute('aria-hidden', 'true');
+        badge.textContent = count > 99 ? '99+' : String(count);
+        el.appendChild(badge);
+        const sr = el.querySelector('.lv-sr');
+        if (sr) sr.textContent = `${count} reports at this spot. Latest: ${sr.textContent}`;
+      }
       const icon = L.divIcon({
         html: el,
         className: 'lv-pin-icon',
@@ -730,10 +752,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       const lat = Number(incident.lat);
       const lng = Number(incident.lng);
-      if (!isFinite(lat) || !isFinite(lng)) {
-        console.warn('Skipping marker with invalid coords:', incident.id, incident.lat, incident.lng);
-        return;
-      }
 
       try {
         const activate = () => {
@@ -748,7 +766,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             }).addTo(map.current);
             window.setTimeout(() => { map.current?.removeLayer(ripple); }, 950);
           }
-          window.requestAnimationFrame(() => onMarkerClickRef.current(incident));
+          window.requestAnimationFrame(() => onMarkerClickRef.current(incident, count > 1 ? st.members : undefined));
         };
         // Divicon pins are focusable (Leaflet sets tabindex and role=button);
         // Enter or Space opens the report like a tap does.
@@ -764,6 +782,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           });
 
         (marker as any).cwCategory = incident.category;
+        (marker as any).cwCategories = st.members.map((i) => i.category);
+        (marker as any).cwSig = sigOf(st);
 
         if (clusterGroup.current) {
           clusterGroup.current.addLayer(marker);
@@ -771,7 +791,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           marker.addTo(map.current!);
         }
 
-        markers.current[incident.id] = marker;
+        markers.current[st.key] = marker;
       } catch (err) {
         console.error('Error adding marker to map:', err);
       }

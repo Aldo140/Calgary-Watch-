@@ -34,6 +34,7 @@ function providerFor(batch: { source: SourceConfig; records?: SourceRecord[] }):
   }
 }
 
+const DUPLICATE_RECHECK_MS = 20 * 3_600_000;
 let failed = 0; let completed = 0;
 for (const batch of batches) {
   const name = batch.source.name;
@@ -63,7 +64,7 @@ for (const batch of batches) {
     // which avoids ingestRecord's full-collection duplicate scan for every listing.
     const raw = await db.collection('discovery_source_records').where('sourceId', '==', provider.source.id).get();
     const previous = new Map(raw.docs.map(d => [d.data().sourceRecordId as string, d.data()]));
-    const now = new Date().toISOString();
+    const now = new Date().toISOString(), nowMs = Date.parse(now);
     let refreshed = 0, written = 0;
     let bulk = db.batch(); let pending = 0;
     for (const record of records) {
@@ -72,7 +73,12 @@ for (const batch of batches) {
       if (unchanged && old.entityId) {
         const ref = db.collection(record.input.kind === 'event' ? 'events' : 'markets').doc(old.entityId);
         const entity = (await ref.get()).data();
-        if (entity && (entity.status !== 'pending' || !provider.source.autoPublish)) {
+        // A trusted feed's listing held as a possible duplicate goes through ingestRecord,
+        // which publishes it once the duplicate is gone. Each check reads every event within
+        // days of it, so an unchanged one is re-checked once a day rather than every run.
+        // ingestRecord stamps the source record's fetchedAt each time it checks.
+        const checkedToday = nowMs - Date.parse(String(old.fetchedAt ?? '')) < DUPLICATE_RECHECK_MS;
+        if (entity && (entity.status !== 'pending' || !provider.source.autoPublish || checkedToday)) {
           const reconfirm = provider.source.autoPublish && entity.verification === 'source-feed' ? { verifiedAt: now } : {};
           bulk.update(ref, { fetchedAt: now, ...reconfirm });
           if (++pending === 400) { await bulk.commit(); bulk = db.batch(); pending = 0; }

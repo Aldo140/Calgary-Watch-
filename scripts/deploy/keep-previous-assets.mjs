@@ -18,9 +18,16 @@
  *
  * Hosting stores files by content hash, so re-uploading an unchanged file is
  * free. Never fails the deploy: a network problem just means fewer old files.
+ *
+ * Downloading them was not free: every deploy pulled ~200 MB of old files back
+ * off calgarywatch.ca, which alone used most of Hosting's 360 MB/day download
+ * quota. With ASSET_CACHE_DIR set (the deploy job restores it from the Actions
+ * cache), hashed files come from that folder first and only a miss is fetched;
+ * afterwards the folder is reset to exactly what this deploy ships, for the next
+ * run to save. Hashed names never change content, so a cached copy is always right.
  */
 
-import { mkdir, readdir, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,6 +38,8 @@ const ORIGIN = (argOrigin > -1 ? process.argv[argOrigin + 1] : process.env.LIVE_
 const RETAIN_DAYS = 7;
 const MAX_CARRIED_BYTES = 250 * 1024 * 1024;
 const CONCURRENCY = 8;
+const CACHE_DIR = process.env.ASSET_CACHE_DIR ? resolve(ROOT, process.env.ASSET_CACHE_DIR) : null;
+const counts = { cached: 0, downloaded: 0 };
 
 const EXT = '(?:js|mjs|css|woff2?|ttf|svg|png|webp|jpg|wasm)';
 
@@ -66,6 +75,30 @@ async function get(path) {
   return res;
 }
 
+/** A hashed assets/… file: from the cache folder when it has it, else from the live site. */
+async function asset(file) {
+  if (CACHE_DIR) {
+    try {
+      const body = await readFile(join(CACHE_DIR, file));
+      counts.cached++;
+      return body;
+    } catch {
+      // Not cached yet: fetch it below.
+    }
+  }
+  const body = Buffer.from(await (await get(file)).arrayBuffer());
+  counts.downloaded++;
+  return body;
+}
+
+/** Leave the cache folder holding exactly this deploy's assets/ (current + carried). */
+async function refreshCache() {
+  if (!CACHE_DIR) return;
+  await rm(join(CACHE_DIR, 'assets'), { recursive: true, force: true });
+  await mkdir(CACHE_DIR, { recursive: true });
+  await cp(join(DIST, 'assets'), join(CACHE_DIR, 'assets'), { recursive: true });
+}
+
 async function crawlLive() {
   const seen = new Set();
   let queue = [];
@@ -83,7 +116,7 @@ async function crawlLive() {
     seen.add(file);
     if (!/\.(m?js|css)$/.test(file)) continue;
     try {
-      const body = Buffer.from(await (await get(file)).arrayBuffer());
+      const body = await asset(file);
       bodies.set(file, body);
       for (const ref of assetRefs(body.toString('utf8'))) if (!seen.has(ref)) queue.push(ref);
     } catch {
@@ -121,7 +154,7 @@ async function run() {
       const file = files[i++];
       if (carriedBytes > MAX_CARRIED_BYTES) return;
       try {
-        const body = bodies.get(file) ?? Buffer.from(await (await get(file)).arrayBuffer());
+        const body = bodies.get(file) ?? await asset(file);
         // A missing file answered with the 404 page is not worth keeping.
         if (/\.(m?js|css)$/.test(file) && /^\s*<!doctype html/i.test(body.subarray(0, 64).toString('utf8'))) continue;
         const out = join(DIST, file);
@@ -148,6 +181,8 @@ async function run() {
   await writeFile(join(DIST, 'asset-manifest.json'), JSON.stringify(manifest) + '\n');
   const size = (await Promise.all(carried.map((f) => stat(join(DIST, f)).then((s) => s.size)))).reduce((a, b) => a + b, 0);
   console.log(`[keep-assets] This build: ${current.size} files. Kept ${carried.length} earlier files (${(size / 1048576).toFixed(1)} MB) so open tabs keep working.`);
+  if (CACHE_DIR) console.log(`[keep-assets] ${counts.cached} files came from the Actions cache, ${counts.downloaded} were downloaded from the live site.`);
+  await refreshCache().catch((error) => console.warn(`[keep-assets] Could not update the asset cache (${error.message}); the next deploy downloads instead.`));
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

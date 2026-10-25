@@ -11,13 +11,48 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: "firebase"
   cancel-in-progress: true
 
 jobs:
+  # Every deploy costs ~2,000 Firestore reads (inventory export, organizer catalogue)
+  # and adds a full release to Hosting storage, against free quotas of 50,000 reads
+  # a day and 10 GB. This gate keeps the deploys that change something.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.decide.outputs.deploy }}
+    steps:
+      # Merges often land a few minutes apart. Waiting first lets the next push
+      # cancel this run (cancel-in-progress above), so a burst ships once.
+      - name: Let a burst of merges settle
+        if: github.event_name == 'push'
+        run: sleep 240
+      - name: Decide
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          deploy=true
+          # The scheduled rebuild is the fallback for when the event ingest (which
+          # starts a deploy itself every 6 hours) is down. Skip it while a recent
+          # deploy already carries fresh listings.
+          if [ "${{ github.event_name }}" = schedule ]; then
+            last="$(gh run list --workflow deploy-firebase.yml --status success --limit 1 --json createdAt --jq '.[0].createdAt' || true)"
+            if [ -n "$last" ] && [ $(( $(date -u +%s) - $(date -u -d "$last" +%s) )) -lt $(( 6 * 3600 )) ]; then
+              deploy=false
+              echo "::notice title=Rebuild skipped::The site was deployed at $last, under 6 hours ago."
+            fi
+          fi
+          echo "deploy=$deploy" >> "$GITHUB_OUTPUT"
+
   build-and-deploy:
+    needs: gate
+    if: needs.gate.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -88,8 +123,25 @@ jobs:
       # Firebase replaces the whole site on deploy. Carry the last week of
       # hashed page files forward so tabs opened before this deploy can still
       # open pages instead of hitting "Failed to fetch dynamically imported module".
+      # The files come from this cache, not from calgarywatch.ca: downloading
+      # them used most of Hosting's daily download quota.
+      - name: Restore earlier builds' page files
+        uses: actions/cache/restore@v4
+        with:
+          path: .hosting-assets
+          key: hosting-assets-${{ github.run_id }}
+          restore-keys: hosting-assets-
+
       - name: Keep earlier builds' page files for open tabs
+        env:
+          ASSET_CACHE_DIR: .hosting-assets
         run: node scripts/deploy/keep-previous-assets.mjs
+
+      - name: Save page files for the next deploy
+        uses: actions/cache/save@v4
+        with:
+          path: .hosting-assets
+          key: hosting-assets-${{ github.run_id }}
 
       # The next deploy merges into this copy, so headlines outlive the feeds' short windows.
       - name: Publish the safety headlines

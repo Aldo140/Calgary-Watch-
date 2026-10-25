@@ -502,3 +502,128 @@
 .cw-map .lv-mcount { align-items: center; gap: 6px; }
 .cw-map .lv-mcount .lv-pulse { align-self: center; }
 .cw-map .lv-mcount-live { font: 700 11px/1 var(--lv-mono); letter-spacing: .12em; text-transform: uppercase; color: #fff; padding-right: 6px; margin-right: 1px; border-right: 1px solid rgba(255, 255, 255, .3); }
+
+/* ── Phone frame v3: one bar, one rail, one bottom row ─────────────────────
+   Account moved into the bar, zoom buttons went (pinch zooms), SOS joined the
+   rail and Post shares a row with the map-view pill, so on a 360 × 640 phone
+   nothing floats over anything else. */
+.cw-map .lv-mcount-live { padding: 0 0 0 1px; margin: 0; border: 0; color: var(--lv-cyan-on-navy); }
+.cw-map .lv-mcount b { order: 0; }
+.cw-map .lv-mavatar {
+  position: relative; display: grid; place-items: center; flex: none; width: 34px; height: 34px; padding: 0; overflow: hidden;
+  border-radius: 999px; background: var(--lv-yellow); color: var(--lv-ink); border: 2px solid var(--lv-ink);
+  box-shadow: 2px 2px 0 var(--lv-cyan); cursor: pointer;
+}
+.cw-map .lv-mavatar img { width: 100%; height: 100%; object-fit: cover; }
+.cw-map .lv-mavatar .lv-sq-initial { font-size: 13px; }
+.cw-map .lv-mavatar:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--lv-cyan); }
+.cw-map .lv-mavatar:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+.cw-map .lv-mtop .lv-mtop-row > :nth-child(4) { animation-delay: .32s; }
+@media (max-width: 374px) {
+  .cw-map .lv-mtop { padding-left: 12px; padding-right: 12px; }
+  .cw-map .lv-mtop .lv-wordmark { font-size: 15px; gap: 6px; }
+  .cw-map .lv-mtop .lv-wordmark-logo { width: 26px; height: 26px; }
+}
+
+.cw-map .lv-rail { right: 12px; top: calc(var(--cw-chrome-h, 160px) + 14px); gap: 10px; }
+.cw-map .lv-rail-group {
+  display: flex; flex-direction: column; overflow: hidden; pointer-events: auto;
+  background: #fff; border: 2px solid var(--lv-ink); border-radius: 16px; box-shadow: 3px 3px 0 var(--lv-ink);
+}
+.cw-map .lv-rail .lv-rail-group .lv-sq { width: 44px; height: 44px; border: 0; border-radius: 0; box-shadow: none; }
+.cw-map .lv-rail .lv-rail-group .lv-sq + .lv-sq { border-top: 2px solid var(--lv-line); }
+.cw-map .lv-rail .lv-rail-group .lv-sq:active { transform: none; background: var(--lv-yellow-soft); }
+.cw-map .lv-sos-rail { width: 48px; height: 48px; border-radius: 16px; }
+.cw-map .lv-sos-desk { display: none; }
+@media (min-width: 1024px) { .cw-map .lv-sos-desk { display: inline-flex; } }
+
+/* Post: right end of the bottom row on phones. */
+@media (max-width: 1023px) {
+  .cw-map .lv-actions { right: 12px; }
+  .cw-map .lv-post { height: 50px; padding: 0 18px 0 14px; box-shadow: 3px 3px 0 var(--lv-ink); font-size: 15px; }
+  /* Pinch zooms on a phone; the buttons only covered pins. */
+  .cw-map .lv-canvas .leaflet-control-zoom { display: none; }
+}
+
+/* Sheet peek: count, window, and the newest crime headline. */
+.cw-map .lv-sheet-count small { margin-left: 8px; font: 600 11px/1 var(--lv-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lv-cyan-on-navy); vertical-align: 3px; }
+.cw-map .lv-sheet-lead {
+  display: flex; align-items: center; gap: 7px; margin-top: 7px; min-width: 0;
+  font: 600 13px/1.2 var(--lv-sans); color: #fff; opacity: .92;
+}
+.cw-map .lv-sheet-lead { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.cw-map .lv-sheet-lead i { display: inline-block; width: 8px; height: 8px; margin-right: 7px; border-radius: 999px; border: 1.5px solid #fff; vertical-align: 1px; }
+.cw-map .lv-sheet-window { text-transform: none; letter-spacing: 0; font: 500 12.5px/1.2 var(--lv-sans); }
+
+/* ── Compact frame: small phones (≤380px wide or ≤700px tall) ──────────────
+   One-row bar (logo, time dial, alert badge, count, account) over the
+   category rail; Layers joins the right rail; Post moves into the closed
+   sheet. The bar drops from ~215px to ~120px and the floating bottom row
+   goes, so a 320 × 568 screen is mostly map. */
+@media (max-width: 1023px) and ((max-width: 380px) or (max-height: 700px)) {
+  .cw-map .lv-mtop { padding: max(8px, env(safe-area-inset-top)) 10px 10px; }
+  .cw-map .lv-mtop-row { gap: 7px; }
+  .cw-map .lv-mtop .lv-wordmark-word { display: none; }
+  .cw-map .lv-mtop .lv-wordmark-logo { width: 34px; height: 34px; border-radius: 11px; }
+  .cw-map .lv-mtop .lv-cats { margin-top: 9px; }
+  .cw-map .lv-mtop .lv-cat { height: 34px; }
+  .cw-map .lv-mcount { height: 34px; padding: 0 10px; }
+  .cw-map .lv-actions[data-compact='true'] { display: none; }
+  .cw-map .lv-rail { top: calc(var(--cw-chrome-h, 120px) + 10px); right: 10px; }
+  .cw-map .lv-rail .lv-rail-group .lv-sq { width: 42px; height: 42px; }
+  .cw-map .lv-sos-rail { width: 46px; height: 46px; border-radius: 15px; }
+  .cw-map .lv-sheet-peek { padding: 0 6px 12px 16px; }
+  .cw-map .lv-sheet-count { font-size: 20px; }
+}
+
+/* Time dial: the window as one yellow pill with a dropdown. */
+.cw-map .lv-dial { position: relative; z-index: 3; flex: none; }
+.cw-map .lv-dial-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px 0 11px; cursor: pointer;
+  border: 2px solid var(--lv-ink); border-radius: 999px; background: var(--lv-yellow); color: var(--lv-ink);
+  box-shadow: 2px 2px 0 var(--lv-cyan); font: 800 13.5px/1 var(--lv-sans); white-space: nowrap;
+}
+.cw-map .lv-dial-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--lv-cyan); }
+.cw-map .lv-dial-btn:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+.cw-map .lv-dial-btn[aria-expanded='true'] .lv-dial-caret { transform: rotate(180deg); }
+.cw-map .lv-dial-caret { transition: transform .15s; }
+.cw-map .lv-dial-list {
+  position: absolute; left: -44px; top: calc(100% + 10px); width: min(17.5rem, calc(100vw - 20px)); margin: 0; padding: 6px; list-style: none;
+  background: #fff; border: 2px solid var(--lv-ink); border-radius: 18px; box-shadow: 5px 5px 0 var(--lv-yellow), 5px 5px 0 2px var(--lv-ink);
+  transform-origin: 30% 0;
+}
+.cw-map .lv-dial-opt {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 50px; padding: 8px 12px;
+  border: 0; border-radius: 12px; background: transparent; color: var(--lv-ink); text-align: left; cursor: pointer;
+}
+.cw-map .lv-dial-opt b { display: block; font: 800 14.5px/1.15 var(--lv-sans); }
+.cw-map .lv-dial-opt small { display: block; margin-top: 2px; font: 500 11.5px/1.25 var(--lv-sans); color: var(--lv-muted); }
+.cw-map .lv-dial-opt[aria-selected='true'] { background: var(--lv-navy); color: #fff; }
+.cw-map .lv-dial-opt[aria-selected='true'] small { color: var(--lv-on-navy-muted); }
+.cw-map .lv-dial-opt[aria-selected='true'] svg { color: var(--lv-yellow); }
+.cw-map .lv-dial-opt:focus-visible { outline: 3px solid var(--lv-blue); outline-offset: -3px; }
+
+/* Sheet peek row: the peek button, plus Post on small phones. */
+.cw-map .lv-sheet-peekrow { display: flex; align-items: center; }
+.cw-map .lv-sheet-peekrow .lv-sheet-peek { flex: 1; min-width: 0; }
+.cw-map .lv-sheet-post {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; height: 46px; margin: 0 14px 12px 0; padding: 0 16px 0 12px;
+  border: 2px solid var(--lv-ink); border-radius: 999px; background: var(--lv-yellow); color: var(--lv-ink); cursor: pointer;
+  box-shadow: 3px 3px 0 var(--lv-cyan); font: 800 15px/1 var(--lv-sans);
+}
+.cw-map .lv-sheet-post:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--lv-cyan); }
+.cw-map .lv-sheet-post:focus-visible { outline: 3px solid var(--lv-cyan); outline-offset: 2px; }
+@media (max-width: 1023px) and ((max-width: 380px) or (max-height: 700px)) {
+  .cw-map .lv-sheet-count small { display: none; } /* the time dial already says it */
+}
+/* The open time list sits above the category rail and the right rail. */
+/* So does the open account menu, which drew under the chips, the alert
+   strip and the rail for signed-in readers. */
+.cw-map .lv-mtop:has(.lv-dial-list), .cw-map .lv-mtop:has(.lv-menu) { z-index: 53; }
+.cw-map .lv-mtop-row:has(.lv-dial-list), .cw-map .lv-mtop-row:has(.lv-menu) { z-index: 5; }
+/* 320-340px phones: the count pill drops its "Live" word so the account
+   button isn't pushed off the right edge. */
+@media (max-width: 340px) {
+  .cw-map .lv-mcount-live { display: none; }
+  .cw-map .lv-mtop-row { gap: 6px; }
+}

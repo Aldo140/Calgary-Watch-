@@ -12,13 +12,17 @@ import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
 import { useCrimeBoard } from '@/src/hooks/useCrimeBoard';
-import { isCitySignal, memberMapLifetimeMs, MEMBER_OTHER_MAP_MS } from '@/src/lib/crimeBoard';
+import { isCitySignal, memberMapLifetimeMs, MEMBER_OTHER_MAP_MS, tidyIncidentText } from '@/src/lib/crimeBoard';
+import { buildAlertDeck, splitCityAlerts } from '@/src/lib/mapAlerts';
+import { QUADRANT_VIEW } from '@/src/lib/cityQuadrants';
+import { AlertBadge, AlertSheet, AlertStrip } from '@/src/components/map/CityAlerts';
 import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible, isCommunityFacingIncident } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, Bell, Search, X, LogIn, Home, Siren, Check, ArrowRight, MapPin, Car, Construction, CloudRain } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, Bell, Search, X, LogIn, Home, Siren, Check, ArrowRight, MapPin, Car, Construction, CloudRain, Layers } from 'lucide-react';
+import { useCompactPhone } from '@/src/hooks/useCompactPhone';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -56,7 +60,10 @@ import { classify311Service } from '@/src/lib/three11';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 import NowBriefing from '@/src/components/map/NowBriefing';
-import { LivePill, WhenChips, WhenTrack, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
+import NearMeSheet from '@/src/components/map/NearMeSheet';
+import ReportPeek from '@/src/components/map/ReportPeek';
+import { nearbyReports, NEAR_ME_RADIUS_KM } from '@/src/lib/nearMe';
+import { LivePill, WhenChips, WhenTrack, WhenDial, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
 import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
 import { inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
 
@@ -592,12 +599,14 @@ function useWeatherAlerts(isAuthReady: boolean) {
               lat, lng,
               timestamp: now,
               email: 'alerts@open-meteo.com',
-              name: 'Environment Canada (via Open-Meteo)',
+              // A forecast model's reading of current conditions, not an
+              // Environment Canada warning; the alert card says so.
+              name: 'Open-Meteo forecast model',
               anonymous: false,
               verified_status: 'community_confirmed' as const,
               report_count: 1,
               data_source: 'official' as const,
-              source_name: 'Environment Canada',
+              source_name: 'Open-Meteo forecast model',
               source_url: 'https://weather.gc.ca/',
               expires_at: now + 2 * 60 * 60 * 1000,
             };
@@ -696,6 +705,11 @@ export default function MapPage() {
   const { data: propertyData } = usePropertyAssessments(selectedArea?.communityName ?? null);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [activeIncidentId, setActiveIncidentId] = useState<string | null>(null);
+  /** Phone: the report docked at the bottom after a tap, by id. */
+  const [peekId, setPeekId] = useState<string | null>(null);
+  /** Phone: the reports on a stacked pin, when that is what was tapped. */
+  const [peekStack, setPeekStack] = useState<Incident[] | null>(null);
+  const peekRef = useRef<HTMLElement>(null);
   
   const [showLiveReports, setShowLiveReports] = useState(true);
   /**
@@ -732,21 +746,9 @@ export default function MapPage() {
   );
   // Also loaded for the personal briefing, which counts them near a saved address.
   const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
-  const [nearMeIndex, setNearMeIndex] = useState(0);
-  // Radar-scan moment before results reveal — the pause builds anticipation
-  // and makes the reveal land (Duolingo-style feedback loop).
-  const [nearMeScanning, setNearMeScanning] = useState(false);
-  /**
-   * The locate button used to do three things on one press: fly, drop a pin,
-   * and jump straight to the nearest incident — which moved the map away from
-   * the thing the person had just asked to see. It now stops on arrival and
-   * asks before going anywhere.
-   */
-  const [nearMeStage, setNearMeStage] = useState<'arrived' | 'results'>('arrived');
   /** Once shown, the "you are here" pin stays for the whole session. */
   const userPinShown = useRef(false);
-  const nearMeScanTimer = useRef<number | null>(null);
-  const NEAR_ME_RADIUS_KM = 3;
+  const nearSheetRef = useRef<HTMLElement>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [sheetState, setSheetState] = useState<SheetState>('rail');
   const sheetRef = useRef<MapSheetRef>(null);
@@ -920,12 +922,26 @@ export default function MapPage() {
   }, []);
 
   useEffect(() => {
+    // Local screenshot harness only (removed from production builds).
+    const profileFixture = import.meta.env.DEV
+      ? (window as { __CW_PROFILE_FIXTURE__?: UserProfileSettings }).__CW_PROFILE_FIXTURE__
+      : undefined;
+    if (user && profileFixture) {
+      setUserProfile(profileFixture);
+      setProfileDraft({
+        neighborhood: profileFixture.neighborhood || '', address: profileFixture.address || '',
+        inferredNeighborhood: profileFixture.inferredNeighborhood || '', piiConsent: Boolean(profileFixture.piiConsentAt),
+        weeklyDigestOptIn: profileFixture.weeklyDigestOptIn === true, digestCategories: profileFixture.digestCategories || [],
+      });
+      return;
+    }
     if (!user || !db) {
       setUserProfile(null);
       setProfileDraft({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false, digestCategories: [] as IncidentCategory[] });
       if (!user) lastNeighborhoodReportUidRef.current = null;
       return;
     }
+
 
     const unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
       const profile = (snapshot.exists() ? snapshot.data() : {}) as UserProfileSettings;
@@ -1196,9 +1212,19 @@ export default function MapPage() {
     }
   }, [hasMoreIncidents, isLoadingMoreIncidents]);
 
-  const handleMarkerClick = useCallback((incident: Incident) => {
+  const handleMarkerClick = useCallback((incident: Incident, stack?: Incident[]) => {
     setSelectedArea(null);
     setActiveIncidentId(incident.id);
+
+    // Phones dock the report at the bottom instead of a popup over the pin,
+    // which opened under the top bar and the rail with its title hidden. The
+    // peek effect below moves the pin into the clear space above the card.
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setNearMeOpen(false);
+      setPeekStack(stack && stack.length > 1 ? stack : null);
+      setPeekId(incident.id);
+      return;
+    }
 
     // Show popup first — user taps "Details" in the popup to open the full panel.
     window.requestAnimationFrame(() => {
@@ -1281,7 +1307,7 @@ export default function MapPage() {
    */
 
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
-  const incidents = useMemo(() => {
+  const mergedIncidents = useMemo(() => {
     const now = Date.now();
     // Browser-derived civic records are rebuilt from their upstream APIs on
     // every load, so a moderator's decision about them can only live in the
@@ -1304,7 +1330,20 @@ export default function MapPage() {
       || incident.data_source !== 'official'
       || keptTrafficIds.has(incident.id)
     );
-    const unique = new globalThis.Map(densityCurated.map((i: Incident) => [i.id, i]));
+    // The board folds updates and repeat coverage of one event into a single
+    // record; the live query can still return the others, so they are left out,
+    // and the lead keeps the board's count when the live copy replaces it.
+    const boardById = new globalThis.Map(crimeBoardIncidents.map((i) => [i.id, i]));
+    const folded = new Set(crimeBoardIncidents.flatMap((i) => i.related_ids ?? []));
+    const unique = new globalThis.Map(densityCurated
+      .filter((i: Incident) => !folded.has(i.id))
+      .map((i: Incident) => {
+        const board = boardById.get(i.id);
+        const merged = board && board !== i && board.related_count
+          ? { ...i, related_count: board.related_count, related_sources: board.related_sources }
+          : i;
+        return [i.id, tidyIncidentText(merged)] as const;
+      }));
     const filtered = [...unique.values()]
       .filter((i) => {
         if (i.expires_at) return i.expires_at > now;
@@ -1316,18 +1355,36 @@ export default function MapPage() {
     // Community reports (no data_source field) always show — never merged.
     const kept: Incident[] = [];
     for (const inc of filtered) {
-      if (inc.data_source !== 'official') {
+      // Police releases and news are placed at a community's centre, so two
+      // stories from one community share a point; only City signals are thinned.
+      if (inc.data_source !== 'official' || !isCitySignal(inc)) {
         kept.push(inc);
         continue;
       }
       const isDup = kept.some(
-        (k) => k.data_source === 'official' &&
+        (k) => k.data_source === 'official' && isCitySignal(k) &&
           getDistance(k.lat, k.lng, inc.lat, inc.lng) < 0.03
       );
       if (!isDup) kept.push(inc);
     }
     return kept;
   }, [crimeBoardIncidents, firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, riverIncidents, suppressedIds]);
+
+  /**
+   * Weather warnings, emergency alerts, smoke and river readings cover an
+   * area, not a street, so they leave the pins, the feed and every count and
+   * become the city alert strip (src/lib/mapAlerts.ts). Neighbours' own
+   * weather posts stay reports.
+   */
+  const { reports: incidents, alertRecords: cityAlertRecords } = useMemo(
+    () => splitCityAlerts(mergedIncidents),
+    [mergedIncidents],
+  );
+  const cityAlerts = useMemo(() => buildAlertDeck(cityAlertRecords, clock), [cityAlertRecords, clock]);
+  const [alertIndex, setAlertIndex] = useState<number | null>(null);
+  /** Small phones get the compact frame: one-row bar, Layers on the rail, Post in the sheet. */
+  const compactPhone = useCompactPhone();
+  const [layersOpen, setLayersOpen] = useState(false);
 
   // ── My Watch ────────────────────────────────────────────────────────────────
   // The reader's persisted "last checked" mark, radius and categories. The
@@ -1725,6 +1782,8 @@ export default function MapPage() {
     if (isFormOpen && !isPinMode) {
       setSelectedLocation({ lat, lng });
     }
+    // Tapping the map around a docked report puts it away.
+    setPeekId(null);
   }, [isFormOpen, isPinMode]);
 
   const handleRequestMapPin = useCallback(() => {
@@ -2004,23 +2063,59 @@ export default function MapPage() {
     return { phoneCategoryOptions: options, phoneCategoryTotal: feedIncidents.length };
   }, [feedIncidents]);
 
-  // Incidents sorted by distance from user for the Near Me panel
-  const nearMeIncidents = useMemo(() => {
-    const loc = userLocation || CALGARY_CENTER;
-    return incidents
-      .map(i => ({ i, dist: getDistance(loc.lat, loc.lng, i.lat, i.lng) }))
-      .filter(x => x.dist <= NEAR_ME_RADIUS_KM)
-      .sort((a, b) => {
-        if (a.i.category === 'emergency' && b.i.category !== 'emergency') return -1;
-        if (b.i.category === 'emergency' && a.i.category !== 'emergency') return 1;
-        return a.dist - b.dist;
-      })
-      .map(x => ({ ...x.i, _dist: x.dist })) as (Incident & { _dist: number })[];
-  }, [incidents, userLocation]);
+  /**
+   * Near me counts what the map shows: the same time window and type chip, so
+   * its number never disagrees with the chips and the count pill above it.
+   */
+  const nearMeIncidents = useMemo(
+    () => nearbyReports(feedIncidents, userLocation || CALGARY_CENTER, selectedCategory),
+    [feedIncidents, userLocation, selectedCategory],
+  );
 
-  /** Latest nearby list, for callbacks that fire after a delay. */
-  const nearMeIncidentsRef = useRef<(Incident & { _dist: number })[]>([]);
-  useEffect(() => { nearMeIncidentsRef.current = nearMeIncidents; }, [nearMeIncidents]);
+  /**
+   * Phone report peek: the reports the map is showing (window and type chip),
+   * newest first, so swiping steps through what is on screen. A report tapped
+   * from somewhere else (a link, a notification) leads the list.
+   */
+  const peekList = useMemo(() => {
+    if (!peekId) return [] as Incident[];
+    // A stacked pin steps through the reports on that spot only.
+    if (peekStack?.some((i) => i.id === peekId)) return peekStack;
+    const list = feedIncidents
+      .filter((i) => selectedCategory === 'all' || i.category === selectedCategory)
+      .slice()
+      .sort((a, b) => b.timestamp - a.timestamp);
+    if (!list.some((i) => i.id === peekId)) {
+      const tapped = incidents.find((i) => i.id === peekId);
+      if (tapped) list.unshift(tapped);
+    }
+    return list;
+  }, [peekId, peekStack, feedIncidents, selectedCategory, incidents]);
+  const peekIndex = peekId ? peekList.findIndex((i) => i.id === peekId) : -1;
+  const peekIncident = peekIndex >= 0 ? peekList[peekIndex] : null;
+
+  // Move the pin into the middle of the clear space between the top bar and
+  // the docked card, and ring it. Runs after the card has laid out.
+  useEffect(() => {
+    if (!peekIncident) { if (!nearMeOpen) mapRef.current?.setNearFocus(null); return; }
+    const inc = peekIncident;
+    const raf = window.requestAnimationFrame(() => {
+      const top = chromeRef.current?.getBoundingClientRect().bottom ?? 0;
+      const bottom = peekRef.current?.getBoundingClientRect().top ?? window.innerHeight;
+      const mid = top + Math.max(0, bottom - top) / 2;
+      mapRef.current?.flyToWithOffset(inc.lat, inc.lng, { zoom: 15, offsetY: window.innerHeight / 2 - mid });
+      mapRef.current?.setNearFocus({ lat: inc.lat, lng: inc.lng, color: categoryColor(inc.category) });
+    });
+    return () => window.cancelAnimationFrame(raf);
+    // Keyed on the report, not the object: a live update to the same report
+    // must not move the map again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peekIncident?.id]);
+
+  // The peek closes when the full report, the form or a pin mode takes over.
+  useEffect(() => {
+    if (selectedIncident || isFormOpen || isPinMode || isEmergencyPinMode || nearMeOpen) setPeekId(null);
+  }, [selectedIncident, isFormOpen, isPinMode, isEmergencyPinMode, nearMeOpen]);
 
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
@@ -2188,39 +2283,49 @@ export default function MapPage() {
   }, [user, preferredAddress, preferredNeighborhood, preferredInferredNeighborhood, profileNeedsSetup]);
 
   /**
-   * Locate: show them where they are, and stop there.
+   * Locate: open "What's near me". The map frames a ring around the reader's
+   * pin and stops there; it only moves to a report when they open one.
    *
    * The pin is deliberately never cleared once placed. Losing your own
    * position the moment you close a panel is disorienting on a map whose whole
    * subject is distance from you.
    */
-  const handleLocate = useCallback(() => {
-    const loc = userLocation || CALGARY_CENTER;
-    if (nearMeOpen) { setNearMeOpen(false); return; }
-    mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 15 : 11);
+  const openNearMe = useCallback(() => {
     if (userLocation) {
       mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
       userPinShown.current = true;
     }
-    setNearMeIndex(0);
-    setNearMeStage('arrived');
-    setNearMeScanning(false);
-    if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
+    setSheetState('rail');
     setNearMeOpen(true);
-  }, [userLocation, nearMeOpen]);
+  }, [userLocation]);
 
-  /** They said yes to the scan: run the radar beat, then reveal. */
-  const startNearMeScan = useCallback(() => {
-    setNearMeStage('results');
-    setNearMeIndex(0);
-    setNearMeScanning(true);
-    if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
-    nearMeScanTimer.current = window.setTimeout(() => {
-      setNearMeScanning(false);
-      const first = nearMeIncidentsRef.current[0];
-      if (first) mapRef.current?.flyTo(first.lat, first.lng, 15);
-    }, 450);
-  }, []);
+  const handleLocate = useCallback(() => {
+    if (nearMeOpen) { setNearMeOpen(false); return; }
+    openNearMe();
+  }, [nearMeOpen, openNearMe]);
+
+  // Frame the ring once the sheet has laid out, and again if the location
+  // arrives while it is open. Closing clears the ring and the marker.
+  useEffect(() => {
+    if (!nearMeOpen) { mapRef.current?.clearNearRing(); return; }
+    const loc = userLocation || CALGARY_CENTER;
+    const t = window.setTimeout(() => {
+      mapRef.current?.showNearRing(loc, NEAR_ME_RADIUS_KM, [chromeRef.current, nearSheetRef.current]);
+    }, 120);
+    return () => window.clearTimeout(t);
+  }, [nearMeOpen, userLocation]);
+
+  // Opening a report (from a card or a pin) hands the screen to the report.
+  useEffect(() => { if (selectedIncident) setNearMeOpen(false); }, [selectedIncident]);
+
+  const handleNearFocus = useCallback((index: number) => {
+    const inc = nearMeIncidents[index];
+    if (!inc) { mapRef.current?.setNearFocus(null); return; }
+    mapRef.current?.setNearFocus(
+      { lat: inc.lat, lng: inc.lng, color: categoryColor(inc.category) },
+      userLocation || CALGARY_CENTER,
+    );
+  }, [nearMeIncidents, userLocation]);
 
   const handleNotificationClick = useCallback((notification: MapNotification) => {
     // The neighbourhood report is this person's own briefing. Sending it to the
@@ -2440,14 +2545,15 @@ export default function MapPage() {
       if (showUserMenu) { setShowUserMenu(false); return; }
       if (selectedIncident) { setSelectedIncident(null); return; }
       if (selectedArea) { setSelectedArea(null); return; }
-      if (nearMeOpen) { setNearMeOpen(false); setNearMeScanning(false); return; }
+      if (nearMeOpen) { setNearMeOpen(false); return; }
+      if (peekId) { setPeekId(null); return; }
       if (sheetState === 'raised') setSheetState('rail');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [tourOpen, viewerCamera, selectedTrafficSegment, briefingOpen, isFormOpen, isEmergencyOpen, isPinMode,
     isEmergencyPinMode, digestPromptOpen, authPanelVisible, canCloseAuthPanel, closeAuthPanel, showNotifications,
-    showUserMenu, selectedIncident, selectedArea, nearMeOpen, sheetState]);
+    showUserMenu, selectedIncident, selectedArea, nearMeOpen, peekId, sheetState]);
 
   // Instant alerts write straight to the profile — small, independent controls
   // that must not wait on the larger report-area form's save cycle.
@@ -2498,7 +2604,7 @@ export default function MapPage() {
   }, [user, updateAlertPrefs]);
 
   return (
-    <div className="map-shell cw-map lv-root relative flex h-dvh w-full overflow-hidden bg-[#FAF8F3] font-sans text-[#151515]">
+    <div data-near={nearMeOpen || undefined} data-dock={nearMeOpen || peekId ? '' : undefined} className="map-shell cw-map lv-root relative flex h-dvh w-full overflow-hidden bg-[#FAF8F3] font-sans text-[#151515]">
       <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
       <AnimatePresence>
         {isLoading && (
@@ -3271,7 +3377,7 @@ export default function MapPage() {
           >
             <div className="lv-toast whitespace-nowrap" style={{ padding: '8px 8px 8px 14px', borderRadius: 999, boxShadow: '3px 3px 0 #151515' }}>
               <Navigation size={14} className="shrink-0" style={{ color: '#1554D1' }} />
-              <span className="truncate">Location off. Showing all of Calgary</span>
+              <span className="truncate">{compactPhone ? 'Location off' : 'Location off. Showing all of Calgary'}</span>
               <button type="button" onClick={() => setLocationError(false)} aria-label="Dismiss" className="grid size-7 shrink-0 place-items-center rounded-full hover:bg-[#FFF5CC]">
                 <X size={13} />
               </button>
@@ -3279,6 +3385,15 @@ export default function MapPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* City alerts card, opened from the alert strip. */}
+      <AlertSheet
+        alerts={cityAlerts}
+        index={alertIndex}
+        onIndex={setAlertIndex}
+        onClose={() => setAlertIndex(null)}
+        onReport={() => requestReport(null)}
+      />
 
       {/* First-run coach-mark tour */}
       <MapTour open={tourOpen} onFinish={finishTour} onStepChange={handleTourStepChange} />
@@ -3288,6 +3403,7 @@ export default function MapPage() {
         <Sidebar
           incidents={feedIncidents}
           briefingIncidents={nearArea ? briefingIncidents : undefined}
+          onQuadrant={(q) => { const v = QUADRANT_VIEW[q]; mapRef.current?.flyTo(v.lat, v.lng, 12); }}
           areaName={nearArea?.name}
           timeWindow={timeWindow}
           onTimeWindowChange={setTimeWindow}
@@ -3362,8 +3478,9 @@ export default function MapPage() {
           onIncidentClick={handleSheetIncidentClick}
           onNeighbourhoodSelect={handleSheetNeighbourhoodSelect}
           onReportPress={() => requestReport(null)}
+          compact={compactPhone}
           activeIncidentId={activeIncidentId}
-          hidden={isFormOpen || isPinMode || isEmergencyPinMode}
+          hidden={isFormOpen || isPinMode || isEmergencyPinMode || nearMeOpen || Boolean(peekIncident)}
           briefing={
             /* ── NowBriefing slot (feed worker's component) ── */
             <>
@@ -3384,6 +3501,11 @@ export default function MapPage() {
               areaName={nearArea?.name}
               selectedCategory={selectedCategory}
               onSelectCategory={(c) => setSelectedCategory(c as IncidentCategory | 'all')}
+              onQuadrant={(q) => {
+                const v = QUADRANT_VIEW[q];
+                setSheetState('rail');
+                mapRef.current?.flyTo(v.lat, v.lng, 12);
+              }}
               />
             </>
           }
@@ -3402,294 +3524,166 @@ export default function MapPage() {
           <span className="lv-mtop-sheen" aria-hidden="true" />
           <div className="lv-mtop-row">
             <DesktopMapBrandMark compact />
+            {compactPhone && <WhenDial value={timeWindow} onChange={setTimeWindow} />}
             <span className="ml-auto" />
+            {compactPhone && <AlertBadge alerts={cityAlerts} onOpen={setAlertIndex} />}
             <button
               type="button"
               data-tour="m-feed"
               onClick={() => sheetRef.current?.raise()}
               className="lv-mcount"
+              aria-label={`${feedCount} ${feedCount === 1 ? 'report' : 'reports'} live: open the list`}
             >
               <span className="lv-pulse" aria-hidden="true" />
+              <b key={feedCount}>{feedCount}</b>
               <span className="lv-mcount-live">Live</span>
-              <b key={feedCount}>{feedCount}</b> {feedCount === 1 ? 'report' : 'reports'}
             </button>
+            {/* Account lives in the bar, so the right rail only holds map
+                actions and nothing stacks over the pins on a short phone. */}
+            <div className="relative">
+              {user ? (
+                <button type="button" onClick={toggleUserMenu} className="lv-mavatar" aria-label="Account menu" aria-expanded={showUserMenu}>
+                  <AvatarFace user={user} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openAuthPanel('signin')}
+                  aria-label="Sign up or sign in"
+                  title="Sign up or sign in"
+                  className="lv-mavatar"
+                >
+                  <LogIn size={17} strokeWidth={2.4} />
+                </button>
+              )}
+              {user && (
+                <UserMenu
+                  open={showUserMenu}
+                  user={user}
+                  isAdmin={isAdmin}
+                  className="!top-[calc(100%+10px)] !right-0 z-[60]"
+                  onAdmin={() => { navigate('/admin'); setShowUserMenu(false); }}
+                  onSettings={() => openAuthPanel('settings')}
+                  onTour={replayTour}
+                  onSignOut={() => { logout(); setShowUserMenu(false); }}
+                />
+              )}
+            </div>
           </div>
-          <WhenTrack value={timeWindow} onChange={setTimeWindow} />
+          {!compactPhone && <WhenTrack value={timeWindow} onChange={setTimeWindow} />}
           <CategoryRail
             options={phoneCategoryOptions}
             total={phoneCategoryTotal}
             value={selectedCategory}
             onChange={(c) => setSelectedCategory(c as IncidentCategory | 'all')}
           />
+          {!compactPhone && <AlertStrip alerts={cityAlerts} onOpen={setAlertIndex} now={clock} />}
         </div>
 
-        {/* Phone action rail (right edge): locate, alerts, account. z-[51]
-            keeps it above the tap-to-close scrim (z-[49]) and below the raised
-            sheet (z-[52]). The column itself ignores pointer events so the
-            scrim still catches taps on the map around the buttons. */}
+        {/* Phone action rail (right edge): near me, alerts, and SOS at the
+            foot, apart from the yellow Post. z-[51] keeps it above the
+            tap-to-close scrim (z-[49]) and below the raised sheet (z-[52]).
+            The column ignores pointer events so the scrim still catches taps
+            on the map around the buttons. */}
         <div className="lv-rail lg:hidden" data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}>
-          <button
-            type="button"
-            onClick={handleLocate}
-            data-tour="near-me"
-            data-on={nearMeOpen ? 'true' : undefined}
-            className="lv-sq"
-            aria-label="What's near me"
-            aria-pressed={nearMeOpen}
-          >
-            <Navigation size={20} strokeWidth={2.2} />
-          </button>
-          <button
-            type="button"
-            onClick={toggleNotifications}
-            data-tour="m-alerts"
-            className="lv-sq"
-            aria-label={bellLabel(unreadNotifications)}
-          >
-            <Bell size={20} strokeWidth={2.2} />
-            <UnreadBadge count={unreadNotifications} />
-          </button>
-          <div className="relative">
-            {user ? (
-              <button type="button" onClick={toggleUserMenu} className="lv-sq" aria-label="Account menu" aria-expanded={showUserMenu}>
-                <AvatarFace user={user} />
-              </button>
-            ) : (
+          <div className="lv-rail-group">
+            <button
+              type="button"
+              onClick={handleLocate}
+              data-tour="near-me"
+              data-on={nearMeOpen ? 'true' : undefined}
+              className="lv-sq"
+              aria-label="What's near me"
+              aria-pressed={nearMeOpen}
+            >
+              <Navigation size={19} strokeWidth={2.3} />
+            </button>
+            <button
+              type="button"
+              onClick={toggleNotifications}
+              data-tour="m-alerts"
+              className="lv-sq"
+              aria-label={bellLabel(unreadNotifications)}
+            >
+              <Bell size={19} strokeWidth={2.3} />
+              <UnreadBadge count={unreadNotifications} />
+            </button>
+            {compactPhone && (
               <button
                 type="button"
-                onClick={() => openAuthPanel('signin')}
-                aria-label="Sign up or sign in"
-                title="Sign up or sign in"
+                data-layers-toggle
+                data-tour="layers"
+                onClick={() => setLayersOpen((v) => !v)}
                 className="lv-sq"
+                aria-label="Map view and layers"
+                aria-expanded={layersOpen}
+                data-on={layersOpen ? 'true' : undefined}
               >
-                <LogIn size={19} strokeWidth={2.2} />
+                <Layers size={19} strokeWidth={2.3} />
               </button>
             )}
-            {user && (
-              <UserMenu
-                open={showUserMenu}
-                user={user}
-                isAdmin={isAdmin}
-                motionFrom="side"
-                className="!top-0 !right-[calc(100%+12px)] z-[60]"
-                onAdmin={() => { navigate('/admin'); setShowUserMenu(false); }}
-                onSettings={() => openAuthPanel('settings')}
-                onTour={replayTour}
-                onSignOut={() => { logout(); setShowUserMenu(false); }}
-              />
-            )}
           </div>
+          <button
+            type="button"
+            data-tour="sos"
+            className="lv-sos lv-sos-rail"
+            aria-label="SOS: report an emergency"
+            title="Emergency report"
+            onClick={() => {
+              const now = Date.now();
+              if (now - buttonClickDebounceRef.current < 300) return;
+              buttonClickDebounceRef.current = now;
+              if (!user) { openAuthPanel('signin'); return; }
+              setIsEmergencyOpen(true);
+            }}
+          >
+            <Siren size={20} className="shrink-0" />
+          </button>
         </div>
 
-        {/* Near Me Panel — card above the sheet rail (phone), bottom-left card (desktop) */}
+        {/* Phone: the tapped report, docked where the sheet was. */}
+        <AnimatePresence>
+          {peekIncident && (
+            <ReportPeek
+              key="report-peek"
+              ref={peekRef}
+              list={peekList}
+              index={peekIndex}
+              onIndex={(i) => { const next = peekList[i]; if (next) { setPeekId(next.id); setActiveIncidentId(next.id); } }}
+              onClose={() => setPeekId(null)}
+              onDetails={(inc) => startTransition(() => setSelectedIncident(inc))}
+              onArea={(name) => { setPeekId(null); handleViewNeighborhood(name); }}
+              windowLabel={peekList === peekStack ? 'At this spot' : windowWord(timeWindow)}
+              userLocation={userLocation}
+              now={clock}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* What's near me: the bottom sheet on phones, a card at the bottom
+            left on desktop. */}
         <AnimatePresence>
           {nearMeOpen && (
-            <motion.div
-              key="near-me-panel"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-              className={cn(
-                'absolute z-40 pointer-events-auto',
-                // Clears the sheet's measured rail rather than sitting under it.
-                'bottom-[calc(var(--cw-rail-h,66px)+1.5rem)] left-3 right-3',
-                'lg:left-6 lg:right-auto lg:bottom-24 lg:w-[24rem]',
-              )}
-              role="dialog"
-              aria-label="Near me"
-            >
-              <div className="lv-card lv-card-shadow lv-near">
-                <div className="lv-near-head">
-                  <span className="lv-eyebrow lv-eyebrow-blue flex items-center gap-1.5">
-                    <Navigation size={13} />
-                    {nearMeStage === 'arrived' ? 'Your location' : `Within ${NEAR_ME_RADIUS_KM} km`}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => { setNearMeOpen(false); setNearMeScanning(false); }}
-                    className="lv-close"
-                    style={{ width: 34, height: 34, borderRadius: 10 }}
-                    aria-label="Close near me panel"
-                  >
-                    <X size={15} />
-                  </button>
-                </div>
-
-                {nearMeStage === 'arrived' ? (
-                  /* Arrival: show them where they are and ask before moving
-                     the map somewhere else. */
-                  <div className="px-4 pb-4">
-                    <div className="flex items-start gap-3">
-                      <span className="lv-near-dot mt-0.5" aria-hidden="true"><i /></span>
-                      <div className="min-w-0 flex-1">
-                        <p className="lv-h-sm">
-                          {userLocation ? 'This is where you are' : 'Showing central Calgary'}
-                        </p>
-                        <p className="lv-small mt-1">
-                          {userLocation
-                            ? 'Your pin stays on the map while you look around.'
-                            : 'Turn on location in your browser to centre the map on you.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 space-y-2.5">
-                      <button type="button" onClick={startNearMeScan} className="lv-btn lv-btn-primary lv-btn-block justify-between" style={{ minHeight: 54, borderRadius: 16 }}>
-                        <span className="min-w-0 text-left">
-                          <span className="block text-[14.5px] font-extrabold leading-tight">See what is near me</span>
-                          <span className="block text-[12px] font-medium opacity-80 mt-0.5">
-                            {nearMeIncidents.length > 0
-                              ? `${nearMeIncidents.length} report${nearMeIncidents.length === 1 ? '' : 's'} within ${NEAR_ME_RADIUS_KM} km`
-                              : `Look ${NEAR_ME_RADIUS_KM} km around this pin`}
-                          </span>
-                        </span>
-                        <ArrowRight size={17} className="shrink-0" />
-                      </button>
-
-                      {/* The deeper version of the same question, for people
-                          who have given us an address to measure from. */}
-                      {user && preferredAddress && (
-                        <button
-                          type="button"
-                          onClick={() => { setNearMeOpen(false); setBriefingOpen(true); }}
-                          className="lv-btn lv-btn-ghost lv-btn-block justify-between"
-                          style={{ minHeight: 54, borderRadius: 16 }}
-                        >
-                          <span className="min-w-0 text-left">
-                            <span className="block text-[14px] font-extrabold leading-tight">Open my full briefing</span>
-                            <span className="block truncate text-[12px] font-medium mt-0.5" style={{ color: '#565a61' }}>
-                              Measured from {preferredAddress}
-                            </span>
-                          </span>
-                          <ArrowRight size={17} className="shrink-0" style={{ color: '#1554D1' }} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ) : nearMeScanning ? (
-                  <div className="px-4 pb-6 pt-2 flex flex-col items-center text-center">
-                    <span className="lv-loading-spin" style={{ borderColor: 'rgba(21,21,21,0.15)', borderTopColor: '#1554D1' }} aria-hidden="true" />
-                    <p className="mt-3 lv-eyebrow lv-eyebrow-blue">Looking within 3 km…</p>
-                    <p className="lv-small mt-1">Reports already on the map around your pin</p>
-                  </div>
-                ) : nearMeIncidents.length === 0 ? (
-                  <div className="px-4 pb-5 pt-1">
-                    <p className="lv-h-sm">Nothing posted within {NEAR_ME_RADIUS_KM} km</p>
-                    <p className="lv-small mt-1.5">
-                      No reports on the map around you right now. Quiet maps are normal, and an empty map isn&rsquo;t proof nothing happened.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="px-4 pb-2.5 lv-h-sm">
-                      {nearMeIncidents.length === 1
-                        ? '1 report nearby'
-                        : `${nearMeIncidents.length} reports nearby`}
-                    </p>
-
-                    {(() => {
-                      const inc = nearMeIncidents[nearMeIndex];
-                      if (!inc) return null;
-                      const catInk = categoryColor(inc.category);
-                      const age = Date.now() - inc.timestamp;
-                      const ageStr = age < 60_000 ? 'Just now'
-                        : age < 3_600_000 ? `${Math.round(age / 60_000)} min ago`
-                        : age < 86_400_000 ? `${Math.round(age / 3_600_000)} h ago`
-                        : `${Math.round(age / 86_400_000)} d ago`;
-                      return (
-                        <div className="px-4 pb-3">
-                          <button
-                            type="button"
-                            className="lv-near-card"
-                            style={{ borderLeft: `8px solid ${catInk}` }}
-                            onClick={() => {
-                              handleMarkerClick(inc);
-                              setNearMeOpen(false);
-                            }}
-                          >
-                            <span className="flex items-center justify-between gap-2">
-                              <span className="lv-eyebrow" style={{ color: '#151515' }}>{inc.category}</span>
-                              <span className="font-mono text-[11px] text-[#565a61] shrink-0">{ageStr}</span>
-                            </span>
-                            <span className="mt-1.5 block text-[15px] font-bold leading-snug text-[#151515]">{inc.title}</span>
-                            <span className="mt-1 block text-[12.5px] leading-relaxed text-[#565a61] line-clamp-2">{inc.description}</span>
-                            <span className="mt-2 block text-[12px] font-semibold text-[#151515]">
-                              {inc._dist < 1 ? `${Math.round(inc._dist * 1000)} m` : `${inc._dist.toFixed(1)} km`} away{inc.neighborhood ? ` · ${inc.neighborhood}` : ''}
-                            </span>
-                          </button>
-                        </div>
-                      );
-                    })()}
-
-                    <div className="flex items-center justify-between gap-2 px-4 pb-4 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = Math.max(0, nearMeIndex - 1);
-                          setNearMeIndex(next);
-                          const inc = nearMeIncidents[next];
-                          if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
-                        }}
-                        disabled={nearMeIndex === 0}
-                        className="lv-near-nav"
-                      >
-                        ← Prev
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setNearMeStage('arrived');
-                          const loc = userLocation || CALGARY_CENTER;
-                          mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 15 : 11);
-                        }}
-                        className="lv-link text-[12px]"
-                        style={{ color: '#565a61' }}
-                      >
-                        {nearMeIndex + 1} of {nearMeIncidents.length} · back to me
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = Math.min(nearMeIncidents.length - 1, nearMeIndex + 1);
-                          setNearMeIndex(next);
-                          const inc = nearMeIncidents[next];
-                          if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
-                        }}
-                        disabled={nearMeIndex === nearMeIncidents.length - 1}
-                        className="lv-near-nav"
-                      >
-                        Next →
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {/* Weekly digest opt-in — wired to the existing profile setting */}
-                {nearMeStage === 'results' && !nearMeScanning && (!user || userProfile?.weeklyDigestOptIn !== true) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNearMeOpen(false);
-                      openAuthPanel(user ? 'settings' : 'signin');
-                    }}
-                    className="lv-digest-row"
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[13px] font-extrabold leading-tight text-[#151515]">
-                        Want this weekly, without opening the map?
-                      </span>
-                      <span className="block text-[12px] text-[#565a61] font-medium mt-0.5">
-                        What was reported near you plus community news, by email. Free, opt out any time.
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-[12.5px] font-extrabold text-[#1554d1]">
-                      {user ? 'Turn on' : 'Sign up'} →
-                    </span>
-                  </button>
-                )}
-              </div>
-            </motion.div>
+            <NearMeSheet
+              key="near-me"
+              ref={nearSheetRef}
+              reports={nearMeIncidents}
+              located={Boolean(userLocation)}
+              windowLabel={windowWord(timeWindow)}
+              category={selectedCategory}
+              loading={isLoading}
+              now={clock}
+              onClose={() => setNearMeOpen(false)}
+              onFocus={handleNearFocus}
+              onOpenReport={(inc) => handleMarkerClick(inc)}
+              onPost={() => { setNearMeOpen(false); requestReport(null); }}
+              briefing={user && preferredAddress
+                ? { address: preferredAddress, onOpen: () => { setNearMeOpen(false); setBriefingOpen(true); } }
+                : undefined}
+              digest={!user || userProfile?.weeklyDigestOptIn !== true
+                ? { action: user ? 'Turn on' : 'Sign up', onOpen: () => { setNearMeOpen(false); openAuthPanel(user ? 'settings' : 'signin'); } }
+                : undefined}
+            />
           )}
         </AnimatePresence>
 
@@ -3728,7 +3722,10 @@ export default function MapPage() {
                   <div className="min-w-0">
                     <h3 id="mobile-notifications-title" className="lv-h">Notifications</h3>
                     <p className="lv-small mt-0.5">
-                      {watchFeed.sinceSummary
+                      {/* Only when the list below has what it counts: on a
+                          first visit the list starts empty, and "since you
+                          last checked" over "All caught up" contradicted itself. */}
+                      {watchFeed.sinceSummary && watchState.lastSeenAt !== null && notifications.length > 0
                         ? `Since you last checked: ${watchFeed.sinceSummary}`
                         : 'Your neighbourhood report and new reports for your saved area'}
                     </p>
@@ -3759,6 +3756,7 @@ export default function MapPage() {
             <span className="lv-stamp" title="Time of the newest neighbour report or City record on the map">
               <b>{freshness}</b>
             </span>
+            <AlertStrip alerts={cityAlerts} onOpen={setAlertIndex} variant="desk" now={clock} />
             {nearArea && (
               <button
                 type="button"
@@ -3824,7 +3822,7 @@ export default function MapPage() {
                       <h3>Notifications</h3>
                       <LivePill />
                     </div>
-                    {watchFeed.sinceSummary && (
+                    {watchFeed.sinceSummary && watchState.lastSeenAt !== null && notifications.length > 0 && (
                       <p className="lv-note-since">Since you last checked: {watchFeed.sinceSummary}</p>
                     )}
                     <div className="max-h-[min(70dvh,34rem)] overflow-y-auto overscroll-contain">
@@ -3873,17 +3871,18 @@ export default function MapPage() {
           guidedPreview={tourOpen && tourTarget === 'camera-viewer'}
         />
 
-        {/* Emergency and report actions. On a phone the column sits above the
-            layer bar, which sits above the sheet rail. */}
+        {/* Emergency and report actions. On a phone Post shares one row with
+            the map-view pill, just above the sheet rail; SOS is on the rail. */}
         <div
-          className="lv-actions bottom-[calc(var(--cw-rail-h,66px)+1.375rem+var(--cw-layerbar-h,3.25rem)+0.75rem+env(safe-area-inset-bottom))] lg:bottom-[5.5rem]"
+          className="lv-actions bottom-[calc(var(--cw-rail-h,66px)+0.875rem+env(safe-area-inset-bottom))] lg:bottom-[5.5rem]"
           data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}
+          data-compact={compactPhone ? 'true' : undefined}
         >
           {/* SOS stays visually separate from standard reporting. */}
           <button
             type="button"
             data-tour="sos"
-            className="lv-sos"
+            className="lv-sos lv-sos-desk"
             aria-label="SOS: report an emergency"
             title="Emergency report"
             onClick={() => {
@@ -3944,6 +3943,9 @@ export default function MapPage() {
           setShowCitySignals={setShowCitySignals}
           crimeStats={crimeStats}
           tourTarget={tourOpen ? tourTarget : undefined}
+          menuOpen={compactPhone ? layersOpen : undefined}
+          onMenuOpenChange={compactPhone ? setLayersOpen : undefined}
+          compact={compactPhone}
           isPinMode={isPinMode || isEmergencyPinMode}
         />
 
@@ -4080,16 +4082,7 @@ export default function MapPage() {
             }}
             onOpenSettings={() => openAuthPanel('settings')}
             photoURL={user.photoURL ?? undefined}
-            onOpenNearby={() => {
-              const loc = userLocation || CALGARY_CENTER;
-              mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 14 : 11);
-              if (userLocation) {
-                mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
-                userPinShown.current = true;
-              }
-              setNearMeOpen(true);
-              startNearMeScan();
-            }}
+            onOpenNearby={openNearMe}
             onSelectIncident={(incident) => startTransition(() => setSelectedIncident(incident))}
             onOpenCamera={(camera) => {
               setViewerCamera(camera);

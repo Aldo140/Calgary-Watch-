@@ -103,6 +103,12 @@ export interface Incident {
   source_url?: string;
   source_logo?: string;
   source_name?: string;
+  /** Crime board: how many records (stories, updates) this one stands for, when more than one. */
+  related_count?: number;
+  /** Crime board: the outlets that covered the same event, when more than one did. */
+  related_sources?: string[];
+  /** Crime board: the other records folded into this one, which the map then leaves out. */
+  related_ids?: string[];
   /**
    * Authoritative visibility. Absent on documents written before the
    * visibility migration — treat a missing value as 'public'.

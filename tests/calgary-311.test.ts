@@ -44,8 +44,15 @@ describe('311 service matching', () => {
     // timestamps and are always the ones dropped. That is how vandalism,
     // transit safety, streetlight damage and water outages ended up invisible
     // despite being configured.
-    const total = [...RULES.matchAll(/cap: (\d+)/g)].reduce((sum, m) => sum + Number(m[1]), 0);
-    assert.ok(total <= 45, `311 caps total ${total}; leave room for 511 and community reports`);
+    // Since 2026-10-24 the neighbour safety types (disturbance, vandalism,
+    // transit safety, derelict property) also ride the crime board, which has
+    // its own room (SAFETY_311_MAX), so the window rule applies to the rest.
+    const BOARD = /Disturbance and Behavioural|Vandalism and Property Damage|Transit Safety|Unsafe Derelict/;
+    const rules = [...RULES.matchAll(/\{ service: '([^']+)'[^}]*cap: (\d+)/g)];
+    const signals = rules.filter((m) => !BOARD.test(m[1])).reduce((sum, m) => sum + Number(m[2]), 0);
+    const board = rules.filter((m) => BOARD.test(m[1])).reduce((sum, m) => sum + Number(m[2]), 0);
+    assert.ok(signals <= 45, `311 signal caps total ${signals}; leave room for 511 and community reports`);
+    assert.ok(board <= 60, `311 board caps total ${board}; the board keeps 60`);
   });
 
   it('caps high-volume types low so they cannot dominate', () => {

@@ -96,6 +96,8 @@ export interface MobileMapSheetProps {
   onIncidentClick: (i: Incident) => void;
   onNeighbourhoodSelect: (name: string) => void;
   onReportPress: () => void;
+  /** Small phones: Post sits in the closed sheet, since there is no room above it. */
+  compact?: boolean;
   activeIncidentId?: string | null;
   /** Report form open or a pin being placed — translate fully offscreen. */
   hidden: boolean;
@@ -123,6 +125,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     onIncidentClick,
     onNeighbourhoodSelect,
     onReportPress,
+    compact = false,
     activeIncidentId,
     hidden,
     briefing,
@@ -182,6 +185,10 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     // wraps; without this the rail could rest a few pixels short.
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
     if (observer && mastheadRef.current) observer.observe(mastheadRef.current);
+    // The sheet's own height follows --cw-chrome-h, which grows when the
+    // phone bar gains its alert strip; a stale travel pushed the rail off
+    // the bottom of the screen.
+    if (observer && sectionRef.current) observer.observe(sectionRef.current);
     return () => {
       observer?.disconnect();
       window.removeEventListener('resize', measure);
@@ -290,6 +297,15 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
   }, [hidden]);
 
   const neighborhoodPulse = useNeighborhoodPulse(incidents);
+  const latestLead = useMemo(() => {
+    let best: Incident | null = null;
+    for (const i of incidents) {
+      if (i.category !== 'crime' && i.category !== 'emergency') continue;
+      if (selectedCategory !== 'all' && i.category !== selectedCategory) continue;
+      if (!best || i.timestamp > best.timestamp) best = i;
+    }
+    return best;
+  }, [incidents, selectedCategory]);
 
   const neighborhoods = useMemo(() => {
     const seen = new Set<string>();
@@ -430,6 +446,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
         </button>
 
         {!isRaised ? (
+          <div className="lv-sheet-peekrow">
           <button
             type="button"
             onClick={() => onStateChange('raised')}
@@ -438,16 +455,35 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             aria-expanded={isRaised}
             className="lv-sheet-peek"
           >
-            <span className="min-w-0">
+            <span className="min-w-0 flex-1">
               <span className="lv-sheet-count block">
                 {feedCount} report{feedCount !== 1 ? 's' : ''}
+                <small>{windowWord(timeWindow)}</small>
               </span>
-              <span className="lv-sheet-window block">{windowWord(timeWindow)}</span>
+              {/* The newest crime or emergency, so the closed sheet already
+                  says what is happening rather than only how much. */}
+              {latestLead ? (
+                <span className="lv-sheet-lead block">
+                  <i style={{ background: latestLead.category === 'emergency' ? CATEGORY.emergency : CATEGORY.crime }} aria-hidden="true" />
+                  {latestLead.title}
+                </span>
+              ) : (
+                <span className="lv-sheet-window block">Neighbours, police and local news</span>
+              )}
             </span>
-            <span className="lv-sheet-open" aria-hidden="true">
-              See the list <ChevronUp size={15} strokeWidth={2.6} />
-            </span>
+            {!compact && (
+              <span className="lv-sheet-open" aria-hidden="true">
+                List <ChevronUp size={15} strokeWidth={2.6} />
+              </span>
+            )}
           </button>
+          {compact && (
+            <button type="button" className="lv-sheet-post" data-tour="report" onClick={onReportPress}>
+              <Plus size={19} strokeWidth={2.8} />
+              <span>Post</span>
+            </button>
+          )}
+          </div>
         ) : (
           <div className="lv-sheet-raised">
             <div className="min-w-0">

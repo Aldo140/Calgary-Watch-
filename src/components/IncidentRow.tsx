@@ -40,7 +40,11 @@ function reporterFirstName(incident: Incident): string {
 
 /** Where a report came from, in the words a resident would use. */
 export function incidentSourceLabel(incident: Incident, withReporter = false): string {
-  if (isPublicSource(incident)) return incident.source_name?.trim() || 'Public source';
+  if (isPublicSource(incident)) {
+    const name = incident.source_name?.trim() || 'Public source';
+    const more = (incident.related_sources?.length ?? 0) - 1;
+    return more > 0 ? `${name} +${more}` : name;
+  }
   if (incident.source_type === 'news_rss') return incident.source_name?.trim() || 'News';
   if (incident.source_type === 'reddit_calgary') return 'Reddit';
   return withReporter ? `Neighbour · ${reporterFirstName(incident)}` : 'Neighbour';

@@ -303,6 +303,7 @@ textarea.lv-o-input { resize: none; min-height: 120px; }
 .lv-idp-phone .lv-idp-bar .lv-o-btn { min-height: 54px; font-size: 16px; }
 .lv-o-btn svg { flex: none; }
 @media (max-width: 420px) { .lv-idp-phone .lv-idp-bar-ico { display: none; } }
+@media (max-width: 360px) { .lv-idp-phone .lv-idp-bar { gap: 8px; padding-inline: 12px; } .lv-idp-phone .lv-idp-bar .lv-o-btn { font-size: 14px; padding-inline: 8px; white-space: nowrap; } }
 .lv-idp-bar .lv-o-iconbtn { width: 50px; height: 50px; }
 .lv-idp-phone .lv-idp-bar .lv-o-iconbtn { width: 54px; height: 54px; }
 

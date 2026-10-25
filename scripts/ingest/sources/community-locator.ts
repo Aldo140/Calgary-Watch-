@@ -52,7 +52,10 @@ const NEEDS_CONTEXT = new Set([
 const LOWERCASE_OK = new Set(['downtown', 'east village', 'chinatown']);
 
 /** Towns and cities near Calgary whose stories run in the Calgary feeds. */
-const ELSEWHERE = /\b(edmonton|red deer|lethbridge|medicine hat|airdrie|cochrane|chestermere|okotoks|strathmore|high river|banff|canmore|sherwood park|st\.? albert|fort mcmurray|grande prairie|lloydminster|camrose|brooks|olds|didsbury|calgary-area rcmp|rocky view county|foothills county|tsuut'?ina|stoney nakoda|siksika|saskatchewan|british columbia|b\.c\.|montana|ontario|toronto|vancouver|winnipeg|regina|saskatoon)\b/i;
+const ELSEWHERE = /\b(edmonton|red deer|lethbridge|medicine hat|airdrie|cochrane|chestermere|okotoks|strathmore|high river|banff|canmore|sherwood park|st\.? albert|fort mcmurray|grande prairie|lloydminster|camrose|brooks|olds|didsbury|calgary-area rcmp|rocky view county|foothills county|tsuut'?ina|stoney nakoda|siksika|saskatchewan|british columbia|b\.c\.|montana|ontario|toronto|vancouver|winnipeg|regina|saskatoon|kelowna|kamloops|lake louise|kananaskis|drumheller|taber|cardston|pincher creek|crossfield|carstairs|turner valley|black diamond|claresholm|sylvan lake|lacombe|wetaskiwin|leduc|spruce grove|montreal|ottawa|quebec|nova scotia|manitoba|u\.s\.|united states)\b/i;
+
+/** "… after a show in Vancouver": the headline sets the story elsewhere, whoever it is about. */
+const SET_IN_ELSEWHERE = new RegExp(`\\b(?:in|near|outside|at|from)\\s+(?:the\\s+)?(?:${ELSEWHERE.source.slice(3, -3)})\\b`, 'i');
 
 function titleCase(value: string): string {
   return value.replace(/\b\w/g, (c) => c.toUpperCase());
@@ -120,6 +123,8 @@ export function loadCommunityPoints(fetchImpl: typeof fetch = fetch): Promise<Co
 
 /** True when the story is set somewhere other than Calgary. */
 export function isSetElsewhere(title: string, text: string): boolean {
+  // "Calgary tourists attacked after show in Vancouver" names Calgary and is still set in Vancouver.
+  if (SET_IN_ELSEWHERE.test(title) && !/\b(?:in|near|outside)\s+(?:\w+\s+){0,2}calgary\b/i.test(title)) return true;
   const titleElsewhere = ELSEWHERE.test(title) && !/\bcalgary\b/i.test(title);
   const nowhereCalgary = ELSEWHERE.test(text) && !/\bcalgary\b/i.test(text);
   return titleElsewhere || nowhereCalgary;

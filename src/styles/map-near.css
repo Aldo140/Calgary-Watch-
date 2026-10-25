@@ -1,0 +1,148 @@
+/* ── What's near me ──────────────────────────────────────────────────────────
+   One navy sheet in the same sky as the top bar and the report sheet. On
+   phones it takes the bottom of the screen while the report sheet, Post, the
+   map-view pill and the rail's button group step aside (SOS stays). */
+
+.cw-map .lv-nearsheet {
+  position: absolute; z-index: 52; left: 0; right: 0; bottom: 0;
+  padding: 16px 0 calc(14px + env(safe-area-inset-bottom));
+  border: 2px solid var(--lv-ink); border-bottom: 0; border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 28px rgba(6, 22, 47, .28);
+  color: #fff; pointer-events: auto;
+}
+@media (min-width: 1024px) {
+  .cw-map .lv-nearsheet {
+    left: 24px; right: auto; bottom: 96px; width: 25rem; z-index: 40;
+    border-bottom: 2px solid var(--lv-ink); border-radius: 22px; padding-bottom: 14px;
+    box-shadow: 5px 5px 0 var(--lv-ink);
+  }
+}
+
+.cw-map .lv-nearsheet-head { display: flex; align-items: center; gap: 12px; padding: 0 16px 0 18px; }
+.cw-map .lv-nearsheet-you { position: relative; display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 14px; background: rgba(255, 255, 255, .08); border: 1.5px solid rgba(255, 255, 255, .22); }
+.cw-map .lv-nearsheet-you i { position: relative; width: 14px; height: 14px; border-radius: 50%; background: var(--lv-blue); border: 2.5px solid #fff; }
+.cw-map .lv-nearsheet-you::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; border: 2px dashed rgba(120, 170, 255, .7); animation: lv-near-spin 9s linear infinite; }
+@keyframes lv-near-spin { to { transform: rotate(360deg); } }
+
+.cw-map .lv-nearsheet-eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 5px; font: 600 11px/1 var(--lv-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lv-cyan-on-navy, #7fe3f2); }
+.cw-map .lv-nearsheet-title { max-width: none; margin-top: 6px; font: 800 21px/1.05 var(--lv-display); letter-spacing: -.03em; color: #fff; }
+.cw-map .lv-nearsheet-x { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 12px; border: 1.5px solid rgba(255, 255, 255, .4); background: transparent; color: #fff; }
+.cw-map .lv-nearsheet-x:active { background: rgba(255, 255, 255, .12); }
+
+.cw-map .lv-nearsheet-mix { padding: 12px 18px 0; }
+.cw-map .lv-nearsheet-bar { display: flex; gap: 3px; height: 8px; }
+.cw-map .lv-nearsheet-bar i { flex-basis: 0; min-width: 8px; border-radius: 999px; box-shadow: 0 0 0 1.5px rgba(6, 22, 47, .9); }
+.cw-map .lv-nearsheet-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 8px; font: 600 12px/1.2 var(--lv-sans); color: rgba(255, 255, 255, .86); }
+.cw-map .lv-nearsheet-legend i { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 999px; border: 1.5px solid #fff; vertical-align: 0; }
+
+.cw-map .lv-nearsheet-note { margin: 10px 18px 0; padding: 8px 10px; border-radius: 10px; background: rgba(255, 223, 79, .12); border: 1px solid rgba(255, 223, 79, .35); font: 500 12px/1.35 var(--lv-sans); color: #fff; }
+
+/* Cards: swipe sideways; the one in view is ringed on the map. */
+.cw-map .lv-nearsheet-track {
+  display: flex; gap: 10px; margin-top: 14px; padding: 2px 16px 8px;
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px;
+  scrollbar-width: none; overscroll-behavior-x: contain;
+}
+.cw-map .lv-nearsheet-track::-webkit-scrollbar { display: none; }
+.cw-map .lv-nearcard {
+  flex: 0 0 calc(100% - 44px); max-width: 340px; scroll-snap-align: start;
+  display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 12px 12px; text-align: left;
+  background: #fff; color: var(--lv-ink); border: 2px solid var(--lv-ink); border-radius: 18px;
+  box-shadow: inset 6px 0 0 var(--c), 3px 3px 0 rgba(0, 0, 0, .45);
+  padding-left: 18px; transition: box-shadow .15s, transform .15s;
+}
+.cw-map .lv-nearcard[data-active] { box-shadow: inset 6px 0 0 var(--c), 4px 4px 0 var(--lv-yellow); }
+.cw-map .lv-nearcard:active { transform: translate(1px, 1px); }
+.cw-map .lv-nearcard-top { display: flex; align-items: center; gap: 8px; }
+.cw-map .lv-nearcard-n {
+  display: grid; place-items: center; width: 24px; height: 24px; flex: none; border-radius: 999px;
+  background: var(--c); color: #fff; border: 2px solid var(--lv-ink);
+}
+.cw-map .lv-nearcard-cat { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 var(--lv-mono); letter-spacing: .08em; text-transform: uppercase; }
+.cw-map .lv-nearcard-age { margin-left: auto; font: 500 11px/1 var(--lv-mono); color: var(--lv-muted); white-space: nowrap; }
+.cw-map .lv-nearcard-title {
+  font: 700 15px/1.25 var(--lv-sans); color: var(--lv-ink);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5em;
+}
+.cw-map .lv-nearcard-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--lv-muted); }
+.cw-map .lv-nearcard-dist { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12.5px/1.2 var(--lv-sans); }
+.cw-map .lv-nearcard-dist b { font-weight: 800; color: var(--lv-ink); }
+.cw-map .lv-nearcard-foot svg { flex: none; color: var(--lv-blue); }
+
+.cw-map .lv-nearsheet-empty { margin: 14px 16px 2px; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, .07); border: 1.5px dashed rgba(255, 255, 255, .3); }
+.cw-map .lv-nearsheet-empty p { font: 500 13px/1.45 var(--lv-sans); color: rgba(255, 255, 255, .9); }
+.cw-map .lv-nearsheet-cta {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; height: 40px; padding: 0 14px;
+  border-radius: 999px; background: var(--lv-yellow); color: var(--lv-ink); border: 2px solid var(--lv-ink); font: 700 13.5px/1 var(--lv-sans);
+}
+
+.cw-map .lv-nearsheet-foot { display: flex; align-items: center; gap: 12px; min-height: 28px; padding: 4px 18px 0; }
+.cw-map .lv-nearsheet-dots { display: flex; align-items: center; gap: 5px; }
+.cw-map .lv-nearsheet-dots i { width: 6px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, .35); transition: width .2s, background .2s; }
+.cw-map .lv-nearsheet-dots i[data-on] { width: 18px; background: var(--lv-yellow); }
+.cw-map .lv-nearsheet-dots em { font: 600 11px/1 var(--lv-mono); font-style: normal; color: rgba(255, 255, 255, .6); margin-left: 2px; }
+.cw-map .lv-nearsheet-link {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 2px;
+  background: none; border: 0; color: #fff; font: 700 12.5px/1 var(--lv-sans); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, .4);
+}
+
+/* While near me or a tapped report is docked on a phone, the bottom belongs to it. */
+@media (max-width: 1023px) {
+  .cw-map[data-dock] .lv-actions,
+  .cw-map[data-dock] .lv-layerdock { opacity: 0; visibility: hidden; pointer-events: none; }
+  /* SOS stays, alone at the top of the rail. */
+  .cw-map[data-dock] .lv-rail-group { display: none; }
+}
+
+/* Small phones: tighter sheet so the ring keeps room above it. */
+@media (max-width: 1023px) and ((max-width: 380px) or (max-height: 700px)) {
+  .cw-map .lv-nearsheet { padding-top: 12px; border-radius: 20px 20px 0 0; }
+  .cw-map .lv-nearsheet-head { gap: 10px; padding: 0 12px 0 14px; }
+  .cw-map .lv-nearsheet-you { width: 34px; height: 34px; border-radius: 12px; }
+  .cw-map .lv-nearsheet-title { font-size: 18px; margin-top: 5px; }
+  .cw-map .lv-nearsheet-x { width: 36px; height: 36px; }
+  .cw-map .lv-nearsheet-mix { padding: 10px 14px 0; }
+  .cw-map .lv-nearsheet-note { margin: 8px 14px 0; }
+  .cw-map .lv-nearsheet-track { margin-top: 10px; padding: 2px 12px 6px; scroll-padding: 0 12px; gap: 8px; }
+  .cw-map .lv-nearcard { flex-basis: calc(100% - 36px); padding: 10px 12px 10px 16px; gap: 6px; border-radius: 16px; }
+  .cw-map .lv-nearcard-title { font-size: 14px; }
+  .cw-map .lv-nearsheet-foot { padding: 2px 14px 0; }
+}
+
+/* The marker for the card in view: a pulsing ring in the report's colour. */
+.lv-nearfocus { position: relative; width: 44px; height: 44px; display: grid; place-items: center; }
+.lv-nearfocus i { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--c); background: color-mix(in srgb, var(--c) 18%, transparent); animation: lv-nearfocus 1.6s ease-out infinite; }
+.lv-nearfocus b { position: absolute; inset: 4px; border-radius: 50%; border: 3px solid #151515; box-shadow: 0 0 0 3px #fff; }
+@keyframes lv-nearfocus { 0% { transform: scale(.7); opacity: 1; } 100% { transform: scale(1.25); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-map .lv-nearsheet-you::before, .lv-nearfocus i { animation: none; }
+}
+
+/* ── Report peek: the tapped report, docked like near me ─────────────────── */
+.cw-map .lv-peek { padding-top: 12px; }
+.cw-map .lv-peek-head { display: flex; align-items: center; gap: 8px; padding: 0 12px 0 18px; }
+.cw-map .lv-peek-head .lv-nearsheet-eyebrow { flex: 1; min-width: 0; }
+.cw-map .lv-peek-away { color: var(--lv-yellow); }
+.cw-map .lv-peek-steps { display: flex; gap: 6px; }
+.cw-map .lv-peek-head .lv-nearsheet-x { width: 38px; height: 38px; }
+.cw-map .lv-peek-head .lv-nearsheet-x:disabled { opacity: .3; }
+.cw-map .lv-peek-card { padding: 12px 16px 4px; touch-action: pan-y; cursor: grab; }
+.cw-map .lv-peek-card .lv-popup { width: 100%; box-shadow: 4px 4px 0 var(--lv-yellow); }
+.cw-map .lv-peek-card .lv-popup p, .cw-map .lv-peek-card .lv-popup h3 { margin: 0; }
+.cw-map .lv-peek-card .lv-popup__photo { height: 120px; }
+.cw-map .lv-peek-card .lv-popup__title { font-size: 20px; line-height: 1.12; }
+.cw-map .lv-peek-card .lv-popup__desc { -webkit-line-clamp: 3; }
+.cw-map .lv-peek-card .lv-popup__btn { min-height: 44px; }
+.cw-map .lv-peek-hint { margin: 6px 0 0; text-align: center; font: 600 11px/1 var(--lv-mono); letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+@media (min-width: 1024px) { .cw-map .lv-peek { display: none; } }
+@media (max-width: 1023px) and ((max-width: 380px) or (max-height: 700px)) {
+  .cw-map .lv-peek { padding-top: 10px; }
+  .cw-map .lv-peek-head { padding: 0 10px 0 14px; gap: 6px; }
+  .cw-map .lv-peek-head .lv-nearsheet-x { width: 34px; height: 34px; }
+  .cw-map .lv-peek-card { padding: 10px 12px 2px; }
+  .cw-map .lv-peek-card .lv-popup__photo { height: 96px; }
+  .cw-map .lv-peek-card .lv-popup__body { padding: 12px 14px 14px; gap: 6px; }
+  .cw-map .lv-peek-card .lv-popup__title { font-size: 18px; }
+  .cw-map .lv-peek-card .lv-popup__desc { -webkit-line-clamp: 2; }
+}

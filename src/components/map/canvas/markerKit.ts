@@ -17,7 +17,7 @@
 import type { Incident } from '@/src/types';
 import { CATEGORY, LIVE } from '@/src/lib/tokens';
 import { formatRelativeTime } from '@/src/lib/format';
-import { isCitySignal } from '@/src/lib/crimeBoard';
+import { isCitySignal, isSafety311 } from '@/src/lib/crimeBoard';
 
 export type CanvasCategory = 'emergency' | 'crime' | 'traffic' | 'infrastructure' | 'weather';
 type Shape = 'diamond' | 'circle' | 'triangle' | 'square' | 'squircle';
@@ -178,8 +178,10 @@ export function buildPinElement(incident: Incident, now = Date.now()): { el: HTM
     category === 'emergency' ? 'lv-pin--alert' : fresh ? 'lv-pin--fresh' : '',
     unverified ? 'lv-pin--unverified' : '',
     tab ? 'lv-pin--official' : '',
-    // City 311, roads, outages and weather sit smaller and quieter than crime.
-    isCitySignal(incident) ? 'lv-pin--signal' : '',
+    // City 311, roads, outages and weather sit smaller and quieter than crime;
+    // so do neighbours' 311 safety reports, which show with crime but under
+    // police releases and news.
+    isCitySignal(incident) || isSafety311(incident) ? 'lv-pin--signal' : '',
   ].filter(Boolean).join(' ');
   el.style.width = `${size}px`;
   el.style.height = `${size}px`;
@@ -263,6 +265,13 @@ export function buildClusterElement(categories: string[]): { el: HTMLElement; si
 
 export interface PopupParts {
   reporterFirstName: string;
+}
+
+/** "By Dana" / "By Anonymous": first name only, never a surname. */
+export function reporterFirstName(incident: Pick<Incident, 'name' | 'anonymous'>): string {
+  const raw = incident.name?.trim() || 'Community Member';
+  if (incident.anonymous || raw.toLowerCase().includes('anonymous')) return 'Anonymous';
+  return raw.split(/\s+/)[0] || 'Community';
 }
 
 /**

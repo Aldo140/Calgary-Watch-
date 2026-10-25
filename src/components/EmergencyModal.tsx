@@ -2,9 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/src/lib/utils';
 import { CATEGORY, LIVE } from '@/src/lib/tokens';
-import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, Image as ImageIcon, Phone, ArrowRight, Check } from 'lucide-react';
+import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, Phone, ArrowRight, Check } from 'lucide-react';
 import '@/src/styles/map-overlays.css';
-import { uploadIncidentImage } from '@/src/lib/storage';
+import { uploadIncidentPhoto } from '@/src/lib/storage';
+import ReportPhoto, { releasePhoto, type PreparedPhoto } from '@/src/components/map/ReportPhoto';
+
+/** The longest an SOS waits on its photo before it goes without it. */
+const SOS_PHOTO_WAIT_MS = 8000;
 
 const NEIGHBOURHOODS = [
   { name: 'Downtown', lat: 51.0478, lng: -114.0625 },
@@ -95,9 +99,13 @@ export default function EmergencyModal({
   const [neighborhood, setNeighborhood] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageError, setImageError] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<PreparedPhoto | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  // Set when the photo was dropped so the report could go out on time.
+  const [photoDropped, setPhotoDropped] = useState(false);
+  const photoRef = useRef(photo);
+  photoRef.current = photo;
+  useEffect(() => () => releasePhoto(photoRef.current), []);
   // 'choose' = pick location method; 'form' = fill in details
   const [step, setStep] = useState<'choose' | 'form'>('choose');
   const submitDebounceRef = useRef(0);
@@ -142,13 +150,21 @@ export default function EmergencyModal({
     const title = `${label}: ${description.trim().slice(0, 60)}`;
 
     // An urgent report must reach the map even if its attachment does not, so
-    // a failed upload is logged and dropped rather than blocking the send.
+    // a failed upload is logged and dropped rather than blocking the send, and
+    // a slow one gets SOS_PHOTO_WAIT_MS before the report goes without it.
     let image_url: string | undefined;
-    if (imageFile && userUid) {
+    if (photo && userUid) {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), SOS_PHOTO_WAIT_MS);
+      setUploadProgress(0);
       try {
-        image_url = await uploadIncidentImage(userUid, imageFile);
+        image_url = await uploadIncidentPhoto(userUid, photo.blob, { signal: controller.signal, onProgress: setUploadProgress });
       } catch (error) {
-        console.error('[CalgaryWatch] Emergency photo upload failed; sending report without it:', error);
+        setPhotoDropped(true);
+        console.error('[CalgaryWatch] Emergency photo upload failed or timed out; sending report without it:', error);
+      } finally {
+        window.clearTimeout(timer);
+        setUploadProgress(null);
       }
     }
 
@@ -158,9 +174,9 @@ export default function EmergencyModal({
       setDescription('');
       setNeighborhood('');
       setSelectedType('emergency');
-      setImageFile(null);
-      setImagePreview(null);
-      setImageError(null);
+      releasePhoto(photoRef.current);
+      setPhoto(null);
+      setPhotoDropped(false);
       setSubmitted(false);
       setStep('choose');
       onClose();
@@ -171,9 +187,9 @@ export default function EmergencyModal({
   const handleClose = () => {
     setDescription('');
     setNeighborhood('');
-    setImageFile(null);
-    setImagePreview(null);
-    setImageError(null);
+    releasePhoto(photoRef.current);
+    setPhoto(null);
+    setPhotoDropped(false);
     setStep('choose');
     setSubmitted(false);
     onClose();
@@ -338,43 +354,14 @@ export default function EmergencyModal({
                     {userUid && (
                       <div>
                         <p className="lv-o-label">Photo <small>Optional</small></p>
-                        {imagePreview ? (
-                          <div className="lv-rf-preview">
-                            <img src={imagePreview} alt="Preview" />
-                            <button
-                              type="button"
-                              onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
-                              className="lv-o-iconbtn"
-                              aria-label="Remove photo"
-                            >
-                              <X size={18} />
-                            </button>
-                          </div>
-                        ) : (
-                          <label className="lv-rf-drop" style={{ minHeight: 92 }}>
-                            <ImageIcon size={22} aria-hidden="true" />
-                            <b style={{ fontSize: 16 }}>Attach a photo</b>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="sr-only"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0] ?? null;
-                                setImageError(null);
-                                if (!file) { setImageFile(null); setImagePreview(null); return; }
-                                if (file.size > 25 * 1024 * 1024) {
-                                  setImageError('Photo must be under 25 MB.');
-                                  setImageFile(null);
-                                  setImagePreview(null);
-                                  return;
-                                }
-                                setImageFile(file);
-                                setImagePreview(URL.createObjectURL(file));
-                              }}
-                            />
-                          </label>
-                        )}
-                        {imageError && <p className="lv-o-err">{imageError}</p>}
+                        <ReportPhoto
+                          variant="sos"
+                          category={selectedType}
+                          photo={photo}
+                          onChange={setPhoto}
+                          uploadProgress={uploadProgress}
+                          disabled={isSubmitting}
+                        />
                       </div>
                     )}
 
@@ -394,10 +381,12 @@ export default function EmergencyModal({
                       disabled={!canSubmit || isSubmitting}
                       className={cn('lv-o-btn lv-o-btn-navy lv-em-send', submitted && 'is-done')}
                     >
-                      {isSubmitting && !submitted ? (
+                      {uploadProgress !== null ? (
+                        <><Loader2 size={20} className="animate-spin" /> Sending · photo {Math.round(uploadProgress * 100)}%</>
+                      ) : isSubmitting && !submitted ? (
                         <><Loader2 size={20} className="animate-spin" /> Posting…</>
                       ) : submitted ? (
-                        <><Check size={20} strokeWidth={2.6} /> Posted to the map. Stay safe.</>
+                        <><Check size={20} strokeWidth={2.6} /> {photoDropped ? 'Posted without the photo. Stay safe.' : 'Posted to the map. Stay safe.'}</>
                       ) : (
                         <><MapPin size={20} /> Post to the map</>
                       )}

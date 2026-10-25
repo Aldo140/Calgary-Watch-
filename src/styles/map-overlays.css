@@ -331,6 +331,13 @@ textarea.lv-o-input { resize: none; min-height: 120px; }
 .lv-rf-head-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .lv-rf-title { margin-top: 6px !important; font: 800 30px/1.05 var(--o-display); letter-spacing: -.03em; color: var(--o-ink); }
 .lv-rf-phone .lv-rf-title { font-size: 30px; }
+/* Short and narrow phones (SE, 320px Android): the head took a third of the
+   sheet, so the step's content started below the fold. */
+@media (max-height: 700px), (max-width: 359px) {
+  .lv-rf-phone .lv-rf-title { font-size: 24px; }
+  .lv-rf-phone .lv-rf-progress { margin-top: 10px; }
+  .lv-rf-phone .lv-rf-progress > span { font-size: 0; gap: 0; }
+}
 .lv-rf-title span { background: linear-gradient(transparent 58%, var(--o-yellow) 58%, var(--o-yellow) 92%, transparent 92%); padding: 0 .06em; }
 .lv-rf-progress { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
 .lv-rf-progress > span { display: flex; flex-direction: column; gap: 6px; font: 600 11px/1 var(--o-mono); letter-spacing: .06em; text-transform: uppercase; color: #7a7f87; }

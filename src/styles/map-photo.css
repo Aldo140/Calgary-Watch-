@@ -1,0 +1,150 @@
+/*
+ * Report photo step (src/components/map/ReportPhoto.tsx). Lives inside the
+ * Post a report sheet and the SOS sheet, so it uses the lv-o tokens from
+ * map-overlays.css. Prefix lv-ph-.
+ */
+
+.lv-ph { display: flex; flex-direction: column; gap: 12px; }
+
+/* ── Empty: navy shot-list card with the capture buttons ─────────────────── */
+.lv-ph-hero {
+  position: relative;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 18px 16px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--o-ink);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(0, 194, 224, .22), transparent 55%),
+    linear-gradient(160deg, var(--o-navy2), var(--o-navy) 70%);
+  color: #fff;
+  box-shadow: 5px 5px 0 var(--o-yellow);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.lv-ph-hero.is-drag { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--o-cyan); }
+.lv-ph-eyebrow { font: 600 11.5px/1.2 var(--o-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--o-cyan-on-navy); }
+.lv-ph-shots { display: flex; flex-direction: column; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.lv-ph-shots li { display: flex; align-items: center; gap: 11px; font: 700 16px/1.25 var(--o-sans); color: #fff; }
+.lv-ph-shots li > span {
+  display: grid; place-items: center; flex: none;
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--o-yellow); color: var(--o-ink);
+  font: 800 14px/1 var(--o-display);
+}
+
+.lv-ph-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lv-ph-actions.is-desk { grid-template-columns: auto 1fr; align-items: center; }
+.lv-ph-btn {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 14px;
+  min-height: 92px; padding: 13px 14px;
+  border-radius: 16px; border: 2px solid var(--o-ink);
+  font: 800 17px/1.1 var(--o-display); letter-spacing: -.01em; text-align: left;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.lv-ph-btn.is-cam { background: var(--o-yellow); color: var(--o-ink); box-shadow: 3px 3px 0 #fff; }
+.lv-ph-btn.is-lib { background: #fff; color: var(--o-ink); box-shadow: 3px 3px 0 var(--o-cyan); }
+.lv-ph-actions.is-desk .lv-ph-btn { flex-direction: row; align-items: center; min-height: 52px; padding: 0 18px; border-radius: 999px; }
+.lv-ph-btn:not(:disabled):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--o-ink); }
+.lv-ph-btn:focus-visible { outline: 3px solid var(--o-cyan); outline-offset: 2px; }
+.lv-ph-btn:disabled { opacity: .6; cursor: not-allowed; }
+.lv-ph-drop { font: 600 13px/1.3 var(--o-mono); letter-spacing: .04em; color: var(--o-cyan-on-navy); }
+
+.lv-ph-busy { display: flex; align-items: center; gap: 12px; min-height: 92px; padding: 0 4px; }
+.lv-ph-busy b { display: block; font: 800 17px/1.2 var(--o-display); }
+.lv-ph-busy small { display: block; margin-top: 3px; font: 500 13px/1.3 var(--o-sans); color: var(--o-cyan-on-navy); }
+
+.lv-ph-promises, .lv-ph-facts { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0 2px; list-style: none; }
+.lv-ph-promises li, .lv-ph-facts li { display: inline-flex; align-items: center; gap: 6px; font: 600 12.5px/1.3 var(--o-sans); color: var(--o-body); }
+.lv-ph-promises svg, .lv-ph-facts svg { color: var(--o-ok); flex: none; }
+.lv-ph-facts b { color: var(--o-ok); }
+
+/* ── Preview ─────────────────────────────────────────────────────────────── */
+.lv-ph-frame {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 10px 10px 9px;
+  border-radius: 20px; border: 2px solid var(--o-ink);
+  background: var(--o-navy);
+  box-shadow: 5px 5px 0 var(--o-yellow);
+}
+.lv-ph-frame.is-blur { box-shadow: 5px 5px 0 var(--o-cyan); }
+.lv-ph-imgwrap { position: relative; display: inline-block; max-width: 100%; line-height: 0; }
+.lv-ph-imgwrap img {
+  display: block;
+  max-width: 100%;
+  max-height: min(44dvh, 380px);
+  width: auto; height: auto;
+  border-radius: 12px;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.lv-ph-frame.is-blur img { cursor: crosshair; outline: 2px dashed var(--o-cyan); outline-offset: 3px; }
+.lv-ph-spin { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; background: rgba(6, 22, 47, .25); border-radius: 12px; }
+.lv-ph-upbar { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 10px; border-radius: 999px; border: 2px solid var(--o-ink); background: rgba(255, 255, 255, .85); overflow: hidden; }
+.lv-ph-upbar > i { display: block; height: 100%; background: var(--o-yellow); transition: width .25s ease; }
+.lv-ph-tag { font: 600 11px/1.2 var(--o-mono); letter-spacing: .09em; text-transform: uppercase; color: var(--o-cyan-on-navy); text-align: center; }
+
+.lv-ph-tools { display: flex; align-items: center; gap: 8px; }
+.lv-ph-tool {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  flex: 1 1 0; min-width: 0; min-height: 46px; padding: 0 10px;
+  border-radius: 999px; border: 2px solid var(--o-ink);
+  background: #fff; color: var(--o-ink);
+  font: 700 14.5px/1 var(--o-sans); white-space: nowrap;
+  cursor: pointer;
+}
+.lv-ph-tool.is-blur { background: var(--o-ink); color: #fff; }
+.lv-ph-tool.is-done { background: var(--o-blue); color: #fff; }
+.lv-ph-tool:disabled { opacity: .5; cursor: not-allowed; }
+.lv-ph-tool:focus-visible { outline: 3px solid var(--o-cyan); outline-offset: 2px; }
+.lv-ph-count { flex: none; font: 600 12px/1 var(--o-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--o-muted); }
+
+/* ── Upload status (rendered by the form, next to the photo) ─────────────── */
+.lv-ph-status {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px; border-radius: 16px; border: 2px solid var(--o-ink);
+  background: var(--o-yellow-soft);
+}
+.lv-ph-status b { display: block; font: 800 17px/1.2 var(--o-display); color: var(--o-ink); }
+.lv-ph-status p { font: 500 13.5px/1.4 var(--o-sans); color: var(--o-body); }
+.lv-ph-status-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.lv-ph-status-actions .lv-o-btn { flex: 1 1 auto; min-height: 46px; font-size: 14.5px; }
+.lv-ph-status.is-fail { background: var(--o-red-soft); }
+.lv-ph-offline { display: flex; gap: 10px; align-items: flex-start; padding: 11px 13px; border-radius: 14px; border: 2px dashed var(--o-ink); background: var(--o-paper); font: 600 13.5px/1.4 var(--o-sans); color: var(--o-ink); }
+
+/* Post button doubling as the progress bar while the photo uploads. */
+.lv-o-btn.lv-ph-progress,
+.lv-o-btn.lv-ph-progress:disabled {
+  background: linear-gradient(90deg, var(--o-yellow) var(--p, 0%), #fff var(--p, 0%));
+  opacity: 1;
+  cursor: progress;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── SOS: compact, one row of buttons ────────────────────────────────────── */
+.lv-ph.is-sos .lv-ph-hero { padding: 12px; gap: 10px; box-shadow: 4px 4px 0 var(--o-red); }
+.lv-ph.is-sos .lv-ph-btn { min-height: 56px; flex-direction: row; align-items: center; gap: 10px; font-size: 15.5px; }
+.lv-ph.is-sos .lv-ph-busy { min-height: 56px; }
+.lv-ph.is-sos .lv-ph-promises { display: none; }
+.lv-ph.is-sos .lv-ph-imgwrap img { max-height: min(30dvh, 260px); }
+
+/* ── Phone sizes ─────────────────────────────────────────────────────────── */
+@media (max-width: 359px) {
+  .lv-ph-hero { padding: 14px 12px 12px; gap: 12px; }
+  .lv-ph-shots li { font-size: 14.5px; gap: 9px; }
+  .lv-ph-btn { min-height: 78px; font-size: 15.5px; padding: 11px 12px; }
+  .lv-ph-tool { font-size: 13.5px; padding: 0 8px; gap: 5px; }
+  .lv-ph-hide-xs { display: none; }
+  .lv-ph-promises li, .lv-ph-facts li { font-size: 12px; }
+}
+@media (max-height: 700px) and (max-width: 1023px) {
+  .lv-ph-shots { gap: 6px; }
+  .lv-ph-btn { min-height: 64px; flex-direction: row; align-items: center; gap: 10px; }
+  .lv-ph-imgwrap img { max-height: min(36dvh, 300px); }
+}
+@media (min-width: 420px) and (max-width: 1023px) {
+  .lv-ph-btn { min-height: 104px; font-size: 18.5px; }
+  .lv-ph-shots li { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lv-ph-hero, .lv-ph-btn, .lv-ph-upbar > i { transition: none; }
+}

@@ -5066,5 +5066,51 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "the-plaza-theatre",
+      "name": "The Plaza Theatre",
+      "approved": true,
+      "hosts": [
+        "theplaza.ca",
+        "www.theplaza.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "rocky-horror-picture-show-2026",
+        "input": {
+          "kind": "event",
+          "organizer": "The Plaza Theatre",
+          "venue": "The Plaza Theatre",
+          "address": "1133 Kensington Road NW, Calgary, AB T2N 3P4",
+          "neighbourhood": "Kensington",
+          "sourceUrl": "https://www.theplaza.ca/whats-on/the-rocky-horror-picture-show",
+          "pricing": "paid",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true,
+          "title": "The Rocky Horror Picture Show",
+          "summary": "The Plaza Theatre’s Halloween run of the 1975 cult musical, October 22–31, 2026 in Kensington.",
+          "description": "The Plaza Theatre brings back The Rocky Horror Picture Show for Halloween. The 1975 cult musical is rated 14A and runs about 100 minutes.\n\nThe run is listed for October 22–31, 2026. This listing covers the run, not a single screening: check the Plaza’s screening page for showtimes, prices and tickets before you go. The Plaza says special events like this one are not refundable or exchangeable.",
+          "categories": [
+            "arts",
+            "holiday",
+            "indoor"
+          ],
+          "tags": [
+            "film",
+            "cinema",
+            "Plaza Theatre",
+            "cult classic",
+            "Halloween",
+            "Kensington"
+          ],
+          "start": "2026-10-22T00:00:00-06:00",
+          "end": "2026-11-01T00:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

@@ -18656,6 +18656,81 @@
       "updatedAt": "2026-10-25T06:30:00Z"
     },
     {
+      "id": "biz-the-plaza-theatre",
+      "kind": "business",
+      "slug": "the-plaza-theatre",
+      "title": "The Plaza Theatre",
+      "name": "The Plaza Theatre",
+      "website": "https://www.theplaza.ca/",
+      "address": "1133 Kensington Road NW, Calgary, AB T2N 3P4",
+      "neighbourhood": "Kensington",
+      "summary": "Kensington’s independent single-screen cinema, showing films in the same building since 1935.",
+      "description": "The Plaza Theatre is an independent cinema on Kensington Road NW. The building went up in 1927 as an auto garage and opened as a single-screen cinema on January 10, 1935. After closing in 2020, it was taken over in 2021 and reopened in January 2022, and today it hosts new releases, repertory screenings, film festivals and special events. The auditorium is also available to rent for private screenings and events.\n\nShowtimes are added to the Plaza’s What’s On page as soon as each film is confirmed, and tickets are sold through the theatre’s own website. Check there for current screenings and prices.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "cinema",
+        "film",
+        "independent cinema",
+        "repertory film",
+        "Kensington"
+      ],
+      "sources": [
+        {
+          "name": "The Plaza Theatre",
+          "url": "https://www.theplaza.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:55:57Z"
+        },
+        {
+          "name": "The Plaza Theatre — What’s On",
+          "url": "https://www.theplaza.ca/whats-on",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:55:57Z"
+        },
+        {
+          "name": "The Plaza Theatre — History",
+          "url": "https://www.theplaza.ca/history",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:55:57Z"
+        },
+        {
+          "name": "The Plaza Theatre — Contact",
+          "url": "https://www.theplaza.ca/contact",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:55:57Z"
+        },
+        {
+          "name": "The Plaza Theatre — Venue Rental",
+          "url": "https://www.theplaza.ca/venue-rental",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:55:57Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.theplaza.ca/",
+        "whatsOn": "https://www.theplaza.ca/whats-on"
+      },
+      "services": [
+        "Film screenings",
+        "Repertory and special screenings",
+        "Film festival screenings",
+        "Venue rental for private screenings and events"
+      ],
+      "email": "hello@theplaza.ca",
+      "phone": "403-283-2222",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-25T06:55:57Z",
+      "updatedAt": "2026-10-25T06:55:57Z"
+    },
+    {
       "id": "4b4662bca05fe789c094931ebffa",
       "kind": "event",
       "slug": "the-magnificent-nothings-blake-senini-and-kristine-zingeler-4b4662",
@@ -19344,6 +19419,54 @@
       "organizer": "The Shakespeare Company",
       "cancelled": false,
       "organizerEntityId": "biz-the-shakespeare-company"
+    },
+    {
+      "id": "7f93b0b5861ddc841f0630b40177",
+      "kind": "event",
+      "slug": "the-rocky-horror-picture-show-7f93b0",
+      "title": "The Rocky Horror Picture Show",
+      "summary": "The Plaza Theatre’s Halloween run of the 1975 cult musical, October 22–31, 2026 in Kensington.",
+      "description": "The Plaza Theatre brings back The Rocky Horror Picture Show for Halloween. The 1975 cult musical is rated 14A and runs about 100 minutes.\n\nThe run is listed for October 22–31, 2026. This listing covers the run, not a single screening: check the Plaza’s screening page for showtimes, prices and tickets before you go. The Plaza says special events like this one are not refundable or exchangeable.",
+      "categories": [
+        "arts",
+        "holiday",
+        "indoor"
+      ],
+      "tags": [
+        "film",
+        "cinema",
+        "Plaza Theatre",
+        "cult classic",
+        "Halloween",
+        "Kensington"
+      ],
+      "address": "1133 Kensington Road NW, Calgary, AB T2N 3P4",
+      "organizer": "The Plaza Theatre",
+      "sources": [
+        {
+          "name": "The Plaza Theatre",
+          "url": "https://www.theplaza.ca/whats-on/the-rocky-horror-picture-show",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:55:57.000Z"
+        }
+      ],
+      "sourceId": "the-plaza-theatre",
+      "sourceRecordId": "rocky-horror-picture-show-2026",
+      "fetchedAt": "2026-10-25T06:55:57.000Z",
+      "updatedAt": "2026-10-25T06:55:57.000Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "The Plaza Theatre",
+      "neighbourhood": "Kensington",
+      "start": "2026-10-22T00:00:00-06:00",
+      "end": "2026-11-01T00:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "endTimeEstimated": true,
+      "pricing": "paid",
+      "schedulePrecision": "date",
+      "cancelled": false,
+      "verifiedAt": "2026-10-25T06:55:57.000Z",
+      "organizerEntityId": "biz-the-plaza-theatre"
     }
   ],
   "occurrences": [

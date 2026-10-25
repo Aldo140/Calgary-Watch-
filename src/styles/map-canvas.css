@@ -593,3 +593,7 @@
   .lv-layerdock .lv-mlayers__scroll { max-height: min(46dvh, 24rem, calc(100dvh - var(--cw-chrome-h, 200px) - var(--cw-rail-h, 80px) - 11rem)); }
 }
 @media (min-width: 1024px) { .lv-viewpill { display: none; } }
+@media (max-width: 1023px) and ((max-width: 380px) or (max-height: 700px)) {
+  .lv-layerdock[data-compact='true'] .lv-mlayers__scroll { max-height: calc(100dvh - var(--cw-chrome-h, 120px) - var(--cw-rail-h, 80px) - 8rem); }
+  .lv-layerdock[data-compact='true'] .lv-mlayers--float { width: calc(100vw - 20px); left: -2px; }
+}

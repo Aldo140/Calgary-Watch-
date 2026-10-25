@@ -38,6 +38,11 @@ interface LayerToggleProps {
   crimeStats?: Map<string, CrimeStatEntry>;
   /** Lets the guided tour reveal nested controls without synthetic clicks. */
   tourTarget?: string;
+  /** Small phones open the menu from the right rail; the page then owns it. */
+  menuOpen?: boolean;
+  onMenuOpenChange?: (open: boolean) => void;
+  /** Small phones: no pill, the menu opens from the rail. */
+  compact?: boolean;
 }
 
 /** One overlay in the "More layers" panel. */
@@ -159,8 +164,16 @@ export default function LayerToggle({
   isPinMode = false,
   crimeStats,
   tourTarget,
+  menuOpen: menuOpenProp,
+  onMenuOpenChange,
+  compact = false,
 }: LayerToggleProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpenState, setMenuOpenState] = useState(false);
+  const menuOpen = menuOpenProp ?? menuOpenState;
+  const setMenuOpen = (next: boolean | ((v: boolean) => boolean)) => {
+    const value = typeof next === 'function' ? next(menuOpen) : next;
+    if (onMenuOpenChange) onMenuOpenChange(value); else setMenuOpenState(value);
+  };
   const wrapRef = useRef<HTMLDivElement>(null);
 
   /**
@@ -199,6 +212,8 @@ export default function LayerToggle({
   useEffect(() => {
     if (!menuOpen) return;
     const onDown = (e: PointerEvent) => {
+      // The rail's Layers button toggles the menu itself.
+      if ((e.target as Element | null)?.closest?.('[data-layers-toggle]')) return;
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setMenuOpen(false);
     };
     // preventDefault tells MapPage's window-level Escape handler (which skips
@@ -236,6 +251,7 @@ export default function LayerToggle({
       // so the panel is never half-covered on a phone.
       // Phones: bottom-left, sharing one row with Post just above the sheet
       // rail. Desktop: the centred segmented bar.
+      data-compact={compact ? 'true' : undefined}
       className={`lv-layerdock absolute bottom-8 left-1/2 ${menuOpen ? 'z-[52]' : 'z-30'} w-auto max-w-[min(94vw,36rem)] -translate-x-1/2 px-1 max-lg:left-3 max-lg:translate-x-0 max-lg:px-0 max-lg:bottom-[calc(var(--cw-rail-h,66px)+0.875rem+env(safe-area-inset-bottom))]`}
     >
       {/*
@@ -407,7 +423,7 @@ export default function LayerToggle({
       )}
 
       {/* Phone: one pill that names what the map shows and opens the views. */}
-      <button
+      {!compact && <button
         type="button"
         data-tour="layers"
         onClick={() => setMenuOpen((v) => !v)}
@@ -422,7 +438,7 @@ export default function LayerToggle({
           <b>{viewName}</b>
         </span>
         {extrasOn > 0 && <span className="lv-seg__badge lv-viewpill__badge" aria-hidden="true">+{extrasOn}</span>}
-      </button>
+      </button>}
 
       <div className="lv-layerbar max-lg:hidden">
         {/* The Layers chip opens the extra layers and the map key. */}

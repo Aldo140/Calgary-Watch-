@@ -65,7 +65,10 @@ import ReportPeek from '@/src/components/map/ReportPeek';
 import { nearbyReports, NEAR_ME_RADIUS_KM } from '@/src/lib/nearMe';
 import { LivePill, WhenChips, WhenTrack, WhenDial, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
 import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
-import { inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
+import { DEFAULT_MAP_WINDOW, inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
+
+/** Older pages a 7-day view may fetch on its own (60 records each). */
+const WEEK_AUTO_PAGES = 4;
 
 const PHONE_CATEGORIES = [
   { id: 'emergency', label: 'Emergency', Icon: Siren },
@@ -713,12 +716,12 @@ export default function MapPage() {
   
   const [showLiveReports, setShowLiveReports] = useState(true);
   /**
-   * City signals (311 requests, roads, outages, water, weather) start hidden.
-   * They were 53 of the newest 60 records and buried every crime report under
-   * debris and signal faults. Picking Traffic, City or Weather shows them
-   * anyway; this switch brings them back alongside crime.
+   * City signals (311 requests, roads, outages, water, weather) start shown.
+   * They were hidden by default once, so "All" meant crime only and the
+   * Traffic and Infrastructure chips read 0 until tapped. The switch in the
+   * layers menu still hides them for a crime-only view.
    */
-  const [showCitySignals, setShowCitySignals] = useState(false);
+  const [showCitySignals, setShowCitySignals] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showCameras, setShowCameras] = useState(false);
   const [showSafetyCameras, setShowSafetyCameras] = useState(false);
@@ -806,13 +809,13 @@ export default function MapPage() {
    * client-side narrowing of data already loaded — it issues no additional
    * requests and touches no ingest behaviour.
    *
-   * Defaults to 'all' so the feed starts exactly as it did before, unless the
-   * link names a window (`?when=tonight`, `?when=yesterday`, ...). The same
+   * Defaults to the last 7 days, unless the link names a window
+   * (`?when=tonight`, `?when=all`, ...). The same
    * window now narrows the map markers too: it used to change the feed while
    * the map kept showing everything.
    */
   const [timeWindow, setTimeWindow] = useState<MapTimeWindow>(
-    () => parseWhenParam(typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('when') : null) ?? 'all',
+    () => parseWhenParam(typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('when') : null) ?? DEFAULT_MAP_WINDOW,
   );
 
   // Keep `?when=` in the address bar so the view can be shared or reloaded.
@@ -824,7 +827,7 @@ export default function MapPage() {
     try {
       const url = new URL(window.location.href);
       const current = url.searchParams.get('when');
-      const want = timeWindow === 'all' ? null : timeWindow;
+      const want = timeWindow === DEFAULT_MAP_WINDOW ? null : timeWindow;
       if (current === want) return;
       if (want) url.searchParams.set('when', want);
       else url.searchParams.delete('when');
@@ -1211,6 +1214,22 @@ export default function MapPage() {
       setIsLoadingMoreIncidents(false);
     }
   }, [hasMoreIncidents, isLoadingMoreIncidents]);
+
+  /**
+   * The live listener reads the newest 60 records, about three days. When the
+   * window asks for a week, fetch older pages until the week is covered, so
+   * day 4 to 7 aren't silently missing. Capped, so a busy week can't turn one
+   * visit into hundreds of reads.
+   */
+  const autoPages = useRef(0);
+  useEffect(() => {
+    if (timeWindow !== '7d' || !hasMoreIncidents || isLoadingMoreIncidents || firebaseIncidents.length === 0) return;
+    if (autoPages.current >= WEEK_AUTO_PAGES) return;
+    const oldest = firebaseIncidents[firebaseIncidents.length - 1].timestamp;
+    if (oldest <= Date.now() - 7 * 86_400_000) return;
+    autoPages.current += 1;
+    void handleLoadMoreIncidents();
+  }, [timeWindow, hasMoreIncidents, isLoadingMoreIncidents, firebaseIncidents, handleLoadMoreIncidents]);
 
   const handleMarkerClick = useCallback((incident: Incident, stack?: Incident[]) => {
     setSelectedArea(null);

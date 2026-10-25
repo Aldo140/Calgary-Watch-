@@ -47,3 +47,6 @@ export function parseWhenParam(raw: string | null | undefined): MapTimeWindow | 
   if (v === 'all') return 'all';
   return null;
 }
+
+/** The window /map opens on when the link names none. */
+export const DEFAULT_MAP_WINDOW: MapTimeWindow = '7d';

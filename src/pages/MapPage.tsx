@@ -3993,6 +3993,10 @@ export default function MapPage() {
         {/* Desktop & Mobile Panels */}
         <IncidentDetailPanel
           incident={selectedIncident}
+          incidents={feedIncidents}
+          userLocation={userLocation}
+          homeNeighbourhood={userProfile?.neighborhood}
+          onSignIn={() => void signIn()}
           onClose={() => setSelectedIncident(null)}
           onViewNeighborhood={handleViewNeighborhood}
           onReportIncident={handleReportFromIncident}

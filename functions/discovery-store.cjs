@@ -7,13 +7,15 @@ async function ingestRecord(db, input, source, recordId, options = {}) {
   if (options.cancelled === true && normalized.entity.kind === 'event') normalized.entity.cancelled = true;
   const entityRef = db.collection(collectionFor(input.kind)).doc(normalized.entity.id);
   const rawRef = db.collection('discovery_source_records').doc(hash(`${source.id}:${recordId}`));
-  // Duplicate matching only considers event starts within 12 hours. A conservative
-  // five-calendar-day envelope includes timezone-offset boundaries while avoiding an archive scan.
+  // Duplicate matching only considers event starts within 12 hours, and every event in
+  // this envelope is a read. Starts are stored in UTC or Calgary's offset (behind UTC), so a
+  // start up to 12 hours either side has a date from the UTC day before to the day after:
+  // three calendar days, not the five this used to read.
   const scope = db.collection(collectionFor(input.kind));
   const day = Date.parse(normalized.entity.start);
   const candidates = input.kind === 'event'
-    ? scope.where('start', '>=', new Date(day - 2 * 86400000).toISOString().slice(0,10))
-      .where('start', '<', new Date(day + 3 * 86400000).toISOString().slice(0,10))
+    ? scope.where('start', '>=', new Date(day - 86400000).toISOString().slice(0,10))
+      .where('start', '<', new Date(day + 2 * 86400000).toISOString().slice(0,10))
     : scope;
   return db.runTransaction(async tx => {
     const [previous, all, oldDates, previousRaw] = await Promise.all([tx.get(entityRef), tx.get(candidates), input.kind === 'market' ? tx.get(db.collection('market_occurrences').where('marketId','==',entityRef.id)) : Promise.resolve({ docs: [] }), tx.get(rawRef)]);

@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { HelpCircle, LayoutDashboard, LogOut, Settings } from 'lucide-react';
+import { Check, ChevronDown, Clock3, HelpCircle, LayoutDashboard, LogOut, Settings } from 'lucide-react';
 import { MAP_TIME_WINDOWS, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
 import { cn } from '@/src/lib/utils';
 
@@ -241,6 +241,77 @@ export function CategoryRail({
           {o.label} <b>{o.count}</b>
         </button>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Small-phone time switch: one yellow pill naming the window, opening a short
+ * list. Takes the place of the five-option track, which needed its own row.
+ */
+export function WhenDial({
+  value,
+  onChange,
+}: {
+  value: MapTimeWindow;
+  onChange: (w: MapTimeWindow) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const current = MAP_TIME_WINDOWS.find((o) => o.id === value) ?? MAP_TIME_WINDOWS[MAP_TIME_WINDOWS.length - 1];
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.preventDefault(); setOpen(false); } };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey); };
+  }, [open]);
+  return (
+    <div ref={ref} className="lv-dial">
+      <button
+        type="button"
+        className="lv-dial-btn"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`Time window: ${current.label}. Change`}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <Clock3 size={15} strokeWidth={2.6} aria-hidden="true" />
+        <span>{current.short}</span>
+        <ChevronDown size={15} strokeWidth={2.8} aria-hidden="true" className="lv-dial-caret" />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            role="listbox"
+            aria-label="Time window for the map and the feed"
+            className="lv-dial-list"
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.14 }}
+          >
+            {MAP_TIME_WINDOWS.map((o) => (
+              <li key={o.id}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={o.id === value}
+                  className="lv-dial-opt"
+                  onClick={() => { onChange(o.id); setOpen(false); }}
+                >
+                  <span>
+                    <b>{o.label}</b>
+                    <small>{o.hint}</small>
+                  </span>
+                  {o.id === value && <Check size={16} strokeWidth={3} aria-hidden="true" />}
+                </button>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

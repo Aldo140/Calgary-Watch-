@@ -61,6 +61,27 @@ export function AlertStrip({
 }
 
 /**
+ * Small-phone alert: one round badge in the top bar instead of a full-width
+ * strip, coloured by how serious the top alert is, with the count of alerts.
+ */
+export function AlertBadge({ alerts, onOpen }: { alerts: MapAlert[]; onOpen: (index: number) => void }) {
+  const top = alerts[0];
+  if (!top) return null;
+  return (
+    <button
+      type="button"
+      className="lv-abadge"
+      data-kind={top.kind}
+      onClick={() => onOpen(0)}
+      aria-label={`${ALERT_KIND_LABEL[top.kind]}: ${top.title}${alerts.length > 1 ? `, and ${alerts.length - 1} more` : ''}. Open city alerts`}
+    >
+      <AlertIcon alert={top} size={16} />
+      {alerts.length > 1 && <span className="lv-abadge-n" aria-hidden="true">{alerts.length}</span>}
+    </button>
+  );
+}
+
+/**
  * The alert card: a sky that matches the hazard, what the alert says, where it
  * applies and until when, what to do, and who issued it. Several alerts page
  * with the chips at the top. A bottom sheet on phones, a centred card above.

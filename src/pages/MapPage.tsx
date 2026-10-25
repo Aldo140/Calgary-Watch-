@@ -15,13 +15,14 @@ import { useCrimeBoard } from '@/src/hooks/useCrimeBoard';
 import { isCitySignal, memberMapLifetimeMs, MEMBER_OTHER_MAP_MS, tidyIncidentText } from '@/src/lib/crimeBoard';
 import { buildAlertDeck, splitCityAlerts } from '@/src/lib/mapAlerts';
 import { QUADRANT_VIEW } from '@/src/lib/cityQuadrants';
-import { AlertSheet, AlertStrip } from '@/src/components/map/CityAlerts';
+import { AlertBadge, AlertSheet, AlertStrip } from '@/src/components/map/CityAlerts';
 import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible, isCommunityFacingIncident } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, Bell, Search, X, LogIn, Home, Siren, Check, ArrowRight, MapPin, Car, Construction, CloudRain } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, Bell, Search, X, LogIn, Home, Siren, Check, ArrowRight, MapPin, Car, Construction, CloudRain, Layers } from 'lucide-react';
+import { useCompactPhone } from '@/src/hooks/useCompactPhone';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -59,7 +60,7 @@ import { classify311Service } from '@/src/lib/three11';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 import NowBriefing from '@/src/components/map/NowBriefing';
-import { LivePill, WhenChips, WhenTrack, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
+import { LivePill, WhenChips, WhenTrack, WhenDial, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
 import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
 import { inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
 
@@ -1361,6 +1362,9 @@ export default function MapPage() {
   );
   const cityAlerts = useMemo(() => buildAlertDeck(cityAlertRecords, clock), [cityAlertRecords, clock]);
   const [alertIndex, setAlertIndex] = useState<number | null>(null);
+  /** Small phones get the compact frame: one-row bar, Layers on the rail, Post in the sheet. */
+  const compactPhone = useCompactPhone();
+  const [layersOpen, setLayersOpen] = useState(false);
 
   // ── My Watch ────────────────────────────────────────────────────────────────
   // The reader's persisted "last checked" mark, radius and categories. The
@@ -3304,7 +3308,7 @@ export default function MapPage() {
           >
             <div className="lv-toast whitespace-nowrap" style={{ padding: '8px 8px 8px 14px', borderRadius: 999, boxShadow: '3px 3px 0 #151515' }}>
               <Navigation size={14} className="shrink-0" style={{ color: '#1554D1' }} />
-              <span className="truncate">Location off. Showing all of Calgary</span>
+              <span className="truncate">{compactPhone ? 'Location off' : 'Location off. Showing all of Calgary'}</span>
               <button type="button" onClick={() => setLocationError(false)} aria-label="Dismiss" className="grid size-7 shrink-0 place-items-center rounded-full hover:bg-[#FFF5CC]">
                 <X size={13} />
               </button>
@@ -3405,6 +3409,7 @@ export default function MapPage() {
           onIncidentClick={handleSheetIncidentClick}
           onNeighbourhoodSelect={handleSheetNeighbourhoodSelect}
           onReportPress={() => requestReport(null)}
+          compact={compactPhone}
           activeIncidentId={activeIncidentId}
           hidden={isFormOpen || isPinMode || isEmergencyPinMode}
           briefing={
@@ -3450,7 +3455,9 @@ export default function MapPage() {
           <span className="lv-mtop-sheen" aria-hidden="true" />
           <div className="lv-mtop-row">
             <DesktopMapBrandMark compact />
+            {compactPhone && <WhenDial value={timeWindow} onChange={setTimeWindow} />}
             <span className="ml-auto" />
+            {compactPhone && <AlertBadge alerts={cityAlerts} onOpen={setAlertIndex} />}
             <button
               type="button"
               data-tour="m-feed"
@@ -3494,14 +3501,14 @@ export default function MapPage() {
               )}
             </div>
           </div>
-          <WhenTrack value={timeWindow} onChange={setTimeWindow} />
+          {!compactPhone && <WhenTrack value={timeWindow} onChange={setTimeWindow} />}
           <CategoryRail
             options={phoneCategoryOptions}
             total={phoneCategoryTotal}
             value={selectedCategory}
             onChange={(c) => setSelectedCategory(c as IncidentCategory | 'all')}
           />
-          <AlertStrip alerts={cityAlerts} onOpen={setAlertIndex} now={clock} />
+          {!compactPhone && <AlertStrip alerts={cityAlerts} onOpen={setAlertIndex} now={clock} />}
         </div>
 
         {/* Phone action rail (right edge): near me, alerts, and SOS at the
@@ -3532,6 +3539,20 @@ export default function MapPage() {
               <Bell size={19} strokeWidth={2.3} />
               <UnreadBadge count={unreadNotifications} />
             </button>
+            {compactPhone && (
+              <button
+                type="button"
+                data-layers-toggle
+                data-tour="layers"
+                onClick={() => setLayersOpen((v) => !v)}
+                className="lv-sq"
+                aria-label="Map view and layers"
+                aria-expanded={layersOpen}
+                data-on={layersOpen ? 'true' : undefined}
+              >
+                <Layers size={19} strokeWidth={2.3} />
+              </button>
+            )}
           </div>
           <button
             type="button"
@@ -3949,6 +3970,7 @@ export default function MapPage() {
         <div
           className="lv-actions bottom-[calc(var(--cw-rail-h,66px)+0.875rem+env(safe-area-inset-bottom))] lg:bottom-[5.5rem]"
           data-hidden={isPinMode || isEmergencyPinMode ? 'true' : undefined}
+          data-compact={compactPhone ? 'true' : undefined}
         >
           {/* SOS stays visually separate from standard reporting. */}
           <button
@@ -4015,6 +4037,9 @@ export default function MapPage() {
           setShowCitySignals={setShowCitySignals}
           crimeStats={crimeStats}
           tourTarget={tourOpen ? tourTarget : undefined}
+          menuOpen={compactPhone ? layersOpen : undefined}
+          onMenuOpenChange={compactPhone ? setLayersOpen : undefined}
+          compact={compactPhone}
           isPinMode={isPinMode || isEmergencyPinMode}
         />
 

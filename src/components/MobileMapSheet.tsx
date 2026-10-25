@@ -96,6 +96,8 @@ export interface MobileMapSheetProps {
   onIncidentClick: (i: Incident) => void;
   onNeighbourhoodSelect: (name: string) => void;
   onReportPress: () => void;
+  /** Small phones: Post sits in the closed sheet, since there is no room above it. */
+  compact?: boolean;
   activeIncidentId?: string | null;
   /** Report form open or a pin being placed — translate fully offscreen. */
   hidden: boolean;
@@ -123,6 +125,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     onIncidentClick,
     onNeighbourhoodSelect,
     onReportPress,
+    compact = false,
     activeIncidentId,
     hidden,
     briefing,
@@ -443,6 +446,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
         </button>
 
         {!isRaised ? (
+          <div className="lv-sheet-peekrow">
           <button
             type="button"
             onClick={() => onStateChange('raised')}
@@ -467,10 +471,19 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
                 <span className="lv-sheet-window block">Neighbours, police and local news</span>
               )}
             </span>
-            <span className="lv-sheet-open" aria-hidden="true">
-              List <ChevronUp size={15} strokeWidth={2.6} />
-            </span>
+            {!compact && (
+              <span className="lv-sheet-open" aria-hidden="true">
+                List <ChevronUp size={15} strokeWidth={2.6} />
+              </span>
+            )}
           </button>
+          {compact && (
+            <button type="button" className="lv-sheet-post" data-tour="report" onClick={onReportPress}>
+              <Plus size={19} strokeWidth={2.8} />
+              <span>Post</span>
+            </button>
+          )}
+          </div>
         ) : (
           <div className="lv-sheet-raised">
             <div className="min-w-0">

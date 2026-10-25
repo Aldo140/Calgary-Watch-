@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CrimeStatEntry } from '@/src/hooks/useCrimeStats';
-import { Layers, Activity, Map as MapIcon, Building2, Video, Camera, Gauge, X, Construction } from 'lucide-react';
+import { Layers, Activity, Map as MapIcon, Building2, Video, Camera, Gauge, X, Construction, ChevronDown, ChevronUp } from 'lucide-react';
 import type { TrafficFlowMode } from '@/src/types/trafficFlow';
 import { TRAFFIC_FLOW } from '@/src/lib/tokens';
 import {
@@ -123,7 +123,13 @@ export function MapLegend() {
   );
 }
 
-// Sorted numerically: Object.entries lists the integer-like key "1" first.
+/** Moving, slower, heavy: the traffic key in one short stroke. */
+const TRAFFIC_CHIP_CSS = `linear-gradient(90deg, ${TRAFFIC_FLOW.observed.free.color} 0 33%, ${TRAFFIC_FLOW.observed.moderate.color} 33% 66%, ${TRAFFIC_FLOW.observed.heavy.color} 66%)`;
+
+/** How long a phone shows the layer key after a layer turns on. */
+const KEY_FOLD_MS = 6000;
+
+// Sorted numerically:Object.entries lists the integer-like key "1" first.
 const HEAT_CSS = `linear-gradient(90deg, ${Object.entries(HEAT_GRADIENT)
   .sort(([a], [b]) => Number(a) - Number(b))
   .map(([stop, colour]) => `${colour} ${Math.round(Number(stop) * 100)}%`)
@@ -232,6 +238,32 @@ export default function LayerToggle({
     else if (tourTarget === 'layers' || tourTarget === 'camera-viewer') setMenuOpen(false);
   }, [tourTarget]);
 
+  // The layers that draw a key, in the order the key lists them.
+  const keyLayers = [showCrimeLayer && '311', showHeatmap && 'heat', showTrafficFlow && 'traffic'].filter(Boolean) as string[];
+  const keySig = keyLayers.join('+');
+  const [keyOpen, setKeyOpen] = useState(false);
+  const shownKeys = useRef<string[]>([]);
+  const foldTimer = useRef<number | undefined>(undefined);
+  // A layer just turned on opens the key so the reader learns its colours.
+  // Phones fold it back into the chip after a few seconds: the map is the
+  // point, and the chip keeps the key one tap away.
+  useEffect(() => {
+    const added = keyLayers.some((k) => !shownKeys.current.includes(k));
+    shownKeys.current = keyLayers;
+    if (keyLayers.length === 0) { window.clearTimeout(foldTimer.current); setKeyOpen(false); return; }
+    if (!added) return;
+    setKeyOpen(true);
+    window.clearTimeout(foldTimer.current);
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      foldTimer.current = window.setTimeout(() => setKeyOpen(false), KEY_FOLD_MS);
+    }
+  }, [keySig]);
+  useEffect(() => () => window.clearTimeout(foldTimer.current), []);
+  // Opened on purpose: it stays until the reader folds it.
+  const openKey = () => { window.clearTimeout(foldTimer.current); setKeyOpen(true); };
+  const foldKey = () => { window.clearTimeout(foldTimer.current); setKeyOpen(false); };
+  const keyNames = [showCrimeLayer && '311 requests', showHeatmap && 'heat', showTrafficFlow && 'traffic'].filter(Boolean) as string[];
+
   if (isPinMode) return null;
 
   /** Count of supplementary layers currently on, surfaced on the Layers chip. */
@@ -255,91 +287,111 @@ export default function LayerToggle({
       className={`lv-layerdock absolute bottom-8 left-1/2 ${menuOpen ? 'z-[52]' : 'z-30'} w-auto max-w-[min(94vw,36rem)] -translate-x-1/2 px-1 max-lg:left-3 max-lg:translate-x-0 max-lg:px-0 max-lg:bottom-[calc(var(--cw-rail-h,66px)+0.875rem+env(safe-area-inset-bottom))]`}
     >
       {/*
-        The neighbourhood 311 key, docked to the control that turns it on, so
-        it moves and is measured with the bar instead of floating over the
-        Report button. This is City 311 service requests, not crime.
+        One key for every layer that needs one (311, heat, traffic), docked to
+        the control that turns them on. Each used to be its own full card, so
+        heat plus 311 covered half a phone screen for as long as they stayed
+        on. Now they share one compact card that folds into a chip: on phones
+        it opens when a layer is turned on and folds itself after a few
+        seconds, and a tap on the chip opens it again.
       */}
-      {showCrimeLayer && !menuOpen && (
-        <div className="lv-mkey" role="group" aria-label="Neighbourhood 311 layer key">
-          {!crimeStats || crimeStats.size === 0 ? (
-            <div className="flex items-center gap-2.5" role="status">
-              <span
-                className="h-4 w-4 shrink-0 rounded-full border-[3px] border-[#1554D1] border-t-transparent motion-safe:animate-spin"
-                aria-hidden="true"
-              />
-              <div className="min-w-0">
-                <p className="lv-mkey__title" style={{ marginTop: 0, fontSize: 14 }}>Loading City 311 requests…</p>
-                <p className="lv-mkey__eyebrow">Counting requests in each community</p>
-              </div>
+      {keyLayers.length > 0 && !menuOpen && (keyOpen ? (
+        <div className="lv-mkey lv-lkey" role="group" aria-label="Layer key" aria-live="polite">
+          <div className="lv-lkey__head">
+            <p className="lv-mkey__eyebrow">Layer key</p>
+            <button type="button" className="lv-lkey__fold" onClick={foldKey} aria-label="Fold the layer key" aria-expanded="true">
+              <ChevronDown size={16} strokeWidth={2.6} />
+            </button>
+          </div>
+
+          {showCrimeLayer && (
+            <div className="lv-lkey__row" role="group" aria-label="Neighbourhood 311 layer key">
+              {!crimeStats || crimeStats.size === 0 ? (
+                <p className="lv-lkey__name" role="status">
+                  <span className="lv-lkey__spin" aria-hidden="true" />
+                  <b>311 requests</b><span>Counting each community…</span>
+                </p>
+              ) : (
+                <>
+                  <p className="lv-lkey__name"><b>311 requests</b><span>{statsYear ? `${statsYear} · ` : ''}by community</span></p>
+                  <div className="lv-ramp" aria-hidden="true">
+                    {COMMUNITY_311_RAMP.map((colour) => <span key={colour} style={{ background: colour }} />)}
+                  </div>
+                  <div className="lv-ramp-labels"><span>Fewer</span><span>More requests</span></div>
+                  <p className="lv-mkey__note">Service requests, not a crime rate. Tap a community for its overview.</p>
+                </>
+              )}
             </div>
-          ) : (
-            <>
-              <p className="lv-mkey__eyebrow">City 311 requests{statsYear ? ` · ${statsYear}` : ''}</p>
-              <p className="lv-mkey__title">Neighbourhood 311 layer</p>
-              <div className="lv-ramp" aria-hidden="true">
-                {COMMUNITY_311_RAMP.map((colour) => <span key={colour} style={{ background: colour }} />)}
-              </div>
-              <div className="lv-ramp-labels">
-                <span>Fewer</span>
-                <span>More 311 requests</span>
-              </div>
-              <p className="lv-mkey__note">
-                Compared with most Calgary communities. Service requests, not a crime rate. Tap a community for its overview.
-              </p>
-            </>
           )}
-        </div>
-      )}
 
-      {showHeatmap && !menuOpen && (
-        <div className="lv-mkey" role="group" aria-label="Heatmap key">
-          <p className="lv-mkey__eyebrow">Heatmap</p>
-          <p className="lv-mkey__title">Where reports cluster</p>
-          <span className="lv-ramp--heat mt-2" style={{ background: HEAT_CSS }} aria-hidden="true" />
-          <div className="lv-ramp-labels">
-            <span>Fewer</span>
-            <span>More reports</span>
-          </div>
-        </div>
-      )}
-
-      {showTrafficFlow && !menuOpen && (
-        <div
-          className="lv-mkey"
-          role="group"
-          aria-label={trafficFlowMode === 'baseline' ? 'Typical road demand key' : 'Traffic flow key'}
-          aria-live="polite"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <p className="lv-mkey__eyebrow">
-              {trafficFlowLoading ? 'Loading roads…' : trafficFlowError && trafficSegmentCount === 0 ? 'Traffic data unavailable' : trafficFlowMode === 'baseline' ? 'Typical demand · not live' : trafficFlowStale ? 'Traffic flow · stale' : 'Traffic flow'}
-            </p>
-            {trafficSegmentCount > 0 && <span className="text-[12px] font-bold text-[#565A61]">{trafficSegmentCount} roads</span>}
-          </div>
-          {trafficFlowLoading ? (
-            <div className="mt-2 grid grid-cols-4 gap-2" role="status">
-              <span className="sr-only">Loading traffic roads</span>
-              {[0, 1, 2, 3].map((item) => <span key={item} className="h-5 animate-pulse rounded bg-[#EAF0FC] motion-reduce:animate-none" />)}
+          {showHeatmap && (
+            <div className="lv-lkey__row" role="group" aria-label="Heatmap key">
+              <p className="lv-lkey__name"><b>Heat</b><span>where reports cluster</span></p>
+              <span className="lv-ramp--heat" style={{ background: HEAT_CSS }} aria-hidden="true" />
+              <div className="lv-ramp-labels"><span>Fewer</span><span>More reports</span></div>
             </div>
-          ) : trafficFlowError && trafficSegmentCount === 0 ? (
-            <p className="lv-mkey__note">The source could not be reached. The layer will retry automatically.</p>
-          ) : (
-            <div className="mt-2 grid grid-cols-4 gap-2">
-              {(trafficFlowMode === 'baseline'
-                ? Object.values(TRAFFIC_FLOW.baseline).slice(0, 4)
-                : Object.values(TRAFFIC_FLOW.observed).slice(0, 4)
-              ).map((item) => (
-                <span key={item.label} className="min-w-0">
-                  <svg className="h-2 w-full" viewBox="0 0 48 6" preserveAspectRatio="none" aria-hidden="true">
-                    <line x1="1" y1="3" x2="47" y2="3" stroke={item.color} strokeWidth="4" strokeDasharray={item.dashArray} strokeLinecap="round" />
-                  </svg>
-                  <span className="mt-0.5 block truncate text-[12px] font-semibold text-[#151515]">{item.label}</span>
+          )}
+
+          {showTrafficFlow && (
+            <div className="lv-lkey__row" role="group" aria-label={trafficFlowMode === 'baseline' ? 'Typical road demand key' : 'Traffic flow key'}>
+              <p className="lv-lkey__name">
+                <b>{trafficFlowMode === 'baseline' ? 'Typical demand' : 'Traffic'}</b>
+                <span>
+                  {trafficFlowLoading ? 'Loading roads…' : trafficFlowError && trafficSegmentCount === 0 ? 'data unavailable' : trafficFlowMode === 'baseline' ? 'not live' : trafficFlowStale ? 'update delayed' : 'live'}
+                  {trafficSegmentCount > 0 ? ` · ${trafficSegmentCount} roads` : ''}
                 </span>
-              ))}
+              </p>
+              {trafficFlowLoading ? (
+                <div className="mt-1.5 grid grid-cols-4 gap-2" role="status">
+                  <span className="sr-only">Loading traffic roads</span>
+                  {[0, 1, 2, 3].map((item) => <span key={item} className="h-4 animate-pulse rounded bg-[#EAF0FC] motion-reduce:animate-none" />)}
+                </div>
+              ) : trafficFlowError && trafficSegmentCount === 0 ? (
+                <p className="lv-mkey__note">The source could not be reached. The layer will retry automatically.</p>
+              ) : (
+                <div className="mt-1.5 grid grid-cols-4 gap-2">
+                  {(trafficFlowMode === 'baseline'
+                    ? Object.values(TRAFFIC_FLOW.baseline).slice(0, 4)
+                    : Object.values(TRAFFIC_FLOW.observed).slice(0, 4)
+                  ).map((item) => (
+                    <span key={item.label} className="min-w-0">
+                      <svg className="h-2 w-full" viewBox="0 0 48 6" preserveAspectRatio="none" aria-hidden="true">
+                        <line x1="1" y1="3" x2="47" y2="3" stroke={item.color} strokeWidth="4" strokeDasharray={item.dashArray} strokeLinecap="round" />
+                      </svg>
+                      <span className="mt-0.5 block truncate text-[11.5px] font-semibold text-[#151515]">{item.label}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
+      ) : (
+        <button
+          type="button"
+          className="lv-lkey-chip"
+          onClick={openKey}
+          aria-expanded="false"
+          aria-label={`Show the key for ${keyNames.join(', ')}`}
+        >
+          <span className="lv-lkey-chip__label" aria-hidden="true">Key</span>
+          {showCrimeLayer && (
+            <span className="lv-lkey-chip__item" aria-hidden="true">
+              <span className="lv-lkey-chip__ramp">{COMMUNITY_311_RAMP.map((c) => <i key={c} style={{ background: c }} />)}</span>311
+            </span>
+          )}
+          {showHeatmap && (
+            <span className="lv-lkey-chip__item" aria-hidden="true">
+              <span className="lv-lkey-chip__heat" style={{ background: HEAT_CSS }} />Heat
+            </span>
+          )}
+          {showTrafficFlow && (
+            <span className="lv-lkey-chip__item" aria-hidden="true">
+              <span className="lv-lkey-chip__traffic" style={{ background: TRAFFIC_CHIP_CSS }} />Traffic
+            </span>
+          )}
+          <ChevronUp size={15} strokeWidth={2.8} aria-hidden="true" />
+        </button>
+      ))}
 
       {/* Supplementary layers and the map key, opened from the Layers chip.
           It floats above the bar instead of joining the measured stack, so

@@ -109,6 +109,12 @@ export interface Incident {
   related_sources?: string[];
   /** Crime board: the other records folded into this one, which the map then leaves out. */
   related_ids?: string[];
+  /** Map: how many identical feed records at this spot fold into this one (src/lib/repeatReports.ts). */
+  repeat_count?: number;
+  /** Map: when the first of those repeats came in. */
+  repeat_first?: number;
+  /** Map: the folded records, newest first. */
+  repeat_ids?: string[];
   /**
    * Authoritative visibility. Absent on documents written before the
    * visibility migration — treat a missing value as 'public'.

@@ -324,6 +324,27 @@ export function buildPopupContent(incident: Incident, parts: PopupParts, now = D
     body.appendChild(desc);
   }
 
+  // Identical feed records at this spot, folded into this card.
+  const repeats = incident.repeat_count ?? 0;
+  if (repeats > 1) {
+    const band = document.createElement('p');
+    band.className = 'lv-popup__repeat';
+    const stack = document.createElement('span');
+    stack.className = 'lv-popup__repeat-stack';
+    stack.setAttribute('aria-hidden', 'true');
+    stack.textContent = `×${repeats}`;
+    const text = document.createElement('span');
+    const lead = document.createElement('b');
+    lead.textContent = `Reported ${repeats} times here`;
+    text.appendChild(lead);
+    const first = incident.repeat_first;
+    if (Number.isFinite(first) && first !== incident.timestamp) {
+      text.append(` · first ${formatRelativeTime(first as number, now)}`);
+    }
+    band.append(stack, text);
+    body.appendChild(band);
+  }
+
   const meta = document.createElement('div');
   meta.className = 'lv-popup__meta';
   const chip = document.createElement('span');

@@ -65,6 +65,7 @@ import ReportPeek from '@/src/components/map/ReportPeek';
 import { nearbyReports, NEAR_ME_RADIUS_KM } from '@/src/lib/nearMe';
 import { LivePill, WhenChips, WhenTrack, WhenDial, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
 import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
+import { foldRepeats } from '@/src/lib/repeatReports';
 import { DEFAULT_MAP_WINDOW, inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
 
 /** Older pages a 7-day view may fetch on its own (60 records each). */
@@ -2008,8 +2009,10 @@ export default function MapPage() {
       return now - i.timestamp < (memberMapLifetimeMs(i) ?? MEMBER_OTHER_MAP_MS); // neighbours' crime 30 days, the rest 5
     }).filter((i) => inMapTimeWindow(i.timestamp, timeWindow, now)) // same window as the feed
       .filter((i) => !hidesCitySignals || !isCitySignal(i));
-    if (selectedCategory === 'all') return visible;
-    return visible.filter(i => i.category === selectedCategory || i.category === 'emergency');
+    // Identical 311 or feed records at one spot read as one report with a count.
+    const folded = foldRepeats(visible);
+    if (selectedCategory === 'all') return folded;
+    return folded.filter(i => i.category === selectedCategory || i.category === 'emergency');
   }, [incidents, selectedCategory, timeWindow, clock, hidesCitySignals]);
 
   /**
@@ -2020,9 +2023,9 @@ export default function MapPage() {
   const feedIncidents = useMemo(() => {
     const localFeed = incidents.filter((incident) => incident.source_type !== 'edmonton_open_data')
       .filter((incident) => !hidesCitySignals || !isCitySignal(incident));
-    if (timeWindow === 'all') return localFeed;
+    if (timeWindow === 'all') return foldRepeats(localFeed);
     const now = Date.now();
-    return localFeed.filter((incident) => inMapTimeWindow(incident.timestamp, timeWindow, now));
+    return foldRepeats(localFeed.filter((incident) => inMapTimeWindow(incident.timestamp, timeWindow, now)));
   }, [incidents, timeWindow, clock, hidesCitySignals]);
 
   /** The feed scoped to the community a ?near= link named, for the briefing. */
@@ -3621,10 +3624,11 @@ export default function MapPage() {
               type="button"
               onClick={toggleNotifications}
               data-tour="m-alerts"
-              className="lv-sq"
+              className="lv-sq lv-bell"
+              data-unread={unreadNotifications > 0 ? 'true' : undefined}
               aria-label={bellLabel(unreadNotifications)}
             >
-              <Bell size={19} strokeWidth={2.3} />
+              <Bell size={19} strokeWidth={2.3} className="lv-bell__icon" />
               <UnreadBadge count={unreadNotifications} />
             </button>
             {compactPhone && (

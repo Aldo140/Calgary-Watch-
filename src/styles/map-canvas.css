@@ -75,6 +75,25 @@
 }
 .lv-pin--alert .lv-pin__tab { top: 4px; right: 4px; }
 
+/* Several reports on one point (community-centre placements): one pin that
+   reads as a stack, with the count in a yellow pill at the lower left. */
+.lv-pin--stack .lv-pin__art { filter: drop-shadow(3px 3px 0 #fff) drop-shadow(1.5px 1.5px 0 var(--lv-ink)); }
+.lv-pin__count {
+  position: absolute;
+  z-index: 3;
+  bottom: -4px;
+  left: -5px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--lv-yellow);
+  border: 2px solid var(--lv-ink);
+  color: var(--lv-ink);
+  font: 800 10.5px/15px var(--lv-body);
+  text-align: center;
+}
+
 /* Pulses: red for emergencies only, one quiet cyan ring for fresh reports. */
 .lv-pin__pulse {
   position: absolute;

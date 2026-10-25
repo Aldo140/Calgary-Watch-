@@ -77,7 +77,7 @@ const SERVICE_RULES: ServiceRule[] = [
   // Disturbance, vandalism, transit safety and derelict property ride the
   // crime board (src/lib/crimeBoard.ts isSafety311), which has its own room,
   // so their caps were raised on 2026-10-24; graffiti and vehicles stay small.
-  { service: 'Bylaw - Disturbance and Behavioural Concerns', category: 'crime', label: 'Disturbance reported', cap: 14 }, // 510
+  { service: 'Bylaw - Disturbance and Behavioural Concerns', category: 'crime', label: 'Disturbance', cap: 14 }, // 510
   { service: 'Bylaw - Vandalism and Property Damage Concerns', category: 'crime', label: 'Vandalism', cap: 6 }, // 40
   { service: 'Corporate - Graffiti Concerns', category: 'crime', label: 'Graffiti', cap: 3 }, // 1030 — deliberately small
   { service: 'Bylaw - Vehicle Concerns', category: 'crime', label: 'Abandoned or problem vehicle', cap: 2 }, // 204

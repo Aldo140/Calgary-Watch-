@@ -61,6 +61,7 @@ import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 import NowBriefing from '@/src/components/map/NowBriefing';
 import NearMeSheet from '@/src/components/map/NearMeSheet';
+import ReportPeek from '@/src/components/map/ReportPeek';
 import { nearbyReports, NEAR_ME_RADIUS_KM } from '@/src/lib/nearMe';
 import { LivePill, WhenChips, WhenTrack, WhenDial, CategoryRail, UnreadBadge, UserMenu, AvatarFace, freshnessLabel, windowWord, bellLabel } from '@/src/components/map/ChromeParts';
 import { NotificationRow, NotificationsEmpty, type MapNotification, type AreaComparison } from '@/src/components/map/NotificationRow';
@@ -704,6 +705,11 @@ export default function MapPage() {
   const { data: propertyData } = usePropertyAssessments(selectedArea?.communityName ?? null);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [activeIncidentId, setActiveIncidentId] = useState<string | null>(null);
+  /** Phone: the report docked at the bottom after a tap, by id. */
+  const [peekId, setPeekId] = useState<string | null>(null);
+  /** Phone: the reports on a stacked pin, when that is what was tapped. */
+  const [peekStack, setPeekStack] = useState<Incident[] | null>(null);
+  const peekRef = useRef<HTMLElement>(null);
   
   const [showLiveReports, setShowLiveReports] = useState(true);
   /**
@@ -1192,9 +1198,19 @@ export default function MapPage() {
     }
   }, [hasMoreIncidents, isLoadingMoreIncidents]);
 
-  const handleMarkerClick = useCallback((incident: Incident) => {
+  const handleMarkerClick = useCallback((incident: Incident, stack?: Incident[]) => {
     setSelectedArea(null);
     setActiveIncidentId(incident.id);
+
+    // Phones dock the report at the bottom instead of a popup over the pin,
+    // which opened under the top bar and the rail with its title hidden. The
+    // peek effect below moves the pin into the clear space above the card.
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setNearMeOpen(false);
+      setPeekStack(stack && stack.length > 1 ? stack : null);
+      setPeekId(incident.id);
+      return;
+    }
 
     // Show popup first — user taps "Details" in the popup to open the full panel.
     window.requestAnimationFrame(() => {
@@ -1752,6 +1768,8 @@ export default function MapPage() {
     if (isFormOpen && !isPinMode) {
       setSelectedLocation({ lat, lng });
     }
+    // Tapping the map around a docked report puts it away.
+    setPeekId(null);
   }, [isFormOpen, isPinMode]);
 
   const handleRequestMapPin = useCallback(() => {
@@ -2039,6 +2057,51 @@ export default function MapPage() {
     () => nearbyReports(feedIncidents, userLocation || CALGARY_CENTER, selectedCategory),
     [feedIncidents, userLocation, selectedCategory],
   );
+
+  /**
+   * Phone report peek: the reports the map is showing (window and type chip),
+   * newest first, so swiping steps through what is on screen. A report tapped
+   * from somewhere else (a link, a notification) leads the list.
+   */
+  const peekList = useMemo(() => {
+    if (!peekId) return [] as Incident[];
+    // A stacked pin steps through the reports on that spot only.
+    if (peekStack?.some((i) => i.id === peekId)) return peekStack;
+    const list = feedIncidents
+      .filter((i) => selectedCategory === 'all' || i.category === selectedCategory)
+      .slice()
+      .sort((a, b) => b.timestamp - a.timestamp);
+    if (!list.some((i) => i.id === peekId)) {
+      const tapped = incidents.find((i) => i.id === peekId);
+      if (tapped) list.unshift(tapped);
+    }
+    return list;
+  }, [peekId, peekStack, feedIncidents, selectedCategory, incidents]);
+  const peekIndex = peekId ? peekList.findIndex((i) => i.id === peekId) : -1;
+  const peekIncident = peekIndex >= 0 ? peekList[peekIndex] : null;
+
+  // Move the pin into the middle of the clear space between the top bar and
+  // the docked card, and ring it. Runs after the card has laid out.
+  useEffect(() => {
+    if (!peekIncident) { if (!nearMeOpen) mapRef.current?.setNearFocus(null); return; }
+    const inc = peekIncident;
+    const raf = window.requestAnimationFrame(() => {
+      const top = chromeRef.current?.getBoundingClientRect().bottom ?? 0;
+      const bottom = peekRef.current?.getBoundingClientRect().top ?? window.innerHeight;
+      const mid = top + Math.max(0, bottom - top) / 2;
+      mapRef.current?.flyToWithOffset(inc.lat, inc.lng, { zoom: 15, offsetY: window.innerHeight / 2 - mid });
+      mapRef.current?.setNearFocus({ lat: inc.lat, lng: inc.lng, color: categoryColor(inc.category) });
+    });
+    return () => window.cancelAnimationFrame(raf);
+    // Keyed on the report, not the object: a live update to the same report
+    // must not move the map again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peekIncident?.id]);
+
+  // The peek closes when the full report, the form or a pin mode takes over.
+  useEffect(() => {
+    if (selectedIncident || isFormOpen || isPinMode || isEmergencyPinMode || nearMeOpen) setPeekId(null);
+  }, [selectedIncident, isFormOpen, isPinMode, isEmergencyPinMode, nearMeOpen]);
 
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
@@ -2469,13 +2532,14 @@ export default function MapPage() {
       if (selectedIncident) { setSelectedIncident(null); return; }
       if (selectedArea) { setSelectedArea(null); return; }
       if (nearMeOpen) { setNearMeOpen(false); return; }
+      if (peekId) { setPeekId(null); return; }
       if (sheetState === 'raised') setSheetState('rail');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [tourOpen, viewerCamera, selectedTrafficSegment, briefingOpen, isFormOpen, isEmergencyOpen, isPinMode,
     isEmergencyPinMode, digestPromptOpen, authPanelVisible, canCloseAuthPanel, closeAuthPanel, showNotifications,
-    showUserMenu, selectedIncident, selectedArea, nearMeOpen, sheetState]);
+    showUserMenu, selectedIncident, selectedArea, nearMeOpen, peekId, sheetState]);
 
   // Instant alerts write straight to the profile — small, independent controls
   // that must not wait on the larger report-area form's save cycle.
@@ -2526,7 +2590,7 @@ export default function MapPage() {
   }, [user, updateAlertPrefs]);
 
   return (
-    <div data-near={nearMeOpen || undefined} className="map-shell cw-map lv-root relative flex h-dvh w-full overflow-hidden bg-[#FAF8F3] font-sans text-[#151515]">
+    <div data-near={nearMeOpen || undefined} data-dock={nearMeOpen || peekId ? '' : undefined} className="map-shell cw-map lv-root relative flex h-dvh w-full overflow-hidden bg-[#FAF8F3] font-sans text-[#151515]">
       <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
       <AnimatePresence>
         {isLoading && (
@@ -3402,7 +3466,7 @@ export default function MapPage() {
           onReportPress={() => requestReport(null)}
           compact={compactPhone}
           activeIncidentId={activeIncidentId}
-          hidden={isFormOpen || isPinMode || isEmergencyPinMode || nearMeOpen}
+          hidden={isFormOpen || isPinMode || isEmergencyPinMode || nearMeOpen || Boolean(peekIncident)}
           briefing={
             /* ── NowBriefing slot (feed worker's component) ── */
             <>
@@ -3562,6 +3626,25 @@ export default function MapPage() {
             <Siren size={20} className="shrink-0" />
           </button>
         </div>
+
+        {/* Phone: the tapped report, docked where the sheet was. */}
+        <AnimatePresence>
+          {peekIncident && (
+            <ReportPeek
+              key="report-peek"
+              ref={peekRef}
+              list={peekList}
+              index={peekIndex}
+              onIndex={(i) => { const next = peekList[i]; if (next) { setPeekId(next.id); setActiveIncidentId(next.id); } }}
+              onClose={() => setPeekId(null)}
+              onDetails={(inc) => startTransition(() => setSelectedIncident(inc))}
+              onArea={(name) => { setPeekId(null); handleViewNeighborhood(name); }}
+              windowLabel={peekList === peekStack ? 'At this spot' : windowWord(timeWindow)}
+              userLocation={userLocation}
+              now={clock}
+            />
+          )}
+        </AnimatePresence>
 
         {/* What's near me: the bottom sheet on phones, a card at the bottom
             left on desktop. */}

@@ -267,6 +267,13 @@ export interface PopupParts {
   reporterFirstName: string;
 }
 
+/** "By Dana" / "By Anonymous": first name only, never a surname. */
+export function reporterFirstName(incident: Pick<Incident, 'name' | 'anonymous'>): string {
+  const raw = incident.name?.trim() || 'Community Member';
+  if (incident.anonymous || raw.toLowerCase().includes('anonymous')) return 'Anonymous';
+  return raw.split(/\s+/)[0] || 'Community';
+}
+
 /**
  * The report card that opens over a pin. Built with DOM APIs; every piece of
  * report text goes in through textContent.

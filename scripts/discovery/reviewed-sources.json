@@ -5023,5 +5023,48 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "the-shakespeare-company",
+      "name": "The Shakespeare Company",
+      "approved": true,
+      "hosts": [
+        "shakespearecompany.com",
+        "www.shakespearecompany.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "tis-pity-shes-a-whore-2026",
+        "input": {
+          "kind": "event",
+          "organizer": "The Shakespeare Company",
+          "address": "Calgary, AB",
+          "sourceUrl": "https://shakespearecompany.com/",
+          "pricing": "paid",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true,
+          "title": "’Tis Pity She’s a Whore",
+          "summary": "The Shakespeare Company opens its 2026–27 season with the Calgary premiere of John Ford’s Jacobean tragedy.",
+          "description": "John Ford’s 17th-century tragedy follows Giovanni and his sister Annabella, whose forbidden romance ends in tragedy. The Shakespeare Company bills its six-actor production as the play’s Calgary premiere, timed for the Halloween season.\n\nThe production runs October 22–31, 2026. This listing covers the run, not a single performance: check The Shakespeare Company’s website for the venue, performance times and tickets before you go.",
+          "categories": [
+            "arts",
+            "theatre",
+            "indoor"
+          ],
+          "tags": [
+            "theatre",
+            "Shakespeare Company",
+            "classical theatre",
+            "tragedy",
+            "Halloween"
+          ],
+          "start": "2026-10-22T00:00:00-06:00",
+          "end": "2026-11-01T00:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

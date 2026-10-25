@@ -7722,6 +7722,66 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-23T19:12:09.037Z",
       "updatedAt": "2026-10-23T19:12:09.037Z"
+    },
+    {
+      "id": "biz-the-shakespeare-company",
+      "kind": "business",
+      "slug": "the-shakespeare-company",
+      "title": "The Shakespeare Company",
+      "name": "The Shakespeare Company",
+      "website": "https://shakespearecompany.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary classical theatre company that has staged Shakespeare and other classics since 1995.",
+      "description": "The Shakespeare Company has been making live classical theatre for Calgary since 1995, with the aim of making Shakespeare’s plays accessible and engaging for today’s audiences. Alongside its mainstage productions it runs community programmes, including the Page to Stage outreach programme and DiVerseCity. Its 2026–27 season opens with the Calgary premiere of John Ford’s ’Tis Pity She’s a Whore, October 22–31, 2026. The company’s own website is its most current source for show dates, venues and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "Shakespeare",
+        "classical theatre",
+        "performing arts"
+      ],
+      "sources": [
+        {
+          "name": "The Shakespeare Company",
+          "url": "https://shakespearecompany.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:30:00Z"
+        },
+        {
+          "name": "The Shakespeare Company — About Us",
+          "url": "https://shakespearecompany.com/about-us/",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:30:00Z"
+        },
+        {
+          "name": "The Shakespeare Company — Contact Us",
+          "url": "https://shakespearecompany.com/contact-us/",
+          "kind": "official",
+          "retrievedAt": "2026-10-25T06:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://shakespearecompany.com/",
+        "facebook": "https://www.facebook.com/shakespeareyyc/"
+      },
+      "services": [
+        "Classical theatre productions",
+        "Shakespeare performances",
+        "Community outreach programmes"
+      ],
+      "email": "info@shakespearecompany.com",
+      "phone": "403-505-4139",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-25T06:30:00Z",
+      "updatedAt": "2026-10-25T06:30:00Z"
     }
   ]
 }

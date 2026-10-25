@@ -19,7 +19,7 @@ interface LayerToggleProps {
   setShowHeatmap: (show: boolean) => void;
   showCrimeLayer: boolean;
   setShowCrimeLayer: (show: boolean) => void;
-  /** 311 requests, roads, outages, water and weather pins. Off by default so crime leads. */
+  /** 311 requests, roads, outages, water and weather pins. On by default; off gives a crime-only map. */
   showCitySignals?: boolean;
   setShowCitySignals?: (show: boolean) => void;
   showCameras: boolean;
@@ -266,8 +266,8 @@ export default function LayerToggle({
 
   if (isPinMode) return null;
 
-  /** Count of supplementary layers currently on, surfaced on the Layers chip. */
-  const extrasOn = (showCitySignals ? 1 : 0) + (showCameras ? 1 : 0) + (showSafetyCameras ? 1 : 0) + (showTrafficFlow ? 1 : 0);
+  /** Count of supplementary layers turned on, surfaced on the Layers chip. City signals start on, so they do not count. */
+  const extrasOn = (showCameras ? 1 : 0) + (showSafetyCameras ? 1 : 0) + (showTrafficFlow ? 1 : 0);
   const closeMenuOnTouch = () => {
     if (window.matchMedia('(max-width: 767px), (pointer: coarse)').matches) setMenuOpen(false);
   };

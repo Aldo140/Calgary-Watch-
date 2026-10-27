@@ -19467,6 +19467,1045 @@
       "cancelled": false,
       "verifiedAt": "2026-10-25T06:55:57.000Z",
       "organizerEntityId": "biz-the-plaza-theatre"
+    },
+    {
+      "id": "c363e8982a436e139e70bf78c1cc",
+      "kind": "event",
+      "slug": "theatre-calgary-a-christmas-carol-c363e8",
+      "title": "Theatre Calgary: A Christmas Carol",
+      "summary": "Calgary’s holiday Scrooge, back at the Max Bell Theatre from Nov. 26 to Dec. 27, 2026.",
+      "description": "Geoffrey Simon Brown’s adaptation of the Dickens story returns for the holidays, directed by Stafford Arima, with Christopher Hunt as Scrooge. Runs November 26 to December 27, 2026; opening night is November 27.\n\nRecommended for ages 6 and up (some frightening scenes). About two hours with an intermission. The 11 a.m. performance on Sunday, December 27 is a relaxed performance. Showtimes and tickets are on Theatre Calgary’s show page.",
+      "categories": [
+        "arts",
+        "holiday",
+        "family",
+        "indoor"
+      ],
+      "tags": [
+        "theatre",
+        "holiday",
+        "christmas",
+        "kids",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Theatre Calgary",
+          "url": "https://www.theatrecalgary.com/shows/a-christmas-carol",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "theatre-calgary",
+      "sourceRecordId": "a-christmas-carol-2026",
+      "neighbourhood": "Downtown",
+      "address": "220 9 Ave SE, Calgary, AB",
+      "venue": "Max Bell Theatre, Werklund Centre",
+      "start": "2026-11-26T19:30:00-07:00",
+      "end": "2026-12-27T13:00:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Theatre Calgary",
+      "cancelled": false,
+      "organizerEntityId": "biz-theatre-calgary"
+    },
+    {
+      "id": "a5ea5f3dad18bb8e9a531ff54d31",
+      "kind": "event",
+      "slug": "zoolights-at-the-calgary-zoo-a5ea5f",
+      "title": "ZOOLIGHTS at the Calgary Zoo",
+      "summary": "The zoo’s winter light walk turns 30: nightly from Nov. 13, 2026 to Jan. 3, 2027.",
+      "description": "ZOOLIGHTS runs nightly from November 13, 2026 to January 3, 2027, 5:30 to 9:30 p.m., with last admission at 9 p.m. It is closed December 25 and open on New Year’s Eve. This is the event’s 30th year.\n\nAnimal buildings are closed during ZOOLIGHTS. The West Gate stays closed for construction, so plan to use the main entrance. Daytime visitors who arrive before 1 p.m. can stay on into the lights; later arrivals need the zoo’s combo ticket. Tickets and timed entry are on the zoo’s ZOOLIGHTS page.",
+      "categories": [
+        "family",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "christmas lights",
+        "holiday",
+        "kids",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Wilder Institute’s Calgary Zoo",
+          "url": "https://www.calgaryzoo.com/zoolights/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-zoo",
+      "sourceRecordId": "zoolights-2026",
+      "neighbourhood": "Bridgeland",
+      "address": "210 St. George's Drive NE, Calgary, AB",
+      "venue": "Wilder Institute’s Calgary Zoo",
+      "start": "2026-11-13T17:30:00-07:00",
+      "end": "2027-01-03T21:30:00-07:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Wilder Institute’s Calgary Zoo",
+      "cancelled": false,
+      "organizerEntityId": "biz-wilder-institutes-calgary-zoo"
+    },
+    {
+      "id": "8432207416cdf51f84ea931872c5",
+      "kind": "event",
+      "slug": "calgary-opera-pied-piper-843220",
+      "title": "Calgary Opera: Pied Piper",
+      "summary": "Calgary Opera’s family opera at the Mamdani Opera Centre, November 13, 14 and 15.",
+      "description": "Pied Piper is the family opera in Calgary Opera’s 2026/27 season, staged at the Mamdani Opera Centre on November 13, 14, 15, 20, 21 and 22, 2026. One of the November 21 performances is sensory-friendly.\n\nThis listing covers November 13, 14 and 15. Check Calgary Opera’s site for showtimes and tickets before you go.",
+      "categories": [
+        "arts",
+        "family",
+        "indoor"
+      ],
+      "tags": [
+        "opera",
+        "kids",
+        "family"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Opera",
+          "url": "https://www.calgaryopera.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-opera",
+      "sourceRecordId": "pied-piper-2026-11-13",
+      "neighbourhood": "Beltline",
+      "address": "1315 7 Street SW, Calgary, AB",
+      "venue": "Mamdani Opera Centre",
+      "start": "2026-11-13T00:00:00-07:00",
+      "end": "2026-11-16T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Opera",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-opera"
+    },
+    {
+      "id": "16f47d45afe8f53cd6985b71b5e0",
+      "kind": "event",
+      "slug": "calgary-opera-pied-piper-16f47d",
+      "title": "Calgary Opera: Pied Piper",
+      "summary": "Calgary Opera’s family opera at the Mamdani Opera Centre, November 20, 21 and 22.",
+      "description": "Pied Piper is the family opera in Calgary Opera’s 2026/27 season, staged at the Mamdani Opera Centre on November 13, 14, 15, 20, 21 and 22, 2026. One of the November 21 performances is sensory-friendly.\n\nThis listing covers November 20, 21 and 22. Check Calgary Opera’s site for showtimes and tickets before you go.",
+      "categories": [
+        "arts",
+        "family",
+        "indoor"
+      ],
+      "tags": [
+        "opera",
+        "kids",
+        "family"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Opera",
+          "url": "https://www.calgaryopera.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-opera",
+      "sourceRecordId": "pied-piper-2026-11-20",
+      "neighbourhood": "Beltline",
+      "address": "1315 7 Street SW, Calgary, AB",
+      "venue": "Mamdani Opera Centre",
+      "start": "2026-11-20T00:00:00-07:00",
+      "end": "2026-11-23T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Opera",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-opera"
+    },
+    {
+      "id": "3a8a5d72cb7a85eb1916b20fe8aa",
+      "kind": "event",
+      "slug": "schumann-strings-soundscapes-3a8a5d",
+      "title": "Schumann, Strings + Soundscapes",
+      "summary": "A Classics series concert from the Calgary Phil, with a guest cellist.",
+      "description": "Part of the Calgary Phil’s 2026/27 Classics series at the Jack Singer Concert Hall, featuring a guest cellist. A seniors and students open rehearsal of the programme runs the same morning. Check the Calgary Phil’s concert page for the full programme and tickets.",
+      "categories": [
+        "music",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "classical"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/events/calendar/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "schumann-strings-soundscapes-2026-10-30",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-10-30T19:30:00-06:00",
+      "end": "2026-10-30T21:30:00-06:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "f34bf2e017466658eaa9c9799a51",
+      "kind": "event",
+      "slug": "tchaikovsky-s-sixth-the-final-symphony-f34bf2",
+      "title": "Tchaikovsky's Sixth: The Final Symphony",
+      "summary": "The Calgary Phil plays Tchaikovsky’s last symphony, the “Pathétique”.",
+      "description": "Part of the Calgary Phil’s Classics series. Performances November 6 and 7, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme details and tickets are on the orchestra’s 2026/27 season pages.",
+      "categories": [
+        "music",
+        "arts",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "classical",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/2026-2027-season/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "tchaikovsky-sixth-2026-11-06",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-11-06T19:30:00-07:00",
+      "end": "2026-11-06T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "e1bfd6224b2ffd3adce18083b48d",
+      "kind": "event",
+      "slug": "tchaikovsky-s-sixth-the-final-symphony-e1bfd6",
+      "title": "Tchaikovsky's Sixth: The Final Symphony",
+      "summary": "The Calgary Phil plays Tchaikovsky’s last symphony, the “Pathétique”.",
+      "description": "Part of the Calgary Phil’s Classics series. Performances November 6 and 7, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme details and tickets are on the orchestra’s 2026/27 season pages.",
+      "categories": [
+        "music",
+        "arts",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "classical",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/2026-2027-season/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "tchaikovsky-sixth-2026-11-07",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-11-07T19:30:00-07:00",
+      "end": "2026-11-07T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "4ddb0c739036c980b4a6003d98fa",
+      "kind": "event",
+      "slug": "the-billy-joel-songbook-with-tony-desare-4ddb0c",
+      "title": "The Billy Joel Songbook with Tony DeSare",
+      "summary": "Singer-pianist Tony DeSare and the Calgary Phil play Billy Joel’s hits.",
+      "description": "A Pops series concert: Tony DeSare fronts the orchestra for the Billy Joel songbook. Performances November 13 and 14, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Tickets on the Calgary Phil’s season pages.",
+      "categories": [
+        "music",
+        "nightlife",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "pop",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/2026-2027-season/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "billy-joel-songbook-2026-11-13",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-11-13T19:30:00-07:00",
+      "end": "2026-11-13T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "531e9d935d6c765c36c35740707e",
+      "kind": "event",
+      "slug": "the-billy-joel-songbook-with-tony-desare-531e9d",
+      "title": "The Billy Joel Songbook with Tony DeSare",
+      "summary": "Singer-pianist Tony DeSare and the Calgary Phil play Billy Joel’s hits.",
+      "description": "A Pops series concert: Tony DeSare fronts the orchestra for the Billy Joel songbook. Performances November 13 and 14, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Tickets on the Calgary Phil’s season pages.",
+      "categories": [
+        "music",
+        "nightlife",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "pop",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/2026-2027-season/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "billy-joel-songbook-2026-11-14",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-11-14T19:30:00-07:00",
+      "end": "2026-11-14T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "e2e3f2706c3bc84a869afee3f496",
+      "kind": "event",
+      "slug": "mozart-mahler-e2e3f2",
+      "title": "Mozart + Mahler",
+      "summary": "A Classics series night of Mozart and Mahler with the Calgary Phil.",
+      "description": "Part of the Calgary Phil’s Classics series. Performances November 20 and 21, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme and tickets on the orchestra’s 2026/27 season pages.",
+      "categories": [
+        "music",
+        "arts",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "classical",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/2026-2027-season/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "mozart-mahler-2026-11-20",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-11-20T19:30:00-07:00",
+      "end": "2026-11-20T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "77261b98543485445e85681ac4e3",
+      "kind": "event",
+      "slug": "mozart-mahler-77261b",
+      "title": "Mozart + Mahler",
+      "summary": "A Classics series night of Mozart and Mahler with the Calgary Phil.",
+      "description": "Part of the Calgary Phil’s Classics series. Performances November 20 and 21, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme and tickets on the orchestra’s 2026/27 season pages.",
+      "categories": [
+        "music",
+        "arts",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "classical",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/2026-2027-season/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "mozart-mahler-2026-11-21",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-11-21T19:30:00-07:00",
+      "end": "2026-11-21T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "9060b3d176621452451bf2cd449f",
+      "kind": "event",
+      "slug": "byron-stripling-s-holiday-swing-9060b3",
+      "title": "Byron Stripling's Holiday Swing",
+      "summary": "Trumpeter and singer Byron Stripling swings the Christmas songbook with the Calgary Phil.",
+      "description": "A jazz-flavoured holiday concert with Byron Stripling on trumpet and vocals, including Joy to the World, Santa Claus Is Comin’ to Town and White Christmas. Thursday, November 26, 2026 at 7:30 p.m. Tickets were listed at $36 to $107.",
+      "categories": [
+        "music",
+        "holiday",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "jazz",
+        "holiday",
+        "christmas"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/events/byron-striplings-holiday-swing-2026-11-26-730-pm/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "byron-stripling-holiday-swing-2026-11-26",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-11-26T19:30:00-07:00",
+      "end": "2026-11-26T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "de1631acd06e4185c046c1f2247c",
+      "kind": "event",
+      "slug": "holiday-bells-winter-dreams-de1631",
+      "title": "Holiday Bells + Winter Dreams",
+      "summary": "Rachmaninoff’s The Bells and Tchaikovsky’s “Winter Daydreams” symphony, with the Calgary Phil Chorus.",
+      "description": "Geoffrey Paterson leads the orchestra, the Calgary Philharmonic Chorus and soloists in Rachmaninoff’s choral work The Bells, then Tchaikovsky’s Symphony No. 1, “Winter Daydreams”. Friday, December 4, 2026 at 7:30 p.m. in the Jack Singer Concert Hall.",
+      "categories": [
+        "music",
+        "holiday",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "choir",
+        "classical",
+        "holiday",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/events/holiday-bells-winter-dreams-2026-12-04-730-pm/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "holiday-bells-winter-dreams-2026-12-04",
+      "neighbourhood": "Downtown",
+      "address": "225 8 Avenue SE, Calgary, AB",
+      "venue": "Jack Singer Concert Hall, Werklund Centre",
+      "start": "2026-12-04T19:30:00-07:00",
+      "end": "2026-12-04T21:45:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "1bf299a8f57ad3e3b7c5729ef4c2",
+      "kind": "event",
+      "slug": "all-i-want-for-christmas-is-my-two-front-teeth-1bf299",
+      "title": "All I Want for Christmas Is My Two Front Teeth",
+      "summary": "Stage West’s holiday family musical: a girl loses her front teeth on Christmas Eve.",
+      "description": "Stage West’s Christmas show for kids and families runs November 21 to December 24, 2026, with 16 performances. It is part of the children’s version of Stage West dinner theatre, so the buffet changes with the showtime. Dates, times and reservations are on Stage West’s box office.",
+      "categories": [
+        "arts",
+        "family",
+        "holiday",
+        "indoor"
+      ],
+      "tags": [
+        "dinner theatre",
+        "musical",
+        "holiday",
+        "kids"
+      ],
+      "sources": [
+        {
+          "name": "Stage West Theatre Restaurant",
+          "url": "https://stagewestcalgary.com/2026-27-season-productions/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "stage-west",
+      "sourceRecordId": "two-front-teeth-2026",
+      "address": "727 42 Avenue SE, Calgary, AB T2G 1Y8",
+      "venue": "Stage West Theatre Restaurant",
+      "start": "2026-11-21T00:00:00-07:00",
+      "end": "2026-12-25T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Stage West Theatre Restaurant",
+      "cancelled": false,
+      "organizerEntityId": "biz-stage-west-calgary"
+    },
+    {
+      "id": "330ca60c430dd42287ad5f3d0362",
+      "kind": "event",
+      "slug": "decades-of-divas-330ca6",
+      "title": "Decades of Divas!",
+      "summary": "A dinner-theatre music revue of diva hits, on through the holidays to Jan. 31, 2027.",
+      "description": "Stage West’s music revue runs November 13, 2026 to January 31, 2027, with a buffet dinner before the show. Performance dates, times and reservations are on Stage West’s box office.",
+      "categories": [
+        "arts",
+        "food",
+        "nightlife",
+        "indoor"
+      ],
+      "tags": [
+        "dinner theatre",
+        "music revue",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Stage West Theatre Restaurant",
+          "url": "https://stagewestcalgary.com/2026-27-season-productions/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "stage-west",
+      "sourceRecordId": "decades-of-divas-2026",
+      "address": "727 42 Avenue SE, Calgary, AB T2G 1Y8",
+      "venue": "Stage West Theatre Restaurant",
+      "start": "2026-11-13T00:00:00-07:00",
+      "end": "2027-02-01T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Stage West Theatre Restaurant",
+      "cancelled": false,
+      "organizerEntityId": "biz-stage-west-calgary"
+    },
+    {
+      "id": "9c8a332653ccd301b32d7e359278",
+      "kind": "event",
+      "slug": "lions-festival-of-lights-9c8a33",
+      "title": "Lions Festival of Lights",
+      "summary": "Calgary’s big free light display turns 40, at Confederation Park Golf Course from Nov. 21.",
+      "description": "The 40th Lions Festival of Lights fills Confederation Park Golf Course with volunteer-built displays. Opening night is Saturday, November 21, 2026, with the lights on at 5 p.m. After that they run nightly from 5:30 p.m. to midnight until January 8, 2027. Admission is free.\n\nThe display is at 14 Street NW and 24 Avenue NW.",
+      "categories": [
+        "family",
+        "holiday",
+        "outdoor"
+      ],
+      "tags": [
+        "christmas lights",
+        "holiday",
+        "free",
+        "kids",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "Lions Festival of Lights — Visit Calgary lights guide",
+          "url": "https://www.visitcalgary.com/plan-and-stay/itineraries-and-travel-inspiration/where-to-see-christmas-lights-in-calgary",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "lions-festival-of-lights-2026",
+      "sourceRecordId": "lions-festival-of-lights-2026",
+      "address": "14 Street NW and 24 Avenue NW, Calgary, AB",
+      "venue": "Confederation Park Golf Course",
+      "start": "2026-11-21T17:00:00-07:00",
+      "end": "2027-01-09T00:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "organizer": "Lions Festival of Lights",
+      "cancelled": false
+    },
+    {
+      "id": "8b83940ea14f460de4ff5ca866d5",
+      "kind": "event",
+      "slug": "jazzyyc-canadian-jazz-festival-8b8394",
+      "title": "JazzYYC Canadian Jazz Festival",
+      "summary": "Six days of Canadian jazz across Calgary, Nov. 3–8, headlined by Dawn Pemberton.",
+      "description": "JazzYYC’s Canadian Jazz Festival runs November 3 to 8, 2026 at venues around the city and along the Music Mile. Dawn Pemberton headlines. Opening night on November 3 is at Studio Bell, presented with the National Music Centre, and the festival closes with a Sunday JazzWalk.\n\nShows are spread across many venues with their own times and prices, from free jams to ticketed concerts. The full lineup and tickets are on JazzYYC’s festival page.",
+      "categories": [
+        "music",
+        "nightlife",
+        "indoor"
+      ],
+      "tags": [
+        "jazz",
+        "live music",
+        "festival",
+        "date night"
+      ],
+      "sources": [
+        {
+          "name": "JazzYYC",
+          "url": "https://www.jazzyyc.com/canadian-jazz-fest/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "jazzyyc",
+      "sourceRecordId": "canadian-jazz-festival-2026",
+      "address": "Various venues, Calgary, AB",
+      "venue": "Studio Bell and venues along the Music Mile",
+      "start": "2026-11-03T00:00:00-07:00",
+      "end": "2026-11-09T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "JazzYYC",
+      "cancelled": false
+    },
+    {
+      "id": "76edafeec834a153726d5db9b207",
+      "kind": "event",
+      "slug": "holiday-wonder-at-the-bmo-centre-76edaf",
+      "title": "Holiday Wonder at the BMO Centre",
+      "summary": "An indoor Christmas light festival at Stampede Park, Dec. 3–31, 2026.",
+      "description": "Holiday Wonder fills the BMO Centre with an indoor festival of lights for its second year, running December 3 to 31, 2026. Last year’s edition had a snowball arena, a Christmas post office and photos with Santa.\n\nThis listing covers the run, not a single session: check Holiday Wonder’s site for daily hours and timed tickets before you go.",
+      "categories": [
+        "family",
+        "holiday",
+        "indoor"
+      ],
+      "tags": [
+        "christmas lights",
+        "holiday",
+        "kids",
+        "indoor"
+      ],
+      "sources": [
+        {
+          "name": "Holiday Wonder",
+          "url": "https://holidaywonder.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "holiday-wonder",
+      "sourceRecordId": "holiday-wonder-2026",
+      "neighbourhood": "Victoria Park",
+      "address": "20 Roundup Way SE, Calgary, AB",
+      "venue": "BMO Centre, Stampede Park",
+      "start": "2026-12-03T00:00:00-07:00",
+      "end": "2027-01-01T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Holiday Wonder",
+      "cancelled": false
+    },
+    {
+      "id": "904da137e760309c2b735ed12f3d",
+      "kind": "event",
+      "slug": "a-christmas-carol-radio-play-live-904da1",
+      "title": "A Christmas Carol Radio Play Live",
+      "summary": "Three actors play every part of Dickens’s story and make the sound effects live, Dec. 1–24.",
+      "description": "Lunchbox Theatre’s holiday show, adapted and directed by Bronwyn Steinberg: three actors voice the characters of A Christmas Carol and create the foley sound effects live on stage. Runs December 1 to 24, 2026 in the studio theatre at cSPACE Marda Loop, Lunchbox’s new home.\n\nTickets were listed at $27 to $37. Check Lunchbox Theatre’s site for showtimes.",
+      "categories": [
+        "arts",
+        "holiday",
+        "indoor"
+      ],
+      "tags": [
+        "theatre",
+        "holiday",
+        "christmas",
+        "radio play"
+      ],
+      "sources": [
+        {
+          "name": "Lunchbox Theatre",
+          "url": "https://www.lunchboxtheatre.com/202627-season",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "lunchbox-theatre",
+      "sourceRecordId": "christmas-carol-radio-play-2026",
+      "neighbourhood": "Marda Loop",
+      "address": "1721 29 Avenue SW, Calgary, AB",
+      "venue": "cSPACE Marda Loop Studio Theatre",
+      "start": "2026-12-01T00:00:00-07:00",
+      "end": "2026-12-25T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "priceRange": [
+        27,
+        37
+      ],
+      "organizer": "Lunchbox Theatre",
+      "cancelled": false
+    },
+    {
+      "id": "4beb6d173b0ef09a2e9762a4feba",
+      "kind": "event",
+      "slug": "field-of-crosses-on-memorial-drive-4beb6d",
+      "title": "Field of Crosses on Memorial Drive",
+      "summary": "More than 3,700 crosses line Memorial Drive NW from Nov. 1 to 11, with daily ceremonies.",
+      "description": "The Field of Crosses memorial returns to Memorial Drive NW for its 18th year, from November 1 to 11, 2026. More than 3,700 crosses honour southern Albertans who died in military service; six were added this year.\n\nSunrise and sunset ceremonies run daily from November 1 to 10, and a Night of Lights is held before Remembrance Day. The Remembrance Day service is on November 11 at 10:30 a.m. The site is open to everyone at all hours, free.",
+      "categories": [
+        "community",
+        "outdoor"
+      ],
+      "tags": [
+        "remembrance",
+        "memorial",
+        "free"
+      ],
+      "sources": [
+        {
+          "name": "Field of Crosses",
+          "url": "https://www.fieldofcrosses.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        },
+        {
+          "name": "CTV News Calgary",
+          "url": "https://www.ctvnews.ca/calgary/article/volunteers-installed-more-than-3700-crosses-at-the-field-of-crosses-along-memorial-drive-nw/",
+          "kind": "editorial"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "field-of-crosses",
+      "sourceRecordId": "field-of-crosses-2026",
+      "address": "200 Memorial Drive NW, Calgary, AB",
+      "venue": "Field of Crosses, Memorial Drive",
+      "start": "2026-11-01T00:00:00-06:00",
+      "end": "2026-11-12T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "organizer": "Field of Crosses",
+      "cancelled": false
+    },
+    {
+      "id": "3bdb9859c6e192129f217103e293",
+      "kind": "event",
+      "slug": "traditional-christmas-3bdb98",
+      "title": "Traditional Christmas",
+      "summary": "The Calgary Phil and the Cantaré Choirs sing the season in at Grace Presbyterian Church.",
+      "description": "The Calgary Phil’s Traditional Christmas concerts with the Cantaré Choirs run December 8, 9 and 10, 2026 at Grace Presbyterian Church. This listing is the Thursday, December 10 performance at 8 p.m.; other times are on the orchestra’s site.",
+      "categories": [
+        "music",
+        "holiday",
+        "family",
+        "indoor"
+      ],
+      "tags": [
+        "orchestra",
+        "choir",
+        "christmas",
+        "holiday",
+        "kids"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/events/traditional-christmas-2026-12-10-800-pm/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "calgary-phil",
+      "sourceRecordId": "traditional-christmas-2026-12-10",
+      "neighbourhood": "Beltline",
+      "address": "1009 15 Avenue SW, Calgary, AB",
+      "venue": "Grace Presbyterian Church",
+      "start": "2026-12-10T20:00:00-07:00",
+      "end": "2026-12-10T21:30:00-07:00",
+      "endTimeEstimated": true,
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Calgary Philharmonic Orchestra",
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-philharmonic-orchestra"
+    },
+    {
+      "id": "ce0ee0488e41df8cfb4c0abb7f9c",
+      "kind": "event",
+      "slug": "handel-s-messiah-with-rosa-barocca-ce0ee0",
+      "title": "Handel's Messiah with Rosa Barocca",
+      "summary": "A full Messiah on period instruments, conducted by Claude Lapalme at Knox United.",
+      "description": "Early Music Voices presents a full performance of Handel’s Messiah with the baroque orchestra Rosa Barocca, conducted by Claude Lapalme, on Friday, December 18, 2026 at Knox United Church. Check the start time and tickets on Early Music Voices’ site.",
+      "categories": [
+        "music",
+        "holiday",
+        "indoor"
+      ],
+      "tags": [
+        "baroque",
+        "choir",
+        "christmas",
+        "holiday"
+      ],
+      "sources": [
+        {
+          "name": "Early Music Voices",
+          "url": "https://www.earlymusicvoices.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "early-music-voices",
+      "sourceRecordId": "messiah-2026-12-18",
+      "neighbourhood": "Downtown",
+      "address": "506 4 Street SW, Calgary, AB",
+      "venue": "Knox United Church",
+      "start": "2026-12-18T00:00:00-07:00",
+      "end": "2026-12-19T00:00:00-07:00",
+      "endTimeEstimated": true,
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.showpass.com/emv-2026-3/",
+      "organizer": "Early Music Voices",
+      "cancelled": false,
+      "organizerEntityId": "biz-early-music-voices"
+    },
+    {
+      "id": "09391fbbc204143597ae5a9b19bf",
+      "kind": "event",
+      "slug": "sing-along-messiah-09391f",
+      "title": "Sing Along Messiah",
+      "summary": "Bring your voice: the audience sings the choruses of Messiah with Rosa Barocca.",
+      "description": "Early Music Voices’ Sing Along Messiah is on Saturday, December 19, 2026, 3 to 6 p.m., at Knox United Church. Rosa Barocca plays, auditioned Debut Singers take the solos, and the audience sings the choruses.",
+      "categories": [
+        "music",
+        "holiday",
+        "family",
+        "indoor"
+      ],
+      "tags": [
+        "baroque",
+        "choir",
+        "sing-along",
+        "christmas",
+        "holiday",
+        "kids"
+      ],
+      "sources": [
+        {
+          "name": "Early Music Voices",
+          "url": "https://www.earlymusicvoices.ca/season-details/sing-along-messiah",
+          "kind": "official",
+          "retrievedAt": "2026-10-24T00:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-24T00:00:00.000Z",
+      "fetchedAt": "2026-10-24T00:00:00.000Z",
+      "updatedAt": "2026-10-24T00:00:00.000Z",
+      "sourceId": "early-music-voices",
+      "sourceRecordId": "sing-along-messiah-2026-12-19",
+      "neighbourhood": "Downtown",
+      "address": "506 4 Street SW, Calgary, AB",
+      "venue": "Knox United Church",
+      "start": "2026-12-19T15:00:00-07:00",
+      "end": "2026-12-19T18:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "tickets": "https://www.showpass.com/emv-2026-4/",
+      "organizer": "Early Music Voices",
+      "cancelled": false,
+      "organizerEntityId": "biz-early-music-voices"
     }
   ],
   "occurrences": [

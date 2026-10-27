@@ -132,6 +132,8 @@ export interface PickItem {
   start: string;
   end: string;
   venue?: string;
+  /** Who puts it on; stands in for the venue when a listing has none. */
+  organizer?: string;
   neighbourhood?: string;
   free: boolean;
   interests: EventInterestId[];
@@ -166,6 +168,25 @@ export interface PickOptions {
   /** Window length. The Thursday email looks 10 days ahead to cover next weekend. */
   days?: number;
   limit?: number;
+  /**
+   * Whose picks these are (a member uid). Mixed with the Calgary date, it
+   * shuffles otherwise-equal picks once a day, differently for each reader,
+   * so the same eight don't sit there all week. Same reader, same day: same picks.
+   */
+  rotation?: string;
+}
+
+const RUN_MS = 3 * 86_400_000;
+const ROTATION_WEIGHT = 0.45;
+const SAME_PLACE_PENALTY = 1.5;
+const RUN_PENALTY = 1;
+const SAME_FLAVOUR_PENALTY = 0.5;
+
+/** A stable number in [0, 1) for a string (FNV-1a). */
+function unitHash(text: string): number {
+  let h = 0x811c9dc5;
+  for (let k = 0; k < text.length; k++) { h ^= text.charCodeAt(k); h = Math.imul(h, 0x01000193); }
+  return (h >>> 0) / 0x1_0000_0000;
 }
 
 function sameArea(a: string | undefined, b: string | undefined): boolean {
@@ -204,6 +225,7 @@ function toItem({ entity, key, start, end }: { entity: Event | Market; key: stri
     start,
     end,
     venue: entity.venue,
+    organizer: entity.organizer,
     neighbourhood: entity.neighbourhood,
     free: entity.kind === 'event' && entity.pricing === 'free',
     interests,
@@ -227,14 +249,25 @@ export function buildEventPicks(options: PickOptions): EventPicks {
   const bySoonest = (a: PickItem, b: PickItem) => Date.parse(a.start) - Date.parse(b.start);
   const going = items.filter((i) => goingIds.has(i.entityId)).sort(bySoonest);
 
+  // Something you can drop into any day (an exhibition, a month of open
+  // studios) is a "run". Runs never earn the "sooner" bonus: one that opened in
+  // June is not more urgent than a concert on Friday. The last week of a run is.
+  const isRun = (i: PickItem) => Date.parse(i.end) - Date.parse(i.start) > RUN_MS;
+  const day = calgaryDay(from);
   const score = (i: PickItem) => {
     let s = i.matched.length * 3;
     if (sameArea(i.neighbourhood, options.homeArea)) s += 3;
     else if (i.distanceM !== null) s += i.distanceM <= 3000 ? 2 : i.distanceM <= 8000 ? 1 : 0;
-    // A little preference for sooner, never enough to beat a real match.
-    s += Math.max(0, 1 - (Date.parse(i.start) - from) / (to - from));
+    if (isRun(i)) {
+      if (Date.parse(i.end) - from <= 7 * DAY_MS) s += 0.5;
+    } else {
+      // A little preference for sooner, never enough to beat a real match.
+      s += Math.min(1, Math.max(0, 1 - (Date.parse(i.start) - from) / (to - from)));
+    }
     // Verified by the organization: orders otherwise equal picks, never beats a match.
     if (i.verified) s += VERIFIED_WEIGHT.picks;
+    // Today's shuffle: less than the verified nudge, so it only reorders ties.
+    s += ROTATION_WEIGHT * unitHash(`${options.rotation ?? ''}|${day}|${i.key}`);
     return s;
   };
 
@@ -250,12 +283,27 @@ export function buildEventPicks(options: PickOptions): EventPicks {
     // With interests chosen, only items that match at least one. With none, everything.
     .filter((i) => wanted.size === 0 || i.matched.length > 0);
 
-  const picks = candidates
-    .map((i) => ({ i, s: score(i) }))
-    .sort((a, b) => b.s - a.s || bySoonest(a.i, b.i))
-    .slice(0, limit)
-    .map(({ i }) => i)
-    .sort(bySoonest);
+  // Picked one at a time, each against what's already in: a gallery with six
+  // shows on gets one or two slots, not six, and exhibitions don't crowd out
+  // the things that only happen once.
+  const place = (i: PickItem) => (i.venue || i.organizer || '').toLowerCase().trim();
+  const flavour = (i: PickItem) => i.interests.find((x) => x !== 'free') ?? i.kind;
+  const pool = candidates.map((i) => ({ i, s: score(i) }));
+  const chosen: PickItem[] = [];
+  while (chosen.length < limit && pool.length) {
+    let best = 0, bestScore = -Infinity;
+    for (let k = 0; k < pool.length; k++) {
+      const { i, s } = pool[k];
+      let adj = s;
+      const where = place(i);
+      if (where) adj -= SAME_PLACE_PENALTY * chosen.filter((c) => place(c) === where).length;
+      if (isRun(i)) adj -= RUN_PENALTY * chosen.filter(isRun).length;
+      adj -= SAME_FLAVOUR_PENALTY * chosen.filter((c) => flavour(c) === flavour(i)).length;
+      if (adj > bestScore || (adj === bestScore && bySoonest(i, pool[best].i) < 0)) { best = k; bestScore = adj; }
+    }
+    chosen.push(pool.splice(best, 1)[0].i);
+  }
+  const picks = chosen.sort(bySoonest);
 
   return { going, picks, considered: items.length };
 }

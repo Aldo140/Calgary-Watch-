@@ -558,3 +558,169 @@
   .mk-desk .mk-sec-head h2 { font-size: 23px; }
   .mk-detail .lp-spread-cover { display: none; }
 }
+
+/* ── Shoppers: forecast on the week, closest first, verified tick ─────── */
+.mk-week-sky { display: flex; align-items: center; gap: 5px; margin-top: -4px !important; padding: 5px 8px; border-radius: 9px; background: rgba(21, 21, 21, .06); font: 600 12px/1 var(--mono); }
+.mk-week-sky b { font: 800 14px/1 var(--display); }
+.mk-week-sky span { opacity: .6; }
+.mk-week-sky em { margin-left: auto; font-style: normal; font-weight: 700; color: var(--blue); }
+.mk-week-days > li.is-today .mk-week-sky { background: rgba(255, 255, 255, .12); }
+.mk-week-days > li.is-today .mk-week-sky em { color: var(--cyan); }
+.mk-week-days > li.is-rough .mk-week-sky { background: var(--navy); color: #fff; }
+.mk-week-days > li.is-rough .mk-week-sky em { color: var(--sun); }
+.mk-week-in { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; padding: 1px 5px; border-radius: 5px; background: var(--navy); color: var(--sun); font: 700 9.5px/1.4 var(--mono); font-style: normal; text-transform: uppercase; vertical-align: 1px; }
+
+.mk .mk-near {
+  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 13px; border: 2px solid var(--ink); border-radius: 999px;
+  background: #fff; font: 700 13px/1 Inter, sans-serif; box-shadow: 2px 2px 0 var(--ink); transition: transform .15s, background .15s;
+}
+.mk .mk-near:hover { transform: translate(-1px, -1px); background: var(--sun); }
+.mk .mk-near.is-on { background: var(--navy); color: #fff; }
+.mk .mk-near:disabled { opacity: .7; cursor: progress; }
+.mk-near-note { flex-basis: 100%; text-transform: none !important; letter-spacing: 0 !important; font: 500 13px/1.3 Inter, sans-serif !important; }
+.mk-row-km { padding: 2px 7px; border-radius: 999px; background: var(--cyan); color: var(--ink); font: 700 11.5px/1.3 Inter, sans-serif; font-style: normal; border: 1.5px solid var(--ink); }
+.mk-row-verified { display: inline-block; margin-left: 6px; vertical-align: -2px; color: var(--blue); }
+
+.mk-bands:has(> :only-child) { grid-template-columns: 1fr; }
+.mk-bands:has(> :only-child) .mk-band { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 12px 20px; }
+.mk-bands:has(> :only-child) .mk-band-go { margin: 0 0 0 auto; }
+
+/* ── Vendors: "Sell at a Calgary market" ──────────────────────────────── */
+.mk-sell {
+  position: relative; margin-top: clamp(48px, 6vw, 80px); display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.5fr); gap: 18px clamp(24px, 3vw, 44px);
+  padding: clamp(24px, 3vw, 38px); border: 2px solid var(--ink); border-radius: 28px; color: #fff; box-shadow: 8px 8px 0 var(--sun), 8px 8px 0 2px var(--ink);
+  background: radial-gradient(90% 90% at 100% 0%, rgba(0, 194, 224, .28), transparent 60%), var(--navy);
+}
+.mk-sell-head { display: flex; flex-direction: column; gap: 14px; align-self: start; position: sticky; top: 96px; }
+.mk-sell-stamp { align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border: 2px solid var(--ink); border-radius: 8px; background: var(--sun); color: var(--ink); font: 700 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; transform: rotate(-3deg); box-shadow: 3px 3px 0 var(--cyan); }
+.mk .mk-sell h2 { color: #fff; font: 800 clamp(34px, 3.6vw, 52px)/.98 var(--display); letter-spacing: -.04em; }
+.mk-sell h2 mark { color: var(--ink); }
+.mk-sell-lead { font: 500 16px/1.5 Inter, sans-serif; color: rgba(255, 255, 255, .86); }
+.mk-sell-fine { display: flex; gap: 7px; font: 500 13px/1.4 Inter, sans-serif; color: rgba(255, 255, 255, .62); }
+.mk-sell-fine svg { flex: none; margin-top: 2px; }
+.mk-sell-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+.mk-sell-list > li {
+  display: grid; grid-template-columns: 62px minmax(0, 1fr); grid-template-rows: auto auto; border: 2px solid var(--ink); border-radius: 16px; overflow: hidden;
+  background: #fff; color: var(--ink); box-shadow: 4px 4px 0 rgba(0, 0, 0, .35); transition: transform .18s;
+}
+.mk-sell-list > li:hover { transform: translateY(-3px); }
+.mk-sell-stub { grid-row: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; background: var(--sun); border-right: 2px dashed var(--ink); }
+.mk-sell-stub small { font: 700 10.5px/1.2 var(--mono); text-transform: uppercase; }
+.mk-sell-stub b { font: 800 28px/.95 var(--display); letter-spacing: -.04em; }
+.is-verified .mk-sell-stub { background: var(--cyan); }
+.mk-sell-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 11px 12px 6px; }
+.mk-sell-body small { font: 600 11px/1.25 var(--mono); text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+.mk-sell-body strong { display: block; font: 800 17px/1.15 var(--display); letter-spacing: -.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mk-sell-body a:hover strong { text-decoration: underline; }
+.mk-sell-body > span { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font: 500 13px/1.3 Inter, sans-serif; color: var(--muted); }
+.mk-sell-body em { display: inline-flex; align-items: center; gap: 3px; font-style: normal; font-weight: 700; color: var(--blue); }
+.mk .mk-sell-go { justify-self: end; display: inline-flex; align-items: center; gap: 4px; margin: 0 10px 10px; padding: 7px 12px; border-radius: 999px; background: var(--navy); color: var(--sun); font: 800 13px/1 Inter, sans-serif; border: 2px solid var(--ink); transition: background .15s, color .15s; }
+.mk .mk-sell-go:hover { background: var(--sun); color: var(--ink); }
+.mk .mk-sell-more { grid-column: 2; justify-self: start; padding: 10px 16px; border: 2px solid #fff; border-radius: 999px; color: #fff; font: 700 14px/1 Inter, sans-serif; }
+.mk .mk-sell-more:hover { background: #fff; color: var(--ink); }
+
+/* ── Organizers: pick your market, get the next step ──────────────────── */
+.mk-org {
+  margin-top: 22px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(300px, .9fr); gap: clamp(20px, 3vw, 40px); align-items: center;
+  padding: clamp(22px, 3vw, 34px); border: 2px solid var(--ink); border-radius: 26px; background: #fff; box-shadow: 6px 6px 0 var(--ink);
+  background-image: linear-gradient(90deg, rgba(21, 84, 209, .07) 1px, transparent 1px), linear-gradient(rgba(21, 84, 209, .07) 1px, transparent 1px); background-size: 22px 22px;
+}
+.mk-org h2 { margin-top: 12px; font: 800 clamp(26px, 2.6vw, 36px)/1.05 var(--display); letter-spacing: -.035em; max-width: 17em; }
+.mk-org-perks { display: flex; flex-direction: column; gap: 12px; margin-top: 18px !important; }
+.mk-org-perks li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start; font: 400 15px/1.45 Inter, sans-serif; }
+.mk-org-perks svg { width: 36px; height: 36px; padding: 7px; border: 2px solid var(--ink); border-radius: 10px; background: var(--cyan); }
+.mk-org-perks strong { font-weight: 800; }
+.mk-org-card { display: flex; flex-direction: column; gap: 10px; padding: 20px; border: 2px solid var(--ink); border-radius: 20px; background: var(--navy); color: #fff; box-shadow: 5px 5px 0 var(--sun), 5px 5px 0 2px var(--ink); transform: rotate(1deg); }
+.mk-org-count { font: 600 12px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: rgba(255, 255, 255, .75); }
+.mk-org-count b { font: 800 30px/1 var(--display); color: var(--sun); margin-right: 4px; }
+.mk-org-card label { margin-top: 4px; font: 800 18px/1.2 var(--display); }
+.mk-org-card select { height: 50px; padding: 0 14px; border: 2px solid var(--ink); border-radius: 12px; background: #fff; color: var(--ink); font: 600 15px/1 Inter, sans-serif; }
+.mk-org-card .mk-btn { height: 50px; }
+.mk .mk-org-card .is-idle { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .35); color: rgba(255, 255, 255, .7); box-shadow: none; pointer-events: none; }
+.mk-org-alt { font: 500 13px/1.5 Inter, sans-serif; color: rgba(255, 255, 255, .72); }
+.mk .mk-org-alt a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.mk-org-alt svg { vertical-align: -2px; }
+
+/* ── Owner's desk: admins only ────────────────────────────────────────── */
+.mk-owner { margin-top: 40px; padding: clamp(20px, 2.6vw, 30px); border: 2px dashed var(--ink); border-radius: 24px; background: #eef3ff; }
+.mk-owner-head { display: flex; flex-direction: column; gap: 8px; }
+.mk-owner-tag { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 6px; background: var(--ink); color: var(--cyan); font: 700 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.mk-owner h2 { font: 800 clamp(24px, 2.4vw, 32px)/1.05 var(--display); letter-spacing: -.03em; }
+.mk-owner-head > p:last-child { font: 400 14.5px/1.45 Inter, sans-serif; color: var(--muted); max-width: 46em; }
+.mk-owner-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0 !important; }
+.mk-owner-kpis > div { display: flex; flex-direction: column; gap: 4px; padding: 14px; border: 2px solid var(--ink); border-radius: 14px; background: #fff; }
+.mk-owner-kpis > div.is-hot { background: var(--sun); }
+.mk-owner-kpis > div.is-warn { background: #ffe2df; }
+.mk-owner-kpis dt { font: 700 11px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mk-owner-kpis dd { font: 800 32px/1 var(--display); letter-spacing: -.03em; }
+.mk-owner-kpis dd small { font-size: 18px; opacity: .55; }
+.mk-owner-kpis span { font: 500 12px/1.3 Inter, sans-serif; color: var(--muted); }
+.mk-owner-table { overflow-x: auto; border: 2px solid var(--ink); border-radius: 14px; background: #fff; }
+.mk-owner table { width: 100%; border-collapse: collapse; font: 500 13.5px/1.35 Inter, sans-serif; }
+.mk-owner th, .mk-owner td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(21, 21, 21, .12); vertical-align: top; }
+.mk-owner thead th { font: 700 11px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .05em; background: var(--paper); white-space: nowrap; }
+.mk-owner tbody th { font-weight: 800; min-width: 180px; }
+.mk-owner tbody th a:hover { text-decoration: underline; }
+.mk-owner tbody th > span { display: flex; align-items: center; gap: 3px; margin-top: 3px; font: 700 11px/1.2 var(--mono); text-transform: uppercase; }
+.mk-owner-ok { color: #0a7a3d; display: inline-flex; align-items: center; gap: 3px; }
+.mk-owner-no { color: var(--red); }
+.mk-owner-hot { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; background: var(--sun); border: 1.5px solid var(--ink); font-weight: 800; white-space: nowrap; }
+.mk-owner-gaps { display: flex; flex-wrap: wrap; gap: 4px; }
+.mk-owner-gaps li { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 999px; background: #fff3d1; font: 600 11.5px/1.3 Inter, sans-serif; white-space: nowrap; }
+.mk-owner-act { white-space: nowrap; text-align: right !important; }
+.mk .mk-owner-act :is(a, button) { display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; font: 700 12.5px/1 Inter, sans-serif; }
+.mk .mk-owner-act :is(a, button):hover { background: var(--sun); }
+.mk-owner-foot { margin-top: 12px !important; font: 500 13px/1.5 Inter, sans-serif; color: var(--muted); }
+.mk-owner-foot a { text-decoration: underline; }
+.mk-owner-foot code { padding: 1px 5px; border-radius: 4px; background: #fff; font: 500 12px/1.4 var(--mono); }
+
+@media (max-width: 1080px) {
+  .mk-sell { grid-template-columns: 1fr; }
+  .mk-sell-head { position: static; }
+  .mk .mk-sell-more { grid-column: 1; }
+  .mk-org { grid-template-columns: 1fr; }
+  .mk-owner-kpis { grid-template-columns: 1fr 1fr; }
+}
+
+/* Phones: the vendor call is a swipeable rail of tickets; the organizer card sits under its pitch; the owner table becomes cards. */
+@media (max-width: 720px) {
+  .mk-week-sky { padding: 4px 7px; }
+  .mk-list .mk-sec-head { align-items: center; }
+  .mk .mk-near { height: 34px; font-size: 12.5px; }
+  .mk-row-place { flex-wrap: wrap; gap: 4px 8px; }
+
+  .mk-sell { margin: 40px -16px 0; padding: 26px 0 22px 16px; border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; gap: 16px; }
+  .mk-sell-head { padding-right: 16px; gap: 12px; }
+  .mk-sell h2 { font-size: 36px; }
+  .mk-sell-lead { font-size: 15px; }
+  .mk-sell-list { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 16px 10px 0; scrollbar-width: none; }
+  .mk-sell-list::-webkit-scrollbar { display: none; }
+  .mk-sell-list > li { flex: 0 0 82%; scroll-snap-align: start; box-shadow: 3px 3px 0 var(--sun); }
+  .mk .mk-sell-more { margin-left: 0; }
+
+  .mk-org { padding: 18px; border-radius: 22px; box-shadow: 4px 4px 0 var(--ink); gap: 18px; }
+  .mk-org h2 { font-size: 25px; }
+  .mk-org-perks li { font-size: 14.5px; grid-template-columns: 32px minmax(0, 1fr); }
+  .mk-org-perks svg { width: 32px; height: 32px; padding: 6px; }
+  .mk-org-card { transform: none; padding: 16px; }
+
+  .mk-owner { margin: 32px 0 0; padding: 16px; }
+  .mk-owner-kpis dd { font-size: 26px; }
+  .mk-owner-table { border: 0; background: none; overflow: visible; }
+  .mk-owner table, .mk-owner tbody, .mk-owner tr, .mk-owner th, .mk-owner td { display: block; }
+  .mk-owner thead { display: none; }
+  .mk-owner tbody { display: flex; flex-direction: column; gap: 10px; }
+  .mk-owner tr { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 2px solid var(--ink); border-radius: 14px; background: #fff; overflow: hidden; }
+  .mk-owner tbody th { grid-column: 1 / -1; min-width: 0; border-bottom: 1px solid rgba(21, 21, 21, .12); }
+  .mk-owner td { border: 0; padding: 8px 12px; }
+  .mk-owner td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; font: 700 10px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .mk-owner td[data-label='Needs'] { grid-column: 1 / -1; }
+  .mk-owner-act { grid-column: 1 / -1; text-align: left !important; padding-bottom: 12px !important; }
+}
+.mk .mk-sell h2 mark { background: var(--sun); color: var(--ink); padding: 0 .12em; margin: 0; border-radius: 8px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.mk-org > * { min-width: 0; }
+.mk-org .mk-band-tag { display: inline-block; }
+.mk-org-card select { width: 100%; min-width: 0; text-overflow: ellipsis; }
+/* Desktop shows eight until "See all"; phones swipe through every one. */
+@media (min-width: 721px) { .mk-sell-list:not(.is-all) > li:nth-child(n + 9) { display: none; } }
+@media (max-width: 720px) { .mk .mk-sell-more { display: none; } }

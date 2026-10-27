@@ -14,6 +14,8 @@ import { BEST_PATH, bestCategory, bestIndexJsonLd, bestItemListJsonLd, bestPath 
 import { DEFAULT_SHARE_ALT, DEFAULT_SHARE_IMAGE, SHARE_CARD, shareCardFor } from './shareImage';
 import { SAFETY_PATH, SAFETY_TOPICS, SAFETY_UPDATED } from '@/src/content/safetyTopics';
 import { safetyJsonLd, safetyPath } from './safety';
+import { SPOTLIGHTS } from '@/src/content/spotlights';
+import { spotlightBySlug, spotlightJsonLd, spotlightPath, SPOTLIGHT_PATH } from './spotlights';
 
 /**
  * Single source of truth for per-route SEO.
@@ -217,6 +219,17 @@ ROUTE_SEO[SAFETY_PATH] = {
 for (const t of SAFETY_TOPICS) {
   ROUTE_SEO[safetyPath(t)] = { title: t.seoTitle, description: t.seoDescription, index: true, pageType: 'CollectionPage', dateModified: SAFETY_UPDATED, image: DEFAULT_IMAGE };
 }
+// CalgaryWatch Spotlights: long-form, sourced features; evergreen, so indexed after the promo ends too.
+for (const s of SPOTLIGHTS) {
+  ROUTE_SEO[spotlightPath(s)] = {
+    title: s.seo.title,
+    description: s.seo.description,
+    index: true,
+    pageType: 'WebPage',
+    dateModified: s.updated,
+    image: DEFAULT_IMAGE,
+  };
+}
 ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Search a Calgary neighbourhood or street for recent reports, or find events, markets and local places.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
   ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], index: false, title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
@@ -263,6 +276,10 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
 ROUTE_BREADCRUMBS[SAFETY_PATH] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Calgary safety news', item: `${PRODUCTION_ORIGIN}${SAFETY_PATH}` }];
 for (const t of SAFETY_TOPICS) {
   ROUTE_BREADCRUMBS[safetyPath(t)] = [...ROUTE_BREADCRUMBS[SAFETY_PATH], { name: t.label, item: `${PRODUCTION_ORIGIN}${safetyPath(t)}` }];
+}
+
+for (const s of SPOTLIGHTS) {
+  ROUTE_BREADCRUMBS[spotlightPath(s)] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Events', item: `${PRODUCTION_ORIGIN}/events` }, { name: s.name, item: `${PRODUCTION_ORIGIN}${spotlightPath(s)}` }];
 }
 
 ROUTE_BREADCRUMBS[BEST_PATH] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Best of Calgary', item: `${PRODUCTION_ORIGIN}${BEST_PATH}` }];
@@ -338,6 +355,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
   const best = section === BEST_PATH.slice(1) ? (slug ? bestCategory(slug) : undefined) : undefined;
   const bestList = best ? bestItemListJsonLd(best, origin) : pathname === BEST_PATH ? bestIndexJsonLd(origin) : undefined;
   const safety = safetyJsonLd(pathname);
+  const spotlight = section === SPOTLIGHT_PATH.slice(1) ? spotlightBySlug(slug) : undefined;
   const crumbs = ROUTE_BREADCRUMBS[pathname]
     ?? (entity ? listingBreadcrumbs(entity).map(c => ({ name: c.name, item: `${PRODUCTION_ORIGIN}${c.path}` }))
       : hub && !slug ? [ROUTE_BREADCRUMBS['/'][0], { name: hub.label, item: `${PRODUCTION_ORIGIN}${hub.path}` }]
@@ -368,6 +386,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
     },
     ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin, repository.occurrences(), repository.list()) } : {}),
     ...(bestList ? { mainEntity: bestList } : {}),
+    ...(spotlight ? { mainEntity: spotlightJsonLd(spotlight, origin, config.image ?? DEFAULT_IMAGE, repository.list()) } : {}),
     ...(safety ?? {}),
     ...(pathname === COMMUNITY_PATH
       ? {

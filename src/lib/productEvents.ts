@@ -22,7 +22,12 @@ export type ProductEventName =
   /** The error screen was shown; `kind` is chunk, offline or crash, `area` the first path segment. */
   | 'page_error'
   /** A tab reloaded itself into a new build after a stale chunk, and the page then loaded. */
-  | 'stale_chunk_recovered';
+  | 'stale_chunk_recovered'
+  /** CalgaryWatch Spotlight features (src/lib/spotlights.ts): `spot` slug, `at` placement, `link` id or `depth`. */
+  | 'spotlight_link_click'
+  | 'spotlight_card_click'
+  | 'spotlight_card_seen'
+  | 'spotlight_read';
 
 /** Keys that could identify a place or a person, dropped unconditionally. */
 const FORBIDDEN_KEYS = new Set(['address', 'description', 'title', 'email', 'name', 'lat', 'lng']);

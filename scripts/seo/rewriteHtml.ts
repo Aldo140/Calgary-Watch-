@@ -40,6 +40,7 @@ import { weekAgenda } from '../../src/lib/discoveryCalendar.js';
 import type { DiscoveryEntity } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 import { BEST_CATEGORIES } from '../../src/content/bestOf.js';
+import { SPOTLIGHT_PATH, spotlightBySlug } from '../../src/lib/spotlights.js';
 import { BEST_PATH, bestCategory, bestPath, publishersOf, rankPlaces, sourceOf, sourcesFor } from '../../src/lib/bestOf.js';
 import { SAFETY_CONTACTS, SAFETY_FAQS, SAFETY_PATH, SAFETY_TOPICS } from '../../src/content/safetyTopics.js';
 import { NEWS_FEEDS } from '../../src/content/newsFeeds.js';
@@ -221,6 +222,7 @@ function routeSections(pathname: string, now: Date): string {
 export function buildStaticRouteBody(pathname: string, now = new Date()): string {
   if (pathname === BEST_PATH || pathname.startsWith(`${BEST_PATH}/`)) return bestStaticBody(pathname);
   if (pathname === SAFETY_PATH || pathname.startsWith(`${SAFETY_PATH}/`)) return safetyStaticBody(pathname);
+  if (pathname.startsWith(`${SPOTLIGHT_PATH}/`)) return spotlightStaticBody(pathname);
   if (pathname === AIRDRIE_GUIDE_PATH) {
     const comparisons = AIRDRIE_MAP_COMPARISON.map((row) => `
       <tr>
@@ -392,6 +394,19 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
   if (!summary) return '';
   const links = summary.links.map(([href, label]) => staticLink(href, label)).join(' · ');
   return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>${escapeText(summary.heading)}</h1><p>${escapeText(summary.copy)}</p><p>${links}</p>${routeSections(pathname, now)}</article></main>`;
+}
+
+/** /spotlight/:slug, mirroring SpotlightPage: headline, dek, how to go, official links and sources. */
+function spotlightStaticBody(pathname: string): string {
+  const s = spotlightBySlug(pathname.split('/')[2]);
+  if (!s) return '';
+  const links = s.links.map(l => `<li>${staticLink(l.url, l.label)}${l.note ? ` (${escapeText(l.note)})` : ''}</li>`).join('');
+  const sources = s.sources.map(src => `<li>${staticLink(src.url, `${src.publisher}: ${src.label}`)}</li>`).join('');
+  return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>${escapeText(s.title)}</h1><p>${escapeText(s.dek)}</p><p>${escapeText(s.disclosure)}</p>
+    <section><h2>How to go</h2><p>${escapeText(`${s.venue.name}, ${s.venue.address}. ${s.venue.hours}.${s.links[0]?.note ? ` ${s.links[0].note}.` : ''}`)}</p></section>
+    <section><h2>What’s next</h2><p>${escapeText(s.future)}</p></section>
+    <section><h2>Official links</h2><ul>${links}</ul></section><section><h2>Sources</h2><ul>${sources}</ul></section>
+    <p>${staticLink('/events', 'Events in Calgary this week')} · ${staticLink('/date-night', 'Date night ideas')}</p></article></main>`;
 }
 
 /** /best and /best/:slug, mirroring BestOfPage: the ordered list with its sources. */

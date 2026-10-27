@@ -300,6 +300,24 @@
   }
   .cw-site .cw-nav-live > span:last-child { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
   .cw-nav-sheet-inner.cw-menu { padding-top: 16px; gap: 16px; }
+  /* Same 16px gutter as the page below, so the burger lines up with the content edge. */
+  .cw-nav .cw-wrap.cw-nav-bar { padding-right: 16px; }
+  /* The actions never shrink, so the burger can't be pushed off screen; the wordmark gives way first. */
+  .cw-nav .cw-wordmark { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+  /* Signed in: the account button is just the avatar (name and menu live behind the tap). */
+  .cw-site .cw-acct-btn { width: 38px; height: 38px; padding: 0; gap: 0; justify-content: center; }
+  .cw-acct-btn > svg { display: none; }
+  .cw-acct-btn .cw-acct-avatar { width: 30px; height: 30px; font-size: 14px; }
+}
+/* Signed in on phones: the bar holds brand, Live, avatar and menu, so Live drops to its dot. */
+@media (max-width: 420px) {
+  .cw-nav-actions:has(.cw-acct) { gap: 6px; }
+  .cw-site .cw-nav-actions:has(.cw-acct) .cw-nav-live { width: 34px; padding: 0; justify-content: center; }
+  .cw-site .cw-nav-actions:has(.cw-acct) .cw-nav-live > span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
+/* Signed in on the narrowest phones there's no room for Live too; it's the first link in the menu. */
+@media (max-width: 359px) {
+  .cw-nav-actions:has(.cw-acct) .cw-nav-live { display: none; }
 }
 @media (max-width: 359px) {
   .cw-nav .cw-wordmark { font-size: 15px; }

@@ -25,6 +25,15 @@ export function planDay(item: { start: string; end: string }, now = Date.now()):
   return `${fmt(item.start, { weekday: 'short', month: 'short', day: 'numeric' })} · ${time(item.start)}`;
 }
 
+const ymd = (t: number | string) => fmt(t, { year: 'numeric', month: '2-digit', day: '2-digit' });
+/** "tonight at 7:30 p.m.", "today at 11 a.m.", "tomorrow", "on Friday". */
+function dayWord(start: string): string {
+  const now = Date.now();
+  if (ymd(start) === ymd(now)) return `${Number(fmt(start, { hour: 'numeric', hourCycle: 'h23' })) >= 17 ? 'tonight' : 'today'} at ${time(start)}`;
+  if (ymd(start) === ymd(now + 86_400_000)) return 'tomorrow';
+  return `on ${fmt(start, { weekday: 'long' })}`;
+}
+
 /** One plain sentence that answers "anything I should know?" before the reader scrolls. */
 export function briefing({ near, nearReady, area, picks, next }: { near: NearReport[]; nearReady: boolean; area: string; picks: number; next?: PickItem }): string {
   const where = area || 'home';
@@ -33,7 +42,7 @@ export function briefing({ near, nearReady, area, picks, next }: { near: NearRep
   const name = next ? (next.title.length > 42 ? `${next.title.slice(0, 40).trim()}…` : next.title) : '';
   const going = !next ? '.'
     : isOnNow(next) ? `, and ${name} is on now until ${fmt(next.end, { month: 'long', day: 'numeric' })}.`
-    : `, and you’re going to ${name} on ${fmt(next.start, { weekday: 'long' })}.`;
+    : `, and you’re going to ${name} ${dayWord(next.start)}.`;
   return [safety, plans + going].filter(Boolean).join(' ');
 }
 

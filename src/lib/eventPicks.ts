@@ -384,7 +384,9 @@ export function buildPlanTimeline(options: {
     const item = toItem(dated, none, null);
     if (end <= now) {
       if (end < since) continue;
-      const days = dayGap(now, end);
+      // A night out is remembered by the night it started (a show that ran past midnight was still Saturday);
+      // a long run by the day it closed.
+      const days = dayGap(now, end - start > 1.5 * DAY_MS ? end : start);
       past.push({ item, status: 'past', days, when: planWhen('past', days, start) });
     } else {
       const status: PlanStatus = start <= now ? 'live' : 'upcoming';

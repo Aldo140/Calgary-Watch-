@@ -9,50 +9,98 @@ import { listingManagementPath } from '../../lib/listingPreview';
 const formatSince = (at: number, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...options }).format(at);
 
 /**
- * Business account: listings this member manages. Approved means the
- * organization confirmed it (the Verified badge shows on the listing);
- * anything else is honest about where the claim stands. Account features
- * for businesses build on this card.
+ * The organizer desk: a band right under the member's day board, because an
+ * organizer opens this page to run their listings first. Each confirmed
+ * organization shows what's live (upcoming events, the next one), and one
+ * button to manage it. Claims still being checked say where they stand.
+ * Approved means the organization confirmed it (the Verified badge shows on
+ * the listing; see docs/verified-listings.md).
  */
+
+const when = (iso: string) => formatSince(Date.parse(iso), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(':00', '');
 
 export function BusinessListings({ claims, business, previewUid }: { claims: Claim[]; business?: BusinessAccount | null; previewUid?: string }) {
   if (!claims.length && !business) return null;
   const approved = claims.filter((c) => c.status === 'approved');
   const isBusiness = Boolean(business) || approved.length > 0;
-  const inventory=discoveryRepository.list();
-  const upcomingByOrg=new Map<string,number>();
-  for(const entity of inventory)if(entity.kind==='event'&&entity.organizerEntityId&&!entity.cancelled&&Date.parse(entity.end)>Date.now())upcomingByOrg.set(entity.organizerEntityId,(upcomingByOrg.get(entity.organizerEntityId)??0)+1);
-  const organizations=[...new Map(approved.map(c=>approvedOrganization(c,discoveryRepository.list())).filter(Boolean).map(o=>[o!.id,o!])).values()];
+  const inventory = discoveryRepository.list();
+  const now = Date.now();
+  const upcoming = (orgId: string) => inventory
+    .filter((e): e is Extract<typeof e, { kind: 'event' }> => e.kind === 'event' && e.organizerEntityId === orgId && !e.cancelled && Date.parse(e.end) > now)
+    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  const organizations = [...new Map(approved.map((c) => approvedOrganization(c, inventory)).filter(Boolean).map((o) => [o!.id, o!])).values()];
   const others = claims.filter((c) => c.status !== 'approved');
+  const as = previewUid ? `?as=${encodeURIComponent(previewUid)}` : '';
   const state = (s: string) => (s === 'rejected' ? { label: 'Not confirmed', note: 'Reply to our email and we’ll take another look.' } : { label: 'Being confirmed', note: 'We check every claim by hand before the Verified badge shows.' });
   return (
-    <section className="pd-card pd-biz" data-business={isBusiness} aria-labelledby="pd-biz">
-      <p className="pd-kicker">{isBusiness ? <><BadgeCheck size={14} aria-hidden="true" /> Business account{business?.since ? ` · since ${formatSince(business.since, { month: 'short', year: 'numeric' })}` : ''}</> : <><Store size={14} aria-hidden="true" /> For organizers</>}</p>
-      <h2 id="pd-biz">{organizations.length?'Your organization'+(organizations.length>1?'s':''):approved.length > 1 || (!approved.length && (business?.listings.length ?? 0) > 1) ? 'Your listings' : approved.length || business ? 'Your listing' : 'Your claim'}</h2>
-      {organizations.map(org=><article key={org.id} className="pd-biz-organization"><span className="pd-biz-org-label"><BadgeCheck size={15} aria-hidden="true"/> {org.managementOnly?'Confirmed organizer access':'Confirmed organization access'}</span><h3>{org.title}</h3><p>{org.managementOnly?'Manage your listing and add events when needed. No extra public business page.':<><strong>{upcomingByOrg.get(org.id)??0}</strong> upcoming events · Profile and programme management</>}</p><p>Build your next update as a draft. Publish all your profile, market and event changes together once every seven days.</p><div className="pd-biz-acts"><Link className="pd-biz-btn" to={`/organization/${org.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>Manage organization &amp; events <ArrowUpRight size={15} aria-hidden="true"/></Link><Link className="pd-biz-btn" data-k="ghost" to={org.sourceListingId?(approved.find(c=>c.entityId===org.sourceListingId)?.entityPath??'/events'):entityPath(org)}>{org.managementOnly?'Public listing':'Public profile'}</Link></div></article>)}
-      {organizations.length?<p className="pd-biz-note">Images are managed by CalgaryWatch. Your personal plans and email preferences are separate from organization management.</p>:null}
-      {approved.length?<details className="pd-biz-history" open={!organizations.length}><summary>Approved listing access · {approved.length}</summary><ul className="pd-biz-list">
-        {approved.map((c) => (
-          <li key={c.entityId} className="pd-biz-item" data-status="approved">
-            <span className="pd-biz-title"><strong>{c.entityTitle}</strong><span className="pd-biz-ok"><BadgeCheck size={14} aria-hidden="true" /> Verified</span></span>
-            {!approvedOrganization(c,discoveryRepository.list())?<small>This approval covers this listing. Contact CalgaryWatch to confirm management of the whole organization.</small>:null}
-            <span className="pd-biz-acts">
-              {c.entityPath ? <Link to={c.entityPath} className="pd-biz-btn">View listing <ArrowUpRight size={15} aria-hidden="true" /></Link> : null}
-              <Link to={listingManagementPath(c.entityId, previewUid)} className="pd-biz-btn" data-k="ghost">Manage listing</Link>{!inventory.some(e=>e.id===c.entityId)&&!c.entityId.startsWith('biz-')?<Link to={`/organization/org-${encodeURIComponent(c.entityId)}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`} className="pd-biz-btn">Open saved organizer workspace</Link>:null}
-            </span>
-          </li>
+    <section className="pd-biz" data-business={isBusiness} aria-labelledby="pd-biz">
+      <div className="pd-biz-head">
+        <p className="pd-kicker">{isBusiness ? <><BadgeCheck size={14} aria-hidden="true" /> Business account{business?.since ? ` · since ${formatSince(business.since, { month: 'short', year: 'numeric' })}` : ''}</> : <><Store size={14} aria-hidden="true" /> For organizers</>}</p>
+        <h2 id="pd-biz">{isBusiness ? 'Organizer desk' : 'Your claim'}</h2>
+        <p className="pd-biz-lede">{isBusiness ? 'Draft changes any time; profile, market and event updates publish together once every seven days.' : 'Once we confirm it, you can update the listing and add events from here.'}</p>
+      </div>
+      <div className="pd-biz-cards">
+        {organizations.map((org) => {
+          const list = upcoming(org.id);
+          const next = list[0];
+          const publicPath = org.sourceListingId ? (approved.find((c) => c.entityId === org.sourceListingId)?.entityPath ?? '/events') : entityPath(org);
+          return (
+            <article key={org.id} className="pd-biz-org">
+              <span className="pd-biz-ok"><BadgeCheck size={14} aria-hidden="true" /> Verified {org.managementOnly ? 'organizer' : 'organization'}</span>
+              <h3>{org.title}</h3>
+              {org.managementOnly ? <p className="pd-biz-sub">Manage your listing and add events when needed.</p> : (
+                <dl className="pd-biz-stats">
+                  <div><dt>Upcoming</dt><dd>{list.length}</dd></div>
+                  <div><dt>Next event</dt><dd>{next ? <Link to={entityPath(next)}><strong>{next.title}</strong><small>{when(next.start)}</small></Link> : <small>Nothing scheduled. Add one.</small>}</dd></div>
+                </dl>
+              )}
+              <div className="pd-biz-acts">
+                <Link className="pd-biz-btn" to={`/organization/${org.id}${as}`}>Manage {org.managementOnly ? 'listing' : 'organization & events'} <ArrowUpRight size={15} aria-hidden="true" /></Link>
+                <Link className="pd-biz-btn" data-k="ghost" to={publicPath}>{org.managementOnly ? 'Public listing' : 'Public profile'}</Link>
+              </div>
+            </article>
+          );
+        })}
+        {approved.filter((c) => !approvedOrganization(c, inventory)).map((c) => (
+          <article key={c.entityId} className="pd-biz-org">
+            <span className="pd-biz-ok"><BadgeCheck size={14} aria-hidden="true" /> Verified listing</span>
+            <h3>{c.entityTitle}</h3>
+            <p className="pd-biz-sub">This approval covers this listing. Contact CalgaryWatch to manage the whole organization.</p>
+            <div className="pd-biz-acts">
+              <Link to={listingManagementPath(c.entityId, previewUid)} className="pd-biz-btn">Manage listing <ArrowUpRight size={15} aria-hidden="true" /></Link>
+              {c.entityPath ? <Link to={c.entityPath} className="pd-biz-btn" data-k="ghost">View listing</Link> : null}
+              {!inventory.some((e) => e.id === c.entityId) && !c.entityId.startsWith('biz-') ? <Link to={`/organization/org-${encodeURIComponent(c.entityId)}${as}`} className="pd-biz-btn" data-k="ghost">Saved organizer workspace</Link> : null}
+            </div>
+          </article>
         ))}
-      </ul></details>:null}
-      <ul className="pd-biz-list">
-        {others.map((c) => (
-          <li key={c.entityId} className="pd-biz-item" data-status={c.status}>
-            <Link to={listingManagementPath(c.entityId, previewUid)} className="pd-biz-row">
-              <span className="pd-dot" data-cat={c.status === 'rejected' ? 'crime' : 'wait'} aria-hidden="true" />
-              <span><strong>{c.entityTitle}</strong><small>{state(c.status).label} · {state(c.status).note}</small></span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+        {others.length ? (
+          <ul className="pd-biz-claims" aria-label="Claims">
+            {others.map((c) => (
+              <li key={c.entityId} data-status={c.status}>
+                <Link to={listingManagementPath(c.entityId, previewUid)}>
+                  <span className="pd-dot" data-cat={c.status === 'rejected' ? 'crime' : 'wait'} aria-hidden="true" />
+                  <span><strong>{c.entityTitle}</strong><small>{state(c.status).label} · {state(c.status).note}</small></span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+      {organizations.length ? (
+        <details className="pd-biz-access">
+          <summary>Approved listing access · {approved.length}</summary>
+          <ul>
+            {approved.map((c) => (
+              <li key={c.entityId}>
+                <strong>{c.entityTitle}</strong>
+                <Link to={listingManagementPath(c.entityId, previewUid)}>Manage listing</Link>
+                {c.entityPath ? <Link to={c.entityPath}>View</Link> : null}
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+      {organizations.length ? <p className="pd-biz-note">Images are managed by CalgaryWatch. Your own plans and emails stay separate from the organization.</p> : null}
     </section>
   );
 }

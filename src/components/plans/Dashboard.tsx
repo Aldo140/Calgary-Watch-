@@ -12,7 +12,8 @@ import type { User } from 'firebase/auth';
 import { BadgeMark } from './BadgeMark';
 import { GoingButton } from './GoingButton';
 import { EASE_OUT } from './Motion';
-import { GlanceTiles, briefing, type GlanceProps } from './Glance';
+import { briefing } from './Glance';
+import { DayBoard } from './DayBoard';
 import { CalgarySky, type SkyVariant } from '../home/CalgarySky';
 import { TEAR } from '../home/HomeHero';
 import { Scribble } from '../home/HomeYours';
@@ -26,7 +27,7 @@ import { calgaryDate } from '../../lib/discovery';
 import { addCalgaryDays } from '../../lib/discoveryCalendar';
 import { BADGES, type BadgeId, type BadgeState } from '../../lib/badges';
 import { EVENT_INTERESTS, isOnNow, nextUp, pickDistance, pickWhen, pickWhenAt, type EventInterestId, type PickItem, type PlanEntry, type PlanTimeline } from '../../lib/eventPicks';
-import { partOfDay, setupPercent, type EmailPlan, type NearReport, type SetupStep, type SetupStepId } from '../../lib/memberHome';
+import { partOfDay, setupPercent, spotlightFor, type EmailPlan, type NearReport, type SetupStep, type SetupStepId } from '../../lib/memberHome';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/home-v3.css';
@@ -116,6 +117,8 @@ export interface DashboardProps {
   memberSince?: number;
   /** Shown under the title right after saving: "You're in" or "Saved". */
   notice?: { joined: BadgeId[] | null; text: string } | null;
+  /** A development demo: buttons show but don't save. */
+  preview?: boolean;
 }
 
 export function MemberDashboard(props: DashboardProps) {
@@ -130,6 +133,7 @@ export function MemberDashboard(props: DashboardProps) {
       <div className="cw-wrap pd-sill">
         {welcome ? <Welcome first={props.first} joined={welcome.joined ?? []} text={welcome.text} onDismiss={props.onDismissWelcome} phone={phone} /> : null}
         <TodayCard {...props} />
+        <BusinessCard claims={props.claims} business={props.business} previewUid={props.previewUid} />
       </div>
       {phone ? null : <DeskTabs {...props} />}
       {phone ? <PhoneBody {...props} /> : <DeskBody {...props} />}
@@ -171,11 +175,11 @@ function sectionsFor(p: DashboardProps, phone: boolean): Array<{ id: string; lab
   const hasPlans = p.timeline.ahead.length + p.timeline.past.length > 0;
   return [
     { id: 'pd-today', label: 'Today', Icon: Sun },
+    ...(p.claims.length || p.business ? [{ id: 'pd-biz', label: phone ? 'Desk' : 'Organizer desk', Icon: Store }] : []),
     ...(hasPlans ? [{ id: 'pd-next', label: 'Plans', Icon: Ticket }] : []),
     { id: 'pd-picks', label: 'Picks', Icon: ListMusic },
     ...(!phone && p.near.length ? [{ id: 'pd-near', label: 'Near home', Icon: Radio, side: true }] : []),
     { id: 'pd-badges', label: 'Badges', Icon: Award, side: !phone },
-    ...(!phone && p.claims.length ? [{ id: 'pd-biz', label: 'Your business', Icon: Store, side: true }] : []),
   ];
 }
 
@@ -271,7 +275,6 @@ function DeskBody(p: DashboardProps) {
         <Tracklist {...p} />
       </div>
       <aside className="pd-side" aria-label="More for you">
-        <BusinessCard claims={p.claims} business={p.business} previewUid={p.previewUid} />
         <NearCard near={p.near} area={p.area} now={p.now} />
         <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} />
         <Fine />
@@ -283,7 +286,6 @@ function DeskBody(p: DashboardProps) {
 function PhoneBody(p: DashboardProps) {
   return (
     <div className="cw-wrap pd-body">
-      <BusinessCard claims={p.claims} business={p.business} previewUid={p.previewUid} />
       <Plans {...p} phone />
       <NearCard near={p.near} area={p.area} now={p.now} />
       <Tracklist {...p} phone />
@@ -438,25 +440,16 @@ function TodayCard(p: DashboardProps) {
     : p.plan.kind === 'thursday' ? { label: 'Add safety near home', id: 'monday' as const }
     : p.plan.kind === 'none' ? { label: 'Turn on Mondays', id: 'monday' as const }
     : null;
-  const emailAction: GlanceProps['emailAction'] = up
+  const emailAction = up
     ? <button type="button" className="gl-btn" disabled={adding} onClick={() => p.onAct(up.id)}>{adding ? 'Adding…' : up.label} <Bell size={15} aria-hidden="true" /></button>
-    : <button type="button" className="gl-btn" onClick={() => p.onEdit()}>Change <Pencil size={14} aria-hidden="true" /></button>;
-  const reduce = useReducedMotion();
+    : <button type="button" className="gl-btn" onClick={() => p.onEdit('emails')}>Change <Pencil size={14} aria-hidden="true" /></button>;
   return (
-    <motion.section
-      id="pd-today" className="pd-today" aria-labelledby="pd-today-title"
-      initial={reduce ? false : { opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 150, damping: 20, delay: 0.2 }}
-    >
-      <div className="pd-today-head">
-        <h2 id="pd-today-title" className="pd-kicker">Your CalgaryWatch · {fmt(p.now, { weekday: 'short', month: 'short', day: 'numeric' })}</h2>
-        {p.area ? <span className="pd-tag"><MapPin size={12} aria-hidden="true" /> {p.area}</span> : null}
-      </div>
-      <GlanceTiles
-        area={p.area} near={p.near} nearReady={p.nearReady} next={nextUp(p.going, p.now)} plan={p.plan} now={p.now}
-        nearHref={p.near.length ? '#pd-near' : '/map'} picksHref="#pd-picks" emailAction={emailAction}
-      />
-      <NextStep steps={p.steps} busy={p.busy} onAct={p.onAct} />
-    </motion.section>
+    <DayBoard
+      spotlight={spotlightFor(p.timeline, p.picks, p.now)} area={p.area} near={p.near} nearReady={p.nearReady} plan={p.plan} now={p.now}
+      picks={p.picks.length} emailAction={emailAction} onEdit={p.onEdit} preview={p.preview || p.adminView != null}
+      art={(item) => <Art item={item} src={p.imageFor(item.entityId)} />}
+      footer={<NextStep steps={p.steps} busy={p.busy} onAct={p.onAct} />}
+    />
   );
 }
 
@@ -567,47 +560,17 @@ function DateBlock({ e }: { e: PlanEntry }) {
   );
 }
 
-function Countdown({ e }: { e: PlanEntry }) {
-  const big = e.status === 'upcoming' && e.days >= 2 && e.days < 100;
-  return (
-    <span className="pd-count-down" data-status={e.status}>
-      {e.status === 'live' ? <><span className="h-pulse" aria-hidden="true" /><strong>On now</strong><small>{closing(e.item.end)}</small></>
-        : big ? <><strong>{e.days}</strong><small>days to go</small></>
-        : <><strong className="pd-count-word">{e.when}</strong><small>{timeOf(e.item.start)}</small></>}
-    </span>
-  );
-}
-
-/** Desktop: the next plan as a big ticket, the rest as a row of stubs, then a cut line and the ones you've been to. */
+/** Desktop: plans ahead as a row of stubs, then a cut line and the ones you've been to. */
 function PlanBoard({ ahead, past, now, more, imageFor }: { ahead: PlanEntry[]; past: PlanEntry[]; now: number; more: ReactNode; imageFor: (id: string) => string | undefined }) {
-  const [next, ...rest] = ahead;
+  // The day board up top gives the next plan the big ticket (or, with nothing ahead, a pick to
+  // make one from); here every plan ahead is a stub, the next one marked in yellow.
   return (
     <div className="pd-board">
-      {next ? (
-        <Link to={next.item.path} className="pd-hero-ticket" data-status={next.status}>
-          <span className="pd-hero-art"><Art item={next.item} src={imageFor(next.item.entityId)} /></span>
-          <span className="pd-hero-body">
-            <span className="pd-hero-tag">{next.status === 'live' ? 'Happening now' : 'Next up'}</span>
-            <strong>{next.item.title}</strong>
-            <small>{next.status === 'live'
-              ? `Open now, until ${fmt(next.item.end, { weekday: 'long', month: 'long', day: 'numeric' })}`
-              : `${fmt(next.item.start, { weekday: 'long', month: 'long', day: 'numeric' })}${timeOf(next.item.start) ? ` · ${timeOf(next.item.start)}` : ''}`}</small>
-            {placeOf(next.item) ? <small><MapPin size={13} aria-hidden="true" /> {placeOf(next.item)}</small> : null}
-          </span>
-          <span className="pd-hero-stub"><Countdown e={next} /></span>
-        </Link>
-      ) : (
-        <a href="#pd-picks" className="pd-hero-empty">
-          <strong>Nothing coming up yet.</strong>
-          <span>Tap <b>I’m going</b> on any pick below and it lands here with a countdown.</span>
-          <ArrowDown size={18} aria-hidden="true" />
-        </a>
-      )}
-      {rest.length ? (
-        <ol className="pd-stubs" aria-label="Also coming up">
-          {rest.map((e) => (
+      {ahead.length ? (
+        <ol className="pd-stubs" aria-label="Coming up">
+          {ahead.map((e, i) => (
             <li key={e.item.key}>
-              <Link to={e.item.path} className="pd-stub" data-status={e.status}>
+              <Link to={e.item.path} className="pd-stub" data-status={e.status} data-lead={i === 0 ? 'true' : undefined}>
                 <span className="pd-stub-when">{e.status === 'live' ? closing(e.item.end) : e.when}</span>
                 <span className="pd-stub-date" data-status={e.status}><DateBlock e={e} /></span>
                 <strong>{e.item.title}</strong>
@@ -791,7 +754,7 @@ function Tracklist(p: DashboardProps & { phone?: boolean }) {
               <span className="pd-track-where">{[item.venue || item.neighbourhood, pickDistance(item.distanceM)].filter(Boolean).join(' · ')}</span>
               <time className="pd-track-when" dateTime={item.start}>{pickWhenAt(item, p.now)}</time>
               <span className="pd-track-go">
-                {item.kind === 'event' ? (p.adminView != null ? (p.adminEditEnabled&&p.previewUid?<AdminGoingButton uid={p.previewUid} eventId={item.entityId} start={item.start} on={p.going.some(e=>e.entityId===item.entityId)}/>:<button type="button" className="cw-going-btn" disabled data-on={p.going.some(e => e.entityId === item.entityId)} aria-label="Member RSVP — read-only">{p.going.some(e => e.entityId === item.entityId) ? 'Going' : 'Not going'}</button>) : <GoingButton eventId={item.entityId} start={item.start} compact />) : <Link to={item.path} className="pd-round" aria-label={`Open ${item.title}`}><ArrowUpRight size={18} /></Link>}
+                {item.kind === 'event' ? (p.adminView != null ? (p.adminEditEnabled&&p.previewUid?<AdminGoingButton uid={p.previewUid} eventId={item.entityId} start={item.start} on={p.going.some(e=>e.entityId===item.entityId)}/>:<button type="button" className="cw-going-btn" disabled data-on={p.going.some(e => e.entityId === item.entityId)} aria-label="Member RSVP — read-only">{p.going.some(e => e.entityId === item.entityId) ? 'Going' : 'Not going'}</button>) : p.preview ? <span className="cw-going" data-compact="true"><button type="button" className="cw-going-btn" data-on={p.timeline.ahead.some((e) => e.item.entityId === item.entityId)}><Ticket size={18} aria-hidden="true" /> I’m going</button></span> : <GoingButton eventId={item.entityId} start={item.start} compact />) : <Link to={item.path} className="pd-round" aria-label={`Open ${item.title}`}><ArrowUpRight size={18} /></Link>}
               </span>
             </li>
           ))}

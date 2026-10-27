@@ -40,6 +40,8 @@ export interface StreetGuess {
   houseNumber?: string;
   /** Calgary names streets after their community; "Copper…" streets are in Copperfield. A guess until the registry confirms. */
   likely?: CommunityMatch;
+  /** A lone word with nothing else to go on ("madigan"): only shown when the register finds it. */
+  bare?: boolean;
 }
 
 /** A named place that isn't a community: "westside" is the Westside Recreation Centre. */
@@ -164,6 +166,12 @@ function matchPhrase(phrase: string): CommunityMatch | null {
     if (e.key[0] !== phrase[0] || (prefix && prefix.community !== e.community)) continue;
     const d = editDistance(phrase, e.key, max);
     if (d <= max && (!best || d < best.d)) best = { e, d };
+  }
+  // "altafor" is two edits from Altadore. Allow that on a 7–8 letter word only
+  // when the first four letters of an official name agree and no other community is as close.
+  if (!best && phrase.length >= 7 && !prefix) {
+    const near = INDEX.filter(e => !e.alias && e.key.startsWith(phrase.slice(0, 4)) && editDistance(phrase, e.key, 2) <= 2);
+    if (near.length && near.every(e => e.community === near[0].community)) best = { e: near[0], d: 2 };
   }
   return best ? { community: best.e.community, slug: toSlug(best.e.community.name), via: 'typo' } : null;
 }
@@ -298,6 +306,19 @@ export function parseSearchIntent(q: string, now = Date.now()): SearchIntent {
   return { communities: communities.slice(0, 3), ...(quadrant ? { quadrant } : {}), time, topics, street, question, ...(landmark ? { landmark } : {}), ...(best ? { best } : {}) };
 }
 
+/**
+ * "madigan" on its own: no community, no suffix, no listing. Many Calgary
+ * streets (Madigan Drive NE) don't share their community's name, so a single
+ * word of five letters or more is worth one exact register lookup. Callers
+ * use it only when nothing else answered, and show it only when it's found.
+ */
+export function bareStreetGuess(intent: SearchIntent, q: string): StreetGuess | null {
+  if (intent.communities.length || intent.street || intent.landmark || intent.best || intent.time || intent.topics.length) return null;
+  const left = normalizeWords(q).filter(w => !FILLER.has(w) && !QUADRANTS.has(w));
+  if (left.length !== 1 || !/^[a-z]{5,}$/.test(left[0])) return null;
+  return { typed: title(left[0]), name: left[0].toUpperCase(), bare: true };
+}
+
 /** A citywide "what's been reported" answer: a topic or a time, but no place. */
 export function showsCitywide(intent: SearchIntent): boolean {
   return !intent.communities.length && (intent.topics.length > 0 || !!intent.time);
@@ -406,7 +427,8 @@ export function streetLookupUrls(street: StreetGuess): string[] {
   const stem = name.split(' ')[0].slice(0, Math.max(5, name.split(' ')[0].length - 3));
   const fuzzy = `address like '% ${stem}%${street.suffix ? ` ${street.suffix} ` : ''}%'`;
   const url = (where: string) => `${ASSESSMENTS}?$select=address,comm_name&$group=address,comm_name&$limit=200&$where=${encodeURIComponent(where)}`;
-  return stem.length >= 5 && stem !== name ? [url(exact), url(fuzzy)] : [url(exact)];
+  // A bare word gets no typo pass: "% DOWNST%" would find a street nobody meant.
+  return !street.bare && stem.length >= 5 && stem !== name ? [url(exact), url(fuzzy)] : [url(exact)];
 }
 
 export interface StreetAnswer { street: string; community: string; quadrant?: string; addresses: number }
@@ -442,13 +464,12 @@ export function summarizeStreetRows(rows: Array<{ address?: string; comm_name?: 
     by.set(name, row);
   }
   const target = compact(street.name);
-  const ranked = [...by.entries()].sort(([a, x], [b, y]) => {
-    const da = editDistance(compact(a.split(' ').slice(0, -2).join(' ') || a), target, 4);
-    const db = editDistance(compact(b.split(' ').slice(0, -2).join(' ') || b), target, 4);
-    return da - db || y.n - x.n;
-  });
+  const distance = (a: string) => editDistance(compact(a.split(' ').slice(0, -2).join(' ') || a), target, 4);
+  const ranked = [...by.entries()].sort(([a, x], [b, y]) => distance(a) - distance(b) || y.n - x.n);
   if (!ranked.length) return null;
   const [name, row] = ranked[0];
+  // A bare word must be the whole street name: "madigan" is Madigan Dr, not Madigan Bay Estates Rd.
+  if (street.bare && distance(name) !== 0) return null;
   const community = [...row.comm.entries()].sort((a, b) => b[1] - a[1])[0][0];
   const quadrant = name.split(' ').pop();
   return { street: titleRegistry(name), community: titleRegistry(community), ...(quadrant && QUADRANTS.has(quadrant.toLowerCase()) ? { quadrant } : {}), addresses: row.n };

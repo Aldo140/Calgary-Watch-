@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { calgaryMidnight, categoriesFor, communityByStreetPrefix, editDistance, parseSearchIntent, reportsForIntent, streetLookupUrls, summarizeStreetRows, timeWindow } from '../src/lib/searchIntent';
+import { bareStreetGuess, calgaryMidnight, categoriesFor, communityByStreetPrefix, editDistance, parseSearchIntent, reportsForIntent, streetLookupUrls, summarizeStreetRows, timeWindow } from '../src/lib/searchIntent';
 import type { Incident } from '../src/types';
 
 // Sat Oct 10 2026, 11:47 p.m. in Calgary (MDT, UTC-6).
@@ -132,4 +132,27 @@ test('"best …" reads the thing asked for and leaves the place', () => {
   assert.equal(parseSearchIntent('best pizza place', NOW).street, null, '"place" is not a street suffix here');
   assert.equal(best('police best'), undefined);
   assert.equal(best('best'), undefined);
+});
+
+test('Oct 27 admin misses: "altafor" is Altadore, a near-miss on another word is not', () => {
+  assert.deepEqual(names('altafor'), ['Altadore']);
+  assert.equal(parseSearchIntent('altafor', NOW).communities[0]?.via, 'typo');
+  assert.deepEqual(names('western'), [], 'two edits from the "West End" alias, but aliases need a closer match');
+});
+
+test('a lone word with no other answer is tried as a street, exact match only', () => {
+  const madigan = bareStreetGuess(parseSearchIntent('madigan', NOW), 'madigan');
+  assert.deepEqual(madigan, { typed: 'Madigan', name: 'MADIGAN', bare: true });
+  assert.equal(streetLookupUrls(madigan!).length, 1, 'no typo pass for a bare word');
+  assert.match(decodeURIComponent(streetLookupUrls(madigan!)[0]), /address like '% MADIGAN %'/);
+  const rows = [
+    { address: '5620 MADIGAN DR NE', comm_name: 'MARLBOROUGH PARK' },
+    { address: '6103 MADIGAN DR NE', comm_name: 'MARLBOROUGH PARK' },
+  ];
+  assert.deepEqual(summarizeStreetRows(rows, madigan!), { street: 'Madigan Drive NE', community: 'Marlborough Park', quadrant: 'NE', addresses: 2 });
+  assert.equal(summarizeStreetRows([{ address: '12 MADIGAN BAY ESTATES RD NE', comm_name: 'X' }], madigan!), null, 'part of a longer name is not the street');
+  // Anything search already answers, or too short to be a street name, isn't guessed.
+  for (const q of ['seton', 'zoo', 'yesterday police', 'best pho', 'jazz night', '1234']) {
+    assert.equal(bareStreetGuess(parseSearchIntent(q, NOW), q), null, q);
+  }
 });

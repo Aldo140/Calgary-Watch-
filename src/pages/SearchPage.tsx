@@ -8,7 +8,8 @@ import { discoveryRepository } from '../data/discovery';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
 import { DISCOVERY_SECTIONS, entityPath, normalizeSearch } from '../lib/discovery';
 import { bestPicks, nearbyListings, searchListings, serviceFor } from '../lib/listingSearch';
-import { answerCount, normalizeWords, parseSearchIntent } from '../lib/searchIntent';
+import { answerCount, bareStreetGuess, normalizeWords, parseSearchIntent } from '../lib/searchIntent';
+import { useStreetLookup } from '../hooks/useStreetLookup';
 import { recordSearch } from '../lib/searchDemand';
 import { BEST_CATEGORIES, type BestCategory } from '../content/bestOf';
 import { bestForQuery, bestPath, isRanked } from '../lib/bestOf';
@@ -45,25 +46,30 @@ export default function SearchPage() {
   const occurrences = useMemo(() => discoveryRepository.occurrences(), []);
   const now = useMemo(() => Date.now(), [q]);
   const results = useMemo(() => searchListings(all, occurrences, q, new Date(now)), [all, occurrences, q, now]);
-  const intent = useMemo(() => parseSearchIntent(q, now), [q, now]);
+  const parsed = useMemo(() => parseSearchIntent(q, now), [q, now]);
   const bestLists = useMemo(() => bestForQuery(q).map(c => ({ to: bestPath(c), label: bestLabel(c), note: bestNote(c) })), [q]);
   // A cited Best of Calgary list beats the "best …" card; the card covers everything else.
-  const best = useMemo(() => intent.best && !bestLists.length
-    ? { picks: bestPicks(all, occurrences, intent.best.thing, new Date(now)), service: serviceFor(intent.best.thing) }
-    : undefined, [intent.best, bestLists.length, all, occurrences, now]);
+  const best = useMemo(() => parsed.best && !bestLists.length
+    ? { picks: bestPicks(all, occurrences, parsed.best.thing, new Date(now)), service: serviceFor(parsed.best.thing) }
+    : undefined, [parsed.best, bestLists.length, all, occurrences, now]);
   // "Best pho" counts as answered only when we list one, so Search demand still shows what to add.
   const safety = useMemo(() => {
     const topics = safetyForQuery(q);
     if (!topics.length && !NEWS_WORDS.test(q)) return undefined;
     const slugs = new Set(topics.map(t => t.slug));
-    const where = intent.communities[0]?.community.name;
+    const where = parsed.communities[0]?.community.name;
     const onTopic = slugs.size ? NEWS.items.filter(h => h.topics.some(s => slugs.has(s))) : NEWS.items;
     const local = where ? onTopic.filter(h => h.community === where) : [];
     return {
       topics: topics.map(t => ({ to: safetyPath(t), label: `${t.label} in Calgary`, note: 'Recent headlines, what to do and who to call' })),
       headlines: (local.length ? local : onTopic).slice(0, 4),
     };
-  }, [q, intent]);
+  }, [q, parsed]);
+  // Nothing else answered "madigan": try it as a street, and show it only if the City's register has it.
+  const bare = useMemo(() => q && !results.total && !answerCount(parsed) && !bestLists.length && !safety?.topics.length ? bareStreetGuess(parsed, q) : null,
+    [q, results.total, parsed, bestLists.length, safety]);
+  const bareLookup = useStreetLookup(bare);
+  const intent = useMemo(() => bare && bareLookup.status === 'ready' ? { ...parsed, street: bare } : parsed, [parsed, bare, bareLookup.status]);
   const answers = q ? answerCount(intent) + (best?.picks.length ? 1 : 0) : 0;
   const resultCount = results.total + answers + bestLists.length + (safety?.topics.length ?? 0);
   const place = intent.communities[0]?.community;
@@ -75,10 +81,11 @@ export default function SearchPage() {
 
   // Record what people look for (anonymously), after they stop typing.
   useEffect(() => {
-    if (!q) return;
+    // Wait for the street register so "madigan" is counted once, with its real answer.
+    if (!q || bareLookup.status === 'loading') return;
     const t = window.setTimeout(() => recordSearch(q, resultCount), 1200);
     return () => clearTimeout(t);
-  }, [q, resultCount]);
+  }, [q, resultCount, bareLookup.status]);
 
   const suggest = useCallback((typed: string): Suggestion[] => {
     const text = normalizeWords(typed).join(' ');

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, Bell, Building2, FlaskConical, Lightbulb, MapPin, Phone, Signpost, Siren, Star } from 'lucide-react';
 import { INCIDENT_CATEGORIES } from '../../constants';
 import { useLatestReports, type LatestReports } from '../../hooks/useLatestReports';
+import { useStreetLookup } from '../../hooks/useStreetLookup';
 import { fetchCommunityBoundaries, type CommunityBoundary } from '../../lib/communityLookup';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { formatRelativeTime } from '../../lib/format';
@@ -10,8 +11,8 @@ import { entityPath } from '../../lib/discovery';
 import type { LocalService } from '../../data/localServices';
 import type { DiscoveryEntity } from '../../types/discovery';
 import {
-  communityByName, reportsForIntent, showsCitywide, streetLookupUrls, summarizeStreetRows, wantsReports,
-  type CommunityMatch, type Landmark, type SearchIntent, type StreetAnswer, type StreetGuess, type Topic,
+  communityByName, reportsForIntent, showsCitywide, wantsReports,
+  type CommunityMatch, type Landmark, type SearchIntent, type StreetGuess, type Topic,
 } from '../../lib/searchIntent';
 import type { Incident } from '../../types';
 import '../../styles/search.css';
@@ -163,31 +164,8 @@ function LandmarkCard({ landmark, reports, boundaries, now }: { landmark: Landma
 
 /* ── Street ────────────────────────────────────────────────────── */
 
-type StreetState = { status: 'loading' | 'ready' | 'none'; answer?: StreetAnswer };
-
-function useStreet(street: StreetGuess): StreetState {
-  const [state, setState] = useState<StreetState>({ status: 'loading' });
-  const key = JSON.stringify(street);
-  useEffect(() => {
-    const ctrl = new AbortController();
-    setState({ status: 'loading' });
-    (async () => {
-      for (const url of streetLookupUrls(street)) {
-        const res = await fetch(url, { signal: ctrl.signal });
-        const rows = res.ok ? await res.json() : [];
-        const answer = Array.isArray(rows) ? summarizeStreetRows(rows, street) : null;
-        if (answer) { setState({ status: 'ready', answer }); return; }
-      }
-      setState({ status: 'none' });
-    })().catch(() => { if (!ctrl.signal.aborted) setState({ status: 'none' }); });
-    return () => ctrl.abort();
-    // `key` stands in for the street object, which is rebuilt every render.
-  }, [key]);
-  return state;
-}
-
 function StreetCard({ street, reports, now }: { street: StreetGuess; reports: LatestReports; now: number }) {
-  const { status, answer } = useStreet(street);
+  const { status, answer } = useStreetLookup(street);
   const found = answer ? communityByName(answer.community) : undefined;
   const hood = found ?? street.likely;
   const name = found?.community.name ?? answer?.community ?? street.likely?.community.name;

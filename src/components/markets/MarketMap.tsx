@@ -18,12 +18,22 @@ const BOW_Y = project([51.05, -114])[1];
  * A hand-drawn Calgary: the Bow and the Elbow, the four quadrants, and a pin
  * for each market. Pins are numbered to match the list beside it.
  */
-export function MarketMap({ markets, openIds, focusId }: { markets: Market[]; openIds?: Set<string>; focusId?: string }) {
-  const pins = markets.map((m, i) => ({ m, n: i + 1, at: marketCoords(m) })).filter((p): p is { m: Market; n: number; at: [number, number] } => !!p.at);
+export function MarketMap({ markets, openIds, focusId, onPick }: { markets: Market[]; openIds?: Set<string>; focusId?: string; onPick?: (id: string) => void }) {
+  const placed: { x: number; y: number }[] = [];
+  const pins = markets.map((m, i) => ({ m, n: i + 1, at: marketCoords(m) })).filter((p): p is { m: Market; n: number; at: [number, number] } => !!p.at).map(p => {
+    // Markets at one address (three at Crossroads) fan out side by side instead of hiding under each other.
+    const [x0, y0] = project(p.at);
+    const k = placed.filter(q => Math.hypot(q.x - x0, q.y - y0) < 18).length;
+    placed.push({ x: x0, y: y0 });
+    const x = x0 + (k ? (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 22 : 0);
+    return { ...p, x, y: y0 + (k ? 4 : 0) };
+  });
+  // The focused pin draws last so it sits on top.
+  const order = focusId ? [...pins.filter(p => p.m.id !== focusId), ...pins.filter(p => p.m.id === focusId)] : pins;
   const [dx, dy] = project([51.0478, -114.0625]);
   return (
     <figure className="mk-map">
-      <svg viewBox={`0 0 ${VW} ${VH}`} role="img" aria-label={`Map of ${pins.length} Calgary markets by quadrant`}>
+      <svg viewBox={`0 0 ${VW} ${VH}`} role={onPick ? 'group' : 'img'} aria-label={`Map of ${pins.length} Calgary markets by quadrant`}>
         <defs>
           <pattern id="mk-dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.1" className="mk-map-dot" /></pattern>
         </defs>
@@ -43,17 +53,30 @@ export function MarketMap({ markets, openIds, focusId }: { markets: Market[]; op
           <rect x="-3" y="-15" width="6" height="15" /><rect x="-9" y="-9" width="5" height="9" /><rect x="4" y="-11" width="5" height="11" />
           
         </g>
-        {pins.map(({ m, n, at }) => {
-          const [x, y] = project(at);
+        {order.map(({ m, n, x, y }) => {
           const open = openIds?.has(m.id);
-          return (
-            <Link key={m.id} to={entityPath(m)} className={`mk-pin${open ? ' is-open' : ''}${focusId === m.id ? ' is-focus' : ''}`} aria-label={`${n}. ${m.title}`} data-pin={m.id}>
-              <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}>
+          const cls = `mk-pin${open ? ' is-open' : ''}${focusId === m.id ? ' is-focus' : ''}`;
+          const pin = (
+            <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}>
+              <g className="mk-pin-in" style={{ ['--i' as string]: n }}>
                 <path className="mk-pin-shadow" d="M3 3 C-8 -8 -12 -14 -12 -21 a14 14 0 1 1 28 0 c0 7 -4 13 -13 24 Z" />
                 <path className="mk-pin-body" d="M0 0 C-11 -11 -14 -17 -14 -24 a14 14 0 1 1 28 0 c0 7 -3 13 -14 24 Z" />
-                <text className="mk-pin-n" y="-19.5">{focusId ? '' : n}</text>
-                {focusId === m.id ? <circle className="mk-pin-core" cy="-24" r="5" /> : null}
+                <text className="mk-pin-n" y="-19.5">{focusId && !onPick ? '' : n}</text>
+                {focusId === m.id && !onPick ? <circle className="mk-pin-core" cy="-24" r="5" /> : null}
               </g>
+            </g>
+          );
+          if (onPick) {
+            return (
+              <g key={m.id} className={cls} role="button" tabIndex={0} aria-label={`${n}. ${m.title}`} data-pin={m.id}
+                onClick={() => onPick(m.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(m.id); } }}>
+                {pin}
+              </g>
+            );
+          }
+          return (
+            <Link key={m.id} to={entityPath(m)} className={cls} aria-label={`${n}. ${m.title}`} data-pin={m.id}>
+              {pin}
               <title>{shortName(m)}</title>
             </Link>
           );

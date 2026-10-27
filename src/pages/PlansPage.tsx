@@ -16,7 +16,7 @@ import { MemberDashboard, type Claim } from '../components/plans/Dashboard';
 import { SettingsSheet, type SettingsFocus } from '../components/plans/SettingsSheet';
 import { celebrateBadge } from '../components/plans/BadgeToast';
 import { discoveryRepository } from '../data/discovery';
-import { entityPath } from '../lib/discovery';
+import { calgaryDate, entityPath } from '../lib/discovery';
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { computeBadges, orderBadges, type BadgeId } from '../lib/badges';
 import { emailPlan, nearHome, setupSteps, type SetupStepId } from '../lib/memberHome';
@@ -79,28 +79,40 @@ function requestedEmails(params: URLSearchParams): Pick<PlansDraft, 'weeklyDiges
   return { weeklyDigestOptIn: want !== 'thursday', eventsDigestOptIn: want !== 'monday' };
 }
 
-/** Development only: `/plans?demo=member|joined|business|monday|new` renders a signed-in reader without Firebase. */
+/**
+ * Development only: `/plans?demo=<mode>` renders a signed-in reader without Firebase.
+ * member (plans either side of today), tonight (a plan later today), past (only plans that already happened),
+ * fresh (set up, no home, no emails, no plans), joined (first look), business (an organizer), monday, new (sign-up).
+ */
 function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; goingIds: Set<string>; claims: Claim[]; joined: boolean } | null {
   const mode = import.meta.env.DEV ? params.get('demo') : null;
   return useMemo(() => {
     if (!mode) return null;
     const user = { uid: 'demo', displayName: 'Vicky Penny', email: 'vicky@example.com', photoURL: '' } as unknown as User;
     const set = mode !== 'new';
+    const fresh = mode === 'fresh';
     const profile: PlansProfile = {
-      displayName: 'Vicky Penny', createdAt: Date.parse('2026-05-01'),
-      neighborhood: set ? 'Beltline' : '', piiConsentAt: set ? 1 : undefined,
-      weeklyDigestOptIn: set, eventsDigestOptIn: mode !== 'monday',
+      displayName: 'Vicky Penny', createdAt: fresh ? Date.now() : Date.parse('2026-05-01'),
+      neighborhood: set && !fresh ? 'Beltline' : '', piiConsentAt: set && !fresh ? 1 : undefined,
+      weeklyDigestOptIn: set && !fresh, eventsDigestOptIn: mode !== 'monday' && !fresh,
       eventInterests: set ? ['music', 'food'] : [],
+      ...(fresh ? { onboardingCompletedAt: Date.now() } : {}),
     };
     const now = Date.now();
     const events = discoveryRepository.list().filter((e): e is Extract<typeof e, { kind: 'event' }> => e.kind === 'event');
-    const n = mode === 'member' || mode === 'business' ? 1 : 0;
-    const soon = events.filter((e) => Date.parse(e.start) > now).slice(0, 3 * n);
+    const n = mode === 'member' || mode === 'business' || mode === 'tonight' ? 1 : 0;
+    const today = calgaryDate(new Date(now));
+    const tonight = mode === 'tonight' ? events.filter((e) => Date.parse(e.start) > now && calgaryDate(new Date(e.start)) === today).slice(0, 1) : [];
+    const soon = [...tonight, ...events.filter((e) => Date.parse(e.start) > now && !tonight.includes(e)).slice(0, 3 * n)];
     // A run that's on now and a few that already happened, so both halves of "Your plans" show.
     const live = events.filter((e) => Date.parse(e.start) < now && Date.parse(e.end) > now).slice(0, n);
-    const past = events.filter((e) => Date.parse(e.end) < now).sort((a, b) => Date.parse(b.end) - Date.parse(a.end)).slice(0, 3 * n);
+    const past = events.filter((e) => Date.parse(e.end) < now).sort((a, b) => Date.parse(b.end) - Date.parse(a.end)).slice(0, mode === 'past' ? 4 : 3 * n);
     // A business account: one listing confirmed, one still being checked.
-    const venues = [...discoveryRepository.list().filter((e) => e.kind === 'market').slice(0, 1), ...discoveryRepository.list().filter((e) => e.kind === 'business').slice(0, 1)];
+    const all = discoveryRepository.list();
+    const hosts = new Map<string, number>();
+    for (const e of events) if (e.organizerEntityId && Date.parse(e.end) > now) hosts.set(e.organizerEntityId, (hosts.get(e.organizerEntityId) ?? 0) + 1);
+    const host = all.filter((e) => e.kind === 'business' && hosts.has(e.id)).sort((a, b) => (hosts.get(b.id) ?? 0) - (hosts.get(a.id) ?? 0))[0];
+    const venues = [...(host ? [host] : all.filter((e) => e.kind === 'business').slice(0, 1)), ...all.filter((e) => e.kind === 'market').slice(0, 1)];
     const claims = mode === 'business' ? venues.map((e, i) => ({ entityId: e.id, entityTitle: e.title, entityPath: entityPath(e), status: i ? 'pending' : 'approved' })) : [];
     return { user, profile, goingIds: new Set([...soon, ...live, ...past].map((e) => e.id)), claims, joined: mode === 'joined' };
   }, [mode]);
@@ -375,7 +387,7 @@ export default function PlansPage() {
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
           adminEditEnabled={adminMode.enabled} onAdminEditChange={adminMode.setEnabled} adminView={asUid ? profile?.displayName ?? '' : null} previewUid={asUid ?? undefined}
           notice={joined ? { joined, text: savedSummary(profile) } : savedAt ? { joined: null, text: savedSummary(profile) } : null}
-          onDismissWelcome={() => setJoined(null)}
+          onDismissWelcome={() => setJoined(null)} preview={Boolean(demo)}
         />
         <SettingsSheet
           open={editing} focus={sheetFocus} user={user} memberSince={profile?.createdAt}

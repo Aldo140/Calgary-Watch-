@@ -14,7 +14,7 @@
 
 import type { BadgeId } from './badges';
 import type { ExampleReport } from './homeClaims';
-import type { Point } from './eventPicks';
+import { nextUp, type PickItem, type PlanEntry, type PlanTimeline, type Point } from './eventPicks';
 import { calgaryDateTimeFormat } from './calgaryTz';
 
 export type SetupStepId = 'home' | 'monday' | 'events' | 'interests' | 'plan' | 'share';
@@ -145,4 +145,42 @@ export function nearHome(recent: readonly ExampleReport[], home: Point | null, a
 export function partOfDay(now: number): string {
   const { hour } = calgaryClock(now);
   return hour < 5 ? 'Evening' : hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening';
+}
+
+/**
+ * The one thing the top of the dashboard leads with, by what this member has
+ * going on: a plan happening right now, one later today, the next one ahead,
+ * a long run they can drop into, or (with nothing on the calendar) the best
+ * pick to make their next plan from. Never the same answer as an empty tile.
+ */
+export type Spotlight =
+  | { kind: 'now' | 'today' | 'soon' | 'run'; entry: PlanEntry; more: number }
+  | { kind: 'starter'; pick: PickItem; been: number }
+  | { kind: 'quiet'; been: number };
+
+const SHORT_MS = 1.5 * 86_400_000;
+
+export function spotlightFor(timeline: PlanTimeline, picks: readonly PickItem[], now: number): Spotlight {
+  const lead = nextUp(timeline.ahead.map((e) => e.item), now);
+  const entry = lead && timeline.ahead.find((e) => e.item === lead);
+  const been = timeline.past.length;
+  if (entry) {
+    const more = timeline.ahead.length - 1;
+    const short = Date.parse(entry.item.end) - Date.parse(entry.item.start) <= SHORT_MS;
+    if (entry.status === 'live') return { kind: short ? 'now' : 'run', entry, more };
+    return { kind: entry.days <= 0 ? 'today' : 'soon', entry, more };
+  }
+  // An event first: that's what "I'm going" works on.
+  const open = picks.filter((p) => Date.parse(p.end) > now);
+  const pick = open.find((p) => p.kind === 'event') ?? open[0];
+  return pick ? { kind: 'starter', pick, been } : { kind: 'quiet', been };
+}
+
+/** "in 45 min", "in 3 h 20 min", "in 6 h": how long until a plan later today starts. */
+export function startsIn(start: number, now: number): string {
+  const mins = Math.max(0, Math.round((start - now) / 60_000));
+  if (mins < 1) return 'starting now';
+  if (mins < 60) return `in ${mins} min`;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return h >= 4 || !m ? `in ${h} h` : `in ${h} h ${m} min`;
 }

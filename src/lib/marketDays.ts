@@ -170,6 +170,11 @@ export function marketCoords(market: Market): [number, number] | null {
   return hood && NEIGHBOURHOOD_COORDS[hood] ? NEIGHBOURHOOD_COORDS[hood] : null;
 }
 
+/** True when the pin is only the neighbourhood's centre, not the market's own address. */
+export function coordsApprox(market: Market): boolean {
+  return !market.coordinates && !(market.sourceRecordId && MARKET_COORDS[market.sourceRecordId]);
+}
+
 /** NW / NE / SW / SE from Centre Street and the Bow, the way Calgarians split the city. */
 export function quadrantOf(market: Market): string | null {
   const m = market.address.match(/\b(NW|NE|SW|SE)\b/);

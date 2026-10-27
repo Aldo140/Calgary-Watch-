@@ -6,6 +6,9 @@ import { entityPath } from '../../lib/discovery';
 import { countdown, dayNum, directionsUrl, hours, isOpen, marketCoords, quadrantOf, shortClock, shortName, statusLine, weekdayShort } from '../../lib/marketDays';
 import { MarketCover } from '../discovery/ListingArt';
 import { MarketMap } from './MarketMap';
+import { SkyGlyph } from '../home/WeekPlanner';
+import type { SkyIcon } from '../../lib/weatherCodes';
+import { distanceLabel } from '../../lib/nearMe';
 
 /**
  * The phone-only pieces of /markets: a swipeable deck of what's on next, a
@@ -111,7 +114,11 @@ export function UpNextDeck({ picks, now }: { picks: NextPick[]; now: Date }) {
   );
 }
 
-export type Day = { key: string; date: Date; label: string; count: number };
+export type Day = {
+  key: string; date: Date; label: string; count: number;
+  /** The day's forecast, when the weather feed has it; rough = likely wet or properly cold. */
+  sky?: { icon: SkyIcon; label: string; max: number; rough: boolean };
+};
 
 /** Seven days as a sticky strip. Picking one narrows the list to the markets on that day. */
 export function DayScrubber({ days, day, total, onPick }: { days: Day[]; day: string; total: number; onPick: (key: string) => void }) {
@@ -132,10 +139,11 @@ export function DayScrubber({ days, day, total, onPick }: { days: Day[]; day: st
           <small>All</small><b>{total}</b><span>markets</span>
         </button>
         {days.map(d => (
-          <button key={d.key} type="button" aria-pressed={day === d.key} disabled={!d.count} onClick={() => onPick(day === d.key ? '' : d.key)}
-            aria-label={`${d.label}: ${d.count} ${d.count === 1 ? 'market' : 'markets'}`}>
+          <button key={d.key} type="button" className={d.sky?.rough ? 'is-rough' : undefined} aria-pressed={day === d.key} disabled={!d.count} onClick={() => onPick(day === d.key ? '' : d.key)}
+            aria-label={`${d.label}: ${d.count} ${d.count === 1 ? 'market' : 'markets'}${d.sky ? `, ${d.sky.label}, high ${d.sky.max}°` : ''}`}>
             <small>{d.label === 'Today' ? 'Today' : d.label === 'Tomorrow' ? 'Tmrw' : weekdayShort.format(d.date)}</small>
             <b>{dayNum.format(d.date)}</b>
+            {d.sky ? <span className="mk-scrub-sky" aria-hidden="true"><SkyGlyph icon={d.sky.icon} size={12} />{d.sky.max}°</span> : null}
             <span className="mk-scrub-meter" aria-hidden="true"><i style={{ width: `${(d.count / most) * 100}%` }} /></span>
           </button>
         ))}
@@ -145,7 +153,7 @@ export function DayScrubber({ days, day, total, onPick }: { days: Day[]; day: st
 }
 
 /** Full-screen map with a rail of cards: swipe the cards and the pin follows, tap a pin and its card comes up. */
-export function MapSheet({ markets, picks, now, onClose }: { markets: Market[]; picks: Map<string, MarketOccurrence | undefined>; now: Date; onClose: () => void }) {
+export function MapSheet({ markets, picks, now, onClose, kmTo }: { markets: Market[]; picks: Map<string, MarketOccurrence | undefined>; now: Date; onClose: () => void; kmTo?: (m: Market) => number | undefined }) {
   const rail = useRef<HTMLOListElement>(null);
   const close = useRef<HTMLButtonElement>(null);
   const at = useCentred(rail, markets.length);
@@ -183,7 +191,7 @@ export function MapSheet({ markets, picks, now, onClose }: { markets: Market[]; 
               <span className="mk-sheet-body">
                 <small>{open ? <><span className="cw-lb-pulse mk-pulse" aria-hidden="true" />Open until {shortClock(next!.end)}</> : next ? `${countdown(next, now)} · ${hours(next)}` : 'No dates yet'}</small>
                 <Link to={entityPath(m)}><strong>{m.title}</strong></Link>
-                <span>{[m.neighbourhood, quadrantOf(m)].filter(Boolean).join(' · ')}{marketCoords(m) ? '' : ' · not on the map'}</span>
+                <span>{[kmTo?.(m) !== undefined ? `${distanceLabel(kmTo(m)!)} away` : m.neighbourhood, quadrantOf(m)].filter(Boolean).join(' · ')}{marketCoords(m) ? '' : ' · not on the map'}</span>
               </span>
               <a className="mk-sheet-go" href={directionsUrl(m)} target="_blank" rel="noopener noreferrer" aria-label={`Directions to ${m.title}`}><Navigation size={17} /></a>
             </li>

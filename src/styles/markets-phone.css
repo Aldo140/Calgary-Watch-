@@ -124,7 +124,7 @@
   .mk-index .mk-side { display: none; }
   .mk-index .mk-list .mk-sec-head { align-items: center; flex-wrap: nowrap; }
   .mk-index .mk-list .mk-sec-head h2 { flex: 1 1 auto; min-width: 0; }
-  .mk-index .mk-list .mk-sec-head p { display: none; }
+  .mk-index .mk-list .mk-sec-head > p:not(.mk-near-note) { display: none; }
   .mk .mk-maplink {
     display: inline-flex; align-items: center; gap: 6px; flex: none; height: 38px; padding: 0 14px; border: 2px solid var(--ink); border-radius: 999px;
     background: var(--cyan); color: var(--ink); font: 800 13.5px/1 Inter, sans-serif; box-shadow: 2px 2px 0 var(--ink);
@@ -259,3 +259,15 @@
   .mk-sheet .mk-map { width: min(100%, calc((100dvh - 230px) * .75)); height: auto; aspect-ratio: 3 / 4; }
 }
 @media (max-width: 720px) { .mk-index .mk-hero-in { grid-template-columns: minmax(0, 1fr); } }
+
+/* Forecast and near-me (from the markets value pass) inside the phone layout. */
+@media (max-width: 720px) {
+  .mk .mk-scrub button { height: 84px; }
+  .mk-scrub-sky { display: inline-flex; align-items: center; gap: 2px; font: 700 10.5px/1 var(--mono); opacity: .85; }
+  .mk .mk-scrub button.is-rough:not([aria-pressed='true']) { background: rgba(21, 84, 209, .08); }
+  .mk-scrub button[aria-pressed='true'] .mk-scrub-sky { color: #fff; }
+  .mk-index .mk-list .mk-sec-head { flex-wrap: wrap; gap: 10px 8px; }
+  .mk-index .mk-list .mk-sec-head h2 { flex-basis: 100%; }
+  .mk-index .mk-list .mk-near { height: 38px; padding: 0 13px; font-size: 13.5px; }
+  .mk-index .mk-list .mk-maplink { margin-left: auto; }
+}

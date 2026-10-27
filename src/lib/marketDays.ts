@@ -136,12 +136,36 @@ const MARKET_COORDS: Record<string, [number, number]> = {
   'calgary-winter-market': [51.0537, -114.0705],
   'holiday-market-collective': [51.0376, -114.0531],
   'dalhousie-harvest-farmers-market': [51.1062, -114.1601],
+  'fresh-and-local-market': [50.944, -114.07],
+};
+
+/**
+ * Markets the feed lists by street address only, keyed by the address up to its first comma.
+ * Close enough for the hand-drawn quadrant map; markets outside city limits are left off it.
+ */
+const ADDRESS_COORDS: Record<string, [number, number]> = {
+  '101 barclay parade sw': [51.0537, -114.0705],
+  '3625 shaganappi trail nw': [51.0853, -114.1556],
+  '324 8 avenue sw': [51.0461, -114.0679],
+  '100 anderson road se': [50.9585, -114.0662],
+  '1833 crowchild trail nw': [51.0712, -114.121],
+  '224 shawmeadows road sw': [50.912, -114.086],
+  '1235 26 avenue se': [51.0302, -114.0282],
+  '400-333 shawville boulevard se': [50.9035, -114.064],
+  '4995 market street se': [50.884, -113.955],
+  '108 quarry park road se': [50.9686, -114.0005],
+  '11300 rocky ridge road nw': [51.1442, -114.238],
+  '7904 43 avenue nw': [51.088, -114.219],
+  '240 90 avenue se': [50.97, -114.059],
+  '5720 silver ridge drive nw': [51.104, -114.189],
 };
 
 export function marketCoords(market: Market): [number, number] | null {
   if (market.coordinates) return [market.coordinates.lat, market.coordinates.lng];
   const known = market.sourceRecordId ? MARKET_COORDS[market.sourceRecordId] : undefined;
   if (known) return known;
+  const street = ADDRESS_COORDS[market.address.split(',')[0].trim().toLowerCase()];
+  if (street) return street;
   const hood = market.neighbourhood?.toLowerCase();
   return hood && NEIGHBOURHOOD_COORDS[hood] ? NEIGHBOURHOOD_COORDS[hood] : null;
 }

@@ -234,13 +234,13 @@ export default function PlansPage() {
   const interests = (showForm ? draft.interests : profile?.eventInterests) ?? [];
   const draftArea = (draft.neighborhood || draft.inferredNeighborhood).trim();
   const picks = useMemo(
-    () => buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area || draftArea, goingIds: mine.ids, days: 10, limit: 8 }),
-    [entities, occurrences, interests, addressPoint, area, draftArea, mine.ids],
+    () => buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area || draftArea, goingIds: mine.ids, days: 10, limit: 8, rotation: user?.uid }),
+    [entities, occurrences, interests, addressPoint, area, draftArea, mine.ids, user?.uid],
   );
   // Everything picked for the next ten days, so the dashboard can show any one day.
   const weekPicks = useMemo(
-    () => (showForm ? [] : buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area, goingIds: mine.ids, days: 10, limit: 80 }).picks),
-    [showForm, entities, occurrences, interests, addressPoint, area, mine.ids],
+    () => (showForm ? [] : buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area, goingIds: mine.ids, days: 10, limit: 80, rotation: user?.uid }).picks),
+    [showForm, entities, occurrences, interests, addressPoint, area, mine.ids, user?.uid],
   );
   const timeline = useMemo(() => buildPlanTimeline({ entities, occurrences, goingIds: mine.ids }), [entities, occurrences, mine.ids]);
 

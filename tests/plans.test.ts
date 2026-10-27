@@ -98,6 +98,27 @@ describe('buildEventPicks', () => {
     const picks = buildEventPicks({ entities: nights, occurrences: [], interests: [], now: NOW });
     assert.deepEqual(picks.picks.map((p) => p.entityId), ['ghost-0']);
   });
+  it('never lets an exhibition that opened months ago outrank this week', () => {
+    const show = (id: string) => event({ id, title: `Exhibition ${id}`, start: '2026-06-04T16:00:00Z', end: '2026-11-08T23:00:00Z', venue: 'Contemporary Calgary', categories: ['arts'] });
+    const concert = event({ id: 'gig', title: 'Friday gig', start: '2026-10-10T02:00:00Z', categories: ['music'] });
+    const picks = buildEventPicks({ entities: [show('a'), show('b'), show('c'), concert], occurrences: [], interests: [], now: NOW, limit: 2 });
+    assert.ok(picks.picks.some((p) => p.entityId === 'gig'), 'the dated plan makes the cut');
+    assert.equal(picks.picks.filter((p) => p.entityId !== 'gig').length, 1, 'one gallery show, not all of them');
+  });
+  it('spreads picks across venues', () => {
+    const at = (id: string, venue: string, h: number) => event({ id, title: `Show ${id}`, venue, start: new Date(Date.parse('2026-10-09T01:00:00Z') + h * 3600_000).toISOString() });
+    const list = [at('a1', 'Heritage Park', 0), at('a2', 'Heritage Park', 1), at('a3', 'Heritage Park', 2), at('b', 'Bella Concert Hall', 30), at('c', 'Arts Commons', 50)];
+    const picks = buildEventPicks({ entities: list, occurrences: [], interests: [], now: NOW, limit: 3 });
+    assert.deepEqual(new Set(picks.picks.map((p) => p.venue)).size, 3);
+  });
+  it('rotates equal picks by day and reader, and holds still within a day', () => {
+    const list = Array.from({ length: 30 }, (_, k) => event({ id: `e${k}`, title: `Event ${k}`, venue: `Hall ${k}`, start: '2026-10-11T02:00:00Z' }));
+    const keys = (now: Date, rotation?: string) => buildEventPicks({ entities: list, occurrences: [], interests: [], now, limit: 8, rotation }).picks.map((p) => p.key).sort().join();
+    const later = new Date(NOW.getTime() + 3600_000);
+    assert.equal(keys(NOW, 'u1'), keys(later, 'u1'), 'same reader, same day, same picks');
+    assert.notEqual(keys(NOW, 'u1'), keys(new Date(NOW.getTime() + 86_400_000), 'u1'), 'tomorrow is different');
+    assert.notEqual(keys(NOW, 'u1'), keys(NOW, 'u2'), 'another reader gets another eight');
+  });
   it('formats times in Calgary', () => {
     assert.equal(pickWhen('2026-10-10T02:00:00Z'), 'Fri, Oct 9 · 8:00 p.m.');
   });

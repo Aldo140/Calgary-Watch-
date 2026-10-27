@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { Search, SearchX } from 'lucide-react';
 import { db } from '../../firebase';
 import { SEARCH_DEMAND, summarizeDemand, readDemandRecords, type DemandRow } from '../../lib/searchDemand';
-import { describeAnswer, parseSearchIntent } from '../../lib/searchIntent';
+import { bareStreetGuess, describeAnswer, parseSearchIntent } from '../../lib/searchIntent';
+import { lookupStreet } from '../../hooks/useStreetLookup';
 import { searchListings } from '../../lib/listingSearch';
 import { discoveryRepository } from '../../data/discovery';
 import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, mono } from './ui';
@@ -82,36 +83,50 @@ function TermList({ rows, miss = false }: { rows: DemandRow[]; miss?: boolean })
   const max = Math.max(...rows.map((r) => r.searches), 1);
   return (
     <ol className="divide-y" style={{ borderColor: T.line }}>
-      {rows.map((r) => {
-        // Searches recorded before search understood neighbourhoods, streets and
-        // "yesterday police" stay at 0 found; say what the same words get today.
-        let now:string|null=null;
-        if(r.lastResults===0){
-          try{
-            now=describeAnswer(parseSearchIntent(r.q));
-            // Or a listing that exists now ("atp" finds Alberta Theatre Projects).
-            if(!now){const found=searchListings(discoveryRepository.list(),discoveryRepository.occurrences(),r.q);const hit=found.partial?undefined:Object.values(found.groups).flat()[0];if(hit)now=hit.title;}
-          }
-          catch(error){console.warn('[admin search] Answer preview unavailable',error);}
-        }
-        return (
-          <li key={r.q} className="flex items-center gap-3 px-4 py-2.5">
-            <div className="min-w-0 flex-1">
-              <Link to={`/search?q=${encodeURIComponent(r.q)}`} target="_blank" className="text-sm font-semibold hover:underline" style={{ color: T.ink }}>{r.q}</Link>
-              <div className="mt-1 h-1.5 rounded-full" style={{ background: `${miss ? T.attention : T.signal}1F` }}>
-                <div className="h-full rounded-full" style={{ width: `${(r.searches / max) * 100}%`, background: miss ? T.attention : T.signal }} />
-              </div>
-              {now ? <p className="mt-1 text-[0.68rem]" style={{ color: T.muted }}>Answered now: {now}</p> : null}
-            </div>
-            <span className="w-20 text-right text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{r.searches} {r.searches === 1 ? 'search' : 'searches'}</span>
-            <span className="w-20 text-right">
-              {r.lastResults === 0
-                ? <Chip tone={now ? 'ok' : 'attention'}>{now ? 'answered' : 'no results'}</Chip>
-                : <span className="text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{r.lastResults} {r.lastResults === 1 ? 'result' : 'results'}</span>}
-            </span>
-          </li>
-        );
-      })}
+      {rows.map((r) => <TermRow key={r.q} r={r} max={max} miss={miss} />)}
     </ol>
+  );
+}
+
+function TermRow({ r, max, miss }: { r: DemandRow; max: number; miss: boolean }) {
+  // Searches recorded before search understood neighbourhoods, streets and
+  // "yesterday police" stay at 0 found; say what the same words get today.
+  const preview = useMemo(() => {
+    if (r.lastResults !== 0) return { now: null, street: null };
+    try {
+      const intent = parseSearchIntent(r.q);
+      let now = describeAnswer(intent);
+      // Or a listing that exists now ("atp" finds Alberta Theatre Projects).
+      if (!now) { const found = searchListings(discoveryRepository.list(), discoveryRepository.occurrences(), r.q); const hit = found.partial ? undefined : Object.values(found.groups).flat()[0]; if (hit) now = hit.title; }
+      return { now, street: now ? null : bareStreetGuess(intent, r.q) };
+    } catch (error) { console.warn('[admin search] Answer preview unavailable', error); return { now: null, street: null }; }
+  }, [r.q, r.lastResults]);
+  // "madigan" alone: search now tries the City's address register, so check it here too.
+  const [street, setStreet] = useState<string | null>(null);
+  useEffect(() => {
+    if (!preview.street) return;
+    let live = true;
+    lookupStreet(preview.street).then(a => { if (live && a) setStreet(`${a.street}, ${a.community}`); });
+    return () => { live = false; };
+  }, [preview.street]);
+  const now = preview.now ?? street;
+  return (
+    <li className="flex items-center gap-3 px-4 py-2.5">
+      <div className="min-w-0 flex-1">
+        <Link to={`/search?q=${encodeURIComponent(r.q)}`} target="_blank" className="text-sm font-semibold hover:underline" style={{ color: T.ink }}>{r.q}</Link>
+        <div className="mt-1 h-1.5 rounded-full" style={{ background: `${miss ? T.attention : T.signal}1F` }}>
+          <div className="h-full rounded-full" style={{ width: `${(r.searches / max) * 100}%`, background: miss ? T.attention : T.signal }} />
+        </div>
+        {now ? <p className="mt-1 text-[0.68rem]" style={{ color: T.muted }}>Answered now: {now}</p>
+        : r.lastResults === 0 ? <p className="mt-1 text-[0.68rem]" style={{ color: T.muted }}>If it’s a real Calgary organization with no profile, add one (docs/search-gap-profiles.md). <a href={`https://www.google.com/search?q=${encodeURIComponent(`"${r.q}" Calgary`)}`} target="_blank" rel="noopener noreferrer" className="underline">Look it up ↗</a></p>
+        : null}
+      </div>
+      <span className="w-20 text-right text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{r.searches} {r.searches === 1 ? 'search' : 'searches'}</span>
+      <span className="w-20 text-right">
+        {r.lastResults === 0
+          ? <Chip tone={now ? 'ok' : 'attention'}>{now ? 'answered' : 'no results'}</Chip>
+          : <span className="text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{r.lastResults} {r.lastResults === 1 ? 'result' : 'results'}</span>}
+      </span>
+    </li>
   );
 }

@@ -59,6 +59,10 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
+    // isAdmin() can cost a billed read of users/{uid} for any signed-in caller
+    // who is not on the token list, so rules put it last: `owner || isAdmin()`.
+    // `||` short-circuits, so a public map query or a member reading their own
+    // rows never touches the users document.
     function isAdmin() {
       // Check the auth token first (no extra Firestore read needed).
       // Only fall back to the user document if the token check doesn't match,
@@ -221,9 +225,9 @@ service cloud.firestore {
       // the client must ask for visibility == 'public' and the rule below
       // requires it. Anything hidden is unreachable, not merely unrendered.
       allow get: if true;
-      allow list: if isAdmin() ||
-                  request.query.limit <= 200 &&
-                  resource.data.visibility == 'public';
+      allow list: if (request.query.limit <= 200 &&
+                   resource.data.visibility == 'public') ||
+                  isAdmin();
 
       allow create: if isAuthenticated() &&
                     hasOnlyAllowedFields([
@@ -290,7 +294,7 @@ service cloud.firestore {
     // and admins. This is what makes a world-readable `incidents` collection
     // safe to keep.
     match /incident_reporters/{incidentId} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.authorUid == request.auth.uid);
+      allow read: if (isAuthenticated() && resource.data.authorUid == request.auth.uid) || isAdmin();
       allow create: if isAuthenticated() &&
                     hasOnlyAllowedFields(['incidentId', 'authorUid', 'email', 'createdAt']) &&
                     request.resource.data.authorUid == request.auth.uid &&
@@ -311,8 +315,8 @@ service cloud.firestore {
     // the id. Never deletable by a client — a retracted opinion is an update to
     // a new kind, and the original signal stays auditable.
     match /incident_feedback/{feedbackId} {
-      allow read: if isAdmin() ||
-                  (isAuthenticated() && feedbackId == (request.auth.uid + '_' + resource.data.incidentId));
+      allow read: if (isAuthenticated() && feedbackId == (request.auth.uid + '_' + resource.data.incidentId)) ||
+                  isAdmin();
       allow create, update: if isAuthenticated() &&
                     feedbackId == (request.auth.uid + '_' + request.resource.data.incidentId) &&
                     hasOnlyAllowedFields(['incidentId', 'uid', 'kind', 'createdAt', 'updatedAt']) &&
@@ -661,8 +665,8 @@ service cloud.firestore {
     }
 
     match /event_rsvps/{rsvpId} {
-      allow read: if isAdmin() ||
-                  (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow read: if (isAuthenticated() && resource.data.uid == request.auth.uid) ||
+                  isAdmin();
       allow create: if isAuthenticated() &&
                     hasOnlyAllowedFields(['uid', 'eventId', 'start', 'createdAt']) &&
                     request.resource.data.uid == request.auth.uid &&
@@ -796,7 +800,7 @@ service cloud.firestore {
     match /organization_catalog/{id} { allow read: if true; allow write: if false; }
     match /organization_live_content/{id} { allow read: if true; allow write: if false; }
     match /listing_claims/{id} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow read: if (isAuthenticated() && resource.data.uid == request.auth.uid) || isAdmin();
       allow create: if isAuthenticated() &&
                     request.auth.token.email_verified == true &&
                     hasOnlyAllowedFields(['uid', 'entityId', 'entityTitle', 'entityPath', 'name', 'role', 'workEmail', 'accountEmail', 'phone', 'note', 'status', 'createdAt']) &&
@@ -817,13 +821,13 @@ service cloud.firestore {
       allow update: if isAdmin() &&
                     request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'reviewedAt', 'reviewedBy', 'reviewNote', 'approvedOrganizationId']) &&
                     request.resource.data.status in ['pending', 'approved', 'rejected'];
-      allow delete: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow delete: if (isAuthenticated() && resource.data.uid == request.auth.uid) || isAdmin();
     }
 
     // Change requests from a verified organizer, applied by admin with the
     // content editor. Only an approved claim for this listing can file one.
     match /listing_updates/{id} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow read: if (isAuthenticated() && resource.data.uid == request.auth.uid) || isAdmin();
       // Historical requests remain readable; new edits use the weekly automatic publisher.
       allow create: if false;
       allow update: if isAdmin() &&
@@ -855,8 +859,8 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /owner_listing_edits/{editId} {
-      allow read: if isAdmin() || (isAuthenticated() &&
-        (resource == null || resource.data.uid == request.auth.uid));
+      allow read: if (isAuthenticated() &&
+        (resource == null || resource.data.uid == request.auth.uid)) || isAdmin();
       allow create: if approvedListingOwner(request.resource.data.rootId) &&
         request.resource.data.keys().hasOnly(['uid','rootId','entityId','entityTitle','changes','status','createdAt','notificationPending']) &&
         request.resource.data.uid == request.auth.uid &&
@@ -924,7 +928,7 @@ service cloud.firestore {
     }
     match /organization_access_changes/{id} { allow read: if isAdmin(); allow write: if false; }
     match /organization_managers/{id} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow read: if (isAuthenticated() && resource.data.uid == request.auth.uid) || isAdmin();
       allow create, update: if isAdmin() &&
         hasOnlyAllowedFields(['uid','organizationId','claimId','grantedAt']) &&
         id == request.resource.data.uid + '_' + request.resource.data.organizationId &&
@@ -1015,7 +1019,7 @@ service cloud.firestore {
 
     // "Have CalgaryWatch run it": a request for the managed service.
     match /market_service_requests/{id} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow read: if (isAuthenticated() && resource.data.uid == request.auth.uid) || isAdmin();
       allow create: if isAuthenticated() &&
                     hasOnlyAllowedFields(['uid', 'marketId', 'marketTitle', 'plan', 'note', 'contact', 'status', 'createdAt']) &&
                     request.resource.data.uid == request.auth.uid &&
@@ -1035,7 +1039,7 @@ service cloud.firestore {
       allow write: if false; // Trusted callable service/Admin SDK only.
     }
     match /entity_submissions/{id} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.submittedBy == request.auth.uid);
+      allow read: if (isAuthenticated() && resource.data.submittedBy == request.auth.uid) || isAdmin();
       // Direct path for when the submitDiscovery callable is not deployed. The
       // id is uid_YYYY-MM-DD_slot with slot 1-5 and no updates, so one account
       // gets five suggestions a Calgary day. Content is validated again, in

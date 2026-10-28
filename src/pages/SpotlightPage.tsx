@@ -55,16 +55,20 @@ function Slate({ scene, take = 1 }: { scene: string; take?: number }) {
   );
 }
 
-/** One chapter, shot as a scene: slate, slugline, a hard cut, then the copy. */
-function Scene({ n, id, slug, label, title, children, take }: { n: number | string; id: string; slug: string; label: string; title: ReactNode; children: ReactNode; take?: number }) {
-  const scene = typeof n === 'number' ? String(n).padStart(2, '0') : n;
+type Look = 'slate' | 'vhs' | 'marquee' | 'box' | 'teaser' | 'polaroid';
+
+/**
+ * One chapter. Each has its own look so the page doesn't repeat itself: only
+ * the opening chapter gets the clapperboard, the history plays off a VHS tape,
+ * this year is on a lightbox marquee, and so on. `kicker` sits above the heading.
+ */
+function Scene({ n, id, look, kicker, label, title, children, take }: { n: number; id: string; look: Look; kicker: ReactNode; label: string; title: ReactNode; children: ReactNode; take?: number }) {
   return (
-    <section id={id} className="hx-reel" aria-labelledby={`${id}-h`} data-roll>
-      <Slate scene={scene} take={take} />
-      <span className="hx-cutflash" aria-hidden="true" />
+    <section id={id} className={`hx-reel is-${look}`} aria-labelledby={`${id}-h`} data-roll>
+      {look === 'slate' ? <><Slate scene={String(n).padStart(2, '0')} take={take} /><span className="hx-cutflash" aria-hidden="true" /></> : null}
       <div className="hx-shot">
-        <p className="hx-reel-no"><span>Scene {scene}</span> {label}</p>
-        <p className="hx-slug" aria-hidden="true">{slug}</p>
+        <p className="hx-reel-no"><span>Chapter {n}</span> {label}</p>
+        <p className={`hx-kick is-${look}`} aria-hidden="true">{kicker}</p>
         <h2 id={`${id}-h`}>{title}</h2>
         {children}
       </div>
@@ -72,8 +76,35 @@ function Scene({ n, id, slug, label, title, children, take }: { n: number | stri
   );
 }
 
-function CutTo({ to = 'Cut to:' }: { to?: string }) {
-  return <p className="hx-cutto" aria-hidden="true" data-roll><span>{to}</span></p>;
+/** Where the festival has played, as frames on a strip of film. */
+function EditionStrip({ items }: { items: { year: string; where: string; what: string }[] }) {
+  return (
+    <ol className="hx-strip" aria-label="Where HEX After Dark has played">
+      {items.map(i => <li key={i.year}><b>{i.year}</b><span>{i.where}</span><small>{i.what}</small></li>)}
+    </ol>
+  );
+}
+
+/** The cinema letterboard: plastic letters on a lit board, bulbs chasing round the edge. */
+function Letterboard({ rows, open }: { rows: [string, string][]; open: [string, string] }) {
+  return (
+    <div className="hx-board">
+      <span className="hx-board-bulbs" aria-hidden="true">{Array.from({ length: 18 }, (_, i) => <i key={i} style={{ ['--i' as string]: i }} />)}</span>
+      <dl className="hx-board-in">
+        {rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+        <div className="is-open"><dt>{open[0]}</dt><dd>{open[1]}</dd></div>
+      </dl>
+    </div>
+  );
+}
+
+/** Empty polaroids for Friday's photos. They stay blank until we have real ones. */
+function Polaroids() {
+  return (
+    <div className="hx-polaroids" aria-hidden="true">
+      {['The bar', 'The screen', 'The crowd'].map((t, i) => <figure key={t} style={{ ['--r' as string]: `${[-5, 2, 6][i]}deg` }}><span /><figcaption>{t} · Oct 30</figcaption></figure>)}
+    </div>
+  );
 }
 
 const motionOk = () => typeof window !== 'undefined' && !!window.matchMedia && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -219,33 +250,35 @@ export default function SpotlightPage() {
           </nav>
 
           <div className="hx-main">
-            <Scene n={1} id="festival" slug="EXT. CALGARY — OCTOBER" label="The festival" title={<>A Halloween festival, <span>in short form.</span></>}>
+            <Scene n={1} id="festival" look="slate" kicker="EXT. CALGARY — OCTOBER" label="The festival" title={<>A Halloween festival, <span>in short form.</span></>}>
               <div className="hx-prose">
                 <p>HEX After Dark is a curated Halloween film festival from HEX Entertainment, the Calgary company behind the HEX Halloween &amp; Entertainment Expo.<Cite s={s} id="hex" /> On its submission page it calls itself the largest Halloween film festival in Western Canada, and says it exists to showcase independent filmmakers and a shared love of Halloween.<Cite s={s} id="filmfreeway" /></p>
                 <p>It takes Halloween, horror, sci-fi and fantasy films, and says it generally doesn’t accept films made with AI. Its awards include Best Short Film, Best Sci-Fi or Fantasy Film and Best Horror Film.<Cite s={s} id="filmfreeway" /> The festival is organized by {s.organizer.name}.</p>
               </div>
             </Scene>
-            <CutTo />
 
-            <Scene n={2} id="origins" slug="INT. BMO CENTRE — OCTOBER 2019" label="Where it came from" title={<>Born in <span>a haunted expo.</span></>}>
+            <Scene n={2} id="origins" look="vhs" kicker={<><b>▶ PLAY</b> <span>OCT. 11 2019 · BMO CENTRE</span></>} label="Where it came from" title={<>Born in <span>a haunted expo.</span></>}>
               <div className="hx-prose">
                 <p>HEX started in 2019 as Calgary’s first Halloween and entertainment expo, October 11 to 14 at the BMO Centre on Stampede Park. It brought back ScreamFest’s haunted houses after a year off, which owner Mike Sheppard described as a blend of the haunt and a comic-style expo.<Cite s={s} id="global-2019" /> Admission included the expo’s screening room and film festival.<Cite s={s} id="livewire-2019" /></p>
                 <p>The festival has moved around since. In 2022 it screened in Burnaby, at Cineplex Cinemas Metropolis, during the Burnaby Halloween Festival.<Cite s={s} id="burnaby-2022" /> Last year it took over the Flanagan Theatre at The GRAND for one night, Monday, October 27, 2025, in three blocks: <em>Horror in the North</em> at 6:30 p.m., <em>Blood and Reels</em> at 8:30 p.m. and <em>The Best of Hex After Dark</em> at 10:30 p.m.<Cite s={s} id="grand-2025" /> Tickets were $10, or $20 for a pass to all three,<Cite s={s} id="showpass-2025" /> and CTV News Calgary covered the night.<Cite s={s} id="ctv-2025" /></p>
               </div>
+              <EditionStrip items={[
+                { year: '2019', where: 'BMO Centre', what: 'Inside the first HEX expo' },
+                { year: '2022', where: 'Cineplex Metropolis', what: 'Burnaby Halloween Festival' },
+                { year: '2025', where: 'The GRAND', what: 'Flanagan Theatre, three blocks' },
+                { year: '2026', where: 'ScreamFest', what: 'In the bar, every night' },
+              ]} />
             </Scene>
-            <CutTo />
 
-            <Scene n={3} id="experience" slug="INT. SCREAMFEST BAR — NIGHT" label="This year" title={<>Horror, <span>between the haunted houses.</span></>}>
+            <Scene n={3} id="experience" look="marquee" kicker="Now playing" label="This year" title={<>Horror, <span>between the haunted houses.</span></>}>
               <div className="hx-prose">
                 <p>This October the festival is back with ScreamFest. Its submission page lists the 2026 run as October 10 to 31, alongside ScreamFest, with an official weekend of October 22 to 25.<Cite s={s} id="filmfreeway" /></p>
                 <p>The festival has told CalgaryWatch the films play in the bar at ScreamFest on every night it’s open, and that because the programme is all shorts, every film can screen each night. They’re included with ScreamFest admission.</p>
-                <ul className="hx-checklist" aria-label="What we know so far">
-                  <li><b>Where</b> The bar at ScreamFest, GMC Stadium, Stampede Park</li>
-                  <li><b>When</b> ScreamFest nights, which run 7 p.m. to midnight</li>
-                  <li><b>Cost</b> Included with ScreamFest admission</li>
-                  <li className="is-open"><b>Still to confirm</b> Screening times and the 2026 film list. We’ll add both here when the festival shares them.</li>
-                </ul>
               </div>
+              <Letterboard
+                rows={[['Where', 'The bar at ScreamFest · GMC Stadium, Stampede Park'], ['When', 'ScreamFest nights · 7 p.m. to midnight'], ['Cost', 'Included with ScreamFest admission']]}
+                open={['Still to confirm', 'Screening times and the 2026 film list. We’ll add both when the festival shares them.']}
+              />
             </Scene>
           </div>
         </div>
@@ -269,7 +302,7 @@ export default function SpotlightPage() {
         <div className="cw-wrap hx-layout">
           <div className="hx-toc-spacer" aria-hidden="true" />
           <div className="hx-main">
-            <Scene n={4} id="go" slug="EXT. STAMPEDE PARK — 7 P.M." label="How to go" title={<>Your ticket <span>to the bar.</span></>}>
+            <Scene n={4} id="go" look="box" kicker="Box office" label="How to go" title={<>Your ticket <span>to the bar.</span></>}>
               <div className="hx-ticket">
                 <div className="hx-ticket-main">
                   <p className="hx-ticket-eyebrow">Admit one · Hex After Dark at ScreamFest</p>
@@ -289,18 +322,22 @@ export default function SpotlightPage() {
                 </div>
               </div>
             </Scene>
-            <CutTo />
 
-            <Scene n={5} id="next" slug="INT. THE GRAND — NEXT YEAR?" label="What’s next" title={<>Back to <span>the big screen?</span></>}>
+            <Scene n={5} id="next" look="teaser" kicker="Coming soon?" label="What’s next" title={<>Back to <span>the big screen?</span></>}>
+              <div className="hx-teaser" aria-hidden="true">
+                <p className="hx-teaser-top">From the festival that played The GRAND in 2025</p>
+                <p className="hx-teaser-big">Back at<span>The GRAND</span></p>
+                <p className="hx-teaser-date">Next year · If the funding comes through</p>
+              </div>
               <div className="hx-prose">
                 <p className="hx-attrib"><b>{s.organizer.name}</b> has told CalgaryWatch he hopes to bring Hex After Dark back to The GRAND next year, if the festival secures grant funding.</p>
                 <p>There’s no date or booking for that yet, and it depends on funding the festival is still looking for.</p>
                 <p>We’ll share with Cameron how many people read this spotlight and how many tapped through to the festival and ScreamFest’s tickets. Those are counts only: nothing about who you are.</p>
               </div>
             </Scene>
-            <CutTo />
 
-            <Scene n={6} id="friday" slug="INT. SCREAMFEST — FRIDAY, OCT 30" label="After Friday" take={s.review.status === 'published' ? 2 : 1} title={<>We’re going <span>on October 30.</span></>}>
+            <Scene n={6} id="friday" look="polaroid" kicker="Developing…" label="After Friday" take={s.review.status === 'published' ? 2 : 1} title={<>We’re going <span>on October 30.</span></>}>
+              {s.review.status === 'published' ? null : <Polaroids />}
               {s.review.status === 'published' && s.review.body.length ? (
                 <div className="hx-prose">
                   {s.review.body.map(p => <p key={p}>{p}</p>)}

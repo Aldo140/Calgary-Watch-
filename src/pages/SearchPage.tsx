@@ -1,5 +1,5 @@
 import { useOrganizationLive } from '../lib/organizationLive';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { SearchBoard } from '../components/site/SearchBoard';
@@ -79,13 +79,21 @@ export default function SearchPage() {
     return items.length ? { title: <>Near {place.name}, <span>in the {place.quadrant}.</span></>, items } : undefined;
   }, [results.total, place, all, occurrences, now]);
 
-  // Record what people look for (anonymously), after they stop typing.
+  // Record what people look for (anonymously), once the result count settles.
+  const pending = useRef<{ q: string; n: number } | null>(null);
   useEffect(() => {
     // Wait for the street register so "madigan" is counted once, with its real answer.
     if (!q || bareLookup.status === 'loading') return;
-    const t = window.setTimeout(() => recordSearch(q, resultCount), 1200);
+    pending.current = { q, n: resultCount };
+    const t = window.setTimeout(() => { pending.current = null; recordSearch(q, resultCount); }, 1200);
     return () => clearTimeout(t);
   }, [q, resultCount, bareLookup.status]);
+  // Opening a result (or searching again) inside that wait used to drop the search.
+  useEffect(() => () => {
+    const p = pending.current;
+    pending.current = null;
+    if (p) recordSearch(p.q, p.n);
+  }, [q]);
 
   const suggest = useCallback((typed: string): Suggestion[] => {
     const text = normalizeWords(typed).join(' ');

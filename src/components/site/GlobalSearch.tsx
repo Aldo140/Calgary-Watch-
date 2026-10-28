@@ -2,6 +2,7 @@ import { useId, useRef, useEffect, useState, type ChangeEvent, type KeyboardEven
 import { useNavigate } from 'react-router-dom';
 import { Search, ArrowRight } from 'lucide-react';
 import { normalizeSearch } from '../../lib/discovery';
+import { recordSearch } from '../../lib/searchDemand';
 
 export interface Suggestion { label: string; note?: string; to: string }
 
@@ -37,7 +38,11 @@ export function GlobalSearch({ initial = '', suggest }: { initial?: string; sugg
   useEffect(() => { setOptions([]); setActive(-1); }, [initial]);
 
   const close = () => { setOptions([]); setActive(-1); };
-  const go = (s: Suggestion) => { close(); inputRef.current?.blur(); navigate(s.to); };
+  const go = (s: Suggestion) => {
+    // A pick that skips /search ("hex" → the Hex profile) is still a search, and it found something.
+    if (!s.to.startsWith('/search')) recordSearch(normalizeSearch(inputRef.current?.value ?? ''), Math.max(1, options.length));
+    close(); inputRef.current?.blur(); navigate(s.to);
+  };
   const onKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (!open) return;
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {

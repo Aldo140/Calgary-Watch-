@@ -85,13 +85,9 @@
 .nb-pin-label text { font: 700 12.5px Inter, sans-serif; fill: var(--ink); }
 .nb-pin.is-dim { opacity: .35; }
 .nb-pin.is-on .nb-pin-body { transform: scale(1.25); }
-.nb-pin.is-on .nb-pin-n { font: 800 12px var(--mono); fill: var(--ink); }
-.nb-pin.q-sw .nb-pin-n { fill: #fff; }
-.nb-pin-label rect { fill: var(--yellow); }
+.nb-pin.is-on .nb-pin-label rect { fill: var(--yellow); }
 .nb-map a { cursor: pointer; outline: none; }
-.nb-map a:focus-visible .nb-pin-n { font: 800 12px var(--mono); fill: var(--ink); }
-.nb-pin.q-sw .nb-pin-n { fill: #fff; }
-.nb-pin-label rect { stroke-width: 3; }
+.nb-map a:focus-visible .nb-pin-label rect { stroke-width: 3; }
 
 /* ── Neighbourhood cards ────────────────────────────────────────────── */
 .nb-grid { list-style: none; margin: clamp(34px, 4vw, 54px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }

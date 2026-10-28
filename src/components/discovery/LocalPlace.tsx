@@ -24,6 +24,8 @@ import { MarketLocations, MeanwhileBoard, NextUp, ProfileRibbon, ProfileSpread, 
 import { ProfileCover } from './ProfileCover';
 import { OwnerPitch, PlanIt, StoryCard } from './ProfileExtras';
 import { isOwnerVerified } from '../../lib/verified';
+import { spotlightForProfile } from '../../lib/spotlights';
+import { SpotlightCard } from '../spotlight/SpotlightCard';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const short = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
@@ -97,6 +99,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
     return () => io.disconnect();
   }, []);
   const note = place.partner ? undefined : LOCAL_NOTES[place.id];
+  const spotlight = spotlightForProfile(place.id);
   const site = place.website || place.sources.find(s => s.kind === 'official')?.url;
   const season = place.socials.season;
   // Companies without a fixed season (Ghost River Theatre) point to their current projects instead.
@@ -230,6 +233,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           {hours.length ? <div className="lp-fact lp-fact-hours"><small><Clock size={14} aria-hidden="true" />Hours</small><ul>{hours.map(([d, h]) => <li key={d}><b>{d}</b>{h}</li>)}</ul></div> : null}
         </section>
 
+        {spotlight ? <SpotlightCard spotlight={spotlight} at="profile" entities={all} compact /> : null}
         {spot ? <NextUp date={spot} now={now} count={ahead.count} onNow={spot === ahead.onNow} /> : null}
         {spot ? <PlanIt date={spot} place={place} /> : null}
 

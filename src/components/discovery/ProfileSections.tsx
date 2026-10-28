@@ -184,7 +184,7 @@ export function ProfileSpread({ place, name, shelf, number, quadrant, since, lin
       id="lp-about" headingId="lp-story" name={name} text={place.description || place.summary} offers={place.services} links={links} facts={facts}
       cover={<ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} />}
       caption={`Cover art for ${name}, drawn for CalgaryWatch Local.`}
-      eyebrow={<><Seal title={place.title} tone={shelf} size="s" />From their own site</>}
+      eyebrow={<><Seal title={place.title} tone={shelf} size="s" />{place.sources.every(src => src.kind === 'official') ? 'From their own site' : 'From their site and public listings'}</>}
     />
   );
 }

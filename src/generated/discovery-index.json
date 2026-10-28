@@ -14768,6 +14768,64 @@
       "updatedAt": "2026-10-17T00:44:59.309327Z"
     },
     {
+      "id": "biz-hex-after-dark",
+      "kind": "business",
+      "slug": "hex-after-dark",
+      "title": "Hex After Dark Film Festival",
+      "name": "Hex After Dark Film Festival",
+      "website": "https://hexafterdark.com/",
+      "address": "Calgary, AB",
+      "summary": "A Halloween festival of short horror films, playing in the bar at ScreamFest this October.",
+      "description": "Hex After Dark is a Halloween film festival of short horror, sci-fi and fantasy films, organized by Cameron Gall. Its FilmFreeway submission page asks for films under an hour and says it generally doesn’t accept films made with AI. The 2025 edition screened at The GRAND’s Flanagan Theatre on October 27, 2025. In October 2026 the festival has told CalgaryWatch that its films play in the bar at ScreamFest on ScreamFest’s operating nights, included with ScreamFest admission.",
+      "categories": [
+        "arts",
+        "holiday"
+      ],
+      "tags": [
+        "organization",
+        "film festival",
+        "horror",
+        "short film",
+        "halloween"
+      ],
+      "sources": [
+        {
+          "name": "Hex After Dark",
+          "url": "https://hexafterdark.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T06:45:00Z"
+        },
+        {
+          "name": "HEX After Dark Film Festival — FilmFreeway",
+          "url": "https://filmfreeway.com/HEXFilmFestival",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T06:45:00Z"
+        },
+        {
+          "name": "The GRAND — HEX After Dark Film Festival, October 27, 2025",
+          "url": "https://www.thegrandyyc.ca/hexafterdark",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-28T06:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://hexafterdark.com/",
+        "facebook": "https://www.facebook.com/p/HEX-After-Dark-100064707322929/"
+      },
+      "services": [
+        "Short horror film screenings",
+        "Film submissions via FilmFreeway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T06:45:00Z",
+      "updatedAt": "2026-10-28T06:45:00Z"
+    },
+    {
       "id": "77a51bfb2d6785943f744e882370",
       "kind": "market",
       "slug": "granary-road-christmas-market-2026-77a51b",

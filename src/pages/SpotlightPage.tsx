@@ -95,6 +95,7 @@ export default function SpotlightPage() {
   const entities = discoveryRepository.list();
   const nights = useMemo(() => (s ? upcomingNights(s, entities) : []), [s, entities]);
   const screamfest = useMemo(() => entities.find(e => e.kind === 'business' && e.id === 'biz-screamfest'), [entities]);
+  const profile = useMemo(() => (s?.profileId ? entities.find(e => e.id === s.profileId) : undefined), [s, entities]);
 
   useEffect(() => {
     if (!s || typeof IntersectionObserver === 'undefined') return;
@@ -278,6 +279,7 @@ export default function SpotlightPage() {
             <nav className="hx-more" aria-label="More from CalgaryWatch">
               <Link to="/events">Everything on in Calgary this week <ArrowUpRight size={16} aria-hidden="true" /></Link>
               <Link to="/date-night">Date night ideas <ArrowUpRight size={16} aria-hidden="true" /></Link>
+              {profile ? <Link to={entityPath(profile)}>{profile.title} on CalgaryWatch Local <ArrowUpRight size={16} aria-hidden="true" /></Link> : null}
               <Link to="/local">The people behind what’s on <ArrowUpRight size={16} aria-hidden="true" /></Link>
             </nav>
           </div>

@@ -26,6 +26,8 @@ Long-form features on the people behind what's on in Calgary. First one:
 
 ## Temporary vs evergreen
 
+The organizer's /local profile (`profileId`) carries the card for good, and the feature links back to it.
+
 `promo.from` / `promo.until` control the homepage and /events cards (Hex: Oct 27 to midnight Oct 31, 2026). The card on related event pages follows `relatedSourceIds` (the ScreamFest nights) and goes away when those listings expire. The feature page itself is indexed and stays up; after the run it says "This year's run has ended".
 
 ## After the visit: adding the review and interview
@@ -41,7 +43,7 @@ Page views come from the existing `page_views` collection (path, referrer host, 
 
 | Event | Props |
 | --- | --- |
-| `spotlight_card_seen` | `spot`, `at` (home, events, event-page), `sid`; once per tab per placement |
+| `spotlight_card_seen` | `spot`, `at` (home, events, event-page, profile), `sid`; once per tab per placement |
 | `spotlight_card_click` | `spot`, `at`, `sid` |
 | `spotlight_link_click` | `spot`, `link` (tickets, festival, screamfest, facebook, submissions, directions, filmmaker-email, film-*), `at`, `sid` |
 | `spotlight_read` | `spot`, `depth` (middle = reached the films, end = reached the links), `sid`; once per tab |

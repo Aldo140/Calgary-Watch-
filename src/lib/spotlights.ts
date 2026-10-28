@@ -23,6 +23,11 @@ export function spotlightForEntity(entity: Pick<DiscoveryEntity, 'sourceId'>): S
   return entity.sourceId ? SPOTLIGHTS.find(s => s.relatedSourceIds.includes(entity.sourceId!)) : undefined;
 }
 
+/** The spotlight written about the organization behind a /local profile. */
+export function spotlightForProfile(id: string): Spotlight | undefined {
+  return SPOTLIGHTS.find(s => s.profileId === id);
+}
+
 /**
  * The nights still to come, from the related listings we already carry (so the
  * feature and the ScreamFest listing can never disagree about the dates).
@@ -54,7 +59,7 @@ const calgaryDay = (d: Date) => dayFmt.format(d);
  * people as well as clicks. No names, no URLs, no location.
  */
 
-export type SpotlightPlacement = 'feature' | 'home' | 'events' | 'event-page';
+export type SpotlightPlacement = 'feature' | 'home' | 'events' | 'event-page' | 'profile';
 
 function sessionId(): string | undefined {
   try { return sessionStorage.getItem('cw_session_id')?.slice(0, 32) || undefined; } catch { return undefined; }

@@ -22,7 +22,7 @@ Long-form features on the people behind what's on in Calgary. First one:
 - Every fact is cited to a public page (`sources`, shown as numbered superscripts) or attributed to the person who told us.
 - No invented films, quotes, biographies or review. The showcase shows an empty state until real details arrive; the review and Q&A sections stay as "coming after Friday" until `review.status` / answers are filled in. Tests enforce this.
 - Images need `credit` and `permission`. No stock photos presented as festival photography.
-- The disclosure (independent, not paid, comp passes) shows at the top and bottom.
+- The partnership disclosure (`disclosure`, `partnerLabel`) shows on the cards, the share card and at the top and bottom of the feature.
 
 ## Temporary vs evergreen
 
@@ -31,7 +31,7 @@ Long-form features on the people behind what's on in Calgary. First one:
 ## After the visit: adding the review and interview
 
 1. In `src/content/spotlights.ts`, fill `interview.questions[].answer` with Cameron's actual words (edited for length only, with his OK), and set `interview.status: 'published'`.
-2. Put the review paragraphs in `review.body` and set `review.status: 'published'`. Keep the comp-pass disclosure in the first paragraph.
+2. Put the review paragraphs in `review.body` and set `review.status: 'published'`.
 3. Add each film as a `ShowcaseFilm`, with `source` saying where the details came from.
 4. Bump `updated`.
 

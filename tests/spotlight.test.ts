@@ -39,11 +39,12 @@ describe('spotlight content', () => {
       if (s.review.status !== 'published') assert.equal(s.review.body.length, 0);
     }
   });
-  it('attributes the GRAND ambition to Cameron and discloses the passes', () => {
+  it('attributes the GRAND ambition to Cameron and names the partnership', () => {
     assert.match(HEX_AFTER_DARK.future, /^Cameron Gall has told CalgaryWatch he hopes/);
     assert.match(HEX_AFTER_DARK.future, /grant funding/);
-    assert.match(HEX_AFTER_DARK.disclosure, /Nobody paid/);
-    assert.match(HEX_AFTER_DARK.disclosure, /two VIP passes/);
+    assert.match(HEX_AFTER_DARK.disclosure, /partnering with Hex After Dark/);
+    assert.match(HEX_AFTER_DARK.partnerLabel, /In partnership with/);
+    assert.doesNotMatch(JSON.stringify(HEX_AFTER_DARK), /VIP|passes|free tickets/i);
   });
 });
 
@@ -80,10 +81,10 @@ describe('spotlight SEO and sharing', () => {
     assert.ok(seo.description.length <= 200);
     assert.equal(seo.image, `https://calgarywatch.ca/og${PATH}.jpg`);
   });
-  it('has its own share card saying it is not sponsored', () => {
+  it('has its own share card naming the partnership', () => {
     const card = shareCardFor(PATH, discoveryRepository)!;
     assert.equal(card.theme, 'spotlight');
-    assert.match(card.pill ?? '', /not sponsored/);
+    assert.match(card.pill ?? '', /In partnership with Hex After Dark/);
   });
   it('emits Article JSON-LD about the festival without prices or performers', () => {
     const page = buildPageJsonLd(PATH, 'https://calgarywatch.ca') as { mainEntity: Record<string, any> };

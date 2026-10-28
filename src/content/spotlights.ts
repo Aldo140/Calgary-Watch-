@@ -59,6 +59,8 @@ export interface Spotlight {
   /** The organizer's plans, attributed to them, in one sentence. */
   future: string;
   /** Disclosure shown at the top and bottom of the feature. */
+  /** Short label for cards and the hero kicker, e.g. "In partnership with …". */
+  partnerLabel: string;
   disclosure: string;
   /** The homepage / events cards run while now is inside this window. */
   promo: { from: string; until: string };
@@ -88,8 +90,9 @@ export const HEX_AFTER_DARK: Spotlight = {
   card: { mark: 'HEX', line: 'Short horror films in the bar at ScreamFest' },
   organizer: { name: 'Cameron Gall', role: 'Organizer, Hex After Dark Film Festival' },
   future: 'Cameron Gall has told CalgaryWatch he hopes to bring Hex After Dark back to The GRAND next year, if the festival secures grant funding.',
-  disclosure: 'This is an independent CalgaryWatch spotlight. Nobody paid for it. Hex After Dark’s organizer has offered us two VIP passes for our visit on Friday, October 30, and we’ll say so again in our review.',
+  disclosure: 'CalgaryWatch is partnering with Hex After Dark on this spotlight, as part of our work with Calgary’s independent arts community. It isn’t paid advertising: the story and any opinions are our own.',
   // ScreamFest's last night ends at midnight on Oct 31 (Calgary is UTC-6 year-round).
+  partnerLabel: 'In partnership with Hex After Dark',
   promo: { from: '2026-10-27T00:00:00-06:00', until: '2026-11-01T00:00:00-06:00' },
   relatedSourceIds: ['screamfest'],
   venue: {

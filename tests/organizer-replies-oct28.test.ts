@@ -77,7 +77,7 @@ describe('October 28 organizer profiles', () => {
 
   it('carries the dates the organizers sent', () => {
     const light = generated.entities.find((e): e is Event => e.kind === 'event' && e.sourceRecordId === 'light-up-montgomery-2026')!;
-    assert.deepEqual([light.start, light.end, light.pricing], ['2026-11-14T17:00:00-07:00', '2026-11-14T20:00:00-07:00', 'free']);
+    assert.deepEqual([light.start, light.end, light.pricing], ['2026-11-14T17:00:00-06:00', '2026-11-14T20:00:00-06:00', 'free']);
     const reggae = generated.entities.find((e): e is Event => e.kind === 'event' && e.sourceRecordId === 'reggaefest-2027')!;
     assert.deepEqual([reggae.start, reggae.end, reggae.schedulePrecision], ['2027-08-27T00:00:00-06:00', '2027-08-29T00:00:00-06:00', 'date']);
     const tuesdays = generated.entities.filter((e): e is Event => e.kind === 'event' && e.sourceId === 'protospace');

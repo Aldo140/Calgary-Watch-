@@ -64,7 +64,7 @@ export interface BadgeState extends BadgeDefinition {
 }
 
 /** First instant of 2027 in Calgary. Accounts opened before it are founding. */
-export const FOUNDING_CUTOFF = Date.parse('2027-01-01T00:00:00-07:00');
+export const FOUNDING_CUTOFF = Date.parse('2027-01-01T00:00:00-06:00');
 
 export function computeBadges(input: BadgeInput): BadgeState[] {
   const has: Record<BadgeId, boolean | number> = {

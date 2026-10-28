@@ -65,3 +65,11 @@ describe('Meadowlark Park and Two Rivers replies', () => {
     assert.ok(!publishedInventory(twoRivers));
   });
 });
+
+// Calgary has stayed at UTC-6 since 2026-03-08 (src/lib/calgaryTz.ts); a hand-entered -07:00 shows the event an hour late.
+describe('reviewed event times', () => {
+  it('use -06:00, not the old winter -07:00, for anything after March 8, 2026', () => {
+    const stale = [...read('scripts/discovery/reviewed-sources.json').matchAll(/"(20\d\d-\d\d-\d\dT[\d:.]+)-07:00"/g)].map(m => m[1]).filter(t => t >= '2026-03-08T02:00');
+    assert.deepEqual(stale, []);
+  });
+});

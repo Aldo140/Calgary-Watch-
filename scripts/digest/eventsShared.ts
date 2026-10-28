@@ -141,7 +141,7 @@ export async function readerPicks(opts: {
   const rsvps = await opts.db.collection(RSVPS).where('uid', '==', opts.uid).get();
   const goingIds = new Set(rsvps.docs.map((d) => String(d.data().eventId)));
 
-  const base = { entities: opts.inventory.entities, occurrences: opts.inventory.occurrences, home, homeArea: area, goingIds, now: opts.now, days: opts.days };
+  const base = { entities: opts.inventory.entities, occurrences: opts.inventory.occurrences, home, homeArea: area, goingIds, now: opts.now, days: opts.days, rotation: opts.uid };
   const lineups = opts.inventory.lineups;
   const annotate = (p: EventPicks): EventPicks => (lineups?.size
     ? { ...p, picks: p.picks.map((i) => (lineups.get(i.key) ? { ...i, lineup: lineups.get(i.key) } : i)), going: p.going.map((i) => (lineups.get(i.key) ? { ...i, lineup: lineups.get(i.key) } : i)) }

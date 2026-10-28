@@ -175,6 +175,7 @@ export default function PrivacyPage() {
                 { what: 'Referring website — hostname only', why: 'Know how people find us', kept: 'Indefinitely, in aggregate' },
                 { what: 'Campaign tags from a shared link', why: 'Measure outreach', kept: 'Indefinitely, in aggregate' },
                 { what: 'A random per-tab session id', why: 'Count visits rather than clicks', kept: 'Cleared when you close the tab' },
+                { what: 'Which link you tapped on a feature, e.g. a festival’s site or tickets', why: 'Show an organizer how many readers we sent them, as counts only', kept: 'Indefinitely, in aggregate' },
               ]}
             />
             <p>

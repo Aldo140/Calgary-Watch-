@@ -7,6 +7,8 @@ import { eventDateLabel } from './listingSeo';
 import { organizerEvents } from './organizations';
 import { BEST_PATH, bestCategory, publishersOf, rankPlaces } from './bestOf';
 import { BEST_CATEGORIES } from '../content/bestOf';
+import { SPOTLIGHTS } from '../content/spotlights';
+import { SPOTLIGHT_PATH, spotlightBySlug, spotlightPath } from './spotlights';
 
 /**
  * Link-preview cards: the picture that shows up when someone shares a
@@ -25,7 +27,7 @@ export const SHARE_ORIGIN = 'https://calgarywatch.ca';
 export const DEFAULT_SHARE_IMAGE = `${SHARE_ORIGIN}/images/hero/calgarywatch-social-v1.jpg`;
 export const DEFAULT_SHARE_ALT = 'An illustrated Calgary skyline with the Bow River, the Peace Bridge and the Rockies behind, under the CalgaryWatch name.';
 
-export type CardTheme = 'event' | 'market' | 'local' | 'neighbourhood' | 'guide' | 'best' | 'hub';
+export type CardTheme = 'event' | 'market' | 'local' | 'neighbourhood' | 'guide' | 'best' | 'hub' | 'spotlight';
 
 /** A calendar-page block for the right side when there's no photo. */
 export interface DateBlock { eyebrow: string; month: string; day: string; weekday: string; note?: string }
@@ -219,6 +221,7 @@ export function allShareCards(repository: DiscoveryRepository, now = new Date())
     ...Object.keys(HUB_CARDS).map(path => hubCard(path, repository, now)!),
     bestIndexCard(),
     ...BEST_CATEGORIES.map(c => bestCard(c.slug)!),
+    ...SPOTLIGHTS.map(s => spotlightCard(s.slug)!),
   ];
 }
 
@@ -241,12 +244,31 @@ function bestCard(slug: string): ShareCard | undefined {
   };
 }
 
+/** A CalgaryWatch Spotlight: the feature's own headline over a marquee mark. No photo unless one is permitted. */
+function spotlightCard(slug: string): ShareCard | undefined {
+  const s = spotlightBySlug(slug);
+  if (!s) return undefined;
+  const path = spotlightPath(s);
+  const [lead, sub] = s.title.split(': ');
+  return {
+    path: cardPath(path), theme: 'spotlight', label: 'CalgaryWatch Spotlight',
+    title: lead,
+    lines: [sub ?? s.name, s.card.line],
+    pill: s.partnerLabel,
+    mark: s.card.mark,
+    colors: { from: '#2a1b3d', to: '#ff5a4e', ink: '#ffdf4f' },
+    footer: `calgarywatch.ca${path}`,
+    alt: `${s.title}. ${s.card.line}. A CalgaryWatch Spotlight.`,
+  };
+}
+
 /** The card for a route, or undefined when the route uses the default picture. */
 export function shareCardFor(pathname: string, repository: DiscoveryRepository, now = new Date()): ShareCard | undefined {
   const clean = pathname.replace(/\/+$/, '') || '/';
   if (HUB_CARDS[clean]) return hubCard(clean, repository, now);
   if (clean === BEST_PATH) return bestIndexCard();
   if (clean.startsWith(`${BEST_PATH}/`)) return bestCard(clean.slice(BEST_PATH.length + 1));
+  if (clean.startsWith(`${SPOTLIGHT_PATH}/`)) return spotlightCard(clean.slice(SPOTLIGHT_PATH.length + 1));
   const [section, slug] = clean.split('/').filter(Boolean);
   const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
   const entity = kind && slug ? repository.find(kind, slug) : undefined;

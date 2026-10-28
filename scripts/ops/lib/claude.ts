@@ -27,7 +27,9 @@ export async function claudeStatus(): Promise<{ ok: boolean; detail: string }> {
     return { ok: true, detail: 'Connected.' };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    return { ok: false, detail: /credit balance/i.test(msg) ? 'Out of Anthropic credits: no new posts get planned or drafted until credits are added at console.anthropic.com (Plans & Billing).' : `Not answering: ${msg.slice(0, 200)}` };
+    if (/credit balance/i.test(msg)) return { ok: false, detail: 'Out of Anthropic credits: no new posts get planned or drafted until credits are added at console.anthropic.com (Plans & Billing).' };
+    if (/invalid x-api-key|authentication_error/i.test(msg)) return { ok: false, detail: 'Anthropic key rejected (deleted, disabled or mistyped): make a new key at console.anthropic.com (API keys) and paste it into the ANTHROPIC_API_KEY secret in GitHub (Settings > Secrets and variables > Actions).' };
+    return { ok: false, detail: `Not answering: ${msg.slice(0, 200)}` };
   }
 }
 

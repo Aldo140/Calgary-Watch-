@@ -43,6 +43,7 @@ const PrivacyPage  = lazy(() => import('@/src/pages/PrivacyPage'));
 const PartnersPage = lazy(() => import('@/src/pages/PartnersPage'));
 const DateNightPage = lazy(() => import('@/src/pages/DateNightPage'));
 const BestOfPage = lazy(() => import('@/src/pages/BestOfPage'));
+const SpotlightPage = lazy(() => import('@/src/pages/SpotlightPage'));
 const SafetyPage = lazy(() => import('@/src/pages/SafetyPage'));
 const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/NeighbourhoodWatchGuidePage'));
 const AirdrieCrimeMapPage = lazy(() => import('@/src/pages/AirdrieCrimeMapPage'));
@@ -246,6 +247,7 @@ export default function App() {
           <Route path="/date-night" element={<DateNightPage />} />
           <Route path="/best" element={<BestOfPage />} />
           <Route path="/best/:slug" element={<BestOfPage />} />
+          <Route path="/spotlight/:slug" element={<SpotlightPage />} />
           <Route path="/safety" element={<SafetyPage />} />
           <Route path="/safety/:slug" element={<SafetyPage />} />
           {/* Event interests, "I'm going", badges and the Thursday picks email. */}

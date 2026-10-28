@@ -1,0 +1,47 @@
+/* SpotlightCard: the seasonal teaser for a CalgaryWatch Spotlight on the
+   homepage, /events and related event pages. A dark screening-room panel in
+   the house outline-and-shadow style, labelled as our own unpaid pick. */
+.spc { --ink: #151515; --night: #0c0a12; --yellow: #ffdf4f; --red: #ff5a4e; margin: 28px 0; }
+.cw-site a.spc-link {
+  position: relative; display: block; overflow: hidden; padding: clamp(22px, 3vw, 34px) clamp(20px, 3.4vw, 40px) clamp(22px, 3vw, 30px);
+  border: 2px solid var(--ink); border-radius: 24px; color: #fff; text-decoration: none; box-shadow: 6px 6px 0 var(--red);
+  background: radial-gradient(70% 90% at 0% 100%, rgba(255, 90, 78, .3), transparent 60%), radial-gradient(50% 80% at 100% 0%, #2a1b3d, transparent 70%), var(--night);
+  transition: transform .15s, box-shadow .15s;
+}
+.cw-site a.spc-link:hover { transform: translate(-2px, -2px); box-shadow: 9px 9px 0 var(--red); }
+.cw-site a.spc-link:focus-visible { outline: 3px solid #00c2e0; outline-offset: 4px; }
+.spc-beam { position: absolute; inset: 0; pointer-events: none;
+  background: conic-gradient(from 196deg at 88% -10%, transparent 0deg, rgba(255, 223, 79, .16) 12deg, rgba(255, 223, 79, .04) 24deg, transparent 32deg); }
+.spc-sign { position: absolute; right: 96px; top: 50%; transform: translateY(-50%) rotate(-3deg); display: grid; justify-items: center; gap: 4px; padding: 24px 28px;
+  border: 3px solid #fff; border-radius: 14px; background: #1b1426; box-shadow: 0 0 0 6px #1b1426, 0 0 0 8px rgba(255, 223, 79, .7);
+  background-image: radial-gradient(circle, var(--yellow) 3px, transparent 3.5px), radial-gradient(circle, var(--yellow) 3px, transparent 3.5px);
+  background-size: 18px 12px, 18px 12px; background-position: 6px 4px, 6px calc(100% - 4px); background-repeat: repeat-x, repeat-x; }
+.spc-sign b { font: 800 54px/.9 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: .06em; color: var(--yellow); }
+.spc-sign small { font: 600 11px/1 'IBM Plex Mono', monospace; letter-spacing: .2em; text-transform: uppercase; color: #fff; }
+@media (max-width: 1080px) { .spc-sign { display: none; } }
+.spc.is-compact .spc-sign { right: 80px; padding: 22px 22px; }
+.spc.is-compact .spc-sign b { font-size: 42px; }
+.spc-grain { position: absolute; inset: 0; opacity: .14; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.spc-strip { position: absolute; right: 22px; top: 0; bottom: 0; width: 38px; display: flex; flex-direction: column; justify-content: space-around; padding: 10px 0; background: #000; border-left: 2px solid rgba(255, 255, 255, .5); border-right: 2px solid rgba(255, 255, 255, .5); }
+.spc-strip i { display: block; width: 12px; height: 8px; margin: 0 auto; border-radius: 2px; background: rgba(255, 255, 255, .8); }
+.spc-copy { position: relative; display: grid; gap: 12px; max-width: min(700px, calc(100% - 64px)); }
+.spc-label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 600 12px/1.2 'IBM Plex Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .72); }
+.spc-label b { padding: 5px 9px; border-radius: 6px; background: var(--yellow); color: var(--ink); font-weight: 700; }
+.spc-title { display: block; font: 800 clamp(28px, 3.6vw, 46px)/.98 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: -.04em; color: #fff; }
+.spc-title em { display: block; margin-top: 6px; font-style: normal; color: var(--red); font-size: .66em; letter-spacing: -.02em; }
+.spc-colon { display: none; }
+.spc-dek { font: 400 16.5px/1.5 Inter, sans-serif; color: rgba(255, 255, 255, .8); max-width: 40em; }
+.spc-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 4px; }
+.spc-nights { padding: 7px 11px; border: 2px solid #fff; border-radius: 10px; font: 600 13px/1 'IBM Plex Mono', monospace; }
+.spc-cta { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border: 2px solid var(--ink); border-radius: 999px; background: var(--yellow); color: var(--ink); font: 700 15px/1 Inter, sans-serif; }
+.spc.is-compact .spc-title { font-size: clamp(24px, 2.8vw, 34px); }
+@media (max-width: 640px) {
+  .spc-strip { right: 10px; width: 26px; }
+  .spc-strip i { width: 9px; height: 6px; }
+  .spc-copy { max-width: calc(100% - 34px); }
+  .spc-cta { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) { .cw-site a.spc-link { transition: none; } }
+.cw-home2 .h-spot-wrap { margin-top: clamp(36px, 5vw, 64px); }
+.cw-home2 .h-spot-wrap .spc { margin: 0; }

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, BadgeCheck, Car, LocateFixed, Map as MapIcon, Navigation, Plus, Search, ShieldCheck, Umbrella, X } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BadgeCheck, Car, ChevronDown, LocateFixed, Map as MapIcon, Navigation, Plus, Search, ShieldCheck, Umbrella, X } from 'lucide-react';
 import type { DiscoveryEntity, Event as EventEntity, Guide, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath, matchesPeriod } from '../../lib/discovery';
 import {
@@ -15,10 +15,11 @@ import { distanceLabel } from '../../lib/nearMe';
 import { isOwnerVerified } from '../../lib/verified';
 import { OrganizerPanel, SellBoard } from './MarketsDesk';
 import { MarketsOwnerDesk } from './MarketsOwnerDesk';
-import { pickWhen } from '../../lib/eventPicks';
+import { isOnNow, pickWhenAt } from '../../lib/eventPicks';
 import { MarketCover } from '../discovery/ListingArt';
 import { TEAR } from '../home/HomeHero';
 import { MarketMap } from './MarketMap';
+import { DayScrubber, MapSheet, MarketsDock, UpNextDeck, openLeft, useMinute } from './MarketsPhone';
 import { ProfileRibbon, useSectionReveal } from '../discovery/ProfileSections';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
@@ -26,6 +27,7 @@ import '../../styles/markets.css';
 import '../../styles/local-directory.css';
 import '../../styles/local-profile.css';
 import '../../styles/story-pages.css';
+import '../../styles/markets-phone.css';
 
 const DAY_MS = 86_400_000;
 
@@ -71,23 +73,31 @@ function NextUp({ market, next, now }: { market: Market; next: MarketOccurrence;
   );
 }
 
-function MarketRow({ market, n, occurrences, now, km }: { market: Market; n: number; occurrences: readonly MarketOccurrence[]; now: Date; km?: number }) {
+function MarketRow({ market, n, occurrences, now, km, on, extra, rough: roughDay }: {
+  market: Market; n: number; occurrences: readonly MarketOccurrence[]; now: Date; km?: number;
+  /** The date being shown when the list is narrowed to one day. */
+  on?: MarketOccurrence;
+  /** Folded away on phones until "Show all". */
+  extra?: boolean;
+  /** The picked day looks wet or bitter, so indoor markets say so. */
+  rough?: boolean;
+}) {
   const dates = upcoming(market, occurrences, now).filter(o => !o.cancelled);
-  const next = dates[0];
+  const next = on ?? dates[0];
   const open = isOpen(next, now);
   const fortnight = now.getTime() + 14 * DAY_MS;
   const days = new Set(dates.filter(o => Date.parse(o.start) < fortnight).map(o => weekdayShort.format(new Date(o.start))));
   const kind = season(market);
   const q = quadrantOf(market);
   return (
-    <li className={`mk-row${open ? ' is-open' : ''}`} data-market={market.id}>
+    <li className={`mk-row${open ? ' is-open' : ''}${extra ? ' is-extra' : ''}`} data-market={market.id} style={{ ['--i' as string]: Math.min(n - 1, 10) }}>
       <Link to={entityPath(market)}>
         <span className="mk-row-n" aria-hidden="true">{n}</span>
         <span className="mk-row-art" aria-hidden="true"><MarketCover market={market} day={next ? weekdayShort.format(new Date(next.start)) : undefined} /></span>
         <span className="mk-row-body">
           <small className="mk-row-when">{open ? <><span className="cw-lb-pulse mk-pulse" aria-hidden="true" />{statusLine(next, now)}</> : statusLine(next, now)}</small>
           <strong>{market.title}{isOwnerVerified(market) ? <BadgeCheck className="mk-row-verified" size={18} aria-label="Verified by the organizer" /> : null}</strong>
-          <span className="mk-row-place">{market.neighbourhood}{q ? <b>{q}</b> : null}{km !== undefined ? <em className="mk-row-km">{coordsApprox(market) ? '~' : ''}{distanceLabel(km)} away</em> : null}</span>
+          <span className="mk-row-place">{market.neighbourhood}{q ? <b>{q}</b> : null}{km !== undefined ? <em className="mk-row-km">{coordsApprox(market) ? '~' : ''}{distanceLabel(km)} away</em> : null}{roughDay && isIndoor(market) ? <i className="mk-week-in"><Umbrella size={11} aria-hidden="true" />Indoors</i> : null}</span>
           <span className="mk-row-foot">
             <span className="mk-row-week" aria-label={days.size ? `On ${[...days].join(', ')} in the next two weeks` : 'No dates in the next two weeks'}>
               {WEEK.map(d => <i key={d} className={days.has(d) ? 'on' : ''}>{d[0]}</i>)}
@@ -98,6 +108,7 @@ function MarketRow({ market, n, occurrences, now, km }: { market: Market; n: num
           </span>
         </span>
         <span className="mk-row-go" aria-hidden="true"><ArrowUpRight size={18} /></span>
+        {open && next ? <span className="mk-row-live" style={{ ['--p' as string]: openLeft(next, now).done }} aria-hidden="true" /> : null}
       </Link>
     </li>
   );
@@ -168,6 +179,53 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
   }, [items, activeType, occurrences, now, here]);
 
   const week = useMemo(() => marketWeek(everyMarket, occurrences, now), [everyMarket, occurrences, now]);
+  const nextOf = useMemo(() => new Map(markets.map(m => [m.id, nextOpen(m, occurrences, now)])), [markets, occurrences, now]);
+  const tick = useMinute();
+
+  // Phones: a day picked on the scrubber, the folded list, the map sheet and the dock.
+  const [day, setDay] = useState('');
+  const [showAll, setShowAll] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [browsing, setBrowsing] = useState(false);
+  const browseRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { setDay(''); setShowAll(false); }, [period, type, query]);
+  useEffect(() => {
+    const el = browseRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setBrowsing(e.isIntersecting), { rootMargin: '-55% 0px -20% 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const closeMap = useCallback(() => setMapOpen(false), []);
+  const toList = () => browseRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const pickDay = (key: string) => { setDay(key); setShowAll(false); toList(); };
+
+  const listed = new Set(markets.map(m => m.id));
+  const days = week.map(d => {
+    const f = weather.daily[dayKey.format(d.date)];
+    return {
+      key: d.key, date: d.date, label: d.label, count: new Set(d.on.filter(x => listed.has(x.market.id)).map(x => x.market.id)).size,
+      sky: f ? { icon: describeSky(f.code).icon, label: describeSky(f.code).label, max: Math.round(f.max), rough: rough(f) } : undefined,
+    };
+  });
+  const dayOn = day ? week.find(d => d.key === day) : undefined;
+  const shown: { market: Market; on?: MarketOccurrence }[] = dayOn
+    ? [...new Map(dayOn.on.filter(x => listed.has(x.market.id)).map(x => [x.market.id, { market: x.market, on: x.o }])).values()]
+    : markets.map(market => ({ market }));
+  const weekEnd = now.getTime() + 7 * DAY_MS;
+  const startOf = (id: string) => Date.parse(nextOf.get(id)?.start ?? '9999');
+  // Closest-first and a picked day are one list; otherwise the list reads by when.
+  const groups = dayOn || here ? [{ id: 'day', label: '', rows: shown }] : [
+    { id: 'open', label: 'Open right now', rows: shown.filter(r => isOpen(nextOf.get(r.market.id), now)) },
+    { id: 'week', label: 'This week', rows: shown.filter(r => !isOpen(nextOf.get(r.market.id), now) && startOf(r.market.id) < weekEnd) },
+    { id: 'later', label: 'Coming up', rows: shown.filter(r => nextOf.get(r.market.id) && startOf(r.market.id) >= weekEnd) },
+    { id: 'tbd', label: 'Dates to come', rows: shown.filter(r => !nextOf.get(r.market.id)) },
+  ].filter(g => g.rows.length);
+  const FOLD = 8;
+  const folded = !dayOn && !showAll && shown.length > FOLD + 2;
+  const deck = markets.map(m => ({ market: m, next: nextOf.get(m.id)! })).filter(p => !!p.next).slice(0, 6);
+  const sheetPicks = new Map(shown.map(r => [r.market.id, r.on ?? nextOf.get(r.market.id)]));
+  const dayName = dayOn ? (dayOn.label === 'Today' || dayOn.label === 'Tomorrow' ? dayOn.label : `${dayOn.label} ${dayNum.format(dayOn.date)}`) : '';
   const thisWeek = new Set(week.flatMap(d => d.on.map(x => x.market.id)));
   const lead = markets.find(m => nextOpen(m, occurrences, now));
   const leadNext = lead ? nextOpen(lead, occurrences, now) : undefined;
@@ -175,9 +233,10 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
   const fortnight = occurrences.filter(o => markets.some(m => m.id === o.marketId) && !o.cancelled && Date.parse(o.end) > now.getTime() && Date.parse(o.start) < now.getTime() + 14 * DAY_MS).length;
 
   const guide = all.find((e): e is Guide => e.kind === 'guide' && !!e.stops?.some(s => everyMarket.some(m => m.id === s.entityId)));
+  // Things that start this weekend lead; a months-long run that's already on goes last and reads by its closing date.
   const weekendEvents = all
     .filter((e): e is EventEntity => e.kind === 'event' && !e.cancelled && Date.parse(e.end) > now.getTime() && matchesPeriod(e.start, e.end, 'this-weekend', now))
-    .sort((a, b) => (b.pricing === 'free' ? 1 : 0) - (a.pricing === 'free' ? 1 : 0) || Date.parse(a.start) - Date.parse(b.start))
+    .sort((a, b) => Number(isOnNow(a, now.getTime())) - Number(isOnNow(b, now.getTime())) || (b.pricing === 'free' ? 1 : 0) - (a.pricing === 'free' ? 1 : 0) || Date.parse(a.start) - Date.parse(b.start))
     .slice(0, 3);
   const hoods = [...new Map(everyMarket.map(m => neighbourhoodFor(m, all)).filter(x => !!x).map(x => [x!.hood.id, x!.hood])).values()];
   const communities = [...new Map(everyMarket.map(communityFor).filter(c => !!c).map(c => [c!.slug, c!])).values()].slice(0, 6);
@@ -204,7 +263,7 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
             <h1 id="mk-title">{period ? <>This weekend’s <mark>markets.</mark></> : <>Market days in <mark>Calgary.</mark></>}</h1>
             <p className="mk-lead">
               {markets.length} {markets.length === 1 ? 'market' : 'markets'}, {fortnight} market {fortnight === 1 ? 'day' : 'days'} in the next two weeks.
-              {' '}Every date comes straight from the organizer.
+              <span className="mk-lead-more">{' '}Every date comes straight from the organizer.</span>
             </p>
             <div className="mk-tools">
               <MarketSearch query={query} />
@@ -213,6 +272,7 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
           </div>
           {lead && leadNext ? <NextUp market={lead} next={leadNext} now={now} /> : null}
         </div>
+        <UpNextDeck picks={deck} now={tick} />
         <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <path d={TEAR} transform="translate(0 -5)" className="h-tear-shade" />
           <path d={TEAR} className="h-tear-paper" />
@@ -253,6 +313,8 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
           </ol>
         </section>
 
+        <div className="mk-browse" ref={browseRef}>
+        {markets.length ? <DayScrubber days={days} day={day} total={markets.length} onPick={pickDay} /> : null}
         <nav className="mk-chips" aria-label="Filter markets">
           <Link to={`/markets${type ? `?type=${type}` : ''}`} aria-current={!period ? 'page' : undefined}>All markets</Link>
           <Link to={weekendPath} aria-current={period === 'this-weekend' ? 'page' : undefined}>This weekend</Link>
@@ -263,16 +325,36 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
         <div className="mk-main">
           <section className="mk-list" data-reveal aria-labelledby="mk-list-title">
             <header className="mk-sec-head">
-              <h2 id="mk-list-title"><span>{query ? `Matching “${query}”` : activeType ? activeType.label : period ? 'On this weekend' : 'Every market'}</span></h2>
-              <p>{markets.length} {markets.length === 1 ? 'market' : 'markets'}, {here ? 'closest first' : 'soonest first'}</p>
+              <h2 id="mk-list-title"><span>{dayOn ? `On ${dayOn.label === 'Today' || dayOn.label === 'Tomorrow' ? dayOn.label.toLowerCase() : dayName}` : query ? `Matching “${query}”` : activeType ? activeType.label : period ? 'On this weekend' : 'Every market'}</span></h2>
+              <p>{shown.length} {shown.length === 1 ? 'market' : 'markets'}{dayOn ? `, ${weekdayShort.format(dayOn.date)} ${monthShort.format(dayOn.date)} ${dayNum.format(dayOn.date)}` : here ? ', closest first' : ', soonest first'}</p>
               <button type="button" className={`mk-near${here ? ' is-on' : ''}`} onClick={locate} aria-pressed={!!here} disabled={locating === 'busy'}>
                 {here ? <X size={15} aria-hidden="true" /> : <LocateFixed size={15} aria-hidden="true" />}
-                {here ? 'Back to soonest' : locating === 'busy' ? 'Finding you…' : 'Closest to me'}
+                <span>{here ? 'Back to soonest' : locating === 'busy' ? 'Finding you…' : 'Closest to me'}</span>
               </button>
+              {shown.length ? <button type="button" className="mk-maplink" onClick={() => setMapOpen(true)}><MapIcon size={15} aria-hidden="true" /> Map</button> : null}
               {locating === 'denied' ? <p className="mk-near-note" role="status">Location is off for this site, so the list stays soonest first.</p> : null}
             </header>
-            {markets.length ? (
-              <ol className="mk-rows">{markets.map((m, i) => <MarketRow key={m.id} market={m} n={i + 1} occurrences={occurrences} now={now} km={kmTo(m)} />)}</ol>
+            {shown.length ? (
+              <div className="mk-groups" key={`${day}-${type}-${query}-${period}`}>
+                {(() => {
+                  let n = 0;
+                  return groups.map(g => (
+                    <div key={g.id} className={`mk-group mk-group-${g.id}${folded && n >= FOLD ? ' is-folded' : ''}`}>
+                      {g.label && groups.length > 1 ? <h3 className="mk-group-head"><span>{g.label}</span><small>{g.rows.length}</small></h3> : null}
+                      <ol className="mk-rows">
+                        {g.rows.map(r => { n += 1; return <MarketRow key={r.market.id} market={r.market} n={n} on={r.on} occurrences={occurrences} now={now} km={kmTo(r.market)} extra={folded && n > FOLD} rough={!!dayOn && rough(weather.daily[dayKey.format(dayOn.date)])} />; })}
+                      </ol>
+                    </div>
+                  ));
+                })()}
+                {folded ? (
+                  <button type="button" className="mk-unfold" onClick={() => setShowAll(true)}>
+                    Show {shown.length - FOLD} more {shown.length - FOLD === 1 ? 'market' : 'markets'} <ChevronDown size={18} aria-hidden="true" />
+                  </button>
+                ) : null}
+              </div>
+            ) : dayOn ? (
+              <div className="mk-empty"><p><strong>Nothing on that day matches.</strong> <button type="button" onClick={() => setDay('')}>See every day</button></p></div>
             ) : (
               <div className="mk-empty">
                 <p><strong>{query ? `Nothing listed matches “${query}” yet.` : 'No markets match that right now.'}</strong> We only list dates we’ve checked with the organizer.</p>
@@ -290,6 +372,7 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
               </div>
             </aside>
           ) : null}
+        </div>
         </div>
 
         <SellBoard markets={everyMarket} occurrences={occurrences} now={now} />
@@ -319,7 +402,7 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
               <small>Also this weekend</small>
               <strong>Pair the market with something on.</strong>
               {weekendEvents.length ? (
-                <ul>{weekendEvents.map(e => <li key={e.id}><Link to={entityPath(e)}><time dateTime={e.start}>{pickWhen(e.start)}</time><b>{e.title}</b>{e.pricing === 'free' ? <span className="mk-free">Free</span> : null}</Link></li>)}</ul>
+                <ul>{weekendEvents.map(e => <li key={e.id}><Link to={entityPath(e)}><time dateTime={e.start}>{pickWhenAt(e, now.getTime())}</time><b>{e.title}</b>{e.pricing === 'free' ? <span className="mk-free">Free</span> : null}</Link></li>)}</ul>
               ) : <p>Nothing else listed for the weekend yet.</p>}
               <Link className="mk-tile-link" to="/events/this-weekend">Everything this weekend <ArrowRight size={15} aria-hidden="true" /></Link>
             </div>
@@ -344,6 +427,18 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
         <OrganizerPanel markets={everyMarket} all={all} />
         <MarketsOwnerDesk markets={everyMarket} all={all} occurrences={occurrences} now={now} />
       </div>
+
+      {markets.length ? (
+        <MarketsDock
+          shown={browsing && !mapOpen}
+          onTop={toList}
+          onMap={() => setMapOpen(true)}
+          label={dayOn ? <><b>{dayName}</b> · {shown.length} {shown.length === 1 ? 'market' : 'markets'}</>
+            : openNow.length ? <><span className="cw-lb-pulse mk-pulse" aria-hidden="true" /><b>{openNow.length} open now</b> · {markets.length} in all</>
+            : <><b>{markets.length}</b> {markets.length === 1 ? 'market' : 'markets'}</>}
+        />
+      ) : null}
+      {mapOpen ? <MapSheet markets={shown.map(r => r.market)} picks={sheetPicks} now={tick} onClose={closeMap} kmTo={here ? kmTo : undefined} /> : null}
     </div>
   );
 }

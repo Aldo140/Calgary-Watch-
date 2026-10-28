@@ -45,9 +45,9 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
     if (!profile) return null;
     return buildEventPicks({
       entities: discoveryRepository.list(), occurrences: discoveryRepository.occurrences(),
-      interests: profile.eventInterests, homeArea: homeAreaOf(profile), goingIds: going.ids, days: 10, limit: 8,
+      interests: profile.eventInterests, homeArea: homeAreaOf(profile), goingIds: going.ids, days: 10, limit: 8, rotation: user?.uid,
     });
-  }, [profile, going.ids]);
+  }, [profile, going.ids, user?.uid]);
 
   const enter = { initial: reduce ? false : { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { type: 'spring' as const, stiffness: 150, damping: 20 } };
 

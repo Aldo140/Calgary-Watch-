@@ -327,11 +327,10 @@ export default function SpotlightPage() {
               <div className="hx-teaser" aria-hidden="true">
                 <p className="hx-teaser-top">From the festival that played The GRAND in 2025</p>
                 <p className="hx-teaser-big">Back at<span>The GRAND</span></p>
-                <p className="hx-teaser-date">Next year · If the funding comes through</p>
+                <p className="hx-teaser-date">Next year · Tentatively</p>
               </div>
               <div className="hx-prose">
-                <p className="hx-attrib"><b>{s.organizer.name}</b> has told CalgaryWatch he hopes to bring Hex After Dark back to The GRAND next year, if the festival secures grant funding.</p>
-                <p>There’s no date or booking for that yet, and it depends on funding the festival is still looking for.</p>
+                <p>Hex After Dark is tentatively set to return to The GRAND next year.</p>
                 <p>We’ll share with Cameron how many people read this spotlight and how many tapped through to the festival and ScreamFest’s tickets. Those are counts only: nothing about who you are.</p>
               </div>
             </Scene>

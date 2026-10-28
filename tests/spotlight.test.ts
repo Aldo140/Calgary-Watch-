@@ -39,9 +39,9 @@ describe('spotlight content', () => {
       if (s.review.status !== 'published') assert.equal(s.review.body.length, 0);
     }
   });
-  it('attributes the GRAND ambition to Cameron and names the partnership', () => {
-    assert.match(HEX_AFTER_DARK.future, /^Cameron Gall has told CalgaryWatch he hopes/);
-    assert.match(HEX_AFTER_DARK.future, /grant funding/);
+  it('keeps the GRAND return tentative and names the partnership', () => {
+    assert.match(HEX_AFTER_DARK.future, /tentatively set to return to The GRAND/);
+    assert.doesNotMatch(HEX_AFTER_DARK.future, /fund|grant/i);
     assert.match(HEX_AFTER_DARK.disclosure, /partnering with Hex After Dark/);
     assert.match(HEX_AFTER_DARK.partnerLabel, /In partnership with/);
     assert.doesNotMatch(JSON.stringify(HEX_AFTER_DARK), /VIP|passes|free tickets/i);
@@ -100,7 +100,7 @@ describe('spotlight SEO and sharing', () => {
   it('prerenders the headline, attribution and official links', () => {
     const html = buildStaticRouteBody(PATH);
     assert.match(html, /The Dark Side of Calgary Cinema/);
-    assert.match(html, /Cameron Gall has told CalgaryWatch/);
+    assert.match(html, /tentatively set to return to The GRAND/);
     assert.match(html, /showpass\.com\/screamfest-28/);
   });
 });

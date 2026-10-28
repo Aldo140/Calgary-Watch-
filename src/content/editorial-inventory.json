@@ -3260,10 +3260,10 @@
       "slug": "hex-after-dark",
       "title": "Hex After Dark Film Festival",
       "name": "Hex After Dark Film Festival",
-      "website": "https://hexafterdark.com/",
+      "website": "https://hex.ca/events/hex-after-dark-film-festival",
       "address": "Calgary, AB",
-      "summary": "A Halloween festival of short horror films, playing in the bar at ScreamFest this October.",
-      "description": "Hex After Dark is a Halloween film festival of short horror, sci-fi and fantasy films, organized by Cameron Gall. Its FilmFreeway submission page asks for films under an hour and says it generally doesn’t accept films made with AI. The 2025 edition screened at The GRAND’s Flanagan Theatre on October 27, 2025. In October 2026 the festival has told CalgaryWatch that its films play in the bar at ScreamFest on ScreamFest’s operating nights, included with ScreamFest admission.",
+      "summary": "Calgary’s Halloween film festival from HEX Entertainment, playing short horror films in the bar at ScreamFest this October.",
+      "description": "HEX After Dark is a curated Halloween film festival from HEX Entertainment, the Calgary company behind the HEX Halloween & Entertainment Expo, and is organized by Cameron Gall. It takes Halloween, horror, sci-fi and fantasy films, generally not ones made with AI, and its awards include Best Short Film, Best Sci-Fi or Fantasy Film and Best Horror Film. Its 2025 edition screened at The GRAND’s Flanagan Theatre on October 27, 2025. In October 2026 the festival has told CalgaryWatch that its films play in the bar at ScreamFest on ScreamFest’s operating nights, included with ScreamFest admission.",
       "categories": [
         "arts",
         "holiday"
@@ -3276,6 +3276,12 @@
         "halloween"
       ],
       "sources": [
+        {
+          "name": "HEX Entertainment — HEX After Dark Film Festival",
+          "url": "https://hex.ca/events/hex-after-dark-film-festival",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        },
         {
           "name": "Hex After Dark",
           "url": "https://hexafterdark.com/",
@@ -3297,7 +3303,7 @@
       ],
       "images": [],
       "socials": {
-        "website": "https://hexafterdark.com/",
+        "website": "https://hex.ca/events/hex-after-dark-film-festival",
         "facebook": "https://www.facebook.com/p/HEX-After-Dark-100064707322929/"
       },
       "services": [
@@ -3309,8 +3315,8 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-28T06:45:00Z",
-      "updatedAt": "2026-10-28T06:45:00Z"
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
     },
     {
       "id": "biz-mercantile-on-9th",

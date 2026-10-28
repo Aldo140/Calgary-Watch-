@@ -6298,5 +6298,57 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "strathcona-community-association",
+      "name": "Strathcona Community Association",
+      "approved": true,
+      "hosts": [
+        "scacalgary.ca",
+        "www.scacalgary.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-craft-fair-2026",
+        "input": {
+          "kind": "market",
+          "organizer": "Strathcona Community Association",
+          "venue": "Strathcona Community Hall",
+          "address": "277 Strathcona Drive SW, Calgary, AB T3H 2A4",
+          "neighbourhood": "Strathcona Park",
+          "sourceUrl": "https://scacalgary.ca/community-programs",
+          "title": "Strathcona Christmas Craft Fair",
+          "summary": "A free Christmas craft fair with 55+ local vendors at the Strathcona community hall, Saturday, December 5.",
+          "description": "The Strathcona Community Association’s annual Christmas Craft Fair brings more than 55 vendors of handmade gifts, from hand-knit items and jewellery to ornaments, floral arrangements and baking, to its hall at 277 Strathcona Drive SW. It runs Saturday, December 5, 2026, from 10 a.m. to 4 p.m. Admission is free; bring a non-perishable item for the Mayor’s Food Drive, and bring cash, which many vendors prefer.",
+          "categories": [
+            "markets",
+            "holiday",
+            "shopping"
+          ],
+          "tags": [
+            "craft fair",
+            "Christmas market",
+            "makers",
+            "free",
+            "Strathcona Park"
+          ],
+          "amenities": [
+            "Indoor"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-12-05",
+              "start": "2026-12-05T10:00:00-07:00",
+              "end": "2026-12-05T16:00:00-07:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
   }
 ]

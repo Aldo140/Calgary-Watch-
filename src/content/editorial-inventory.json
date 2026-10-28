@@ -8799,17 +8799,17 @@
       "name": "Trickster Theatre",
       "website": "https://www.trickstertheatre.com/",
       "address": "Calgary, AB",
-      "summary": "Calgary theatre company creating work with and for young people.",
-      "description": "Trickster Theatre is a Calgary theatre company that creates performances and programs with young people and schools.",
+      "summary": "Calgary theatre company that brings drama and performance programs into schools.",
+      "description": "Trickster Theatre is a Calgary theatre company that works directly in schools, running drama residencies and performance programs with students. Its work happens inside schools rather than as public shows, so there are no public performances to book; schools contact Trickster directly to bring a program in.",
       "categories": [
         "arts",
-        "family",
         "learning"
       ],
       "tags": [
         "organization",
         "theatre",
-        "youth"
+        "youth",
+        "schools"
       ],
       "sources": [
         {
@@ -8824,8 +8824,8 @@
         "website": "https://www.trickstertheatre.com/"
       },
       "services": [
-        "Productions",
-        "School residencies"
+        "School residencies",
+        "School programs"
       ],
       "claimed": false,
       "partner": false,
@@ -8833,7 +8833,7 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
-      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T19:40:00.000Z",
       "email": "communications@trickstertheatre.com"
     },
     {
@@ -11518,6 +11518,63 @@
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
       "email": "reception@su.ucalgary.ca"
+    },
+    {
+      "id": "biz-strathcona-community-association",
+      "kind": "business",
+      "slug": "strathcona-community-association",
+      "title": "Strathcona Community Association",
+      "name": "Strathcona Community Association",
+      "website": "https://scacalgary.ca/",
+      "address": "277 Strathcona Drive SW, Calgary, AB T3H 2A4",
+      "summary": "The community association for Strathcona, Christie and Aspen in southwest Calgary, with programs, a community hall and a public events calendar.",
+      "description": "The Strathcona Community Association serves the southwest Calgary communities of Strathcona, Christie and Aspen from its hall at 277 Strathcona Drive SW. It runs community programs and seasonal events and lists them on its own events page, including the annual Christmas Craft Fair in December. The office is open Monday to Friday, 10 a.m. to 1 p.m.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "community association",
+        "strathcona-park",
+        "christie-park",
+        "aspen-woods"
+      ],
+      "sources": [
+        {
+          "name": "Strathcona Community Association — events",
+          "url": "https://scacalgary.ca/events",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T19:40:00.000Z"
+        },
+        {
+          "name": "Strathcona Community Association — programs",
+          "url": "https://scacalgary.ca/community-programs",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T19:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://scacalgary.ca/"
+      },
+      "services": [
+        "Community events",
+        "Programs",
+        "Christmas Craft Fair"
+      ],
+      "phone": "403-249-1138",
+      "email": "info@scacalgary.ca",
+      "hours": {
+        "Monday–Friday": "10 a.m.–1 p.m. (office)"
+      },
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T19:40:00.000Z",
+      "updatedAt": "2026-10-28T19:40:00.000Z"
     }
   ]
 }

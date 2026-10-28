@@ -790,6 +790,8 @@ service cloud.firestore {
     // account per listing, so the id is the key.
     // Organization authority and live projections are validated by the callable server.
     match /admin_member_edits/{id} { allow read: if isAdmin(); allow write: if false; }
+    // Which claims and organizer sign-ups admins were emailed about (scripts/claims/notify-admins.ts).
+    match /admin_alerts/{id} { allow read: if isAdmin(); allow write: if false; }
     // Organizer contact details are private to the approved listing representative and admins.
     match /organization_management_profiles/{sourceId} {
       allow get: if isAdmin() || (isAuthenticated() &&

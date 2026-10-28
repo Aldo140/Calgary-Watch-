@@ -4,7 +4,7 @@ import {AdminAccessBar} from '../components/admin/AdminAccessBar';
 import {useAdminEditMode} from '../hooks/useAdminEditMode';
 import { approvedOrganization } from '../lib/organizationWorkspace';
 import { ListingManagement } from '../components/entity/ListingManagement';
-import { restoreClaimDraft } from '../lib/claimDraft';
+import { clearClaimDraft, isClaimQueued, loadClaimDraft, saveClaimDraft, setClaimQueued } from '../lib/claimDraft';
 import { INVITE_PARAM, decodeInvite, inviteGreetingName, normalizeInvite, type ClaimInvite, type SignupIntent } from '../lib/claimInvite';
 import { useVerifiedListing } from '../lib/claimsApi';
 import { VerifiedBadge } from '../components/entity/VerifiedBadge';
@@ -111,8 +111,7 @@ function ClaimForm({ id }: { id: string }) {
   const profile=management??(legacyClaim&&entity&&(entity.kind==='event'||entity.kind==='market')?standaloneOrganization(entity):organization?.profile);
   const sites = entity ? sourceDomains(entity.sources) : [];
   const [draft, setDraft] = useState<ClaimDraft>(() => {
-    let d: ClaimDraft;
-    try { d = restoreClaimDraft(sessionStorage.getItem(`claim-draft:${id}`)); } catch { d = restoreClaimDraft(null); }
+    const d = loadClaimDraft(id);
     // An invitation fills in who we wrote to; anything already typed wins.
     return { ...d, name: d.name || invite?.name || '', workEmail: d.workEmail || invite?.email || '' };
   });
@@ -121,9 +120,11 @@ function ClaimForm({ id }: { id: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [tried, setTried] = useState(false);
-  const pending = useRef(false);
+  // Survives the new tab the verification link opens (claimDraft.ts).
+  const pending = useRef(isClaimQueued(id));
+  const queue = (on: boolean) => { pending.current = on; setClaimQueued(id, on); };
   const verifiedListing = useVerifiedListing(id, Boolean(entity?.ownerVerifiedAt));
-  useEffect(() => { try { sessionStorage.setItem(`claim-draft:${id}`, JSON.stringify(draft)); } catch { /* storage is optional */ } }, [id, draft]);
+  useEffect(() => { saveClaimDraft(id, draft); }, [id, draft]);
 
   useEffect(() => { document.title = entity ? `Claim ${entity.title} | CalgaryWatch` : 'Claim a listing | CalgaryWatch'; }, [entity]);
   // Prefill from the authenticated account once signed in, without overwriting typing.
@@ -140,9 +141,9 @@ function ClaimForm({ id }: { id: string }) {
   const accountTitle = entity ? `Your organizer account for ${profile?.title ?? entity.title}.` : '';
   /** Google, or an account that already exists: the shared dialog, worded for an organizer. */
   const useOtherAccount = async () => {
-    pending.current = true;
+    queue(true);
     await signIn({ mode: 'signin', email: draft.workEmail, name: draft.name, verify: true, signupAs: intent, title: accountTitle, intro: 'Sign in, or continue with Google. Your claim answers stay on this page and send once your email is verified.' });
-    if (!auth?.currentUser) pending.current = false;
+    if (!auth?.currentUser) queue(false);
   };
 
   const send = async () => {
@@ -166,11 +167,11 @@ function ClaimForm({ id }: { id: string }) {
       if (pp) { setTried(true); setError(pp === 'Enter your password.' ? 'Choose a password for your organizer account.' : pp); document.getElementById('cl-password')?.focus(); return; }
       setBusy(true); setError('');
       try {
-        pending.current = true;
+        queue(true);
         await signUpWithEmail(draft.workEmail.trim(), password, draft.name.trim(), intent);
         setPassword('');
       } catch (e) {
-        pending.current = false;
+        queue(false);
         if (authCode(e) === 'auth/email-already-in-use') { setError(`${draft.workEmail.trim()} already has a CalgaryWatch account. Sign in with it and your claim sends from there.`); void useOtherAccount(); }
         else setError(authErrorMessage(e));
       } finally { setBusy(false); }
@@ -179,11 +180,11 @@ function ClaimForm({ id }: { id: string }) {
     // Accounts made before names were asked for take the name typed on the claim.
     if (!realName(current.displayName)) void saveName(draft.name).catch(() => {});
     // Unverified: keep the claim queued and send it the moment verification lands.
-    if (!current.emailVerified) { pending.current = true; setError('Verify your email before submitting this claim. We’ll send it as soon as you do.'); return; }
+    if (!current.emailVerified) { queue(true); setError('Verify your email before submitting this claim. We’ll send it as soon as you do.'); return; }
     setBusy(true); setError('');
     try {
       await submitClaim(current, { id: entity.id, title: entity.title, path: entityPath(entity) }, draft);
-      try { sessionStorage.removeItem(`claim-draft:${id}`); } catch { /* optional storage */ }
+      clearClaimDraft(id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setError('That didn’t send. If you already claimed this listing, refresh the page; otherwise try again in a moment.');
@@ -199,7 +200,7 @@ function ClaimForm({ id }: { id: string }) {
     return () => { window.removeEventListener('focus', check); document.removeEventListener('visibilitychange', check); };
   }, [user, user?.emailVerified, previewUid, refreshCurrentUser]);
   useEffect(() => {
-    if (!previewUid && pending.current && user?.emailVerified && claims) { pending.current = false; setError(''); if (!claim) void send(); }
+    if (!previewUid && pending.current && user?.emailVerified && claims) { pending.current = false; setError(''); if (claim) setClaimQueued(id, false); else void send(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, user?.emailVerified, claims]);
 

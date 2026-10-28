@@ -123,6 +123,9 @@ describe('email authentication', () => {
     assert.match(readFileSync('firestore.rules','utf8'), /request\.auth\.token\.email_verified == true/);
     const page=readFileSync('src/pages/ClaimListingPage.tsx','utf8');
     assert.match(page,/Verify your email before submitting this claim/);
-    assert.match(page,/claim-draft:/);
+    // The queued claim and its draft outlive the tab the verification link replaces.
+    assert.match(page,/loadClaimDraft\(id\)/);
+    assert.match(page,/useRef\(isClaimQueued\(id\)\)/);
+    assert.match(readFileSync('src/lib/claimDraft.ts','utf8'),/localStorage/);
   });
 });

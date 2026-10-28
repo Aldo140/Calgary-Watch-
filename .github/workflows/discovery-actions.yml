@@ -68,6 +68,15 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+      # Tells admins about new claims and organizer sign-ups stuck before their claim (src/lib/claimAdminAlert.ts).
+      - name: Email admins about new claims
+        if: ${{ !inputs.claim_email_sample }}
+        run: npx tsx scripts/claims/notify-admins.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ADMIN_ALERT_TO: ${{ vars.ADMIN_ALERT_TO }}
       - name: Republish the site
         if: ${{ !inputs.claim_email_sample && steps.apply.outputs.applied != '' && steps.apply.outputs.applied != '0' }}
         run: gh workflow run deploy-firebase.yml --ref main

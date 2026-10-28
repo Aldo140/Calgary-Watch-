@@ -186,8 +186,8 @@
           "venue": "Max Bell Theatre, Werklund Centre",
           "neighbourhood": "Downtown",
           "sourceUrl": "https://www.theatrecalgary.com/shows/a-christmas-carol",
-          "start": "2026-11-26T19:30:00-07:00",
-          "end": "2026-12-27T13:00:00-07:00",
+          "start": "2026-11-26T19:30:00-06:00",
+          "end": "2026-12-27T13:00:00-06:00",
           "endTimeEstimated": true
         }
       }
@@ -346,8 +346,8 @@
           "venue": "Scotiabank Saddledome",
           "neighbourhood": "Beltline",
           "sourceUrl": "https://scotiabanksaddledome.com/events/",
-          "start": "2026-11-03T20:00:00-07:00",
-          "end": "2026-11-03T23:00:00-07:00",
+          "start": "2026-11-03T20:00:00-06:00",
+          "end": "2026-11-03T23:00:00-06:00",
           "endTimeEstimated": true
         }
       }
@@ -433,74 +433,74 @@
           "occurrences": [
             {
               "sourceRecordId": "icm-2026-11-13",
-              "start": "2026-11-13T12:00:00-07:00",
-              "end": "2026-11-13T21:00:00-07:00",
+              "start": "2026-11-13T12:00:00-06:00",
+              "end": "2026-11-13T21:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-14",
-              "start": "2026-11-14T10:00:00-07:00",
-              "end": "2026-11-14T19:00:00-07:00",
+              "start": "2026-11-14T10:00:00-06:00",
+              "end": "2026-11-14T19:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-15",
-              "start": "2026-11-15T10:00:00-07:00",
-              "end": "2026-11-15T18:00:00-07:00",
+              "start": "2026-11-15T10:00:00-06:00",
+              "end": "2026-11-15T18:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-20",
-              "start": "2026-11-20T12:00:00-07:00",
-              "end": "2026-11-20T21:00:00-07:00",
+              "start": "2026-11-20T12:00:00-06:00",
+              "end": "2026-11-20T21:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-21",
-              "start": "2026-11-21T10:00:00-07:00",
-              "end": "2026-11-21T19:00:00-07:00",
+              "start": "2026-11-21T10:00:00-06:00",
+              "end": "2026-11-21T19:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-22",
-              "start": "2026-11-22T10:00:00-07:00",
-              "end": "2026-11-22T18:00:00-07:00",
+              "start": "2026-11-22T10:00:00-06:00",
+              "end": "2026-11-22T18:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-27",
-              "start": "2026-11-27T12:00:00-07:00",
-              "end": "2026-11-27T21:00:00-07:00",
+              "start": "2026-11-27T12:00:00-06:00",
+              "end": "2026-11-27T21:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-28",
-              "start": "2026-11-28T10:00:00-07:00",
-              "end": "2026-11-28T19:00:00-07:00",
+              "start": "2026-11-28T10:00:00-06:00",
+              "end": "2026-11-28T19:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-11-29",
-              "start": "2026-11-29T10:00:00-07:00",
-              "end": "2026-11-29T18:00:00-07:00",
+              "start": "2026-11-29T10:00:00-06:00",
+              "end": "2026-11-29T18:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-12-04",
-              "start": "2026-12-04T12:00:00-07:00",
-              "end": "2026-12-04T21:00:00-07:00",
+              "start": "2026-12-04T12:00:00-06:00",
+              "end": "2026-12-04T21:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-12-05",
-              "start": "2026-12-05T10:00:00-07:00",
-              "end": "2026-12-05T19:00:00-07:00",
+              "start": "2026-12-05T10:00:00-06:00",
+              "end": "2026-12-05T19:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "icm-2026-12-06",
-              "start": "2026-12-06T10:00:00-07:00",
-              "end": "2026-12-06T18:00:00-07:00",
+              "start": "2026-12-06T10:00:00-06:00",
+              "end": "2026-12-06T18:00:00-06:00",
               "cancelled": false
             }
           ]
@@ -1104,8 +1104,8 @@
           "venue": "Wilder Institute’s Calgary Zoo",
           "neighbourhood": "Bridgeland",
           "sourceUrl": "https://www.calgaryzoo.com/zoolights/",
-          "start": "2026-11-13T17:30:00-07:00",
-          "end": "2027-01-03T21:30:00-07:00"
+          "start": "2026-11-13T17:30:00-06:00",
+          "end": "2027-01-03T21:30:00-06:00"
         }
       }
     ]
@@ -1219,8 +1219,8 @@
           "sourceUrl": "https://www.calgaryopera.com/",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-11-13T00:00:00-07:00",
-          "end": "2026-11-16T00:00:00-07:00"
+          "start": "2026-11-13T00:00:00-06:00",
+          "end": "2026-11-16T00:00:00-06:00"
         }
       },
       {
@@ -1248,8 +1248,8 @@
           "sourceUrl": "https://www.calgaryopera.com/",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-11-20T00:00:00-07:00",
-          "end": "2026-11-23T00:00:00-07:00"
+          "start": "2026-11-20T00:00:00-06:00",
+          "end": "2026-11-23T00:00:00-06:00"
         }
       }
     ]
@@ -1372,8 +1372,8 @@
           "summary": "The Calgary Phil plays Tchaikovsky’s last symphony, the “Pathétique”.",
           "description": "Part of the Calgary Phil’s Classics series. Performances November 6 and 7, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme details and tickets are on the orchestra’s 2026/27 season pages.",
           "sourceUrl": "https://calgaryphil.com/2026-2027-season/",
-          "start": "2026-11-06T19:30:00-07:00",
-          "end": "2026-11-06T21:45:00-07:00"
+          "start": "2026-11-06T19:30:00-06:00",
+          "end": "2026-11-06T21:45:00-06:00"
         }
       },
       {
@@ -1400,8 +1400,8 @@
           "summary": "The Calgary Phil plays Tchaikovsky’s last symphony, the “Pathétique”.",
           "description": "Part of the Calgary Phil’s Classics series. Performances November 6 and 7, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme details and tickets are on the orchestra’s 2026/27 season pages.",
           "sourceUrl": "https://calgaryphil.com/2026-2027-season/",
-          "start": "2026-11-07T19:30:00-07:00",
-          "end": "2026-11-07T21:45:00-07:00"
+          "start": "2026-11-07T19:30:00-06:00",
+          "end": "2026-11-07T21:45:00-06:00"
         }
       },
       {
@@ -1428,8 +1428,8 @@
           "summary": "Singer-pianist Tony DeSare and the Calgary Phil play Billy Joel’s hits.",
           "description": "A Pops series concert: Tony DeSare fronts the orchestra for the Billy Joel songbook. Performances November 13 and 14, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Tickets on the Calgary Phil’s season pages.",
           "sourceUrl": "https://calgaryphil.com/2026-2027-season/",
-          "start": "2026-11-13T19:30:00-07:00",
-          "end": "2026-11-13T21:45:00-07:00"
+          "start": "2026-11-13T19:30:00-06:00",
+          "end": "2026-11-13T21:45:00-06:00"
         }
       },
       {
@@ -1456,8 +1456,8 @@
           "summary": "Singer-pianist Tony DeSare and the Calgary Phil play Billy Joel’s hits.",
           "description": "A Pops series concert: Tony DeSare fronts the orchestra for the Billy Joel songbook. Performances November 13 and 14, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Tickets on the Calgary Phil’s season pages.",
           "sourceUrl": "https://calgaryphil.com/2026-2027-season/",
-          "start": "2026-11-14T19:30:00-07:00",
-          "end": "2026-11-14T21:45:00-07:00"
+          "start": "2026-11-14T19:30:00-06:00",
+          "end": "2026-11-14T21:45:00-06:00"
         }
       },
       {
@@ -1484,8 +1484,8 @@
           "summary": "A Classics series night of Mozart and Mahler with the Calgary Phil.",
           "description": "Part of the Calgary Phil’s Classics series. Performances November 20 and 21, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme and tickets on the orchestra’s 2026/27 season pages.",
           "sourceUrl": "https://calgaryphil.com/2026-2027-season/",
-          "start": "2026-11-20T19:30:00-07:00",
-          "end": "2026-11-20T21:45:00-07:00"
+          "start": "2026-11-20T19:30:00-06:00",
+          "end": "2026-11-20T21:45:00-06:00"
         }
       },
       {
@@ -1512,8 +1512,8 @@
           "summary": "A Classics series night of Mozart and Mahler with the Calgary Phil.",
           "description": "Part of the Calgary Phil’s Classics series. Performances November 20 and 21, 2026 at 7:30 p.m. in the Jack Singer Concert Hall. Programme and tickets on the orchestra’s 2026/27 season pages.",
           "sourceUrl": "https://calgaryphil.com/2026-2027-season/",
-          "start": "2026-11-21T19:30:00-07:00",
-          "end": "2026-11-21T21:45:00-07:00"
+          "start": "2026-11-21T19:30:00-06:00",
+          "end": "2026-11-21T21:45:00-06:00"
         }
       },
       {
@@ -1541,8 +1541,8 @@
           "summary": "Trumpeter and singer Byron Stripling swings the Christmas songbook with the Calgary Phil.",
           "description": "A jazz-flavoured holiday concert with Byron Stripling on trumpet and vocals, including Joy to the World, Santa Claus Is Comin’ to Town and White Christmas. Thursday, November 26, 2026 at 7:30 p.m. Tickets were listed at $36 to $107.",
           "sourceUrl": "https://calgaryphil.com/events/byron-striplings-holiday-swing-2026-11-26-730-pm/",
-          "start": "2026-11-26T19:30:00-07:00",
-          "end": "2026-11-26T21:45:00-07:00"
+          "start": "2026-11-26T19:30:00-06:00",
+          "end": "2026-11-26T21:45:00-06:00"
         }
       },
       {
@@ -1571,8 +1571,8 @@
           "summary": "Rachmaninoff’s The Bells and Tchaikovsky’s “Winter Daydreams” symphony, with the Calgary Phil Chorus.",
           "description": "Geoffrey Paterson leads the orchestra, the Calgary Philharmonic Chorus and soloists in Rachmaninoff’s choral work The Bells, then Tchaikovsky’s Symphony No. 1, “Winter Daydreams”. Friday, December 4, 2026 at 7:30 p.m. in the Jack Singer Concert Hall.",
           "sourceUrl": "https://calgaryphil.com/events/holiday-bells-winter-dreams-2026-12-04-730-pm/",
-          "start": "2026-12-04T19:30:00-07:00",
-          "end": "2026-12-04T21:45:00-07:00"
+          "start": "2026-12-04T19:30:00-06:00",
+          "end": "2026-12-04T21:45:00-06:00"
         }
       },
       {
@@ -1601,8 +1601,8 @@
           "venue": "Grace Presbyterian Church",
           "neighbourhood": "Beltline",
           "sourceUrl": "https://calgaryphil.com/events/traditional-christmas-2026-12-10-800-pm/",
-          "start": "2026-12-10T20:00:00-07:00",
-          "end": "2026-12-10T21:30:00-07:00",
+          "start": "2026-12-10T20:00:00-06:00",
+          "end": "2026-12-10T21:30:00-06:00",
           "endTimeEstimated": true
         }
       }
@@ -3451,8 +3451,8 @@
             0,
             30
           ],
-          "start": "2026-11-08T15:00:00-07:00",
-          "end": "2026-11-08T17:00:00-07:00"
+          "start": "2026-11-08T15:00:00-06:00",
+          "end": "2026-11-08T17:00:00-06:00"
         }
       }
     ]
@@ -3831,8 +3831,8 @@
             "opening night",
             "filmmaker in attendance"
           ],
-          "start": "2026-11-18T18:30:00-07:00",
-          "end": "2026-11-18T20:30:00-07:00"
+          "start": "2026-11-18T18:30:00-06:00",
+          "end": "2026-11-18T20:30:00-06:00"
         }
       },
       {
@@ -3866,8 +3866,8 @@
             "short films",
             "Canadian film"
           ],
-          "start": "2026-11-19T16:00:00-07:00",
-          "end": "2026-11-19T18:00:00-07:00"
+          "start": "2026-11-19T16:00:00-06:00",
+          "end": "2026-11-19T18:00:00-06:00"
         }
       },
       {
@@ -5599,8 +5599,8 @@
             "free",
             "Montgomery"
           ],
-          "start": "2026-11-14T17:00:00-07:00",
-          "end": "2026-11-14T20:00:00-07:00"
+          "start": "2026-11-14T17:00:00-06:00",
+          "end": "2026-11-14T20:00:00-06:00"
         }
       }
     ]
@@ -5648,14 +5648,14 @@
           "occurrences": [
             {
               "sourceRecordId": "2026-11-21",
-              "start": "2026-11-21T10:00:00-07:00",
-              "end": "2026-11-21T15:00:00-07:00",
+              "start": "2026-11-21T10:00:00-06:00",
+              "end": "2026-11-21T15:00:00-06:00",
               "cancelled": false
             },
             {
               "sourceRecordId": "2026-11-22",
-              "start": "2026-11-22T10:00:00-07:00",
-              "end": "2026-11-22T15:00:00-07:00",
+              "start": "2026-11-22T10:00:00-06:00",
+              "end": "2026-11-22T15:00:00-06:00",
               "cancelled": false
             }
           ]
@@ -5744,8 +5744,8 @@
             "tour",
             "Protospace"
           ],
-          "start": "2026-11-03T19:00:00-07:00",
-          "end": "2026-11-03T21:00:00-07:00"
+          "start": "2026-11-03T19:00:00-06:00",
+          "end": "2026-11-03T21:00:00-06:00"
         }
       },
       {
@@ -5773,8 +5773,8 @@
             "tour",
             "Protospace"
           ],
-          "start": "2026-11-10T19:00:00-07:00",
-          "end": "2026-11-10T21:00:00-07:00"
+          "start": "2026-11-10T19:00:00-06:00",
+          "end": "2026-11-10T21:00:00-06:00"
         }
       },
       {
@@ -5802,8 +5802,8 @@
             "tour",
             "Protospace"
           ],
-          "start": "2026-11-17T19:00:00-07:00",
-          "end": "2026-11-17T21:00:00-07:00"
+          "start": "2026-11-17T19:00:00-06:00",
+          "end": "2026-11-17T21:00:00-06:00"
         }
       },
       {
@@ -5831,8 +5831,8 @@
             "tour",
             "Protospace"
           ],
-          "start": "2026-11-24T19:00:00-07:00",
-          "end": "2026-11-24T21:00:00-07:00"
+          "start": "2026-11-24T19:00:00-06:00",
+          "end": "2026-11-24T21:00:00-06:00"
         }
       },
       {
@@ -5860,8 +5860,8 @@
             "tour",
             "Protospace"
           ],
-          "start": "2026-12-01T19:00:00-07:00",
-          "end": "2026-12-01T21:00:00-07:00"
+          "start": "2026-12-01T19:00:00-06:00",
+          "end": "2026-12-01T21:00:00-06:00"
         }
       },
       {
@@ -5889,8 +5889,8 @@
             "tour",
             "Protospace"
           ],
-          "start": "2026-12-08T19:00:00-07:00",
-          "end": "2026-12-08T21:00:00-07:00"
+          "start": "2026-12-08T19:00:00-06:00",
+          "end": "2026-12-08T21:00:00-06:00"
         }
       },
       {
@@ -5918,8 +5918,8 @@
             "tour",
             "Protospace"
           ],
-          "start": "2026-12-15T19:00:00-07:00",
-          "end": "2026-12-15T21:00:00-07:00"
+          "start": "2026-12-15T19:00:00-06:00",
+          "end": "2026-12-15T21:00:00-06:00"
         }
       }
     ]
@@ -5963,8 +5963,8 @@
           "sourceUrl": "https://stagewestcalgary.com/2026-27-season-productions/",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-11-21T00:00:00-07:00",
-          "end": "2026-12-25T00:00:00-07:00"
+          "start": "2026-11-21T00:00:00-06:00",
+          "end": "2026-12-25T00:00:00-06:00"
         }
       },
       {
@@ -5992,8 +5992,8 @@
           "sourceUrl": "https://stagewestcalgary.com/2026-27-season-productions/",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-11-13T00:00:00-07:00",
-          "end": "2027-02-01T00:00:00-07:00"
+          "start": "2026-11-13T00:00:00-06:00",
+          "end": "2027-02-01T00:00:00-06:00"
         }
       }
     ]
@@ -6033,8 +6033,8 @@
           "address": "14 Street NW and 24 Avenue NW, Calgary, AB",
           "venue": "Confederation Park Golf Course",
           "sourceUrl": "https://www.visitcalgary.com/plan-and-stay/itineraries-and-travel-inspiration/where-to-see-christmas-lights-in-calgary",
-          "start": "2026-11-21T17:00:00-07:00",
-          "end": "2027-01-09T00:00:00-07:00"
+          "start": "2026-11-21T17:00:00-06:00",
+          "end": "2027-01-09T00:00:00-06:00"
         }
       }
     ]
@@ -6076,8 +6076,8 @@
           "sourceUrl": "https://www.jazzyyc.com/canadian-jazz-fest/",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-11-03T00:00:00-07:00",
-          "end": "2026-11-09T00:00:00-07:00"
+          "start": "2026-11-03T00:00:00-06:00",
+          "end": "2026-11-09T00:00:00-06:00"
         }
       }
     ]
@@ -6120,8 +6120,8 @@
           "sourceUrl": "https://holidaywonder.ca/",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-12-03T00:00:00-07:00",
-          "end": "2027-01-01T00:00:00-07:00"
+          "start": "2026-12-03T00:00:00-06:00",
+          "end": "2027-01-01T00:00:00-06:00"
         }
       }
     ]
@@ -6168,8 +6168,8 @@
           "sourceUrl": "https://www.lunchboxtheatre.com/202627-season",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-12-01T00:00:00-07:00",
-          "end": "2026-12-25T00:00:00-07:00"
+          "start": "2026-12-01T00:00:00-06:00",
+          "end": "2026-12-25T00:00:00-06:00"
         }
       }
     ]
@@ -6217,7 +6217,7 @@
           "schedulePrecision": "date",
           "endTimeEstimated": true,
           "start": "2026-11-01T00:00:00-06:00",
-          "end": "2026-11-12T00:00:00-07:00"
+          "end": "2026-11-12T00:00:00-06:00"
         }
       }
     ]
@@ -6261,8 +6261,8 @@
           "tickets": "https://www.showpass.com/emv-2026-3/",
           "schedulePrecision": "date",
           "endTimeEstimated": true,
-          "start": "2026-12-18T00:00:00-07:00",
-          "end": "2026-12-19T00:00:00-07:00"
+          "start": "2026-12-18T00:00:00-06:00",
+          "end": "2026-12-19T00:00:00-06:00"
         }
       },
       {
@@ -6293,8 +6293,8 @@
           "description": "Early Music Voices’ Sing Along Messiah is on Saturday, December 19, 2026, 3 to 6 p.m., at Knox United Church. Rosa Barocca plays, auditioned Debut Singers take the solos, and the audience sings the choruses.",
           "sourceUrl": "https://www.earlymusicvoices.ca/season-details/sing-along-messiah",
           "tickets": "https://www.showpass.com/emv-2026-4/",
-          "start": "2026-12-19T15:00:00-07:00",
-          "end": "2026-12-19T18:00:00-07:00"
+          "start": "2026-12-19T15:00:00-06:00",
+          "end": "2026-12-19T18:00:00-06:00"
         }
       }
     ]

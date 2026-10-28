@@ -16,7 +16,7 @@ test('CUFF.Docs is a single date-only festival, associated with its permanent or
 });
 test('CUFF.Docs carries the October 28 lineup: on-sale prices, opening night and the Rankin talk',()=>{
  const fest=index.find((e:any)=>e.sourceRecordId==='cuff-docs-2026');assert.equal(fest.ticketSaleStatus,'on-sale');assert.deepEqual(fest.priceRange,[10,12]);assert.doesNotMatch(fest.description,/will be released October 28/);
- const opening=index.find((e:any)=>e.sourceRecordId==='cuff-docs-2026-opening-night');assert.ok(validateEntity(opening));assert.equal(opening.start,'2026-11-18T18:30:00-07:00');assert.equal(opening.organizerEntityId,'biz-calgary-underground-film-festival');
- const talk=index.find((e:any)=>e.sourceRecordId==='cuff-docs-2026-matthew-rankin-talk');assert.ok(validateEntity(talk));assert.equal(talk.start,'2026-11-19T16:00:00-07:00');
+ const opening=index.find((e:any)=>e.sourceRecordId==='cuff-docs-2026-opening-night');assert.ok(validateEntity(opening));assert.equal(opening.start,'2026-11-18T18:30:00-06:00');assert.equal(opening.organizerEntityId,'biz-calgary-underground-film-festival');
+ const talk=index.find((e:any)=>e.sourceRecordId==='cuff-docs-2026-matthew-rankin-talk');assert.ok(validateEntity(talk));assert.equal(talk.start,'2026-11-19T16:00:00-06:00');
  const profile=authored.find((e:any)=>e.id==='biz-calgary-underground-film-festival');assert.doesNotMatch(profile.description,/scheduled for release/);
 });

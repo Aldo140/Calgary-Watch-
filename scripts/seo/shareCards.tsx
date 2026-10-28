@@ -38,6 +38,7 @@ const PALETTES: Record<CardTheme, Palette> = {
   neighbourhood: { bg: '#1554d1', ink: CREAM, muted: '#d6e2fa', accent: '#ffdf4f', onAccent: NAVY, panel: CREAM, panelInk: NAVY },
   guide: { bg: CREAM, ink: NAVY, muted: '#565a61', accent: NAVY, onAccent: CREAM, panel: '#ffffff', panelInk: NAVY },
   best: { bg: '#ffdf4f', ink: NAVY, muted: '#4d4415', accent: NAVY, onAccent: '#ffdf4f', panel: '#ffffff', panelInk: NAVY },
+  spotlight: { bg: '#0c0a12', ink: '#ffffff', muted: '#c9c2d6', accent: '#ff5a4e', onAccent: '#ffffff', panel: '#17121f', panelInk: '#ffffff' },
 };
 
 type Fonts = Parameters<typeof satori>[1]['fonts'];

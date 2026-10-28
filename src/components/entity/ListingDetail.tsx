@@ -27,6 +27,8 @@ import { VerifiedMark } from './ClaimCta';
 import { SourceBadge } from './EntityDetail';
 import { GoingButton } from '../plans/GoingButton';
 import { ThursdayNudge } from '../plans/ThursdayNudge';
+import { SpotlightCard } from '../spotlight/SpotlightCard';
+import { spotlightForEntity } from '../../lib/spotlights';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/markets.css';
@@ -122,6 +124,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const open = !past && !event.cancelled;
   const photo = eventArtwork(event, all);
   const organization = organizerProfile(event, all);
+  const spotlight = spotlightForEntity(event);
   const orgShelf = organization ? SHELVES.find(sh => sh.id === shelfOf(organization)) : undefined;
   const lead = event.summary && event.summary !== event.title && !event.summary.startsWith(`${event.title}, listed by`) ? event.summary : '';
   const description = event.description && event.description !== event.summary ? event.description : lead || event.description;
@@ -202,6 +205,8 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
             {interests.length ? <p className="mk-amenities">{interests.map(i => <Link key={i} className="mk-tag" to={`/events?filter=${i === 'outdoors' ? 'outdoor' : i === 'learning' ? 'talks' : i}`}>{interestLabel(i)}</Link>)}</p> : null}
             {organizerSite ? <a className="mk-organizer" href={organizerSite} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} aria-hidden="true" /> {event.organizer}’s page</a> : null}
           </section>
+
+          {spotlight ? <SpotlightCard spotlight={spotlight} at="event-page" entities={all} compact /> : null}
 
           {organization && orgShelf ? (
             <section className="mk-dsec mk-runby" data-reveal aria-labelledby="ld-runby">

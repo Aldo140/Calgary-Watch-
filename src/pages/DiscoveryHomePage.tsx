@@ -14,6 +14,8 @@ import { CalgaryDailyStrip } from '../components/home/CalgaryDailyStrip';
 import { useCalgaryWeather } from '../hooks/useCalgaryWeather';
 import { weekAgenda } from '../lib/discoveryCalendar';
 import { discoveryRepository } from '../data/discovery';
+import { SpotlightCard } from '../components/spotlight/SpotlightCard';
+import { activeSpotlight } from '../lib/spotlights';
 import '../styles/home.css';
 import '../styles/home-board.css';
 import '../styles/home-v3.css';
@@ -48,6 +50,7 @@ export default function DiscoveryHomePage() {
   const days = useMemo(() => weekAgenda(entities, discoveryRepository.occurrences()), [entities]);
   const weather = useCalgaryWeather();
   const pulse = withDemoPulse(useLivePulse(true));
+  const spotlight = activeSpotlight();
   const [selected, setSelected] = useState(() => Math.max(0, days.findIndex(d => d.items.length)));
 
   const pickDay = (index: number) => {
@@ -63,6 +66,7 @@ export default function DiscoveryHomePage() {
         <div className="cw-wrap h-ways-wrap">
           <WhatsHere days={days} entities={entities} pulse={pulse} />
         </div>
+        {spotlight ? <div className="cw-wrap h-spot-wrap"><SpotlightCard spotlight={spotlight} at="home" entities={entities} /></div> : null}
         <div className="cw-wrap h-week-wrap">
           <WeekPlanner days={days} forecast={weather.daily} selected={selected} onSelect={setSelected} />
         </div>

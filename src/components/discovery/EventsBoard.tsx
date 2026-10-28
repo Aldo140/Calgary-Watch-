@@ -19,6 +19,8 @@ import { EventArt, eventArtKind } from './ListingArt';
 import { MenuArt } from '../site/MenuArt';
 import { discoveryRepository } from '../../data/discovery';
 import { resolvePicks } from '../../lib/dateNight';
+import { activeSpotlight } from '../../lib/spotlights';
+import { SpotlightCard } from '../spotlight/SpotlightCard';
 import { eventArtwork, listingImageSrc } from '../../lib/organizations';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
@@ -91,6 +93,7 @@ export interface EventsBoardProps {
 export function EventsBoard({ title, items, upcoming, when, interests, query, period, emptyCta }: EventsBoardProps) {
   const now = useMemo(() => new Date(), []);
   const today = calgaryDate(now);
+  const spotlight = activeSpotlight(now);
   const board = useMemo(() => buildEventsBoard(items, now), [items, now]);
   const reduce = useReducedMotion();
   const [shown, setShown] = useState(() => initialDayCount(board.days));
@@ -200,6 +203,8 @@ export function EventsBoard({ title, items, upcoming, when, interests, query, pe
             </>
           ) : emptyCta}</div>
         ) : null}
+
+        {!query && spotlight ? <SpotlightCard spotlight={spotlight} at="events" entities={discoveryRepository.list()} compact /> : null}
 
         {!query ? <DateNight now={now} period={period} /> : null}
 

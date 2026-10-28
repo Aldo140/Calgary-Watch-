@@ -1,0 +1,37 @@
+name: Spotlight report
+
+# Run by hand: counts views, card taps and outbound link taps for a
+# CalgaryWatch Spotlight and writes a shareable Markdown report to the run
+# summary. Reads a few hundred documents at most.
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: Spotlight slug
+        default: hex-after-dark
+        required: true
+      since:
+        description: Start date, YYYY-MM-DD (defaults to the publish date)
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/ops/spotlight-report.ts "$SLUG" ${SINCE:+--since "$SINCE"}
+        env:
+          SLUG: ${{ inputs.slug }}
+          SINCE: ${{ inputs.since }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}

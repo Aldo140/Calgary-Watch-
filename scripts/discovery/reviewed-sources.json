@@ -3397,7 +3397,7 @@
           "kind": "event",
           "title": "14th CUFF.Docs Documentary Film Festival",
           "summary": "Five days of independent documentary features and shorts at Globe Cinema, presented by Calgary Underground Film Festival.",
-          "description": "The 14th CUFF.Docs Documentary Film Festival runs November 18–22, 2026 at Globe Cinema. Presented by Calgary Underground Film Festival, the festival showcases non-fiction features and shorts across a range of subjects, styles and genres.\n\nThis listing covers the festival dates, not continuous screening hours. CUFF says the full programme and individual tickets will be released October 28; confirm each screening’s start time and availability on its official site. Festival passes are available through the official pass page.\n\nVenue: Globe Cinema, 617 8 Avenue SW, Calgary. Check the official programme for film details, ticket categories and current prices.",
+          "description": "The 14th CUFF.Docs Documentary Film Festival runs November 18–22, 2026 at Globe Cinema. Presented by Calgary Underground Film Festival, the festival showcases non-fiction features and shorts across a range of subjects, styles and genres.\n\nThe full programme was announced October 28: 15 features, 17 shorts across two shorts packages and before features, and CATVIDEOFEST. Matthew Rankin’s LADIES AND GENTLEMEN, BRIAN MULRONEY opens the festival on Wednesday, November 18 at 6:30 p.m., and Rankin returns Thursday, November 19 at 4 p.m. for an artist talk and retrospective of his documentary shorts. Canadian features include CAPTAIN NEWFOUNDLAND, MORE MILES THAN MONEY: THE STORY OF JR. GONE WILD, TURTLE ISLAND RAP and the world premiere of the Calgary-made STARRY NIGHT. CATVIDEOFEST returns with 10% of ticket sales going to the Meow Foundation.\n\nThis listing covers the festival dates, not continuous screening hours; confirm each screening’s start time on the official programme. CUFF lists tickets at $12 per film, or $10 for members, students and seniors, with 5-Film Packs at $50 and Festival Passes at $75. Check the official site for availability and fees.\n\nVenue: Globe Cinema, 617 8 Avenue SW, Calgary.",
           "organizer": "Calgary Underground Film Festival",
           "address": "617 8 Avenue SW, Calgary, AB",
           "venue": "Globe Cinema",
@@ -3415,10 +3415,84 @@
             "CUFF.Docs"
           ],
           "pricing": "paid",
+          "ticketSaleStatus": "on-sale",
+          "priceRange": [
+            10,
+            12
+          ],
           "start": "2026-11-18T00:00:00-06:00",
           "end": "2026-11-23T00:00:00-06:00",
           "schedulePrecision": "date",
           "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "cuff-docs-2026-opening-night",
+        "input": {
+          "kind": "event",
+          "organizer": "Calgary Underground Film Festival",
+          "address": "617 8 Avenue SW, Calgary, AB",
+          "venue": "Globe Cinema",
+          "sourceUrl": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "tickets": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "pricing": "paid",
+          "ticketSaleStatus": "on-sale",
+          "priceRange": [
+            10,
+            12
+          ],
+          "endTimeEstimated": true,
+          "title": "CUFF.Docs Opening Night: Ladies and Gentlemen, Brian Mulroney",
+          "summary": "Matthew Rankin’s archive-collage portrait of Brian Mulroney opens CUFF.Docs 2026 at Globe Cinema, with the director in attendance.",
+          "description": "CUFF.Docs 2026 opens on Wednesday, November 18 at 6:30 p.m. at Globe Cinema with LADIES AND GENTLEMEN, BRIAN MULRONEY, the third feature from Canadian director Matthew Rankin (THE TWENTIETH CENTURY, UNIVERSAL LANGUAGE). Rankin remixes some 80,000 pieces of archive into a genre-bending collage of VHS-era Canadiana, following Canada’s 18th prime minister from his win over Joe Clark into a new kind of 1980s conservatism. The film won the People’s Choice Midnight Madness Award at the Toronto International Film Festival.\n\nCUFF says Rankin will attend the screening. The end time shown is an estimate; check the official programme for the running time.\n\nCUFF lists tickets at $12, or $10 for members, students and seniors. 5-Film Packs and Festival Passes also cover CUFF.Docs screenings. Check the official site for availability.",
+          "categories": [
+            "arts",
+            "film"
+          ],
+          "tags": [
+            "documentary",
+            "CUFF.Docs",
+            "Canadian film",
+            "opening night",
+            "filmmaker in attendance"
+          ],
+          "start": "2026-11-18T18:30:00-07:00",
+          "end": "2026-11-18T20:30:00-07:00"
+        }
+      },
+      {
+        "id": "cuff-docs-2026-matthew-rankin-talk",
+        "input": {
+          "kind": "event",
+          "organizer": "Calgary Underground Film Festival",
+          "address": "617 8 Avenue SW, Calgary, AB",
+          "venue": "Globe Cinema",
+          "sourceUrl": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "tickets": "https://www.calgaryundergroundfilm.org/cuffdocs/",
+          "pricing": "paid",
+          "ticketSaleStatus": "on-sale",
+          "priceRange": [
+            10,
+            12
+          ],
+          "endTimeEstimated": true,
+          "title": "An Afternoon with Matthew Rankin: Doc Shorts Retrospective and Artist Talk",
+          "summary": "CUFF.Docs’ first artist talk: Matthew Rankin screens and discusses his documentary shorts at Globe Cinema.",
+          "description": "On Thursday, November 19 at 4 p.m., Opening Night filmmaker Matthew Rankin joins CUFF Lead Programmer Cameron Macgowan at Globe Cinema to look back at his short-form documentary work. It is the first artist talk in CUFF.Docs history.\n\nThe retrospective includes Rankin’s shorts CATTLE CALL (2008, with Mike Maryniuk), KUBASA IN A GLASS: THE STRANGE WORLD OF THE WINNIPEG TV COMMERCIAL (2006, with Walter Forsberg), NEGATIVIPEG (2010) and A DAY IN GRASSLANDS (2019). The end time shown is an estimate; check the official programme for the running time.\n\nCUFF lists tickets at $12, or $10 for members, students and seniors. Check the official site for availability.",
+          "categories": [
+            "arts",
+            "film",
+            "learning"
+          ],
+          "tags": [
+            "documentary",
+            "CUFF.Docs",
+            "artist talk",
+            "short films",
+            "Canadian film"
+          ],
+          "start": "2026-11-19T16:00:00-07:00",
+          "end": "2026-11-19T18:00:00-07:00"
         }
       },
       {

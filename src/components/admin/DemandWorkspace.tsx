@@ -1,22 +1,27 @@
 import { useEffect, useMemo, useState } from 'react';
-import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
+import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
-import { Search, SearchX } from 'lucide-react';
+import { RefreshCw, Search, SearchX } from 'lucide-react';
 import { db } from '../../firebase';
 import { SEARCH_DEMAND, summarizeDemand, readDemandRecords, type DemandRow } from '../../lib/searchDemand';
 import { bareStreetGuess, describeAnswer, parseSearchIntent } from '../../lib/searchIntent';
 import { lookupStreet } from '../../hooks/useStreetLookup';
 import { searchListings } from '../../lib/listingSearch';
 import { discoveryRepository } from '../../data/discovery';
-import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, mono } from './ui';
+import { trackSubscription } from '../../lib/readEfficiency';
+import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, TimeAgo, mono } from './ui';
 
 const WINDOWS = [7, 30, 90] as const;
+/** Rows in the live "Latest searches" list: one read each when the page opens, then one per new search. */
+const LATEST = 20;
+const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 
 /**
  * Search demand: what people typed into CalgaryWatch search, grouped.
  * "Found nothing" is the business list: events, places and topics people
- * want that the site doesn't carry yet. Read once per window change
- * (capped at 2,000 rows), never live, to stay inside the free read quota.
+ * want that the site doesn't carry yet. The totals are read once per window
+ * change or Refresh (capped at 2,000 rows) to stay inside the free read
+ * quota, and say when they were read; "Latest searches" is live.
  */
 export function DemandWorkspace() {
   const [days, setDays] = useState<(typeof WINDOWS)[number]>(30);
@@ -24,13 +29,15 @@ export function DemandWorkspace() {
   const [error, setError] = useState('');
   const [ignored,setIgnored]=useState(0);
   const [attempt,setAttempt]=useState(0);
+  const [readAt, setReadAt] = useState<number | null>(null);
+  const [allTerms, setAllTerms] = useState(false);
 
   useEffect(() => {
     if (!db) { setRows([]); return; }
     let live = true;
     setRows(null); setError('');
     getDocs(query(collection(db, SEARCH_DEMAND), where('ts', '>=', Date.now() - days * 86_400_000), orderBy('ts', 'desc'), limit(2000)))
-      .then((snap) => { if (live) {const parsed=readDemandRecords(snap.docs.map(d=>d.data()));setRows(parsed.rows);setIgnored(parsed.ignored);} })
+      .then((snap) => { if (live) {const parsed=readDemandRecords(snap.docs.map(d=>d.data()));setRows(parsed.rows);setIgnored(parsed.ignored);setReadAt(Date.now());} })
       .catch((e) => { if (live) { setError(e instanceof Error ? e.message : 'Could not load searches.'); } });
     return () => { live = false; };
   }, [days,attempt]);
@@ -45,7 +52,10 @@ export function DemandWorkspace() {
         {WINDOWS.map((w) => (
           <AdminButton key={w} size="sm" tone="signal" variant={w === days ? 'solid' : 'outline'} onClick={() => setDays(w)}>Last {w} days</AdminButton>
         ))}
-        <span className="text-xs" style={{ color: T.muted }}>Anonymous: the words and the result count only.</span>
+        <AdminButton size="sm" variant="ghost" title="Re-read the totals" disabled={rows === null} onClick={() => setAttempt(n => n + 1)}><RefreshCw size={14} />Refresh</AdminButton>
+        <span className="text-xs" style={{ color: T.muted }}>
+          {readAt ? `Totals as of ${clock.format(readAt)}; Refresh to include newer searches. ` : ''}Anonymous: the words and the result count only.
+        </span>
       </div>
       {error ? <Panel title="Couldn’t load searches"><AdminButton variant="outline" onClick={()=>setAttempt(n=>n+1)}>Retry searches</AdminButton><p className="p-4 text-sm" style={{ color: T.critical }}>{error} If this says permission denied, deploy the Firestore rules (Deploy Firebase Backend → rules).</p></Panel> : null}
       {ignored>0&&!error?<p role="status" className="admin-read-warning">{ignored} invalid or unsupported search records were excluded. Totals below use valid records only.</p>:null}
@@ -56,20 +66,53 @@ export function DemandWorkspace() {
         <StatTile label="Found nothing" value={rows ? misses.length : null} tone={misses.length ? 'attention' : 'neutral'} hint={`Of ${terms.length} terms, the latest search had no results`} />
         <StatTile label="Hit rate" value={rows && total ? Math.round((1 - (rows.filter((r) => r.results === 0).length / total)) * 100) : null} unit="%" />
       </StatGrid>
+      <LatestSearches />
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Looked for, not found" subtitle="What to list next. Each is a real search that came back empty.">
           {rows === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
             : misses.length ? <TermList rows={misses.slice(0, 25)} miss />
             : <EmptyState icon={<SearchX size={20} />} title={total?"Nothing missed":"No searches yet"} body={total?"Every recent search found at least one listing.":"Searches appear here once people use the site search."} />}
         </Panel>
-        <Panel title="Most searched" subtitle="Open a term to see what a resident sees.">
+        <Panel title="Most searched" subtitle="Open a term to see what a resident sees."
+          action={terms.length > 25 ? <AdminButton size="sm" variant="ghost" onClick={() => setAllTerms(v => !v)}>{allTerms ? 'Top 25' : `All ${terms.length}`}</AdminButton> : undefined}>
           {rows === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
-            : terms.length ? <TermList rows={terms.slice(0, 25)} />
+            : terms.length ? <TermList rows={allTerms ? terms : terms.slice(0, 25)} />
             : <EmptyState icon={<Search size={20} />} title="No searches yet" body="Searches appear here once people use the site search." />}
         </Panel>
       </div>
       </>}
     </div>
+  );
+}
+
+/**
+ * The newest searches as they happen, so a search made a minute ago shows
+ * here without a reload, even when it's too rare to make the ranked lists.
+ */
+function LatestSearches() {
+  const [rows, setRows] = useState<Array<{ q: string; results: number; ts: number }> | null>(null);
+  useEffect(() => {
+    if (!db) { setRows([]); return; }
+    const database = db;
+    return trackSubscription('demand:latest', () => onSnapshot(query(collection(database, SEARCH_DEMAND), orderBy('ts', 'desc'), limit(LATEST)),
+      (snap) => setRows(readDemandRecords(snap.docs.map(d => d.data())).rows),
+      () => setRows([])));
+  }, []);
+  return (
+    <Panel title="Latest searches" subtitle="Live. Each search a reader made, newest first." padded={false}>
+      {rows === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+        : rows.length ? (
+          <ol className="divide-y" style={{ borderColor: T.line }}>
+            {rows.map((r, i) => (
+              <li key={`${r.ts}-${i}`} className="flex items-center gap-3 px-4 py-2">
+                <Link to={`/search?q=${encodeURIComponent(r.q)}`} target="_blank" className="min-w-0 flex-1 truncate text-sm font-semibold hover:underline" style={{ color: T.ink }}>{r.q}</Link>
+                <span className="text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: r.results ? T.muted : T.attention }}>{r.results ? `${r.results} ${r.results === 1 ? 'result' : 'results'}` : 'no results'}</span>
+                <span className="w-16 text-right"><TimeAgo ts={r.ts} /></span>
+              </li>
+            ))}
+          </ol>
+        ) : <EmptyState icon={<Search size={20} />} title="No searches yet" body="Searches appear here once people use the site search." />}
+    </Panel>
   );
 }
 

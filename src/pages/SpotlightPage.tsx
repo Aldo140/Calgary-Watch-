@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowDown, ArrowUpRight, CalendarDays, Clock, ExternalLink, MapPin, Ticket } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -37,44 +37,87 @@ function Cite({ s, id }: { s: Spotlight; id: string }) {
   return <sup className="hx-cite"><a href={`#src-${src.id}`} aria-label={`Source ${n + 1}: ${src.publisher}`}>{n + 1}</a></sup>;
 }
 
-function Reel({ n, id, label, title, children, tone }: { n: number; id: string; label: string; title: ReactNode; children: ReactNode; tone?: 'dark' }) {
+/** The clapperboard that opens every scene. Its stick snaps shut when the scene rolls into view. */
+function Slate({ scene, take = 1 }: { scene: string; take?: number }) {
   return (
-    <section id={id} className={`hx-reel${tone ? ` is-${tone}` : ''}`} aria-labelledby={`${id}-h`}>
-      <p className="hx-reel-no"><span>Reel {String(n).padStart(2, '0')}</span> {label}</p>
-      <h2 id={`${id}-h`}>{title}</h2>
-      <div className="hx-prose">{children}</div>
+    <div className="hx-slate" aria-hidden="true">
+      <div className="hx-slate-stick"><span /></div>
+      <div className="hx-slate-board">
+        <p className="hx-slate-row"><small>Prod.</small><b>HEX After Dark</b></p>
+        <div className="hx-slate-grid">
+          <p><small>Scene</small><b>{scene}</b></p>
+          <p><small>Take</small><b>{take}</b></p>
+          <p><small>Roll</small><b>2026</b></p>
+        </div>
+        <p className="hx-slate-row hx-slate-slug"><small>Date</small><b>Oct 2026</b></p>
+      </div>
+    </div>
+  );
+}
+
+/** One chapter, shot as a scene: slate, slugline, a hard cut, then the copy. */
+function Scene({ n, id, slug, label, title, children, take }: { n: number | string; id: string; slug: string; label: string; title: ReactNode; children: ReactNode; take?: number }) {
+  const scene = typeof n === 'number' ? String(n).padStart(2, '0') : n;
+  return (
+    <section id={id} className="hx-reel" aria-labelledby={`${id}-h`} data-roll>
+      <Slate scene={scene} take={take} />
+      <span className="hx-cutflash" aria-hidden="true" />
+      <div className="hx-shot">
+        <p className="hx-reel-no"><span>Scene {scene}</span> {label}</p>
+        <p className="hx-slug" aria-hidden="true">{slug}</p>
+        <h2 id={`${id}-h`}>{title}</h2>
+        {children}
+      </div>
     </section>
   );
 }
 
-function Marquee() {
+function CutTo({ to = 'Cut to:' }: { to?: string }) {
+  return <p className="hx-cutto" aria-hidden="true" data-roll><span>{to}</span></p>;
+}
+
+const motionOk = () => typeof window !== 'undefined' && !!window.matchMedia && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * The film leader: 3, 2, 1, then a hard cut to the title card. Once per tab,
+ * never with reduced motion, never in the prerendered HTML, and skippable.
+ */
+function Leader() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    let seen = false;
+    try { seen = sessionStorage.getItem('hx-leader') === '1'; sessionStorage.setItem('hx-leader', '1'); } catch { /* private mode: play it */ }
+    if (seen || !motionOk()) return;
+    setShow(true);
+    const t = window.setTimeout(() => setShow(false), 2700);
+    return () => window.clearTimeout(t);
+  }, []);
+  if (!show) return null;
   return (
-    <svg className="hx-art" viewBox="0 0 420 400" role="img" aria-label="Drawing: a cinema marquee reading Hex After Dark, Now showing, short horror, in the bar at ScreamFest">
-      <defs>
-        <linearGradient id="hx-beam" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#ffdf4f" stopOpacity=".55" />
-          <stop offset="1" stopColor="#ffdf4f" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path className="hx-art-beam" d="M210 392 40 40h340Z" fill="url(#hx-beam)" />
-      <rect className="hx-art-board" x="38" y="44" width="344" height="212" rx="14" />
-      {Array.from({ length: 16 }, (_, i) => <circle key={`t${i}`} className="hx-bulb" style={{ animationDelay: `${(i % 4) * 0.25}s` }} cx={58 + i * 20.3} cy="62" r="5" />)}
-      {Array.from({ length: 16 }, (_, i) => <circle key={`b${i}`} className="hx-bulb" style={{ animationDelay: `${((i + 2) % 4) * 0.25}s` }} cx={58 + i * 20.3} cy="238" r="5" />)}
-      <text className="hx-art-small" x="210" y="98" textAnchor="middle">NOW SHOWING</text>
-      <text className="hx-art-big" x="210" y="152" textAnchor="middle">HEX</text>
-      <text className="hx-art-mid" x="210" y="190" textAnchor="middle">AFTER DARK</text>
-      <text className="hx-art-small" x="210" y="218" textAnchor="middle">SHORT HORROR · IN THE BAR</text>
-      <path className="hx-art-post" d="M96 256v120M324 256v120" />
-      <g className="hx-art-strip" transform="rotate(-8 210 320)">
-        <rect x="70" y="296" width="280" height="54" rx="4" />
-        {Array.from({ length: 12 }, (_, i) => <rect key={`p${i}`} className="hx-art-hole" x={80 + i * 22.5} y="300" width="10" height="7" rx="2" />)}
-        {Array.from({ length: 12 }, (_, i) => <rect key={`q${i}`} className="hx-art-hole" x={80 + i * 22.5} y="339" width="10" height="7" rx="2" />)}
-        {[0, 1, 2, 3].map(i => <rect key={`f${i}`} className="hx-art-frame" x={80 + i * 67} y="311" width="58" height="24" rx="2" />)}
-      </g>
-      <path className="hx-art-bat" d="M330 118c8-6 14-6 18 0 4-6 10-6 18 0-6 0-9 4-10 8-3-3-6-3-8 0-2-3-5-3-8 0-1-4-4-8-10-8Z" />
-      <path className="hx-art-bat is-b" d="M60 118c6-4 10-4 13 0 3-4 7-4 13 0-4 0-7 3-7 6-2-2-4-2-6 0-2-2-4-2-6 0 0-3-3-6-7-6Z" />
-    </svg>
+    <div className="hx-leader" role="presentation">
+      <svg className="hx-leader-dial" viewBox="0 0 200 200" aria-hidden="true">
+        <circle className="hx-leader-ring" cx="100" cy="100" r="86" />
+        <circle className="hx-leader-ring is-in" cx="100" cy="100" r="70" />
+        <circle className="hx-leader-sweep" cx="100" cy="100" r="43" pathLength="100" />
+        <path className="hx-leader-cross" d="M100 0v200M0 100h200" />
+      </svg>
+      <p className="hx-leader-n" aria-hidden="true"><span>3</span><span>2</span><span>1</span></p>
+      <span className="hx-leader-flash" aria-hidden="true" />
+      <button type="button" className="hx-leader-skip" onClick={() => setShow(false)}>Skip intro</button>
+    </div>
   );
+}
+
+/** Marks each `[data-roll]` scene as it comes into view, so its slate claps once. */
+function useRolls(on: boolean) {
+  useEffect(() => {
+    if (!on || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting) { (e.target as HTMLElement).dataset.rolled = ''; io.unobserve(e.target); }
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.hx [data-roll]').forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, [on]);
 }
 
 function Sources({ sources }: { sources: SpotlightSource[] }) {
@@ -96,6 +139,11 @@ export default function SpotlightPage() {
   const nights = useMemo(() => (s ? upcomingNights(s, entities) : []), [s, entities]);
   const screamfest = useMemo(() => entities.find(e => e.kind === 'business' && e.id === 'biz-screamfest'), [entities]);
   const profile = useMemo(() => (s?.profileId ? entities.find(e => e.id === s.profileId) : undefined), [s, entities]);
+
+  // Scenes start hidden only once we know they'll be revealed: never in prerendered HTML or with reduced motion.
+  const [anim, setAnim] = useState(false);
+  useEffect(() => setAnim(motionOk() && typeof IntersectionObserver !== 'undefined'), []);
+  useRolls(anim && !!s);
 
   useEffect(() => {
     if (!s || typeof IntersectionObserver === 'undefined') return;
@@ -121,27 +169,35 @@ export default function SpotlightPage() {
 
   return (
     <SiteLayout>
-      <article className="hx">
+      <article className="hx" data-anim={anim ? '' : undefined}>
+        <Leader />
         <header className="hx-hero">
+          <span className="hx-beam" aria-hidden="true" />
           <span className="hx-grain" aria-hidden="true" />
-          <div className="cw-wrap hx-hero-grid">
-            <div className="hx-hero-copy">
-              <p className="hx-kicker"><span>CalgaryWatch Spotlight</span> {s.partnerLabel}</p>
-              <h1>
-                The Dark Side of <mark>Calgary Cinema</mark><span className="hx-h1-sub">Inside Hex After Dark</span>
-              </h1>
-              <p className="hx-dek">{s.dek}</p>
-              <p className="hx-byline">By <b>CalgaryWatch</b> · <time dateTime={s.published}>{dateOf(s.published)}</time>{s.updated !== s.published ? <> · Updated <time dateTime={s.updated}>{dateOf(s.updated)}</time></> : null}</p>
-              <div className="hx-ctas">
-                <a className="hx-btn hx-btn-hi" href={tickets.url} target="_blank" rel="noopener noreferrer" onClick={out('tickets')}><Ticket size={18} aria-hidden="true" /> {tickets.label}</a>
-                <a className="hx-btn" href="#go">How to go <ArrowDown size={17} aria-hidden="true" /></a>
-              </div>
-              <ul className="hx-nights" aria-label="Nights left">
-                {nights.length ? nights.slice(0, 4).map(n => <li key={n.id}>{nightLabel(n)}</li>) : <li className="is-over">This year’s run has ended</li>}
-              </ul>
+          <span className="hx-scratch" aria-hidden="true" />
+          <span className="hx-sprockets is-l" aria-hidden="true" />
+          <span className="hx-sprockets is-r" aria-hidden="true" />
+          <p className="hx-bar hx-bar-top"><span>CalgaryWatch Spotlight</span><span>{s.partnerLabel}</span></p>
+          <div className="cw-wrap hx-frame">
+            <p className="hx-presents">CalgaryWatch presents</p>
+            <h1>
+              <span className="hx-t1">The Dark Side of</span>
+              <span className="hx-t2" data-text="Calgary Cinema">Calgary Cinema</span>
+              <span className="hx-h1-sub">Inside Hex After Dark</span>
+            </h1>
+            <p className="hx-dek">{s.dek}</p>
+            <div className="hx-ctas">
+              <a className="hx-btn hx-btn-hi" href={tickets.url} target="_blank" rel="noopener noreferrer" onClick={out('tickets')}><Ticket size={18} aria-hidden="true" /> {tickets.label}</a>
+              <a className="hx-btn" href="#go">How to go <ArrowDown size={17} aria-hidden="true" /></a>
             </div>
-            <div className="hx-hero-art"><Marquee /></div>
+            <ul className="hx-nights" aria-label="Nights left">
+              {nights.length ? nights.slice(0, 4).map(n => <li key={n.id}>{nightLabel(n)}</li>) : <li className="is-over">This year’s run has ended</li>}
+            </ul>
           </div>
+          <p className="hx-bar hx-bar-bottom">
+            <span>By <b>CalgaryWatch</b> · <time dateTime={s.published}>{dateOf(s.published)}</time>{s.updated !== s.published ? <> · Updated <time dateTime={s.updated}>{dateOf(s.updated)}</time></> : null}</span>
+            <span>{s.card.line}</span>
+          </p>
         </header>
 
         <div className="cw-wrap hx-disclose">
@@ -150,11 +206,11 @@ export default function SpotlightPage() {
 
         <div className="cw-wrap hx-layout">
           <nav className="hx-toc" aria-label="In this spotlight">
-            <p>In this spotlight</p>
+            <p>Shot list</p>
             <ol>
               <li><a href="#festival">The festival</a></li>
-              <li><a href="#experience">Horror in the bar</a></li>
-              <li><a href="#why">Why it matters</a></li>
+              <li><a href="#origins">Where it came from</a></li>
+              <li><a href="#experience">This year</a></li>
               <li><a href="#films">The films</a></li>
               <li><a href="#go">How to go</a></li>
               <li><a href="#next">What’s next</a></li>
@@ -163,32 +219,39 @@ export default function SpotlightPage() {
           </nav>
 
           <div className="hx-main">
-            <Reel n={1} id="festival" label="The festival" title={<>Short films, <span>made to scare you.</span></>}>
-              <p className="hx-first">Hex After Dark is a festival of short horror films, organized by {s.organizer.name}. Its submission page asks for Halloween, horror, sci-fi and fantasy work under an hour long, and says it generally doesn’t accept films made with AI.<Cite s={s} id="filmfreeway" /> The same page bills it as the largest Halloween film festival in Western Canada.</p>
-              <p>This October it’s somewhere you might not expect: the bar at ScreamFest, the haunted-house night out at Stampede Park. The shorts play on ScreamFest’s operating nights, and the festival has told us they’re included with ScreamFest admission.</p>
-              <p>It hasn’t always lived there. Last year it took over the Flanagan Theatre at The GRAND on 1 Street SW for one Monday night, October 27, 2025, in three programmes: <em>Horror in the North</em>, eight new Canadian horror shorts; <em>Blood and Reels</em>, eight international submissions; and <em>The Best of Hex After Dark</em>, a showcase of past favourites.<Cite s={s} id="grand-2025" /> In 2022 it screened in Burnaby, at Cineplex Cinemas Metropolis, during the Burnaby Halloween Festival.<Cite s={s} id="burnaby-2022" /></p>
-            </Reel>
+            <Scene n={1} id="festival" slug="EXT. CALGARY — OCTOBER" label="The festival" title={<>A Halloween festival, <span>in short form.</span></>}>
+              <div className="hx-prose">
+                <p>HEX After Dark is a curated Halloween film festival from HEX Entertainment, the Calgary company behind the HEX Halloween &amp; Entertainment Expo.<Cite s={s} id="hex" /> On its submission page it calls itself the largest Halloween film festival in Western Canada, and says it exists to showcase independent filmmakers and a shared love of Halloween.<Cite s={s} id="filmfreeway" /></p>
+                <p>It takes Halloween, horror, sci-fi and fantasy films, and says it generally doesn’t accept films made with AI. Its awards include Best Short Film, Best Sci-Fi or Fantasy Film and Best Horror Film.<Cite s={s} id="filmfreeway" /> The festival is organized by {s.organizer.name}.</p>
+              </div>
+            </Scene>
+            <CutTo />
 
-            <Reel n={2} id="experience" label="The experience" title={<>Horror, <span>between the haunted houses.</span></>}>
-              <p>A short film has a few minutes to do what a feature does in two hours: build a world, make you care about someone in it, then pull the floor out. Horror suits the form. A good short scare doesn’t need a second act, just a room that’s paying attention.</p>
-              <p>At ScreamFest that room is the bar, with the haunted houses outside. You don’t buy a separate film ticket: if you’re at ScreamFest, the films are part of the night.</p>
-              <ul className="hx-checklist" aria-label="What we know so far">
-                <li><b>Where</b> The bar at ScreamFest, GMC Stadium, Stampede Park</li>
-                <li><b>When</b> ScreamFest nights, which run 7 p.m. to midnight</li>
-                <li><b>Cost</b> Included with ScreamFest admission</li>
-                <li className="is-open"><b>Still to confirm</b> Screening times and the 2026 film list. We’ll add both here when the festival shares them.</li>
-              </ul>
-            </Reel>
+            <Scene n={2} id="origins" slug="INT. BMO CENTRE — OCTOBER 2019" label="Where it came from" title={<>Born in <span>a haunted expo.</span></>}>
+              <div className="hx-prose">
+                <p>HEX started in 2019 as Calgary’s first Halloween and entertainment expo, October 11 to 14 at the BMO Centre on Stampede Park. It brought back ScreamFest’s haunted houses after a year off, which owner Mike Sheppard described as a blend of the haunt and a comic-style expo.<Cite s={s} id="global-2019" /> Admission included the expo’s screening room and film festival.<Cite s={s} id="livewire-2019" /></p>
+                <p>The festival has moved around since. In 2022 it screened in Burnaby, at Cineplex Cinemas Metropolis, during the Burnaby Halloween Festival.<Cite s={s} id="burnaby-2022" /> Last year it took over the Flanagan Theatre at The GRAND for one night, Monday, October 27, 2025, in three blocks: <em>Horror in the North</em> at 6:30 p.m., <em>Blood and Reels</em> at 8:30 p.m. and <em>The Best of Hex After Dark</em> at 10:30 p.m.<Cite s={s} id="grand-2025" /> Tickets were $10, or $20 for a pass to all three,<Cite s={s} id="showpass-2025" /> and CTV News Calgary covered the night.<Cite s={s} id="ctv-2025" /></p>
+              </div>
+            </Scene>
+            <CutTo />
 
-            <Reel n={3} id="why" label="Why it matters" title={<>Where Calgary’s <span>next filmmakers</span> find a crowd.</>}>
-              <p>Most filmmakers start with shorts, and most shorts never get a cinema run. A festival screening is often the only time a short plays to a room of strangers, which is the one thing a filmmaker can’t get from a link.</p>
-              <p>Calgary has its big festivals, from the Calgary International Film Festival to the Calgary Underground Film Festival. Genre nights like Hex After Dark do something different: they put a first-time filmmaker’s short in front of people who came for exactly that kind of film.</p>
-              <p>That matters to a city that wants people to make things here. The cheapest way to help is the obvious one: go, stay for the credits, and follow the filmmakers whose work gets to you.</p>
-            </Reel>
+            <Scene n={3} id="experience" slug="INT. SCREAMFEST BAR — NIGHT" label="This year" title={<>Horror, <span>between the haunted houses.</span></>}>
+              <div className="hx-prose">
+                <p>This October the festival is back with ScreamFest. Its submission page lists the 2026 run as October 10 to 31, alongside ScreamFest, with an official weekend of October 22 to 25.<Cite s={s} id="filmfreeway" /></p>
+                <p>The festival has told CalgaryWatch the films play in the bar at ScreamFest on every night it’s open, and that because the programme is all shorts, every film can screen each night. They’re included with ScreamFest admission.</p>
+                <ul className="hx-checklist" aria-label="What we know so far">
+                  <li><b>Where</b> The bar at ScreamFest, GMC Stadium, Stampede Park</li>
+                  <li><b>When</b> ScreamFest nights, which run 7 p.m. to midnight</li>
+                  <li><b>Cost</b> Included with ScreamFest admission</li>
+                  <li className="is-open"><b>Still to confirm</b> Screening times and the 2026 film list. We’ll add both here when the festival shares them.</li>
+                </ul>
+              </div>
+            </Scene>
           </div>
         </div>
 
-        <div id="films" className="hx-band">
+        <div id="films" className="hx-band" data-roll>
+          <span className="hx-band-light" aria-hidden="true" />
           <div className="cw-wrap">
             <FilmShowcase
               id="hx-films-h"
@@ -206,9 +269,7 @@ export default function SpotlightPage() {
         <div className="cw-wrap hx-layout">
           <div className="hx-toc-spacer" aria-hidden="true" />
           <div className="hx-main">
-            <section id="go" className="hx-reel" aria-labelledby="go-h">
-              <p className="hx-reel-no"><span>Reel 04</span> How to go</p>
-              <h2 id="go-h">Your ticket <span>to the bar.</span></h2>
+            <Scene n={4} id="go" slug="EXT. STAMPEDE PARK — 7 P.M." label="How to go" title={<>Your ticket <span>to the bar.</span></>}>
               <div className="hx-ticket">
                 <div className="hx-ticket-main">
                   <p className="hx-ticket-eyebrow">Admit one · Hex After Dark at ScreamFest</p>
@@ -221,23 +282,25 @@ export default function SpotlightPage() {
                   <p className="hx-ticket-note">The films play in ScreamFest’s bar. ScreamFest recommends the event for ages 12 and up, and October 22 was adults-only; check its age rules for the bar before bringing anyone under 18.</p>
                 </div>
                 <div className="hx-ticket-stub">
-                  <p className="hx-stub-mark" aria-hidden="true">{s.card.mark}<small>{nights.length ? nightsLine(nights) : 'See you next year'}</small></p>
+                  <p className="hx-stub-mark" aria-hidden="true"><span>Admit one</span>{s.card.mark}<small>{nights.length ? nightsLine(nights) : 'See you next year'}</small></p>
                   <a className="hx-btn hx-btn-hi" href={tickets.url} target="_blank" rel="noopener noreferrer" onClick={out('tickets')}>Get tickets <ArrowUpRight size={17} aria-hidden="true" /></a>
                   <a className="hx-btn" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.venue.mapQuery)}`} target="_blank" rel="noopener noreferrer" onClick={out('directions')}>Directions <MapPin size={16} aria-hidden="true" /></a>
                   {nextNight ? <Link className="hx-stub-link" to={entityPath(nextNight)}>ScreamFest on CalgaryWatch</Link> : screamfest ? <Link className="hx-stub-link" to={entityPath(screamfest)}>ScreamFest on CalgaryWatch</Link> : null}
                 </div>
               </div>
-            </section>
+            </Scene>
+            <CutTo />
 
-            <Reel n={5} id="next" label="What’s next" title={<>Back to <span>the big screen?</span></>}>
-              <p className="hx-attrib"><b>{s.organizer.name}</b> has told CalgaryWatch he hopes to bring Hex After Dark back to The GRAND next year, if the festival secures grant funding.</p>
-              <p>That’s his ambition, not an announcement: there’s no date or booking we know of, and it depends on funding the festival doesn’t have yet. Grant applications usually ask for evidence that people care. Turning up this week, and following the festival, is the kind of evidence that counts.</p>
-              <p>We’ll share with Cameron how many people read this spotlight and how many tapped through to the festival and ScreamFest’s tickets. Those are counts only: nothing about who you are.</p>
-            </Reel>
+            <Scene n={5} id="next" slug="INT. THE GRAND — NEXT YEAR?" label="What’s next" title={<>Back to <span>the big screen?</span></>}>
+              <div className="hx-prose">
+                <p className="hx-attrib"><b>{s.organizer.name}</b> has told CalgaryWatch he hopes to bring Hex After Dark back to The GRAND next year, if the festival secures grant funding.</p>
+                <p>There’s no date or booking for that yet, and it depends on funding the festival is still looking for.</p>
+                <p>We’ll share with Cameron how many people read this spotlight and how many tapped through to the festival and ScreamFest’s tickets. Those are counts only: nothing about who you are.</p>
+              </div>
+            </Scene>
+            <CutTo />
 
-            <section id="friday" className="hx-reel" aria-labelledby="friday-h">
-              <p className="hx-reel-no"><span>Coming soon</span> After Friday</p>
-              <h2 id="friday-h">We’re going <span>on October 30.</span></h2>
+            <Scene n={6} id="friday" slug="INT. SCREAMFEST — FRIDAY, OCT 30" label="After Friday" take={s.review.status === 'published' ? 2 : 1} title={<>We’re going <span>on October 30.</span></>}>
               {s.review.status === 'published' && s.review.body.length ? (
                 <div className="hx-prose">
                   {s.review.body.map(p => <p key={p}>{p}</p>)}
@@ -257,9 +320,10 @@ export default function SpotlightPage() {
                   {answered.map(q => <div key={q.question}><dt>{q.question}</dt><dd>{q.answer}</dd></div>)}
                 </dl>
               ) : null}
-            </section>
+            </Scene>
 
-            <section id="links" className="hx-reel" aria-labelledby="links-h">
+            <section id="links" className="hx-reel hx-credits" aria-labelledby="links-h" data-roll>
+              <p className="hx-end" aria-hidden="true">The End<span>?</span></p>
               <p className="hx-reel-no"><span>Credits</span> Official links and sources</p>
               <h2 id="links-h">Go <span>straight to the source.</span></h2>
               <ul className="hx-links">

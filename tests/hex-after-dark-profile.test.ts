@@ -29,7 +29,7 @@ describe('Hex After Dark organization profile', () => {
     // The organizer's personal contact was given to us, not for publishing.
     assert.equal(org.email, undefined);
     assert.equal(org.phone, undefined);
-    for (const source of org.sources.filter(s => s.kind === 'official')) assert.ok(['hexafterdark.com', 'filmfreeway.com'].includes(host(source.url)));
+    for (const source of org.sources.filter(s => s.kind === 'official')) assert.ok(['hex.ca', 'hexafterdark.com', 'filmfreeway.com'].includes(host(source.url)));
     assert.equal(shelfOf(org), 'seasonal', 'sits beside ScreamFest');
   });
 

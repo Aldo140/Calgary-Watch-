@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import type { Neighbourhood } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
@@ -8,7 +9,7 @@ import { hoodCentre, type LatLng } from '../../lib/neighbourhoods';
  * a pin for each neighbourhood we write about. Not to survey scale, but every
  * pin is placed from its real latitude and longitude, so it reads true.
  */
-const W = 560, H = 420;
+export const W = 560, H = 420;
 // Centred on Centre Street at the quadrant line, with a gentle fisheye: the
 // close-together inner-city neighbourhoods spread out, the edges tuck in.
 // Straight lines through the centre (the quadrant axes) stay straight.
@@ -68,20 +69,23 @@ export function HoodMap({ hoods, active, quadrant, onHover, compact = false, num
           {quadrant === q ? <rect x={x} y={y} width={w} height={h} fill="url(#nb-hatch)" className="nb-map-hatch" /> : null}
         </g>
       ))}
-      <path className="nb-map-river nb-map-river-edge" d={BOW} />
-      <path className="nb-map-river" d={BOW} />
-      <path className="nb-map-river nb-map-river-edge is-elbow" d={ELBOW} />
-      <path className="nb-map-river is-elbow" d={ELBOW} />
+      {/* pathLength lets the rivers draw themselves in on arrival */}
+      <path className="nb-map-river nb-map-river-edge" d={BOW} pathLength={1} />
+      <path className="nb-map-river" d={BOW} pathLength={1} />
+      <path className="nb-map-river nb-map-river-edge is-elbow" d={ELBOW} pathLength={1} />
+      <path className="nb-map-river is-elbow" d={ELBOW} pathLength={1} />
       <path className="nb-map-axis" d={`M${CX},0V${H}M0,${CY}H${W}`} />
       <g className="nb-map-towers" transform={`translate(${DOWNTOWN[0] - 18} ${DOWNTOWN[1] - 30})`} aria-hidden="true">
         <rect x="0" y="12" width="8" height="18" /><rect x="10" y="0" width="9" height="30" /><rect x="21" y="7" width="7" height="23" /><rect x="30" y="16" width="7" height="14" />
       </g>
       <text className="nb-map-q" x="14" y="28">NW</text><text className="nb-map-q" x={W - 14} y="28" textAnchor="end">NE</text>
       <text className="nb-map-q" x="14" y={H - 14}>SW</text><text className="nb-map-q" x={W - 14} y={H - 14} textAnchor="end">SE</text>
-      {placed.map(({ h, x, y, left, dy, w }) => {
+      {placed.map(({ h, x, y, left, dy, w }, i) => {
         const on = active === h.slug;
         const pin = (
           <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`} className={`nb-pin q-${h.quadrant.toLowerCase()}${on ? ' is-on' : ''}${quadrant && quadrant !== h.quadrant ? ' is-dim' : ''}`}>
+            <g className="nb-pin-in" style={{ '--i': i } as CSSProperties}>
+            {on ? <circle className="nb-pin-ping" cy="-22" r="13" /> : null}
             <path className="nb-pin-body" d="M0,0C-7,-9 -12,-15 -12,-22A12,12 0 1 1 12,-22C12,-15 7,-9 0,0Z" />
             {numbered
               ? <text className="nb-pin-n" y="-18" textAnchor="middle">{hoods.indexOf(h) + 1}</text>
@@ -91,6 +95,7 @@ export function HoodMap({ hoods, active, quadrant, onHover, compact = false, num
               <rect x={left ? -w : 0} y="0" width={w} height="22" rx="11" />
               <text x={left ? -8 : 8} y="15" textAnchor={left ? 'end' : 'start'}>{h.title}</text>
             </g>}
+            </g>
           </g>
         );
         return onHover

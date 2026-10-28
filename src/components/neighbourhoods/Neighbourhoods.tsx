@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, Baby, BookOpen, CalendarDays, Coffee, Eye, Footprints, Landmark, Mail, MapPin, Moon, Mountain, Palette, Radio,
@@ -10,7 +10,7 @@ import { closeCount, hoodCentre, linksFor, vibes, type HoodLinks, type Linked } 
 import { toSlug } from '../../lib/communityRank';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { TEAR } from '../home/HomeHero';
-import { HoodMap } from './HoodMap';
+import { H, HoodMap, W, project } from './HoodMap';
 import { ProfileCover } from '../discovery/ProfileCover';
 import { ProfileRibbon, StorySpread, useSectionReveal } from '../discovery/ProfileSections';
 import { shelfOf, SHELVES, type Shelf } from '../../lib/localShelves';
@@ -18,6 +18,7 @@ import '../../styles/neighbourhoods.css';
 import '../../styles/local-directory.css';
 import '../../styles/local-profile.css';
 import '../../styles/story-pages.css';
+import '../../styles/neighbourhoods-atlas.css';
 
 // The community awareness game, already part of the Neighbourhoods pages.
 const RankStrip = lazy(() => import('../check/RankStrip'));
@@ -64,39 +65,226 @@ function QuadTag({ q, long = false }: { q: string; long?: boolean }) {
 
 /* ───────────────────────── The index ───────────────────────── */
 
+const reduceMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+function useMedia(query: string) {
+  const [on, setOn] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia?.(query);
+    if (!mq) return;
+    const sync = () => setOn(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, [query]);
+  return on;
+}
+
+/** Steps through 0..n-1 every `ms`, unless paused or the reader prefers no motion. */
+function useCycle(n: number, ms: number, paused: boolean) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (paused || n < 2 || reduceMotion()) return;
+    const t = window.setTimeout(() => setI(x => (x + 1) % n), ms);
+    return () => window.clearTimeout(t);
+  }, [i, n, ms, paused]);
+  return [Math.min(i, Math.max(n - 1, 0)), setI] as const;
+}
+
+/** A number that counts up from zero the first time it is drawn. */
+function CountUp({ to }: { to: number }) {
+  const [n, setN] = useState(() => (reduceMotion() ? to : 0));
+  useEffect(() => {
+    if (reduceMotion()) { setN(to); return; }
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / 1400);
+      setN(Math.round(to * (1 - (1 - p) ** 3)));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to]);
+  return <>{n}</>;
+}
+
+/** The headline's last word: each neighbourhood's name, rising in a letter at a time. */
+function RollingName({ hood }: { hood?: Neighbourhood }) {
+  const name = hood ? `${hood.title}.` : 'neighbourhood.';
+  return (
+    <span className={`nb-roll q-${(hood?.quadrant ?? 'ne').toLowerCase()}`} style={{ '--len': Math.max(name.length, 8) } as CSSProperties} aria-hidden="true">
+      <span className="nb-roll-word" key={name}>
+        {[...name].map((ch, i) => <span key={i} style={{ '--i': i } as CSSProperties}>{ch}</span>)}
+      </span>
+    </span>
+  );
+}
+
+/** A fanned stack of postcards; the front one is the neighbourhood in the headline. */
+function PostcardDeck({ hoods, active, onPick, numberOf }: { hoods: Neighbourhood[]; active: number; onPick: (i: number) => void; numberOf: (h: Neighbourhood) => number }) {
+  const n = hoods.length;
+  return (
+    <div className="nb-deck">
+      <ul className="nb-deck-stack">
+        {hoods.map((h, i) => {
+          const k = (i - active + n) % n;
+          const pos = k === 0 ? 'front' : k === 1 ? 'two' : k === 2 ? 'three' : n > 3 && k === n - 1 ? 'gone' : 'back';
+          return (
+            <li key={h.id} className={`nb-deck-card is-${pos} q-${h.quadrant.toLowerCase()}`} aria-hidden={k !== 0}>
+              <Link to={entityPath(h)} tabIndex={k === 0 ? 0 : -1}>
+                <img src={h.image?.src || '/images/photo/calgary1.webp'} alt="" width="640" height="460" loading={k < 3 ? 'eager' : 'lazy'} />
+                <span className="nb-deck-shade" aria-hidden="true" />
+                <QuadTag q={h.quadrant} long />
+                <span className="nb-deck-n" aria-hidden="true">{String(numberOf(h)).padStart(2, '0')}</span>
+                <span className="nb-deck-title"><strong>{h.title}</strong><small>{h.summary}</small></span>
+                <span className="nb-deck-stamp" aria-hidden="true"><HoodCover hood={h} mini /></span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+      {n > 1 ? (
+        <div className="nb-deck-dots" role="group" aria-label="Pick a neighbourhood">
+          {hoods.map((h, i) => (
+            <button key={h.id} type="button" className={`q-${h.quadrant.toLowerCase()}`} aria-label={h.title} aria-pressed={i === active} onClick={() => onPick(i)} />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** One neighbourhood in the atlas: a big postcard that lights its pin as it scrolls by. */
+function AtlasCard({ hood, number, count, on, onHover }: {
+  hood: Neighbourhood; number: number; count: { events: number; markets: number; places: number }; on: boolean; onHover: (slug?: string) => void;
+}) {
+  const stats = ([['events', count.events, CalendarDays], ['markets', count.markets, ShoppingBasket], ['places', count.places, Coffee]] as const).filter(([, v]) => v);
+  return (
+    <li data-hood={hood.slug} data-reveal className={`nb-chap q-${hood.quadrant.toLowerCase()}${on ? ' is-on' : ''}`} onMouseEnter={() => onHover(hood.slug)}>
+      <Link to={entityPath(hood)} className="nb-post">
+        <span className="nb-post-photo">
+          <img src={hood.image?.src || '/images/photo/calgary1.webp'} alt="" width="900" height="560" loading={number < 3 ? 'eager' : 'lazy'} />
+          <QuadTag q={hood.quadrant} long />
+          <span className="nb-post-n" aria-hidden="true">{String(number).padStart(2, '0')}</span>
+          <span className="nb-post-stamp" aria-hidden="true"><HoodCover hood={hood} mini /></span>
+        </span>
+        <span className="nb-post-body">
+          <strong>{hood.title}<i aria-hidden="true">.</i></strong>
+          <span className="nb-post-sum">{hood.summary}</span>
+          {vibes(hood).length ? <span className="nb-vibes">{vibes(hood).slice(0, 3).map(v => <em key={v}>{v}</em>)}</span> : null}
+          {/* Only what's there: a row of zeros reads as a dead neighbourhood. */}
+          <span className="nb-post-stats">
+            {stats.length
+              ? stats.map(([label, v, Icon]) => <span key={label}><Icon size={16} aria-hidden="true" /><b>{v}</b>{v === 1 ? label.slice(0, -1) : label}</span>)
+              : <span className="is-quiet">Walks, history and what’s nearby</span>}
+          </span>
+          <span className="nb-post-go">Open {hood.title} <ArrowRight size={17} aria-hidden="true" /></span>
+        </span>
+      </Link>
+    </li>
+  );
+}
+
+/** The drawn map, flown in to whichever neighbourhood is in view. */
+function AtlasLens({ hoods, active, quadrant, onHover }: { hoods: Neighbourhood[]; active?: string; quadrant: string | null; onHover: (slug?: string) => void }) {
+  const phone = useMedia('(max-width: 700px)');
+  const hood = hoods.find(h => h.slug === active);
+  const at = hood ? hoodCentre(hood) : undefined;
+  // The lens is the map's own shape on desktop and a wide letterbox on phones, so it zooms harder there.
+  const aspect = phone ? 2.05 : W / H;
+  const s = at ? (phone ? 2 : 1.45) : 1;
+  const [px, py] = at ? project(at) : [W / 2, H / 2];
+  const lensH = W / aspect;
+  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+  const tx = clamp(W / 2 - s * px, W - s * W, 0);
+  const ty = clamp(lensH / 2 - s * py, lensH - s * H, 0);
+  return (
+    <div className="nb-lens" style={{ aspectRatio: `${aspect}` }}>
+      <div className="nb-lens-map" style={{ transform: `translate(${(tx / W) * 100}%, ${(ty / H) * 100}%) scale(${s})` }}>
+        <HoodMap hoods={hoods} active={active} quadrant={quadrant} onHover={onHover} numbered />
+      </div>
+    </div>
+  );
+}
+
+const QUAD_LINE: Record<string, string> = {
+  NW: 'Bow River towns, Kensington cafés and the Peace Bridge.',
+  NE: 'Escarpment views, Italian bakeries and riverside parks.',
+  SW: 'Seventeenth Avenue, murals and village high streets.',
+  SE: 'Red brick, breweries and the confluence of two rivers.',
+};
+
 export function NeighbourhoodsBoard({ hoods, all, occurrences, quadrant }: {
   hoods: Neighbourhood[]; all: readonly DiscoveryEntity[]; occurrences: readonly MarketOccurrence[]; quadrant: string | null;
 }) {
-  const [hover, setHover] = useState<string>();
   const everyHood = useMemo(() => all.filter((e): e is Neighbourhood => e.kind === 'neighbourhood'), [all]);
-  const counts = useMemo(() => new Map(everyHood.map(h => [h.id, closeCount(linksFor(h, all, occurrences))])), [everyHood, all, occurrences]);
-  const shown = quadrant ? hoods.filter(h => h.quadrant === quadrant) : hoods;
+  const links = useMemo(() => new Map(everyHood.map(h => [h.id, linksFor(h, all, occurrences)])), [everyHood, all, occurrences]);
+  const counts = useMemo(() => new Map([...links].map(([id, l]) => [id, closeCount(l)])), [links]);
+  const shown = useMemo(() => (quadrant ? hoods.filter(h => h.quadrant === quadrant) : hoods), [hoods, quadrant]);
+  // Totals count each listing once, however many of the shown neighbourhoods it sits near.
+  const totals = useMemo(() => {
+    const ids = { events: new Set<string>(), markets: new Set<string>(), places: new Set<string>() };
+    for (const l of shown.map(h => links.get(h.id)).filter((x): x is HoodLinks => !!x)) for (const k of ['events', 'markets', 'places'] as const) l[k].forEach(x => { if (x.closeness !== 'quadrant') ids[k].add(x.entity.id); });
+    return { events: ids.events.size, markets: ids.markets.size, places: ids.places.size };
+  }, [links, shown]);
   const preview = shown.some(h => h.developmentOnly);
-  const perQuad = Object.fromEntries(QUADRANTS.map(q => [q, everyHood.filter(h => h.quadrant === q).length]));
+  const perQuad = Object.fromEntries(QUADRANTS.map(q => [q, everyHood.filter(h => h.quadrant === q)]));
+  const numberOf = (h: Neighbourhood) => everyHood.indexOf(h) + 1;
   const revealRef = useSectionReveal(quadrant ?? 'all');
   const ribbon = [plural(everyHood.length, 'neighbourhood'), ...shown.map(h => `${h.title} · ${h.quadrant}`), 'CalgaryWatch Neighbourhoods'];
 
+  // The hero: one name at a time, the deck following along.
+  const [deckHold, setDeckHold] = useState(false);
+  const [front, setFront] = useCycle(shown.length, 3200, deckHold);
+  const heroHood = shown[front];
+
+  // The atlas: whichever postcard crosses the middle of the screen lights its pin.
+  const [active, setActive] = useState<string>();
+  const atlasRef = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    const els = [...(atlasRef.current?.querySelectorAll<HTMLElement>('[data-hood]') ?? [])];
+    if (!els.length || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) setActive((e.target as HTMLElement).dataset.hood); }), { rootMargin: '-45% 0px -50% 0px' });
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, [quadrant, shown.length]);
+  const activeHood = shown.find(h => h.slug === active);
+
   return (
     <div className="nb nb-index" ref={revealRef}>
-      <section className="nb-hero" aria-labelledby="nb-title">
-        <div className="nb-wrap nb-hero-grid">
-          <div className="nb-hero-text">
-            <p className="nb-dateline"><span className="nb-pulse" aria-hidden="true" />Neighbourhoods · {plural(everyHood.length, 'pocket')} of the city</p>
-            <h1 id="nb-title">{quadrant ? <>{QUAD_NAME[quadrant]} <span>Calgary.</span></> : <>Know your <span>neighbourhood.</span></>}</h1>
-            <p className="nb-lead">Where to walk, eat and wander, what’s on nearby this week, and what neighbours are keeping an eye on. Tap a pin or pick a quadrant.</p>
+      <section className="nb-hero nb-hx" aria-labelledby="nb-title">
+        <span className="nb-hx-glow" aria-hidden="true" />
+        <div className="nb-wrap nb-hx-grid">
+          <div className="nb-hx-text">
+            <p className="nb-dateline"><span className="nb-pulse" aria-hidden="true" />{quadrant ? `${QUAD_NAME[quadrant]} Calgary` : 'Neighbourhoods'} · {plural(shown.length, 'pocket')} of the city</p>
+            <h1 id="nb-title">
+              <span className="nb-hx-know">Know your</span>
+              <span className="sr-only">{quadrant ? `${QUAD_NAME[quadrant]} Calgary neighbourhoods.` : 'neighbourhood.'}</span>
+              <RollingName hood={heroHood} />
+            </h1>
+            {shown.length > 1 ? <span className="nb-hx-timer" key={`${front}-${deckHold}`} data-hold={deckHold || undefined} aria-hidden="true" /> : null}
+            <p className="nb-lead">Where to walk, eat and wander, what’s on nearby this week, and what neighbours are keeping an eye on.</p>
+            <dl className="nb-hx-stats">
+              <div><dt>neighbourhoods</dt><dd><CountUp to={shown.length} /></dd></div>
+              <div><dt>events nearby</dt><dd><CountUp to={totals.events} /></dd></div>
+              <div><dt>markets</dt><dd><CountUp to={totals.markets} /></dd></div>
+              <div><dt>local places</dt><dd><CountUp to={totals.places} /></dd></div>
+            </dl>
             <nav className="nb-quads" aria-label="Filter by quadrant">
               <Link to="/neighbourhoods" aria-current={!quadrant ? 'page' : undefined}>All <b>{everyHood.length}</b></Link>
               {QUADRANTS.map(q => (
                 <Link key={q} to={`/neighbourhoods?quadrant=${q}`} className={`q-${q.toLowerCase()}`} aria-current={quadrant === q ? 'page' : undefined}>
-                  <i aria-hidden="true" />{q} <b>{perQuad[q]}</b>
+                  <i aria-hidden="true" />{q} <b>{perQuad[q].length}</b>
                 </Link>
               ))}
             </nav>
           </div>
-          <figure className="nb-hero-map">
-            <HoodMap hoods={everyHood} active={hover} quadrant={quadrant} onHover={setHover} numbered />
-            <figcaption><MapPin size={13} aria-hidden="true" /> Inner city · pins at each neighbourhood’s heart</figcaption>
-          </figure>
+          {shown.length ? (
+            <div className="nb-hx-deck" onMouseEnter={() => setDeckHold(true)} onMouseLeave={() => setDeckHold(false)} onFocus={() => setDeckHold(true)} onBlur={() => setDeckHold(false)}>
+              <PostcardDeck hoods={shown} active={front} onPick={i => { setFront(i); setDeckHold(true); }} numberOf={numberOf} />
+            </div>
+          ) : null}
         </div>
         <Tear />
       </section>
@@ -105,40 +293,59 @@ export function NeighbourhoodsBoard({ hoods, all, occurrences, quadrant }: {
       <div className="nb-wrap">
         {preview && <p className="cw-preview-note">Illustrative design previews. These are not confirmed listings.</p>}
         {shown.length ? (
-          <ol className="nb-grid">
-            {shown.map((h, i) => {
-              const c = counts.get(h.id) ?? { events: 0, markets: 0, places: 0 };
-              return (
-                <li key={h.id} className={hover === h.slug ? 'is-hover' : undefined} onMouseEnter={() => setHover(h.slug)} onMouseLeave={() => setHover(undefined)}>
-                  <Link to={entityPath(h)} className={`nb-card q-${h.quadrant.toLowerCase()}`}>
-                    <span className="nb-card-photo">
-                      <img src={h.image?.src || '/images/photo/calgary1.webp'} alt="" loading={i < 3 ? 'eager' : 'lazy'} width="720" height="480" />
-                      <QuadTag q={h.quadrant} />
-                      <span className="nb-card-n" aria-hidden="true">{String(everyHood.indexOf(h) + 1).padStart(2, '0')}</span>
-                      <span className="nb-card-cover"><HoodCover hood={h} mini /></span>
-                    </span>
-                    <span className="nb-card-body">
-                      <strong>{h.title}</strong>
-                      <span className="nb-card-sum">{h.summary}</span>
-                      <span className="nb-vibes">{vibes(h).slice(0, 3).map(v => <em key={v}>{v}</em>)}</span>
-                      {/* Only what's there: a row of zeros reads as a dead neighbourhood. */}
-                      <span className="nb-card-counts">
-                        {c.events ? <span title="Events in or near it"><CalendarDays size={15} aria-hidden="true" />{plural(c.events, 'event')}</span> : null}
-                        {c.markets ? <span title="Markets in or near it"><ShoppingBasket size={15} aria-hidden="true" />{plural(c.markets, 'market')}</span> : null}
-                        {c.places ? <span title="Local places"><Coffee size={15} aria-hidden="true" />{plural(c.places, 'place')}</span> : null}
-                        {!c.events && !c.markets && !c.places ? <span>Walks, history and what’s nearby</span> : null}
-                      </span>
-                    </span>
-                    <span className="nb-card-go" aria-hidden="true"><ArrowUpRight size={20} /></span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ol>
+          <section className="nb-atlas" aria-labelledby="nb-atlas-title">
+            <header className="nb-atlas-head" data-reveal>
+              <p className="nb-kicker"><MapPin size={14} aria-hidden="true" /> The atlas · scroll the city</p>
+              <h2 id="nb-atlas-title">{plural(shown.length, 'neighbourhood')}, <mark>one river.</mark></h2>
+            </header>
+            <div className="nb-atlas-grid">
+              <div className="nb-atlas-map">
+                <div className="nb-atlas-frame">
+                  <AtlasLens hoods={everyHood} active={active} quadrant={quadrant} onHover={slug => slug && setActive(slug)} />
+                  <div className={`nb-atlas-now${activeHood ? ` q-${activeHood.quadrant.toLowerCase()}` : ''}`} aria-live="polite">
+                    {activeHood ? (
+                      <>
+                        <span className="nb-atlas-num">{String(numberOf(activeHood)).padStart(2, '0')}<small>/{String(everyHood.length).padStart(2, '0')}</small></span>
+                        <span className="nb-atlas-name" key={activeHood.id}><strong>{activeHood.title}</strong><small>{QUAD_NAME[activeHood.quadrant] ?? 'Central'} Calgary</small></span>
+                        <Link to={entityPath(activeHood)} className="nb-atlas-go" aria-label={`Open ${activeHood.title}`}><ArrowUpRight size={20} aria-hidden="true" /></Link>
+                      </>
+                    ) : (
+                      <span className="nb-atlas-name"><strong>Inner-city Calgary</strong><small>Scroll, and the map follows</small></span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <ol className="nb-chaps" ref={atlasRef}>
+                {shown.map(h => (
+                  <AtlasCard key={h.id} hood={h} number={numberOf(h)} count={counts.get(h.id) ?? { events: 0, markets: 0, places: 0 }} on={active === h.slug} onHover={slug => slug && setActive(slug)} />
+                ))}
+              </ol>
+            </div>
+          </section>
         ) : (
           <div className="nb-empty"><h2>Nothing in {quadrant} yet.</h2><p>We’re adding neighbourhoods a few at a time.</p><Link className="nb-btn" to="/neighbourhoods">See every neighbourhood <ArrowRight size={16} aria-hidden="true" /></Link></div>
         )}
       </div>
+
+      <section className="nb-wrap nb-sides" data-reveal aria-labelledby="nb-sides-title">
+        <h2 id="nb-sides-title">Four sides of <mark>the city.</mark></h2>
+        <ul>
+          {QUADRANTS.map(q => (
+            <li key={q}>
+              <Link to={`/neighbourhoods?quadrant=${q}`} className={`nb-side-tile q-${q.toLowerCase()}`} aria-current={quadrant === q ? 'page' : undefined}>
+                <span className="nb-side-art" aria-hidden="true"><img src={`/images/quadrant/quadrant-${q.toLowerCase()}-collage.webp`} alt="" loading="lazy" width="480" height="480" /></span>
+                <b className="nb-side-q" aria-hidden="true">{q}</b>
+                <span className="nb-side-copy">
+                  <strong>{QUAD_NAME[q]}</strong>
+                  <span>{QUAD_LINE[q]}</span>
+                  <small>{perQuad[q].length ? perQuad[q].map(h => h.title).join(' · ') : 'Coming soon'}</small>
+                </span>
+                <span className="nb-side-go" aria-hidden="true"><ArrowUpRight size={20} /></span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="nb-wrap nb-connect" data-reveal aria-labelledby="nb-connect-title">
         <h2 id="nb-connect-title">Look out for <mark>your block.</mark></h2>

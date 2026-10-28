@@ -6350,5 +6350,59 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "meadowlark-park-community-association",
+      "name": "Meadowlark Park Community Association",
+      "approved": true,
+      "hosts": [
+        "meadowlarkpark.org",
+        "www.meadowlarkpark.org"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "mag-holiday-market-2026",
+        "input": {
+          "kind": "market",
+          "organizer": "MAG Holiday Market",
+          "venue": "Meadowlark Park Community Hall",
+          "address": "623 58 Avenue SW, Calgary, AB",
+          "neighbourhood": "Meadowlark Park",
+          "sourceUrl": "https://meadowlarkpark.org/",
+          "title": "MAG Holiday Market",
+          "summary": "A pay-what-you-can holiday market at the Meadowlark Park Community Hall on Saturday, December 5, with every dollar going to the Canadian Mental Health Association.",
+          "description": "Shop local makers at the MAG Holiday Market, Saturday, December 5, 2026, from noon to 8 p.m. at the Meadowlark Park Community Hall, 623 58 Avenue SW. Admission is pay-what-you-can, and 100% of admissions and vendor fees go to the Canadian Mental Health Association. All ages are welcome and parking is free.",
+          "categories": [
+            "markets",
+            "holiday",
+            "shopping"
+          ],
+          "tags": [
+            "holiday market",
+            "Christmas market",
+            "makers",
+            "pay what you can",
+            "CMHA",
+            "Meadowlark Park"
+          ],
+          "amenities": [
+            "Indoor"
+          ],
+          "parking": "Free parking",
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-12-05",
+              "start": "2026-12-05T12:00:00-07:00",
+              "end": "2026-12-05T20:00:00-07:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
   }
 ]

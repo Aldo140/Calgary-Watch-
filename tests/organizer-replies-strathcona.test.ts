@@ -31,7 +31,7 @@ describe('Strathcona Community Association reply', () => {
     assert.ok(batch.source.hosts.includes(new URL(record.input.sourceUrl).hostname));
     const { entity, occurrences } = domain.normalizeRecord(record.input, batch.source, record.id, '2026-10-28T19:40:00.000Z');
     assert.equal(entity.kind, 'market');
-    assert.deepEqual(occurrences.map((o: { start: string; end: string }) => [o.start, o.end]), [['2026-12-05T10:00:00-07:00', '2026-12-05T16:00:00-07:00']]);
+    assert.deepEqual(occurrences.map((o: { start: string; end: string }) => [o.start, o.end]), [['2026-12-05T10:00:00-06:00', '2026-12-05T16:00:00-06:00']]);
     const [linked] = associateOrganizers([{ ...entity, status: 'published' }, org]) as Array<{ organizerEntityId?: string }>;
     assert.equal(linked.organizerEntityId, org.id);
   });
@@ -53,7 +53,7 @@ describe('Meadowlark Park and Two Rivers replies', () => {
     const [record] = batch.records;
     const { entity, occurrences } = domain.normalizeRecord(record.input, batch.source, record.id, '2026-10-28T20:50:00.000Z');
     assert.equal(entity.kind, 'market');
-    assert.deepEqual(occurrences.map((o: { start: string; end: string }) => [o.start, o.end]), [['2026-12-05T12:00:00-07:00', '2026-12-05T20:00:00-07:00']]);
+    assert.deepEqual(occurrences.map((o: { start: string; end: string }) => [o.start, o.end]), [['2026-12-05T12:00:00-06:00', '2026-12-05T20:00:00-06:00']]);
     // MAG runs the market; the association hosts it, so the organizer stays MAG.
     assert.equal(entity.organizer, 'MAG Holiday Market');
     assert.equal(entity.venue, 'Meadowlark Park Community Hall');

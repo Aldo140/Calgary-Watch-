@@ -231,54 +231,32 @@ export default function SpotlightPage() {
           </p>
         </header>
 
-        <div className="cw-wrap hx-disclose">
-          <p><b>About this spotlight.</b> {s.disclosure}</p>
-        </div>
-
         <div className="cw-wrap hx-layout">
-          <nav className="hx-toc" aria-label="In this spotlight">
-            <p>Shot list</p>
-            <ol>
-              <li><a href="#festival">The festival</a></li>
-              <li><a href="#origins">Where it came from</a></li>
-              <li><a href="#experience">This year</a></li>
-              <li><a href="#films">The films</a></li>
-              <li><a href="#go">How to go</a></li>
-              <li><a href="#next">What’s next</a></li>
-              <li><a href="#friday">After Friday</a></li>
-            </ol>
-          </nav>
-
           <div className="hx-main">
-            <Scene n={1} id="festival" look="slate" kicker="EXT. CALGARY — OCTOBER" label="The festival" title={<>A Halloween festival, <span>in short form.</span></>}>
-              <div className="hx-prose">
-                <p>HEX After Dark is a curated Halloween film festival from HEX Entertainment, the Calgary company behind the HEX Halloween &amp; Entertainment Expo.<Cite s={s} id="hex" /> On its submission page it calls itself the largest Halloween film festival in Western Canada, and says it exists to showcase independent filmmakers and a shared love of Halloween.<Cite s={s} id="filmfreeway" /></p>
-                <p>It takes Halloween, horror, sci-fi and fantasy films, and says it generally doesn’t accept films made with AI. Its awards include Best Short Film, Best Sci-Fi or Fantasy Film and Best Horror Film.<Cite s={s} id="filmfreeway" /> The festival is organized by {s.organizer.name}.</p>
-              </div>
+            <Scene n={1} id="festival" look="slate" kicker="EXT. CALGARY — OCTOBER" label="The festival" title={<>The largest Halloween film festival <span>in Western Canada.</span></>}>
+              <p className="hx-line">In its own words.<Cite s={s} id="filmfreeway" /> From HEX Entertainment, the team behind the HEX Halloween &amp; Entertainment Expo.<Cite s={s} id="hex" /> Organized by {s.organizer.name}.</p>
+              <ul className="hx-tags" aria-label="What it screens">
+                {['Halloween', 'Horror', 'Sci-fi', 'Fantasy', 'Indie shorts', 'No AI films'].map(x => <li key={x}>{x}</li>)}
+              </ul>
             </Scene>
 
             <Scene n={2} id="origins" look="vhs" kicker={<><b>▶ PLAY</b> <span>OCT. 11 2019 · BMO CENTRE</span></>} label="Where it came from" title={<>Born in <span>a haunted expo.</span></>}>
-              <div className="hx-prose">
-                <p>HEX started in 2019 as Calgary’s first Halloween and entertainment expo, October 11 to 14 at the BMO Centre on Stampede Park. It brought back ScreamFest’s haunted houses after a year off, which owner Mike Sheppard described as a blend of the haunt and a comic-style expo.<Cite s={s} id="global-2019" /> Admission included the expo’s screening room and film festival.<Cite s={s} id="livewire-2019" /></p>
-                <p>The festival has moved around since. In 2022 it screened in Burnaby, at Cineplex Cinemas Metropolis, during the Burnaby Halloween Festival.<Cite s={s} id="burnaby-2022" /> Last year it took over the Flanagan Theatre at The GRAND for one night, Monday, October 27, 2025, in three blocks: <em>Horror in the North</em> at 6:30 p.m., <em>Blood and Reels</em> at 8:30 p.m. and <em>The Best of Hex After Dark</em> at 10:30 p.m.<Cite s={s} id="grand-2025" /> Tickets were $10, or $20 for a pass to all three,<Cite s={s} id="showpass-2025" /> and CTV News Calgary covered the night.<Cite s={s} id="ctv-2025" /></p>
-              </div>
+              <p className="hx-line">First screened inside Calgary’s first HEX expo, the one that brought ScreamFest back.<Cite s={s} id="global-2019" /><Cite s={s} id="livewire-2019" /></p>
               <EditionStrip items={[
-                { year: '2019', where: 'BMO Centre', what: 'Inside the first HEX expo' },
-                { year: '2022', where: 'Cineplex Metropolis', what: 'Burnaby Halloween Festival' },
-                { year: '2025', where: 'The GRAND', what: 'Flanagan Theatre, three blocks' },
-                { year: '2026', where: 'ScreamFest', what: 'In the bar, every night' },
+                { year: '2019', where: 'BMO Centre', what: 'The first HEX expo' },
+                { year: '2022', where: 'Burnaby', what: 'Cineplex Metropolis' },
+                { year: '2025', where: 'The GRAND', what: 'Flanagan Theatre' },
+                { year: '2026', where: 'ScreamFest', what: 'In the bar' },
               ]} />
+              <p className="hx-src-line">2022<Cite s={s} id="burnaby-2022" /> · 2025<Cite s={s} id="grand-2025" /><Cite s={s} id="ctv-2025" /></p>
             </Scene>
 
-            <Scene n={3} id="experience" look="marquee" kicker="Now playing" label="This year" title={<>Horror, <span>between the haunted houses.</span></>}>
-              <div className="hx-prose">
-                <p>This October the festival is back with ScreamFest. Its submission page lists the 2026 run as October 10 to 31, alongside ScreamFest, with an official weekend of October 22 to 25.<Cite s={s} id="filmfreeway" /></p>
-                <p>The festival has told CalgaryWatch the films play in the bar at ScreamFest on every night it’s open, and that because the programme is all shorts, every film can screen each night. They’re included with ScreamFest admission.</p>
-              </div>
+            <Scene n={3} id="experience" look="marquee" kicker="Now playing" label="This year" title={<>Shorts, <span>between the haunted houses.</span></>}>
               <Letterboard
-                rows={[['Where', 'The bar at ScreamFest · GMC Stadium, Stampede Park'], ['When', 'ScreamFest nights · 7 p.m. to midnight'], ['Cost', 'Included with ScreamFest admission']]}
-                open={['Still to confirm', 'Screening times and the 2026 film list. We’ll add both when the festival shares them.']}
+                rows={[['Where', 'The bar at ScreamFest'], ['When', 'Every ScreamFest night'], ['Run', 'Oct 10 – 31'], ['Cost', 'Included with admission']]}
+                open={['Film list', 'Coming soon']}
               />
+              <p className="hx-src-line">Run dates<Cite s={s} id="filmfreeway" /> · Every short screens each night, per the festival</p>
             </Scene>
           </div>
         </div>
@@ -291,8 +269,8 @@ export default function SpotlightPage() {
               kicker={`Hex After Dark ${s.showcase.season}`}
               heading={s.showcase.heading}
               films={films}
-              emptyTitle="This year’s lineup isn’t public yet."
-              emptyBody="We’ve asked the festival for its 2026 titles, the filmmakers behind them and permission to show stills. Each film will get a card here with its title, director and team, a short synopsis, a still or poster, its genre and runtime, and links to its trailer and socials. We won’t fill this in from guesses."
+              emptyTitle="Lineup coming soon."
+              emptyBody="Titles, filmmakers and stills land here once the festival shares them."
               contact={{ href: `mailto:${SPOTLIGHT_CONTACT}?subject=${encodeURIComponent('My film at Hex After Dark')}`, label: 'Tell us about your film', note: s.showcase.callForFilmmakers }}
               onLink={id => trackSpotlightLink(s, id)}
             />
@@ -300,7 +278,6 @@ export default function SpotlightPage() {
         </div>
 
         <div className="cw-wrap hx-layout">
-          <div className="hx-toc-spacer" aria-hidden="true" />
           <div className="hx-main">
             <Scene n={4} id="go" look="box" kicker="Box office" label="How to go" title={<>Your ticket <span>to the bar.</span></>}>
               <div className="hx-ticket">
@@ -310,9 +287,9 @@ export default function SpotlightPage() {
                     <div><dt><CalendarDays size={16} aria-hidden="true" /> Nights</dt><dd>{nights.length ? nights.map(nightLabel).join(' · ') : 'This year’s run has ended'}<span>{nightsLine(nights)}</span></dd></div>
                     <div><dt><Clock size={16} aria-hidden="true" /> Hours</dt><dd>{s.venue.hours}<span>Film times not published</span></dd></div>
                     <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{s.venue.name}<span>{s.venue.address}</span></dd></div>
-                    <div><dt><Ticket size={16} aria-hidden="true" /> Admission</dt><dd>Included with ScreamFest admission<span>Packages vary; check ScreamFest’s booking page</span></dd></div>
+                    <div><dt><Ticket size={16} aria-hidden="true" /> Admission</dt><dd>Included with ScreamFest admission</dd></div>
                   </dl>
-                  <p className="hx-ticket-note">The films play in ScreamFest’s bar. ScreamFest recommends the event for ages 12 and up, and October 22 was adults-only; check its age rules for the bar before bringing anyone under 18.</p>
+                  <p className="hx-ticket-note">In the bar. Check ScreamFest’s age rules before bringing anyone under 18.</p>
                 </div>
                 <div className="hx-ticket-stub">
                   <p className="hx-stub-mark" aria-hidden="true"><span>Admit one</span>{s.card.mark}<small>{nights.length ? nightsLine(nights) : 'See you next year'}</small></p>
@@ -324,14 +301,10 @@ export default function SpotlightPage() {
             </Scene>
 
             <Scene n={5} id="next" look="teaser" kicker="Coming soon?" label="What’s next" title={<>Back to <span>the big screen?</span></>}>
-              <div className="hx-teaser" aria-hidden="true">
-                <p className="hx-teaser-top">From the festival that played The GRAND in 2025</p>
+              <div className="hx-teaser">
+                <p className="hx-teaser-top">Hex After Dark</p>
                 <p className="hx-teaser-big">Back at<span>The GRAND</span></p>
                 <p className="hx-teaser-date">Next year · Tentatively</p>
-              </div>
-              <div className="hx-prose">
-                <p>Hex After Dark is tentatively set to return to The GRAND next year.</p>
-                <p>We’ll share with Cameron how many people read this spotlight and how many tapped through to the festival and ScreamFest’s tickets. Those are counts only: nothing about who you are.</p>
               </div>
             </Scene>
 
@@ -342,14 +315,7 @@ export default function SpotlightPage() {
                   {s.review.body.map(p => <p key={p}>{p}</p>)}
                 </div>
               ) : (
-                <div className="hx-soon">
-                  <p>On Friday we’re visiting Hex After Dark. Two things will be added here afterwards:</p>
-                  <ul>
-                    <li><b>Our review</b> of the night, written from what we actually saw.</li>
-                    <li><b>A conversation with {s.interview.with}</b> about how the festival began, how films are chosen, what makes it different and what it would take to return to a theatre, in his own words.</li>
-                  </ul>
-                  <p className="hx-soon-fine">Until then, everything on this page is either linked to a public source or something the festival told us directly, and it says which.</p>
-                </div>
+                <p className="hx-line">Our review of the night and a conversation with {s.interview.with}, after Friday.</p>
               )}
               {answered.length ? (
                 <dl className="hx-qa">

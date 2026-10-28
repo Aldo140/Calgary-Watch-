@@ -82,7 +82,7 @@ export const HEX_AFTER_DARK: Spotlight = {
   slug: 'hex-after-dark',
   name: 'Hex After Dark',
   title: 'The Dark Side of Calgary Cinema: Inside Hex After Dark',
-  dek: 'Calgary’s Halloween film festival, from the people behind the HEX Halloween & Entertainment Expo, is playing short horror films in the bar at ScreamFest this October.',
+  dek: 'Short horror films in the bar at ScreamFest. Every night. Included with admission.',
   published: '2026-10-27',
   updated: '2026-10-28',
   seo: {

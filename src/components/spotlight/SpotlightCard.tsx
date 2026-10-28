@@ -8,8 +8,7 @@ import '../../styles/spotlight-card.css';
 
 /**
  * The seasonal teaser for a CalgaryWatch Spotlight, used on the homepage, the
- * events hub and the related event pages. It always says it's our own,
- * unpaid spotlight. Logs one "seen" per tab and every tap.
+ * events hub and the related event pages. It always names the partnership. Logs one "seen" per tab and every tap.
  */
 export function SpotlightCard({ spotlight: s, at, entities, compact = false }: {
   spotlight: Spotlight;
@@ -35,7 +34,7 @@ export function SpotlightCard({ spotlight: s, at, entities, compact = false }: {
         <span className="spc-sign" aria-hidden="true"><small>Now showing</small><b>{s.card.mark}</b><small>{s.name.replace(new RegExp(s.card.mark, 'i'), '').trim() || s.name}</small></span>
         <span className="spc-strip" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} />)}</span>
         <span className="spc-copy">
-          <span className="spc-label"><b>CalgaryWatch Spotlight</b> <span>Independent · not sponsored</span></span>
+          <span className="spc-label"><b>CalgaryWatch Spotlight</b> <span>{s.partnerLabel}</span></span>
           <span className="spc-title" id={`spc-${at}`}>{lead}{rest ? <><span className="spc-colon">:</span> <em>{rest}</em></> : null}</span>
           {compact ? null : <span className="spc-dek">{s.dek}</span>}
           <span className="spc-foot">

@@ -254,7 +254,7 @@ function spotlightCard(slug: string): ShareCard | undefined {
     path: cardPath(path), theme: 'spotlight', label: 'CalgaryWatch Spotlight',
     title: lead,
     lines: [sub ?? s.name, s.card.line],
-    pill: 'Independent · not sponsored',
+    pill: s.partnerLabel,
     mark: s.card.mark,
     colors: { from: '#2a1b3d', to: '#ff5a4e', ink: '#ffdf4f' },
     footer: `calgarywatch.ca${path}`,

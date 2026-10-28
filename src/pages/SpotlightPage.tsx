@@ -125,7 +125,7 @@ export default function SpotlightPage() {
           <span className="hx-grain" aria-hidden="true" />
           <div className="cw-wrap hx-hero-grid">
             <div className="hx-hero-copy">
-              <p className="hx-kicker"><span>CalgaryWatch Spotlight</span> Independent · not sponsored</p>
+              <p className="hx-kicker"><span>CalgaryWatch Spotlight</span> {s.partnerLabel}</p>
               <h1>
                 The Dark Side of <mark>Calgary Cinema</mark><span className="hx-h1-sub">Inside Hex After Dark</span>
               </h1>
@@ -144,7 +144,7 @@ export default function SpotlightPage() {
         </header>
 
         <div className="cw-wrap hx-disclose">
-          <p><b>Why this is here.</b> {s.disclosure}</p>
+          <p><b>About this spotlight.</b> {s.disclosure}</p>
         </div>
 
         <div className="cw-wrap hx-layout">
@@ -243,7 +243,7 @@ export default function SpotlightPage() {
                 </div>
               ) : (
                 <div className="hx-soon">
-                  <p>On Friday we’re visiting Hex After Dark with two passes from the festival. Two things will be added here afterwards:</p>
+                  <p>On Friday we’re visiting Hex After Dark. Two things will be added here afterwards:</p>
                   <ul>
                     <li><b>Our review</b> of the night, written from what we actually saw.</li>
                     <li><b>A conversation with {s.interview.with}</b> about how the festival began, how films are chosen, what makes it different and what it would take to return to a theatre, in his own words.</li>

@@ -3605,7 +3605,7 @@
       "website": "https://calgaryundergroundfilm.org/",
       "address": "Calgary, AB",
       "summary": "Independent film beyond the mainstream: CUFF.Docs brings documentaries to Globe Cinema November 18–22, 2026, ahead of CUFF’s April 2027 festival.",
-      "description": "Calgary Underground Film Festival (CUFF) presents independent features, shorts and documentaries beyond the mainstream, from horror and comedy to music films. Its programme includes the main festival, CUFF.Docs and special screenings throughout the year.\n\nComing up: the 14th CUFF.Docs Documentary Film Festival runs November 18–22, 2026 at Globe Cinema, 617 8 Avenue SW. The five-day festival showcases non-fiction features and shorts across a range of subjects and filmmaking styles. Festival passes are available through CUFF’s official site; the full programme and individual tickets are scheduled for release on October 28. Check the official programme for individual screening times and availability.\n\nThe 24th Calgary Underground Film Festival takes place April 15–25, 2027. Its official site says the programme will be announced and passes will go on sale in late March. See CUFF’s website for confirmed screenings, passes and programme updates.",
+      "description": "Calgary Underground Film Festival (CUFF) presents independent features, shorts and documentaries beyond the mainstream, from horror and comedy to music films. Its programme includes the main festival, CUFF.Docs and special screenings throughout the year.\n\nComing up: the 14th CUFF.Docs Documentary Film Festival runs November 18–22, 2026 at Globe Cinema, 617 8 Avenue SW. The lineup, announced October 28, has 15 features, 17 shorts and CATVIDEOFEST. Matthew Rankin’s LADIES AND GENTLEMEN, BRIAN MULRONEY opens the festival on November 18 at 6:30 p.m., and Rankin gives CUFF.Docs’ first artist talk on November 19 at 4 p.m. Tickets are on sale at $12 per film ($10 for members, students and seniors), with 5-Film Packs at $50 and Festival Passes at $75. Check the official programme for individual screening times and availability.\n\nThe 24th Calgary Underground Film Festival takes place April 15–25, 2027. Its official site says the programme will be announced and passes will go on sale in late March. See CUFF’s website for confirmed screenings, passes and programme updates.",
       "categories": [
         "arts"
       ],
@@ -7501,7 +7501,7 @@
       ],
       "format": "planning",
       "introduction": "You do not need to be a film-festival regular to try CUFF.Docs. Start with a subject you care about, choose one screening and leave time to talk about it afterwards. The 14th documentary festival runs November 18–22, 2026 at Globe Cinema.",
-      "methodology": "Prepared from Calgary Underground Film Festival’s official programme and visitor information, checked October 23, 2026. The CUFF.Docs lineup and individual tickets are due October 28; film recommendations and screening links need that announced programme. This is an advance-planning guide, not a screening review.",
+      "methodology": "Prepared from Calgary Underground Film Festival’s official programme and visitor information, checked October 23, 2026, and updated with the lineup CUFF announced October 28. Film notes come from CUFF’s own programme descriptions. This is a planning guide, not a screening review.",
       "entries": [
         {
           "entityId": "biz-calgary-underground-film-festival",
@@ -7512,6 +7512,14 @@
           "note": "Plan your documentary festival visit"
         },
         {
+          "entityId": "56030c706c102bb95bad2d584985",
+          "note": "Opening night with Matthew Rankin"
+        },
+        {
+          "entityId": "6bd9a58925b76a0b0cb278204392",
+          "note": "The festival’s first artist talk"
+        },
+        {
           "entityId": "860263f35da4888782608f80697b",
           "note": "A separate October horror marathon"
         }
@@ -7520,8 +7528,8 @@
       "facts": {
         "time": "November 18–22, 2026",
         "distance": "Globe Cinema · 617 8 Avenue SW",
-        "cost": "Check official screening tickets or passes",
-        "season": "Lineup announced October 28"
+        "cost": "$12 per film · $10 members, students, seniors",
+        "season": "Lineup out · tickets on sale"
       },
       "cover": {
         "from": "#10233f",
@@ -7538,7 +7546,7 @@
       "sections": [
         {
           "title": "Start with your curiosity",
-          "body": "When the lineup arrives October 28, look for a subject you already care about: a place, a creative practice, a community or an unanswered question. Read the official film description before choosing; the documentary label covers many styles and subjects."
+          "body": "Start with a subject you already care about. This year’s 15 features range from Calgary’s own STARRY NIGHT, a world premiere about performers living with schizophrenia, to the Alberta country punk band in MORE MILES THAN MONEY, Japan’s sumo stables in SUMO: SPIRIT WEIGHS NOTHING and an escaped Central Park owl in WILD INSIDE. Read the official film description before choosing; the documentary label covers many styles and subjects."
         },
         {
           "title": "Build one good evening",
@@ -7546,7 +7554,7 @@
         },
         {
           "title": "Let the conversation continue",
-          "body": "After the credits, compare what surprised you and what you would like to learn more about. If a filmmaker conversation is announced for your screening, check the official programme for its timing. Talks and guests should never be assumed."
+          "body": "After the credits, compare what surprised you and what you would like to learn more about. CUFF lists filmmakers in attendance for several screenings this year, including Opening Night with Matthew Rankin, STARRY NIGHT with its local cast and crew, and TURTLE ISLAND RAP. Check the official programme for your screening; guests can change."
         },
         {
           "title": "Before the documentaries: an overnight horror marathon",

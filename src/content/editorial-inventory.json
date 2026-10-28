@@ -9559,8 +9559,8 @@
       "name": "Two Rivers Distillery",
       "website": "https://www.tworiversdistillery.com/",
       "address": "453 42 Ave SE, Calgary, AB",
-      "summary": "Small-batch craft distillery in southeast Calgary.",
-      "description": "Two Rivers Distillery makes small-batch craft spirits at 453 42 Ave SE.",
+      "summary": "Calgary craft distillery; its distillery at 453 42 Ave SE was destroyed by fire in June 2026.",
+      "description": "Two Rivers Distillery made small-batch craft spirits at 453 42 Ave SE until a fire destroyed the distillery in June 2026, as its founder told CalgaryWatch. There is no distillery or tasting room to visit, so the profile is archived.",
       "categories": [
         "food",
         "nightlife"
@@ -9581,17 +9581,14 @@
       "socials": {
         "website": "https://www.tworiversdistillery.com/"
       },
-      "services": [
-        "Tasting room",
-        "Craft spirits"
-      ],
+      "services": [],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
-      "status": "published",
+      "status": "archived",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
-      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:50:00.000Z",
       "email": "info@tworiversdistillery.com"
     },
     {
@@ -11575,6 +11572,51 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T19:40:00.000Z",
       "updatedAt": "2026-10-28T19:40:00.000Z"
+    },
+    {
+      "id": "biz-meadowlark-park-community-association",
+      "kind": "business",
+      "slug": "meadowlark-park-community-association",
+      "title": "Meadowlark Park Community Association",
+      "name": "Meadowlark Park Community Association",
+      "website": "https://meadowlarkpark.org/",
+      "address": "623 58 Avenue SW, Calgary, AB",
+      "summary": "The community association for Meadowlark Park, a small southwest Calgary neighbourhood of about 278 homes, with a community hall at 623 58 Avenue SW.",
+      "description": "The Meadowlark Park Community Association serves one of Calgary's smallest neighbourhoods, about 278 homes in the southwest, from its community hall at 623 58 Avenue SW. It posts community events on its website and Instagram as they come up, and its hall hosts the MAG Holiday Market for the Canadian Mental Health Association in December.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "community association",
+        "meadowlark-park"
+      ],
+      "sources": [
+        {
+          "name": "Meadowlark Park Community Association — official website",
+          "url": "https://meadowlarkpark.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:50:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://meadowlarkpark.org/"
+      },
+      "services": [
+        "Community events",
+        "Community hall",
+        "MAG Holiday Market"
+      ],
+      "email": "info@meadowlarkpark.org",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:50:00.000Z",
+      "updatedAt": "2026-10-28T20:50:00.000Z"
     }
   ]
 }

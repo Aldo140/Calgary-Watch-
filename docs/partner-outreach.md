@@ -236,3 +236,85 @@ On 2026-10-21, 30 new organizations got the claim invitation from Outlook. They 
 | Killarney-Glengarry Community Association | `biz-killarney-glengarry-community-association` | `gm@kgca.ca` |
 | Renfrew Community Association | `biz-renfrew-community-association` | `contact@renfrewyyc.ca` |
 | 17th Avenue Retail & Entertainment District | `biz-17th-avenue-district` | `tulene@17thave.ca` |
+
+## Outlook invite-only and partnership batch (2026-10-28)
+
+On 2026-10-28, 70 organizations that had never been contacted got a personal email from Outlook. Each profile below was published first, and every email carried the profile link and a personal claim link (`via=outlook-oct28`).
+
+- **Invite-only listings (40):** a short, custom note that the profile is hand-picked and free to claim.
+- **Partnership pitches (30):** a specific co-hosted idea (contest, guide, event night, data link), with the profile and claim link as a P.S.
+
+Before sending, every address was checked against Outlook (all folders), the STOP list, `brand/partner-prospects.json`, the catalogue organizers and earlier batch files. Who got which pitch is in the project file `organizer-replies/2026-10-28-invite-and-partnership-outreach.md`. These addresses aren't in `partner-prospects.json`, so add any STOP reply to `outreach_suppression` by hand.
+
+| Track | Organization | Entity | Contact |
+|---|---|---|---|
+| Invite | Queer Calgary | `biz-queer-calgary` | `hello@queercalgary.ngo` |
+| Invite | Calgary Roller Derby | `biz-calgary-roller-derby` | `info@calgaryrollerderby.com` |
+| Invite | The Kinkonauts | `biz-kinkonauts` | `improv@kinkonauts.com` |
+| Invite | Nature Calgary | `biz-nature-calgary` | `fieldtrips@naturecalgary.com` |
+| Invite | Chinook Country Historical Society | `biz-chinook-country-historical-society` | `info@chinookhistory.ca` |
+| Invite | Hidden Valley Community Association | `biz-hidden-valley-community-association` | `president@hiddenhut.org` |
+| Invite | Calgary Evergreen Community Association | `biz-calgary-evergreen-community-association` | `info@myceca.ca` |
+| Invite | Signal Hill Community Association | `biz-signal-hill-community-association` | `sponsorships@shca.ca` |
+| Invite | Theatre Encounter | `biz-theatre-encounter` | `info@theatreencounter.com` |
+| Invite | Trickster Theatre | `biz-trickster-theatre` | `communications@trickstertheatre.com` |
+| Invite | European Cultural Society of Calgary | `biz-european-cultural-society-of-calgary` | `info@europeincalgary.org` |
+| Invite | W&M Dance Projects | `biz-wm-dance-projects` | `information@wmdance.com` |
+| Invite | D Rhythm Soul Dance Experience | `biz-d-rhythm-soul-dance-experience` | `drsdcalgary@gmail.com` |
+| Invite | Parindey Dance Team | `biz-parindey-dance-team` | `parindeydance23@gmail.com` |
+| Invite | Calgary Performing Arts Festival | `biz-calgary-performing-arts-festival` | `info@cpafestival.ca` |
+| Invite | Tool Shed Brewing | `biz-tool-shed-brewing` | `taproom@toolshed.beer` |
+| Invite | Bow River Brewing | `biz-bow-river-brewing` | `taproom@bowriverbrewing.ca` |
+| Invite | Railyard Brewing | `biz-railyard-brewing` | `info@railyard.ca` |
+| Invite | The Establishment Brewing Company | `biz-establishment-brewing` | `info@establishmentbrewing.ca` |
+| Invite | Irish Cultural Society of Calgary | `biz-irish-cultural-society-of-calgary` | `admin@calgaryics.org` |
+| Invite | Turkish Canadian Cultural Association of Calgary | `biz-turkish-canadian-cultural-association-of-calgary` | `info@tccacalgary.org` |
+| Invite | Calgary Finlandia Cultural Association | `biz-calgary-finlandia-cultural-association` | `info@finlandiacalgary.com` |
+| Invite | The Improv Guild | `biz-improv-guild` | `info@improvguild.com` |
+| Invite | Vintage Redefined Market | `biz-vintage-redefined-market` | `info@vintageredefinedmarket.com` |
+| Invite | Honky Tonk Market | `biz-honky-tonk-market` | `howdy@honkytonkmarket.com` |
+| Invite | Burwood Distillery | `biz-burwood-distillery` | `info@burwooddistillery.ca` |
+| Invite | Two Rivers Distillery | `biz-two-rivers-distillery` | `info@tworiversdistillery.com` |
+| Invite | Skunkworks Distillery | `biz-skunkworks-distillery` | `info@skunkworksdistillery.com` |
+| Invite | Kensington Night Market | `biz-kensington-night-market` | `info@dmeinc.ca` |
+| Invite | Calgary Night Market | `biz-calgary-night-market` | `calgarynightmarket@yahoo.com` |
+| Invite | Inglewood Night Market | `biz-inglewood-night-market` | `jennifer@urbanproductionsgroup.com` |
+| Invite | Wiseguy Trivia | `biz-wiseguy-trivia` | `contact@wiseguy-trivia.com` |
+| Invite | Calgary Japanese Community Association | `biz-calgary-japanese-community-association` | `omatsuri@calgaryjca.com` |
+| Invite | ChamberFest West | `biz-chamberfest-west` | `info@chamberfestwest.com` |
+| Invite | Land's End Ensemble | `biz-lands-end-ensemble` | `landsendmusic@gmail.com` |
+| Invite | Calgary Folk Arts Council | `biz-calgary-folk-arts-council` | `info@calgaryfolkartscouncil.ca` |
+| Invite | Scandinavian Centre | `biz-scandinavian-centre` | `scanctr@telus.net` |
+| Invite | Calgary Artists Studio Tour | `biz-calgary-artists-studio-tour` | `hello@calgaryartiststudiotour.com` |
+| Invite | Art Market Craft Sale | `biz-art-market-craft-sale` | `info@artmarketcraftsale.com` |
+| Invite | Alberta Family History Society | `biz-alberta-family-history-society` | `info@afhs.ab.ca` |
+| Partnership | The Camera Store | `biz-the-camera-store` | `info@thecamerastore.com` |
+| Partnership | Calgary Food Bank | `biz-calgary-food-bank` | `events@calgaryfoodbank.com` |
+| Partnership | Calgary Humane Society | `biz-calgary-humane-society` | `kaleigh.goehringer@calgaryhumane.ca` |
+| Partnership | Showpass | `biz-showpass` | `info@showpass.com` |
+| Partnership | Students' Association of Mount Royal University | `biz-samru` | `info@samru.ca` |
+| Partnership | Centre for Newcomers | `biz-centre-for-newcomers` | `info@centrefornewcomers.ca` |
+| Partnership | Arusha Centre | `biz-arusha-centre` | `projects@arusha.org` |
+| Partnership | Sentry Box | `biz-sentry-box` | `events@sentrybox.com` |
+| Partnership | Bike Calgary | `biz-bike-calgary` | `connect@bikecalgary.org` |
+| Partnership | Calgary Arts Development | `biz-calgary-arts-development` | `info@calgaryartsdevelopment.com` |
+| Partnership | Calgary Cinematheque | `biz-calgary-cinematheque` | `programming@calgarycinema.org` |
+| Partnership | Calgary Justice Film Festival | `biz-calgary-justice-film-festival` | `program@justicefilmfestival.ca` |
+| Partnership | Unison at Kerby Centre | `biz-unison-at-kerby-centre` | `HelloYYC@UnisonAlberta.com` |
+| Partnership | Alberta Food Tours | `biz-alberta-food-tours` | `info@albertafoodtours.ca` |
+| Partnership | 88 Brewing Company | `biz-88-brewing` | `events@88brewing.ca` |
+| Partnership | Cabin Brewing Company | `biz-cabin-brewing` | `taproom@cabinbrewing.ca` |
+| Partnership | Bolder Climbing Community | `biz-bolder-climbing-community` | `info@bolderclimbing.com` |
+| Partnership | Shelf Life Books | `biz-shelf-life-books` | `contact@shelflifebooks.ca` |
+| Partnership | Pages on Kensington | `biz-pages-on-kensington` | `mail@pageskensington.com` |
+| Partnership | RUN21 Calgary | `biz-run21-calgary` | `info@run21calgary.ca` |
+| Partnership | Strides Running Marda Loop | `biz-strides-marda-loop` | `mardaloop@stridesrunning.com` |
+| Partnership | Hot Wax Records | `biz-hot-wax-records` | `hotwax@shaw.ca` |
+| Partnership | Harvard Media | `biz-harvard-media` | `hello@harvardmedia.com` |
+| Partnership | Calgary Black Chambers | `biz-calgary-black-chambers` | `info@calgaryblackchambers.org` |
+| Partnership | Calgary African Community Collective | `biz-calgary-african-community-collective` | `info@calgaryafrican.ca` |
+| Partnership | Tipsy Trivia | `biz-tipsy-trivia` | `curtis@tipsytrivia.ca` |
+| Partnership | Calgary Sport and Social Club | `biz-calgary-sport-and-social-club` | `info@calgarysportsclub.com` |
+| Partnership | City & Country Winery | `biz-city-and-country-winery` | `info@cityandcountrywine.com` |
+| Partnership | Calgary Curling Club | `biz-calgary-curling-club` | `info@calgarycurlingclub.com` |
+| Partnership | University of Calgary Students' Union | `biz-ucalgary-students-union` | `reception@su.ucalgary.ca` |

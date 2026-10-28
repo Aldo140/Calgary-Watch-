@@ -8389,6 +8389,3135 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T07:30:00Z",
       "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-queer-calgary",
+      "kind": "business",
+      "slug": "queer-calgary",
+      "title": "Queer Calgary",
+      "name": "Queer Calgary",
+      "website": "https://queercalgary.ngo/",
+      "address": "Calgary, AB",
+      "summary": "Queer Calgary runs social events for 2SLGBTQ+ Calgarians, including a regular board game night.",
+      "description": "Queer Calgary is a community organization that brings 2SLGBTQ+ Calgarians together through low-key social events. Its regular Friday board game night at the Sentry Box is one of the easiest ways in. Check its site for the current calendar.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "2slgbtq+",
+        "social",
+        "games"
+      ],
+      "sources": [
+        {
+          "name": "Queer Calgary — official website",
+          "url": "https://queercalgary.ngo/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://queercalgary.ngo/"
+      },
+      "services": [
+        "Community events",
+        "Social nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "hello@queercalgary.ngo"
+    },
+    {
+      "id": "biz-calgary-roller-derby",
+      "kind": "business",
+      "slug": "calgary-roller-derby",
+      "title": "Calgary Roller Derby",
+      "name": "Calgary Roller Derby",
+      "website": "https://www.calgaryrollerderby.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's roller derby league, with home bouts, travel teams and intake for new skaters.",
+      "description": "Calgary Roller Derby is the city's flat-track roller derby league (it took this name in a 2018 rebrand). It plays home bouts that are open to spectators and runs intake programs for new skaters. Check its site for the season schedule.",
+      "categories": [
+        "recreation",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "sport",
+        "roller-derby",
+        "league"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Roller Derby — official website",
+          "url": "https://www.calgaryrollerderby.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryrollerderby.com/"
+      },
+      "services": [
+        "Bouts",
+        "Recruitment and training"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@calgaryrollerderby.com"
+    },
+    {
+      "id": "biz-kinkonauts",
+      "kind": "business",
+      "slug": "kinkonauts",
+      "title": "The Kinkonauts",
+      "name": "The Kinkonauts",
+      "website": "https://www.kinkonauts.com/",
+      "address": "834 11 Ave SW, Calgary, AB",
+      "summary": "Beltline improv company with regular shows, classes for all levels and the Four Corners improv festival.",
+      "description": "The Kinkonauts is an improv theatre company based at 834 11 Ave SW. It runs regular improv shows, classes from beginner to advanced, and the Four Corners improv festival.",
+      "categories": [
+        "arts",
+        "learning",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "improv",
+        "comedy",
+        "theatre",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "The Kinkonauts — official website",
+          "url": "https://www.kinkonauts.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kinkonauts.com/"
+      },
+      "services": [
+        "Improv shows",
+        "Improv classes",
+        "Four Corners improv festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "improv@kinkonauts.com"
+    },
+    {
+      "id": "biz-nature-calgary",
+      "kind": "business",
+      "slug": "nature-calgary",
+      "title": "Nature Calgary",
+      "name": "Nature Calgary",
+      "website": "https://naturecalgary.com/",
+      "address": "Calgary, AB",
+      "summary": "Volunteer naturalist society running field trips, bird counts and nature talks around Calgary.",
+      "description": "Nature Calgary is a volunteer-run naturalist society. Its members lead field trips, bird studies and talks about the plants and wildlife of the Calgary region, and many trips are open to newcomers.",
+      "categories": [
+        "recreation",
+        "learning",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "nature",
+        "birding",
+        "field-trips"
+      ],
+      "sources": [
+        {
+          "name": "Nature Calgary — official website",
+          "url": "https://naturecalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://naturecalgary.com/"
+      },
+      "services": [
+        "Field trips",
+        "Bird studies",
+        "Talks"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "fieldtrips@naturecalgary.com"
+    },
+    {
+      "id": "biz-chinook-country-historical-society",
+      "kind": "business",
+      "slug": "chinook-country-historical-society",
+      "title": "Chinook Country Historical Society",
+      "name": "Chinook Country Historical Society",
+      "website": "https://www.chinookhistory.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's local history society, best known for Historic Calgary Week each summer.",
+      "description": "The Chinook Country Historical Society is the Calgary chapter of the Historical Society of Alberta. It organizes Historic Calgary Week, a run of walks, talks and tours from late July into early August, plus history events through the year.",
+      "categories": [
+        "heritage",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "history",
+        "walking-tours",
+        "talks"
+      ],
+      "sources": [
+        {
+          "name": "Chinook Country Historical Society — official website",
+          "url": "https://www.chinookhistory.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.chinookhistory.ca/"
+      },
+      "services": [
+        "Historic Calgary Week",
+        "History talks and tours"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@chinookhistory.ca"
+    },
+    {
+      "id": "biz-hidden-valley-community-association",
+      "kind": "business",
+      "slug": "hidden-valley-community-association",
+      "title": "Hidden Valley Community Association",
+      "name": "Hidden Valley Community Association",
+      "website": "https://www.hiddenhut.org/",
+      "address": "Hidden Valley, Calgary, AB",
+      "summary": "Community association for Hidden Valley in northwest Calgary.",
+      "description": "The Hidden Valley Community Association runs community events and programs for residents of Hidden Valley in northwest Calgary.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "nw"
+      ],
+      "sources": [
+        {
+          "name": "Hidden Valley Community Association — official website",
+          "url": "https://www.hiddenhut.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.hiddenhut.org/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "president@hiddenhut.org"
+    },
+    {
+      "id": "biz-calgary-evergreen-community-association",
+      "kind": "business",
+      "slug": "calgary-evergreen-community-association",
+      "title": "Calgary Evergreen Community Association",
+      "name": "Calgary Evergreen Community Association",
+      "website": "https://myceca.ca/",
+      "address": "Evergreen, Calgary, AB",
+      "summary": "Community association for Evergreen in southwest Calgary.",
+      "description": "The Calgary Evergreen Community Association organizes community events and programs for Evergreen residents in southwest Calgary.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "sw"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Evergreen Community Association — official website",
+          "url": "https://myceca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://myceca.ca/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@myceca.ca"
+    },
+    {
+      "id": "biz-signal-hill-community-association",
+      "kind": "business",
+      "slug": "signal-hill-community-association",
+      "title": "Signal Hill Community Association",
+      "name": "Signal Hill Community Association",
+      "website": "https://shca.ca/",
+      "address": "Signal Hill, Calgary, AB",
+      "summary": "Community association serving Signal Hill in southwest Calgary since 1987.",
+      "description": "The Signal Hill Community Association has served Signal Hill in southwest Calgary since 1987, with community events and programs supported by local sponsors.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "sw"
+      ],
+      "sources": [
+        {
+          "name": "Signal Hill Community Association — official website",
+          "url": "https://shca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://shca.ca/"
+      },
+      "services": [
+        "Community events",
+        "Sponsorship"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "sponsorships@shca.ca"
+    },
+    {
+      "id": "biz-theatre-encounter",
+      "kind": "business",
+      "slug": "theatre-encounter",
+      "title": "Theatre Encounter",
+      "name": "Theatre Encounter",
+      "website": "https://www.theatreencounter.com/",
+      "address": "Calgary, AB",
+      "summary": "Experimental physical theatre company making original work in Calgary since 2007.",
+      "description": "Theatre Encounter is a Calgary company making experimental, physical theatre. It has created original productions since 2007.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "physical-theatre"
+      ],
+      "sources": [
+        {
+          "name": "Theatre Encounter — official website",
+          "url": "https://www.theatreencounter.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.theatreencounter.com/"
+      },
+      "services": [
+        "Productions",
+        "Workshops"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@theatreencounter.com"
+    },
+    {
+      "id": "biz-trickster-theatre",
+      "kind": "business",
+      "slug": "trickster-theatre",
+      "title": "Trickster Theatre",
+      "name": "Trickster Theatre",
+      "website": "https://www.trickstertheatre.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary theatre company creating work with and for young people.",
+      "description": "Trickster Theatre is a Calgary theatre company that creates performances and programs with young people and schools.",
+      "categories": [
+        "arts",
+        "family",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "youth"
+      ],
+      "sources": [
+        {
+          "name": "Trickster Theatre — official website",
+          "url": "https://www.trickstertheatre.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.trickstertheatre.com/"
+      },
+      "services": [
+        "Productions",
+        "School residencies"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "communications@trickstertheatre.com"
+    },
+    {
+      "id": "biz-european-cultural-society-of-calgary",
+      "kind": "business",
+      "slug": "european-cultural-society-of-calgary",
+      "title": "European Cultural Society of Calgary",
+      "name": "European Cultural Society of Calgary",
+      "website": "https://europeincalgary.org/",
+      "address": "Calgary, AB",
+      "summary": "The society behind the Calgary European Film Festival.",
+      "description": "The European Cultural Society of Calgary brings European culture to Calgary audiences. It presents the Calgary European Film Festival along with other cultural events.",
+      "categories": [
+        "arts",
+        "festivals",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "festival",
+        "culture"
+      ],
+      "sources": [
+        {
+          "name": "European Cultural Society of Calgary — official website",
+          "url": "https://europeincalgary.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://europeincalgary.org/"
+      },
+      "services": [
+        "Calgary European Film Festival",
+        "Cultural events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@europeincalgary.org"
+    },
+    {
+      "id": "biz-wm-dance-projects",
+      "kind": "business",
+      "slug": "wm-dance-projects",
+      "title": "W&M Dance Projects",
+      "name": "W&M Dance Projects",
+      "website": "https://www.wmdance.com/",
+      "address": "Calgary, AB",
+      "summary": "Contemporary dance company led by Wojciech Mochniej and Melissa Monteros.",
+      "description": "W&M Dance Projects is a Calgary contemporary dance company led by choreographers Wojciech Mochniej and Melissa Monteros, creating and presenting new dance work.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "dance",
+        "contemporary"
+      ],
+      "sources": [
+        {
+          "name": "W&M Dance Projects — official website",
+          "url": "https://www.wmdance.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.wmdance.com/"
+      },
+      "services": [
+        "Performances",
+        "Dance creation"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "information@wmdance.com"
+    },
+    {
+      "id": "biz-d-rhythm-soul-dance-experience",
+      "kind": "business",
+      "slug": "d-rhythm-soul-dance-experience",
+      "title": "D Rhythm Soul Dance Experience",
+      "name": "D Rhythm Soul Dance Experience",
+      "website": "https://drsdcalgary.ca/",
+      "address": "1909 8 Ave NE, Calgary, AB",
+      "summary": "Dance school teaching styles with Afro-Caribbean roots, from dancehall to Afrobeats.",
+      "description": "D Rhythm Soul Dance Experience (DRSD) teaches dance styles with Afro-Caribbean roots, including jazz, Latin, hip hop, dancehall and Afrobeats, from 1909 8 Ave NE.",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "dance",
+        "afro-caribbean",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "D Rhythm Soul Dance Experience — official website",
+          "url": "https://drsdcalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        },
+        {
+          "name": "Calgary Arts Development directory",
+          "url": "https://calgaryartsdevelopment.com/news-information/directory/d-rhythm-soul-dance-experience/",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://drsdcalgary.ca/"
+      },
+      "services": [
+        "Dance classes",
+        "Performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "drsdcalgary@gmail.com"
+    },
+    {
+      "id": "biz-parindey-dance-team",
+      "kind": "business",
+      "slug": "parindey-dance-team",
+      "title": "Parindey Dance Team",
+      "name": "Parindey Dance Team",
+      "address": "Calgary, AB",
+      "summary": "Calgary dance team fusing hip-hop with Bollywood, Kathak, Bharatanatyam and Bhangra.",
+      "description": "Parindey Dance Team specializes in hip-hop, Bollyhop and street styles, mixing South Asian forms such as Bollywood, Kathak, Bharatanatyam and Bhangra with hip-hop. The team performs and competes, and is available for bookings.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "dance",
+        "hip-hop",
+        "bollywood",
+        "south-asian"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Arts Development directory",
+          "url": "https://calgaryartsdevelopment.com/news-information/directory/parindey-dance-team/",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Performances",
+        "Competitions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "parindeydance23@gmail.com"
+    },
+    {
+      "id": "biz-calgary-performing-arts-festival",
+      "kind": "business",
+      "slug": "calgary-performing-arts-festival",
+      "title": "Calgary Performing Arts Festival",
+      "name": "Calgary Performing Arts Festival",
+      "website": "https://www.cpafestival.ca/",
+      "address": "Calgary, AB",
+      "summary": "Annual festival where Calgary performers of all ages get adjudicated, coached and heard.",
+      "description": "The Calgary Performing Arts Festival is an annual festival of music, speech and performance where performers of all ages perform for adjudicators. Many sessions are open to the public.",
+      "categories": [
+        "arts",
+        "festivals",
+        "music",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "festival",
+        "youth",
+        "music",
+        "performance"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Performing Arts Festival — official website",
+          "url": "https://www.cpafestival.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cpafestival.ca/"
+      },
+      "services": [
+        "Performing arts festival",
+        "Adjudicated performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@cpafestival.ca"
+    },
+    {
+      "id": "biz-tool-shed-brewing",
+      "kind": "business",
+      "slug": "tool-shed-brewing",
+      "title": "Tool Shed Brewing",
+      "name": "Tool Shed Brewing",
+      "website": "https://www.toolshedbrewing.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary craft brewery with a taproom.",
+      "description": "Tool Shed Brewing is a Calgary craft brewery with a taproom for pints, flights and events.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "Tool Shed Brewing — official website",
+          "url": "https://www.toolshedbrewing.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.toolshedbrewing.com/"
+      },
+      "services": [
+        "Taproom",
+        "Craft beer"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "taproom@toolshed.beer"
+    },
+    {
+      "id": "biz-bow-river-brewing",
+      "kind": "business",
+      "slug": "bow-river-brewing",
+      "title": "Bow River Brewing",
+      "name": "Bow River Brewing",
+      "website": "https://www.bowriverbrewing.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary craft brewery with a taproom.",
+      "description": "Bow River Brewing is a Calgary craft brewery with a taproom for pints and events.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "Bow River Brewing — official website",
+          "url": "https://www.bowriverbrewing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bowriverbrewing.ca/"
+      },
+      "services": [
+        "Taproom",
+        "Craft beer"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "taproom@bowriverbrewing.ca"
+    },
+    {
+      "id": "biz-railyard-brewing",
+      "kind": "business",
+      "slug": "railyard-brewing",
+      "title": "Railyard Brewing",
+      "name": "Railyard Brewing",
+      "website": "https://www.railyardbrewing.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary craft brewery and taproom.",
+      "description": "Railyard Brewing is a Calgary craft brewery with a taproom.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "Railyard Brewing — official website",
+          "url": "https://www.railyardbrewing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.railyardbrewing.ca/"
+      },
+      "services": [
+        "Taproom",
+        "Craft beer"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@railyard.ca"
+    },
+    {
+      "id": "biz-establishment-brewing",
+      "kind": "business",
+      "slug": "establishment-brewing",
+      "title": "The Establishment Brewing Company",
+      "name": "The Establishment Brewing Company",
+      "website": "https://www.establishmentbrewing.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary craft brewery known for small-batch beers and a busy taproom.",
+      "description": "The Establishment Brewing Company is a Calgary craft brewery making small-batch beers, served in its own taproom.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "The Establishment Brewing Company — official website",
+          "url": "https://www.establishmentbrewing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.establishmentbrewing.ca/"
+      },
+      "services": [
+        "Taproom",
+        "Craft beer"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@establishmentbrewing.ca"
+    },
+    {
+      "id": "biz-irish-cultural-society-of-calgary",
+      "kind": "business",
+      "slug": "irish-cultural-society-of-calgary",
+      "title": "Irish Cultural Society of Calgary",
+      "name": "Irish Cultural Society of Calgary",
+      "website": "https://calgaryics.org/",
+      "address": "6452 35 Ave NW, Calgary, AB",
+      "summary": "Irish cultural centre in Bowness hosting music, dance and community events.",
+      "description": "The Irish Cultural Society of Calgary runs Irish cultural, music and community events from its centre at 6452 35 Ave NW.",
+      "categories": [
+        "community",
+        "music",
+        "heritage"
+      ],
+      "tags": [
+        "organization",
+        "irish",
+        "culture",
+        "ceilidh"
+      ],
+      "sources": [
+        {
+          "name": "Irish Cultural Society of Calgary — official website",
+          "url": "https://calgaryics.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryics.org/"
+      },
+      "services": [
+        "Cultural events",
+        "Music and dance",
+        "Hall rental"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "admin@calgaryics.org"
+    },
+    {
+      "id": "biz-turkish-canadian-cultural-association-of-calgary",
+      "kind": "business",
+      "slug": "turkish-canadian-cultural-association-of-calgary",
+      "title": "Turkish Canadian Cultural Association of Calgary",
+      "name": "Turkish Canadian Cultural Association of Calgary",
+      "website": "https://tccacalgary.org/",
+      "address": "Calgary, AB",
+      "summary": "Community association sharing Turkish culture in Calgary through events and programs.",
+      "description": "The Turkish Canadian Cultural Association of Calgary brings the city's Turkish community together and shares Turkish culture through events and programs open to all.",
+      "categories": [
+        "community",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "turkish",
+        "culture"
+      ],
+      "sources": [
+        {
+          "name": "Turkish Canadian Cultural Association of Calgary — official website",
+          "url": "https://tccacalgary.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://tccacalgary.org/"
+      },
+      "services": [
+        "Cultural events",
+        "Community programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@tccacalgary.org"
+    },
+    {
+      "id": "biz-calgary-finlandia-cultural-association",
+      "kind": "business",
+      "slug": "calgary-finlandia-cultural-association",
+      "title": "Calgary Finlandia Cultural Association",
+      "name": "Calgary Finlandia Cultural Association",
+      "website": "https://finlandiacalgary.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's Finnish cultural association, with community gatherings and traditions through the year.",
+      "description": "The Calgary Finlandia Cultural Association keeps Finnish culture and traditions alive in Calgary with gatherings and events through the year.",
+      "categories": [
+        "community",
+        "heritage"
+      ],
+      "tags": [
+        "organization",
+        "finnish",
+        "culture"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Finlandia Cultural Association — official website",
+          "url": "https://finlandiacalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://finlandiacalgary.com/"
+      },
+      "services": [
+        "Cultural events",
+        "Community gatherings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@finlandiacalgary.com"
+    },
+    {
+      "id": "biz-improv-guild",
+      "kind": "business",
+      "slug": "improv-guild",
+      "title": "The Improv Guild",
+      "name": "The Improv Guild",
+      "website": "https://www.improvguild.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary improv theatre with weekly shows and classes.",
+      "description": "The Improv Guild is a Calgary improv theatre presenting regular shows and teaching classes.",
+      "categories": [
+        "arts",
+        "nightlife",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "improv",
+        "comedy",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "The Improv Guild — official website",
+          "url": "https://www.improvguild.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.improvguild.com/"
+      },
+      "services": [
+        "Improv shows",
+        "Improv classes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@improvguild.com"
+    },
+    {
+      "id": "biz-vintage-redefined-market",
+      "kind": "business",
+      "slug": "vintage-redefined-market",
+      "title": "Vintage Redefined Market",
+      "name": "Vintage Redefined Market",
+      "address": "Calgary, AB",
+      "summary": "Pop-up vintage market bringing local vintage sellers together.",
+      "description": "Vintage Redefined Market is a Calgary pop-up market of vintage clothing, homewares and collectibles from local sellers.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "organization",
+        "market",
+        "vintage"
+      ],
+      "sources": [
+        {
+          "name": "Vintage Redefined Market — Facebook",
+          "url": "https://www.facebook.com/vintageredefinedmarket/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Vintage markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@vintageredefinedmarket.com"
+    },
+    {
+      "id": "biz-honky-tonk-market",
+      "kind": "business",
+      "slug": "honky-tonk-market",
+      "title": "Honky Tonk Market",
+      "name": "Honky Tonk Market",
+      "website": "https://www.honkytonkmarket.com/",
+      "address": "Calgary, AB",
+      "summary": "Western and vintage pop-up market.",
+      "description": "Honky Tonk Market is a pop-up market of western wear, vintage and handmade goods from local vendors.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "organization",
+        "market",
+        "vintage",
+        "western"
+      ],
+      "sources": [
+        {
+          "name": "Honky Tonk Market — official website",
+          "url": "https://www.honkytonkmarket.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.honkytonkmarket.com/"
+      },
+      "services": [
+        "Pop-up markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "howdy@honkytonkmarket.com"
+    },
+    {
+      "id": "biz-burwood-distillery",
+      "kind": "business",
+      "slug": "burwood-distillery",
+      "title": "Burwood Distillery",
+      "name": "Burwood Distillery",
+      "website": "https://www.burwooddistillery.ca/",
+      "address": "#100 2566 Flanders Ave SW, Calgary, AB",
+      "summary": "Calgary craft distillery with a tasting room in Currie.",
+      "description": "Burwood Distillery is a Calgary craft distillery with a tasting room at #100 2566 Flanders Ave SW.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "distillery",
+        "cocktails"
+      ],
+      "sources": [
+        {
+          "name": "Burwood Distillery — official website",
+          "url": "https://www.burwooddistillery.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.burwooddistillery.ca/"
+      },
+      "services": [
+        "Tasting room",
+        "Craft spirits"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@burwooddistillery.ca"
+    },
+    {
+      "id": "biz-two-rivers-distillery",
+      "kind": "business",
+      "slug": "two-rivers-distillery",
+      "title": "Two Rivers Distillery",
+      "name": "Two Rivers Distillery",
+      "website": "https://www.tworiversdistillery.com/",
+      "address": "453 42 Ave SE, Calgary, AB",
+      "summary": "Small-batch craft distillery in southeast Calgary.",
+      "description": "Two Rivers Distillery makes small-batch craft spirits at 453 42 Ave SE.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "distillery"
+      ],
+      "sources": [
+        {
+          "name": "Two Rivers Distillery — official website",
+          "url": "https://www.tworiversdistillery.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tworiversdistillery.com/"
+      },
+      "services": [
+        "Tasting room",
+        "Craft spirits"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@tworiversdistillery.com"
+    },
+    {
+      "id": "biz-skunkworks-distillery",
+      "kind": "business",
+      "slug": "skunkworks-distillery",
+      "title": "Skunkworks Distillery",
+      "name": "Skunkworks Distillery",
+      "website": "https://www.skunkworksdistillery.com/",
+      "address": "4009 4 St SE, Calgary, AB",
+      "summary": "Craft distillery in southeast Calgary.",
+      "description": "Skunkworks Distillery is a craft distillery at 4009 4 St SE.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "distillery"
+      ],
+      "sources": [
+        {
+          "name": "Skunkworks Distillery — official website",
+          "url": "https://www.skunkworksdistillery.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.skunkworksdistillery.com/"
+      },
+      "services": [
+        "Craft spirits"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@skunkworksdistillery.com"
+    },
+    {
+      "id": "biz-kensington-night-market",
+      "kind": "business",
+      "slug": "kensington-night-market",
+      "title": "Kensington Night Market",
+      "name": "Kensington Night Market",
+      "website": "https://thedowntownmarkets.ca/markets",
+      "address": "1209 Kensington Rd NW, Calgary, AB",
+      "summary": "Summer Thursday night market in the Kensington Road parkade.",
+      "description": "Kensington Night Market runs on selected summer Thursdays at the Kensington Road Parkade (1209 Kensington Rd NW). In 2026 it ran June 25 to September 3, 4:30 to 8:30 pm, with local makers and food vendors. Dates for 2027 haven't been announced yet.",
+      "categories": [
+        "markets",
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "market",
+        "night-market",
+        "summer"
+      ],
+      "sources": [
+        {
+          "name": "Kensington Night Market — official website",
+          "url": "https://thedowntownmarkets.ca/markets",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        },
+        {
+          "name": "TodoCanada listing",
+          "url": "https://www.todocanada.ca/city/calgary/event/kensington-night-market-2/",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thedowntownmarkets.ca/markets"
+      },
+      "services": [
+        "Summer night markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@dmeinc.ca"
+    },
+    {
+      "id": "biz-calgary-night-market",
+      "kind": "business",
+      "slug": "calgary-night-market",
+      "title": "Calgary Night Market",
+      "name": "Calgary Night Market",
+      "website": "https://calgarynightmkt.com/",
+      "address": "917 Centre Ave NE, Calgary, AB",
+      "summary": "Free summer night market in Bridgeland with food trucks, artisans and city views.",
+      "description": "Calgary Night Market is a free, family-friendly summer night market at the Bridgeland-Riverside community hall (917 Centre Ave NE), with food trucks, artisans and local entertainment. The 2026 season wrapped in September; 2027 dates haven't been announced yet.",
+      "categories": [
+        "markets",
+        "food",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "market",
+        "night-market",
+        "summer",
+        "bridgeland"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Night Market — official website",
+          "url": "https://calgarynightmkt.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        },
+        {
+          "name": "TodoCanada listing",
+          "url": "https://www.todocanada.ca/city/calgary/event/calgary-night-market/",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarynightmkt.com/"
+      },
+      "services": [
+        "Summer night markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "calgarynightmarket@yahoo.com"
+    },
+    {
+      "id": "biz-inglewood-night-market",
+      "kind": "business",
+      "slug": "inglewood-night-market",
+      "title": "Inglewood Night Market",
+      "name": "Inglewood Night Market",
+      "website": "https://www.inglewoodnightmarket.ca/",
+      "address": "Inglewood, Calgary, AB",
+      "summary": "Night market in Inglewood produced by Urban Productions Group.",
+      "description": "Inglewood Night Market brings local makers, food and music to Inglewood on summer evenings. It's produced by Urban Productions Group.",
+      "categories": [
+        "markets",
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "market",
+        "night-market",
+        "inglewood"
+      ],
+      "sources": [
+        {
+          "name": "Inglewood Night Market — official website",
+          "url": "https://www.inglewoodnightmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.inglewoodnightmarket.ca/"
+      },
+      "services": [
+        "Night markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "jennifer@urbanproductionsgroup.com"
+    },
+    {
+      "id": "biz-wiseguy-trivia",
+      "kind": "business",
+      "slug": "wiseguy-trivia",
+      "title": "Wiseguy Trivia",
+      "name": "Wiseguy Trivia",
+      "website": "https://www.wiseguy-trivia.com/",
+      "address": "Calgary, AB",
+      "summary": "Weekly pub trivia nights at bars around Calgary.",
+      "description": "Wiseguy Trivia hosts weekly trivia nights at bars and restaurants around Calgary.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "trivia",
+        "pub-quiz"
+      ],
+      "sources": [
+        {
+          "name": "Wiseguy Trivia — official website",
+          "url": "https://www.wiseguy-trivia.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.wiseguy-trivia.com/"
+      },
+      "services": [
+        "Weekly trivia nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "contact@wiseguy-trivia.com"
+    },
+    {
+      "id": "biz-calgary-japanese-community-association",
+      "kind": "business",
+      "slug": "calgary-japanese-community-association",
+      "title": "Calgary Japanese Community Association",
+      "name": "Calgary Japanese Community Association",
+      "website": "https://www.calgaryjca.com/",
+      "address": "2236 29 St SW, Calgary, AB",
+      "summary": "Japanese community centre in Killarney and the team behind the Omatsuri festival.",
+      "description": "The Calgary Japanese Community Association runs cultural programs from its centre at 2236 29 St SW and organizes Omatsuri, its Japanese festival.",
+      "categories": [
+        "community",
+        "festivals",
+        "heritage"
+      ],
+      "tags": [
+        "organization",
+        "japanese",
+        "culture",
+        "festival"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Japanese Community Association — official website",
+          "url": "https://www.calgaryjca.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryjca.com/"
+      },
+      "services": [
+        "Omatsuri festival",
+        "Cultural programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "omatsuri@calgaryjca.com"
+    },
+    {
+      "id": "biz-chamberfest-west",
+      "kind": "business",
+      "slug": "chamberfest-west",
+      "title": "ChamberFest West",
+      "name": "ChamberFest West",
+      "website": "https://www.chamberfestwest.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary chamber music festival and concert series.",
+      "description": "ChamberFest West presents chamber music concerts in Calgary, with a festival and performances through the year.",
+      "categories": [
+        "music",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "classical",
+        "chamber-music",
+        "festival"
+      ],
+      "sources": [
+        {
+          "name": "ChamberFest West — official website",
+          "url": "https://www.chamberfestwest.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.chamberfestwest.com/"
+      },
+      "services": [
+        "Chamber music festival",
+        "Concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@chamberfestwest.com"
+    },
+    {
+      "id": "biz-lands-end-ensemble",
+      "kind": "business",
+      "slug": "lands-end-ensemble",
+      "title": "Land's End Ensemble",
+      "name": "Land's End Ensemble",
+      "website": "https://www.landsendensemble.ca/",
+      "address": "Calgary, AB",
+      "summary": "Juno-nominated Calgary chamber ensemble with a concert season of classic and new music.",
+      "description": "Land's End Ensemble is a Juno-nominated Calgary chamber music ensemble that presents a concert season mixing well-known repertoire with new music.",
+      "categories": [
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "classical",
+        "chamber-music",
+        "new-music"
+      ],
+      "sources": [
+        {
+          "name": "Land's End Ensemble — official website",
+          "url": "https://www.landsendensemble.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.landsendensemble.ca/"
+      },
+      "services": [
+        "Concert series"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "landsendmusic@gmail.com"
+    },
+    {
+      "id": "biz-calgary-folk-arts-council",
+      "kind": "business",
+      "slug": "calgary-folk-arts-council",
+      "title": "Calgary Folk Arts Council",
+      "name": "Calgary Folk Arts Council",
+      "website": "https://www.calgaryfolkartscouncil.ca/",
+      "address": "Calgary, AB",
+      "summary": "Umbrella council for Calgary's cultural folk dance and folk arts groups.",
+      "description": "The Calgary Folk Arts Council brings together Calgary's cultural folk dance and folk arts groups and helps showcase them at community events.",
+      "categories": [
+        "arts",
+        "community",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "folk-dance",
+        "culture",
+        "multicultural"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Folk Arts Council — official website",
+          "url": "https://www.calgaryfolkartscouncil.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryfolkartscouncil.ca/"
+      },
+      "services": [
+        "Multicultural performances",
+        "Folk dance"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@calgaryfolkartscouncil.ca"
+    },
+    {
+      "id": "biz-scandinavian-centre",
+      "kind": "business",
+      "slug": "scandinavian-centre",
+      "title": "Scandinavian Centre",
+      "name": "Scandinavian Centre",
+      "website": "https://www.scancentre.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's Scandinavian community hall, home to Nordic cultural events and gatherings.",
+      "description": "The Scandinavian Centre is a community hall for Calgary's Nordic cultural groups, hosting gatherings, cultural events and hall rentals.",
+      "categories": [
+        "community",
+        "heritage"
+      ],
+      "tags": [
+        "organization",
+        "scandinavian",
+        "culture",
+        "hall"
+      ],
+      "sources": [
+        {
+          "name": "Scandinavian Centre — official website",
+          "url": "https://www.scancentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.scancentre.ca/"
+      },
+      "services": [
+        "Cultural events",
+        "Hall rental"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "scanctr@telus.net"
+    },
+    {
+      "id": "biz-calgary-artists-studio-tour",
+      "kind": "business",
+      "slug": "calgary-artists-studio-tour",
+      "title": "Calgary Artists Studio Tour",
+      "name": "Calgary Artists Studio Tour",
+      "website": "https://www.calgaryartiststudiotour.com/",
+      "address": "Calgary, AB",
+      "summary": "Self-guided tour of local artists' studios, open to the public.",
+      "description": "The Calgary Artists Studio Tour opens local artists' studios to the public, so visitors can meet artists where they work and buy directly from them.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "studio-tour",
+        "visual-art"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Artists Studio Tour — official website",
+          "url": "https://www.calgaryartiststudiotour.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryartiststudiotour.com/"
+      },
+      "services": [
+        "Studio tour"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "hello@calgaryartiststudiotour.com"
+    },
+    {
+      "id": "biz-art-market-craft-sale",
+      "kind": "business",
+      "slug": "art-market-craft-sale",
+      "title": "Art Market Craft Sale",
+      "name": "Art Market Craft Sale",
+      "website": "https://www.artmarketcraftsale.com/",
+      "address": "TELUS Convention Centre, Calgary, AB",
+      "summary": "Juried art and craft sale; the 2026 holiday show runs Nov 19–22 at the TELUS Convention Centre.",
+      "description": "Art Market Craft Sale is a juried show of Canadian artists and makers. Its 2026 holiday show runs November 19 to 22 at the TELUS Convention Centre.",
+      "categories": [
+        "markets",
+        "shopping",
+        "arts",
+        "holiday"
+      ],
+      "tags": [
+        "organization",
+        "craft-sale",
+        "holiday",
+        "artisans"
+      ],
+      "sources": [
+        {
+          "name": "Art Market Craft Sale — official website",
+          "url": "https://www.artmarketcraftsale.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.artmarketcraftsale.com/"
+      },
+      "services": [
+        "Juried art and craft sale"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@artmarketcraftsale.com"
+    },
+    {
+      "id": "biz-alberta-family-history-society",
+      "kind": "business",
+      "slug": "alberta-family-history-society",
+      "title": "Alberta Family History Society",
+      "name": "Alberta Family History Society",
+      "website": "https://afhs.ab.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary-based genealogy society with talks, workshops and help tracing family history.",
+      "description": "The Alberta Family History Society helps people research their family history, with talks, workshops and research help from volunteers.",
+      "categories": [
+        "learning",
+        "heritage"
+      ],
+      "tags": [
+        "organization",
+        "genealogy",
+        "family-history",
+        "talks"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Family History Society — official website",
+          "url": "https://afhs.ab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://afhs.ab.ca/"
+      },
+      "services": [
+        "Genealogy talks",
+        "Research help"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@afhs.ab.ca"
+    },
+    {
+      "id": "biz-the-camera-store",
+      "kind": "business",
+      "slug": "the-camera-store",
+      "title": "The Camera Store",
+      "name": "The Camera Store",
+      "website": "https://www.thecamerastore.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's independent camera shop, with gear, rentals and photography events.",
+      "description": "The Camera Store is an independent Calgary camera shop selling photo and video gear, and a hub for the local photography community.",
+      "categories": [
+        "shopping",
+        "learning",
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "photography",
+        "camera",
+        "workshops"
+      ],
+      "sources": [
+        {
+          "name": "The Camera Store — official website",
+          "url": "https://www.thecamerastore.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thecamerastore.com/"
+      },
+      "services": [
+        "Camera sales",
+        "Photography workshops"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@thecamerastore.com"
+    },
+    {
+      "id": "biz-calgary-food-bank",
+      "kind": "business",
+      "slug": "calgary-food-bank",
+      "title": "Calgary Food Bank",
+      "name": "Calgary Food Bank",
+      "website": "https://www.calgaryfoodbank.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's food bank, with food drives, volunteer shifts and community fundraisers.",
+      "description": "The Calgary Food Bank provides emergency food to Calgarians in need. Community food drives, including the holiday Mayor's Christmas Food Drive, and volunteer shifts are the main ways the public gets involved.",
+      "categories": [
+        "community",
+        "holiday"
+      ],
+      "tags": [
+        "organization",
+        "charity",
+        "food-security",
+        "volunteer"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Food Bank — official website",
+          "url": "https://www.calgaryfoodbank.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryfoodbank.com/"
+      },
+      "services": [
+        "Food drives",
+        "Volunteer shifts",
+        "Community events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "events@calgaryfoodbank.com"
+    },
+    {
+      "id": "biz-calgary-humane-society",
+      "kind": "business",
+      "slug": "calgary-humane-society",
+      "title": "Calgary Humane Society",
+      "name": "Calgary Humane Society",
+      "website": "https://www.calgaryhumane.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's humane society: pet adoption, animal care and community fundraisers.",
+      "description": "Calgary Humane Society cares for and rehomes animals in need. It runs adoptions alongside public fundraisers such as Cocktails for Critters and the Dog Jog.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "charity",
+        "animals",
+        "adoption",
+        "fundraiser"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Humane Society — official website",
+          "url": "https://www.calgaryhumane.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryhumane.ca/"
+      },
+      "services": [
+        "Pet adoption",
+        "Fundraising events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "kaleigh.goehringer@calgaryhumane.ca"
+    },
+    {
+      "id": "biz-showpass",
+      "kind": "business",
+      "slug": "showpass",
+      "title": "Showpass",
+      "name": "Showpass",
+      "website": "https://www.showpass.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary-born ticketing platform used by many of the city's venues and events.",
+      "description": "Showpass is a Calgary-founded ticketing platform that many local venues, festivals and organizers use to sell tickets.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "organization",
+        "ticketing",
+        "technology"
+      ],
+      "sources": [
+        {
+          "name": "Showpass — official website",
+          "url": "https://www.showpass.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.showpass.com/"
+      },
+      "services": [
+        "Event ticketing"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@showpass.com"
+    },
+    {
+      "id": "biz-samru",
+      "kind": "business",
+      "slug": "samru",
+      "title": "Students' Association of Mount Royal University",
+      "name": "Students' Association of Mount Royal University",
+      "website": "https://www.samru.ca/",
+      "address": "Mount Royal University, Calgary, AB",
+      "summary": "Mount Royal's students' association, running campus events and student services.",
+      "description": "The Students' Association of Mount Royal University (SAMRU) represents Mount Royal students and runs campus events, clubs and student services.",
+      "categories": [
+        "community",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "students",
+        "campus"
+      ],
+      "sources": [
+        {
+          "name": "Students' Association of Mount Royal University — official website",
+          "url": "https://www.samru.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.samru.ca/"
+      },
+      "services": [
+        "Student events",
+        "Student services"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@samru.ca"
+    },
+    {
+      "id": "biz-centre-for-newcomers",
+      "kind": "business",
+      "slug": "centre-for-newcomers",
+      "title": "Centre for Newcomers",
+      "name": "Centre for Newcomers",
+      "website": "https://www.centrefornewcomers.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary non-profit helping immigrants and refugees settle and connect.",
+      "description": "The Centre for Newcomers helps immigrants and refugees settle in Calgary, with settlement, language and employment services and community programs.",
+      "categories": [
+        "community",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "newcomers",
+        "settlement",
+        "volunteer"
+      ],
+      "sources": [
+        {
+          "name": "Centre for Newcomers — official website",
+          "url": "https://www.centrefornewcomers.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.centrefornewcomers.ca/"
+      },
+      "services": [
+        "Settlement services",
+        "Community programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@centrefornewcomers.ca"
+    },
+    {
+      "id": "biz-arusha-centre",
+      "kind": "business",
+      "slug": "arusha-centre",
+      "title": "Arusha Centre",
+      "name": "Arusha Centre",
+      "website": "https://www.arusha.org/",
+      "address": "Calgary, AB",
+      "summary": "Calgary non-profit resource centre for social and environmental justice projects.",
+      "description": "The Arusha Centre is a Calgary non-profit that supports community-led projects for social and environmental justice, including community repair events.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "non-profit",
+        "sustainability",
+        "repair"
+      ],
+      "sources": [
+        {
+          "name": "Arusha Centre — official website",
+          "url": "https://www.arusha.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.arusha.org/"
+      },
+      "services": [
+        "Community projects"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "projects@arusha.org"
+    },
+    {
+      "id": "biz-sentry-box",
+      "kind": "business",
+      "slug": "sentry-box",
+      "title": "Sentry Box",
+      "name": "Sentry Box",
+      "website": "https://www.sentrybox.com/",
+      "address": "1835 10 Ave SW, Calgary, AB",
+      "summary": "Calgary's landmark game store, with game nights and tournaments in-store.",
+      "description": "The Sentry Box is a long-running Calgary game store at 1835 10 Ave SW, selling board games, tabletop and hobby games, and hosting game nights and tournaments.",
+      "categories": [
+        "shopping",
+        "nightlife",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "games",
+        "board-games",
+        "tabletop"
+      ],
+      "sources": [
+        {
+          "name": "Sentry Box — official website",
+          "url": "https://www.sentrybox.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sentrybox.com/"
+      },
+      "services": [
+        "Game store",
+        "Game nights and tournaments"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "events@sentrybox.com"
+    },
+    {
+      "id": "biz-bike-calgary",
+      "kind": "business",
+      "slug": "bike-calgary",
+      "title": "Bike Calgary",
+      "name": "Bike Calgary",
+      "website": "https://www.bikecalgary.org/",
+      "address": "Calgary, AB",
+      "summary": "Volunteer cycling advocacy group for safer, easier biking in Calgary.",
+      "description": "Bike Calgary is a volunteer-run non-profit that advocates for safer and easier cycling in Calgary and shares resources for people who ride.",
+      "categories": [
+        "community",
+        "recreation"
+      ],
+      "tags": [
+        "organization",
+        "cycling",
+        "advocacy"
+      ],
+      "sources": [
+        {
+          "name": "Bike Calgary — official website",
+          "url": "https://www.bikecalgary.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bikecalgary.org/"
+      },
+      "services": [
+        "Cycling advocacy",
+        "Community rides"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "connect@bikecalgary.org"
+    },
+    {
+      "id": "biz-calgary-arts-development",
+      "kind": "business",
+      "slug": "calgary-arts-development",
+      "title": "Calgary Arts Development",
+      "name": "Calgary Arts Development",
+      "website": "https://calgaryartsdevelopment.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's arts development authority, which funds and promotes the city's arts sector.",
+      "description": "Calgary Arts Development is the City of Calgary's arts development authority. It invests in local artists and arts organizations and keeps a public directory of them.",
+      "categories": [
+        "arts",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "arts-funding",
+        "directory"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Arts Development — official website",
+          "url": "https://calgaryartsdevelopment.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryartsdevelopment.com/"
+      },
+      "services": [
+        "Arts funding",
+        "Artist directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@calgaryartsdevelopment.com"
+    },
+    {
+      "id": "biz-calgary-cinematheque",
+      "kind": "business",
+      "slug": "calgary-cinematheque",
+      "title": "Calgary Cinematheque",
+      "name": "Calgary Cinematheque",
+      "website": "https://calgarycinema.org/",
+      "address": "Globe Cinema, Calgary, AB",
+      "summary": "Calgary's repertory film society, screening classic and art-house cinema at the Globe.",
+      "description": "Calgary Cinematheque is a non-profit film society that screens classic, international and art-house films, mostly at the Globe Cinema downtown.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "repertory-cinema"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Cinematheque — official website",
+          "url": "https://calgarycinema.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarycinema.org/"
+      },
+      "services": [
+        "Film screenings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "programming@calgarycinema.org"
+    },
+    {
+      "id": "biz-calgary-justice-film-festival",
+      "kind": "business",
+      "slug": "calgary-justice-film-festival",
+      "title": "Calgary Justice Film Festival",
+      "name": "Calgary Justice Film Festival",
+      "website": "https://justicefilmfestival.ca/",
+      "address": "Calgary, AB",
+      "summary": "November film festival of documentaries on human rights and social justice.",
+      "description": "The Calgary Justice Film Festival screens documentaries on human rights, social justice and the environment each November, with discussions and a Peace Market of local groups.",
+      "categories": [
+        "arts",
+        "festivals",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "festival",
+        "social-justice"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Justice Film Festival — official website",
+          "url": "https://justicefilmfestival.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://justicefilmfestival.ca/"
+      },
+      "services": [
+        "Film festival",
+        "Peace Market"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "program@justicefilmfestival.ca"
+    },
+    {
+      "id": "biz-unison-at-kerby-centre",
+      "kind": "business",
+      "slug": "unison-at-kerby-centre",
+      "title": "Unison at Kerby Centre",
+      "name": "Unison at Kerby Centre",
+      "website": "https://unisonalberta.com/",
+      "address": "1133 7 Ave SW, Calgary, AB",
+      "summary": "Downtown centre for Calgarians 50+, with fitness, wellness and social programs.",
+      "description": "Unison at Kerby Centre (1133 7 Ave SW) serves Calgarians aged 50 and over with Active Aging programs, wellness clinics, fitness classes and the Kerby Dining Room. Founded in 1973 as Kerby Centre, its governing body was renamed Unison in 2022.",
+      "categories": [
+        "community",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "seniors",
+        "50-plus",
+        "wellness"
+      ],
+      "sources": [
+        {
+          "name": "Unison at Kerby Centre — official website",
+          "url": "https://unisonalberta.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        },
+        {
+          "name": "Unison — contact page",
+          "url": "https://unison50plus.unisonalberta.com/Contact-us",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://unisonalberta.com/"
+      },
+      "services": [
+        "Active Aging programs",
+        "Wellness clinics",
+        "Kerby Dining Room"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "HelloYYC@UnisonAlberta.com"
+    },
+    {
+      "id": "biz-alberta-food-tours",
+      "kind": "business",
+      "slug": "alberta-food-tours",
+      "title": "Alberta Food Tours",
+      "name": "Alberta Food Tours",
+      "website": "https://www.albertafoodtours.ca/",
+      "address": "Calgary, AB",
+      "summary": "Guided food walks through Calgary neighbourhoods and markets.",
+      "description": "Alberta Food Tours runs guided food walks through Calgary neighbourhoods, introducing local restaurants, producers and markets.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "organization",
+        "food-tours",
+        "walking-tours"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Food Tours — official website",
+          "url": "https://www.albertafoodtours.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.albertafoodtours.ca/"
+      },
+      "services": [
+        "Guided food tours"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@albertafoodtours.ca"
+    },
+    {
+      "id": "biz-88-brewing",
+      "kind": "business",
+      "slug": "88-brewing",
+      "title": "88 Brewing Company",
+      "name": "88 Brewing Company",
+      "website": "https://www.88brewing.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary brewery and taproom that hosts community events.",
+      "description": "88 Brewing Company is a Calgary craft brewery with a taproom that hosts events and private bookings.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom",
+        "events"
+      ],
+      "sources": [
+        {
+          "name": "88 Brewing Company — official website",
+          "url": "https://www.88brewing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.88brewing.ca/"
+      },
+      "services": [
+        "Taproom",
+        "Events and private bookings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "events@88brewing.ca"
+    },
+    {
+      "id": "biz-cabin-brewing",
+      "kind": "business",
+      "slug": "cabin-brewing",
+      "title": "Cabin Brewing Company",
+      "name": "Cabin Brewing Company",
+      "website": "https://www.cabinbrewing.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary craft brewery with a taproom that takes event bookings.",
+      "description": "Cabin Brewing Company is a Calgary craft brewery whose taproom hosts events and private bookings.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom",
+        "events"
+      ],
+      "sources": [
+        {
+          "name": "Cabin Brewing Company — official website",
+          "url": "https://www.cabinbrewing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cabinbrewing.ca/"
+      },
+      "services": [
+        "Taproom",
+        "Event bookings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "taproom@cabinbrewing.ca"
+    },
+    {
+      "id": "biz-bolder-climbing-community",
+      "kind": "business",
+      "slug": "bolder-climbing-community",
+      "title": "Bolder Climbing Community",
+      "name": "Bolder Climbing Community",
+      "website": "https://www.bolderclimbing.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary bouldering gyms with a big community focus.",
+      "description": "Bolder Climbing Community runs bouldering gyms in Calgary, with drop-in climbing, programs for new climbers and community events.",
+      "categories": [
+        "recreation"
+      ],
+      "tags": [
+        "organization",
+        "climbing",
+        "bouldering",
+        "fitness"
+      ],
+      "sources": [
+        {
+          "name": "Bolder Climbing Community — official website",
+          "url": "https://www.bolderclimbing.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bolderclimbing.com/"
+      },
+      "services": [
+        "Bouldering gyms",
+        "Climbing programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@bolderclimbing.com"
+    },
+    {
+      "id": "biz-shelf-life-books",
+      "kind": "business",
+      "slug": "shelf-life-books",
+      "title": "Shelf Life Books",
+      "name": "Shelf Life Books",
+      "website": "https://www.shelflifebooks.ca/",
+      "address": "Calgary, AB",
+      "summary": "Independent Calgary bookstore that hosts readings and book launches.",
+      "description": "Shelf Life Books is an independent Calgary bookstore that hosts author readings, launches and book clubs.",
+      "categories": [
+        "shopping",
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "bookstore",
+        "readings",
+        "book-club"
+      ],
+      "sources": [
+        {
+          "name": "Shelf Life Books — official website",
+          "url": "https://www.shelflifebooks.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.shelflifebooks.ca/"
+      },
+      "services": [
+        "Independent bookstore",
+        "Readings and launches"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "contact@shelflifebooks.ca"
+    },
+    {
+      "id": "biz-pages-on-kensington",
+      "kind": "business",
+      "slug": "pages-on-kensington",
+      "title": "Pages on Kensington",
+      "name": "Pages on Kensington",
+      "website": "https://www.pageskensington.com/",
+      "address": "Kensington, Calgary, AB",
+      "summary": "Independent bookstore in Kensington with author events.",
+      "description": "Pages on Kensington is an independent bookstore in Kensington that hosts author events and readings.",
+      "categories": [
+        "shopping",
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "bookstore",
+        "kensington",
+        "readings"
+      ],
+      "sources": [
+        {
+          "name": "Pages on Kensington — official website",
+          "url": "https://www.pageskensington.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.pageskensington.com/"
+      },
+      "services": [
+        "Independent bookstore",
+        "Author events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "mail@pageskensington.com"
+    },
+    {
+      "id": "biz-run21-calgary",
+      "kind": "business",
+      "slug": "run21-calgary",
+      "title": "RUN21 Calgary",
+      "name": "RUN21 Calgary",
+      "website": "https://www.run21calgary.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary run crew with regular social group runs.",
+      "description": "RUN21 Calgary is a run crew with regular social group runs open to runners of all levels.",
+      "categories": [
+        "recreation",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "running",
+        "run-club"
+      ],
+      "sources": [
+        {
+          "name": "RUN21 Calgary — official website",
+          "url": "https://www.run21calgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.run21calgary.ca/"
+      },
+      "services": [
+        "Group runs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@run21calgary.ca"
+    },
+    {
+      "id": "biz-strides-marda-loop",
+      "kind": "business",
+      "slug": "strides-marda-loop",
+      "title": "Strides Running Marda Loop",
+      "name": "Strides Running Marda Loop",
+      "website": "https://www.stridesrunning.com/",
+      "address": "Marda Loop, Calgary, AB",
+      "summary": "Marda Loop running store that hosts run groups.",
+      "description": "Strides Running in Marda Loop is a running specialty store that hosts run groups and clinics for the neighbourhood.",
+      "categories": [
+        "recreation",
+        "shopping"
+      ],
+      "tags": [
+        "organization",
+        "running",
+        "run-club",
+        "marda-loop"
+      ],
+      "sources": [
+        {
+          "name": "Strides Running Marda Loop — official website",
+          "url": "https://www.stridesrunning.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.stridesrunning.com/"
+      },
+      "services": [
+        "Running store",
+        "Run groups"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "mardaloop@stridesrunning.com"
+    },
+    {
+      "id": "biz-hot-wax-records",
+      "kind": "business",
+      "slug": "hot-wax-records",
+      "title": "Hot Wax Records",
+      "name": "Hot Wax Records",
+      "address": "Calgary, AB",
+      "summary": "Calgary record store selling new and used vinyl since 1978.",
+      "description": "Hot Wax is a Calgary record store that has sold new and used records across every genre since 1978.",
+      "categories": [
+        "shopping",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "records",
+        "vinyl"
+      ],
+      "sources": [
+        {
+          "name": "Daily Hive — Kensington guide",
+          "url": "https://dailyhive.com/calgary/calgary-kensington-neighbourhood",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "New and used records"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "hotwax@shaw.ca"
+    },
+    {
+      "id": "biz-harvard-media",
+      "kind": "business",
+      "slug": "harvard-media",
+      "title": "Harvard Media",
+      "name": "Harvard Media",
+      "website": "https://www.harvardmedia.com/",
+      "address": "Calgary, AB",
+      "summary": "Radio broadcaster behind several Calgary stations.",
+      "description": "Harvard Media is a western Canadian broadcaster that runs several Calgary radio stations and community partnerships.",
+      "categories": [
+        "services",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "radio",
+        "media"
+      ],
+      "sources": [
+        {
+          "name": "Harvard Media — official website",
+          "url": "https://www.harvardmedia.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.harvardmedia.com/"
+      },
+      "services": [
+        "Radio stations",
+        "Community partnerships"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "hello@harvardmedia.com"
+    },
+    {
+      "id": "biz-calgary-black-chambers",
+      "kind": "business",
+      "slug": "calgary-black-chambers",
+      "title": "Calgary Black Chambers",
+      "name": "Calgary Black Chambers",
+      "website": "https://www.calgaryblackchambers.org/",
+      "address": "Calgary, AB",
+      "summary": "Non-profit supporting Black entrepreneurs and professionals in Calgary.",
+      "description": "Calgary Black Chambers supports Black entrepreneurs and professionals in Calgary with programs, networking and events.",
+      "categories": [
+        "community",
+        "services"
+      ],
+      "tags": [
+        "organization",
+        "business",
+        "black-owned",
+        "networking"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Black Chambers — official website",
+          "url": "https://www.calgaryblackchambers.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryblackchambers.org/"
+      },
+      "services": [
+        "Business support",
+        "Networking events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@calgaryblackchambers.org"
+    },
+    {
+      "id": "biz-calgary-african-community-collective",
+      "kind": "business",
+      "slug": "calgary-african-community-collective",
+      "title": "Calgary African Community Collective",
+      "name": "Calgary African Community Collective",
+      "website": "https://www.calgaryafrican.ca/",
+      "address": "Calgary, AB",
+      "summary": "Collective connecting Calgary's African communities through programs and events.",
+      "description": "The Calgary African Community Collective brings Calgary's African communities together through community programs and cultural events.",
+      "categories": [
+        "community",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "african",
+        "culture"
+      ],
+      "sources": [
+        {
+          "name": "Calgary African Community Collective — official website",
+          "url": "https://www.calgaryafrican.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryafrican.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Cultural events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@calgaryafrican.ca"
+    },
+    {
+      "id": "biz-tipsy-trivia",
+      "kind": "business",
+      "slug": "tipsy-trivia",
+      "title": "Tipsy Trivia",
+      "name": "Tipsy Trivia",
+      "website": "https://www.tipsytrivia.ca/",
+      "address": "Calgary, AB",
+      "summary": "Trivia nights at Calgary bars, plus private and corporate trivia.",
+      "description": "Tipsy Trivia hosts trivia nights at Calgary bars and runs private and corporate trivia events.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "trivia",
+        "pub-quiz"
+      ],
+      "sources": [
+        {
+          "name": "Tipsy Trivia — official website",
+          "url": "https://www.tipsytrivia.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tipsytrivia.ca/"
+      },
+      "services": [
+        "Trivia nights",
+        "Private events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "curtis@tipsytrivia.ca"
+    },
+    {
+      "id": "biz-calgary-sport-and-social-club",
+      "kind": "business",
+      "slug": "calgary-sport-and-social-club",
+      "title": "Calgary Sport and Social Club",
+      "name": "Calgary Sport and Social Club",
+      "website": "https://www.calgarysportsclub.com/",
+      "address": "Calgary, AB",
+      "summary": "Adult rec leagues and social events across Calgary.",
+      "description": "The Calgary Sport and Social Club runs adult recreational sports leagues and social events across the city.",
+      "categories": [
+        "recreation",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "rec-leagues",
+        "social"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Sport and Social Club — official website",
+          "url": "https://www.calgarysportsclub.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarysportsclub.com/"
+      },
+      "services": [
+        "Recreational leagues",
+        "Social events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@calgarysportsclub.com"
+    },
+    {
+      "id": "biz-city-and-country-winery",
+      "kind": "business",
+      "slug": "city-and-country-winery",
+      "title": "City & Country Winery",
+      "name": "City & Country Winery",
+      "website": "https://www.cityandcountrywine.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary urban winery with tastings and events.",
+      "description": "City & Country Winery is an urban winery in Calgary offering tastings and events.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "winery",
+        "urban-winery",
+        "tasting"
+      ],
+      "sources": [
+        {
+          "name": "City & Country Winery — official website",
+          "url": "https://www.cityandcountrywine.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cityandcountrywine.com/"
+      },
+      "services": [
+        "Urban winery",
+        "Tastings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@cityandcountrywine.com"
+    },
+    {
+      "id": "biz-calgary-curling-club",
+      "kind": "business",
+      "slug": "calgary-curling-club",
+      "title": "Calgary Curling Club",
+      "name": "Calgary Curling Club",
+      "website": "https://www.calgarycurlingclub.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary curling club with leagues, learn-to-curl and ice rentals.",
+      "description": "The Calgary Curling Club runs curling leagues, learn-to-curl sessions and ice rentals for groups.",
+      "categories": [
+        "recreation"
+      ],
+      "tags": [
+        "organization",
+        "curling",
+        "winter",
+        "leagues"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Curling Club — official website",
+          "url": "https://www.calgarycurlingclub.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarycurlingclub.com/"
+      },
+      "services": [
+        "Curling leagues",
+        "Learn-to-curl",
+        "Rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "info@calgarycurlingclub.com"
+    },
+    {
+      "id": "biz-ucalgary-students-union",
+      "kind": "business",
+      "slug": "ucalgary-students-union",
+      "title": "University of Calgary Students' Union",
+      "name": "University of Calgary Students' Union",
+      "website": "https://www.su.ucalgary.ca/",
+      "address": "University of Calgary, Calgary, AB",
+      "summary": "The University of Calgary's undergraduate students' union, running campus events and services.",
+      "description": "The University of Calgary Students' Union represents undergraduate students and runs campus events, clubs and student services.",
+      "categories": [
+        "community",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "students",
+        "campus"
+      ],
+      "sources": [
+        {
+          "name": "University of Calgary Students' Union — official website",
+          "url": "https://www.su.ucalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.su.ucalgary.ca/"
+      },
+      "services": [
+        "Student events",
+        "Student services"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "reception@su.ucalgary.ca"
     }
   ]
 }

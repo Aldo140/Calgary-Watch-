@@ -5112,5 +5112,367 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "montgomery-on-the-bow-bia",
+      "name": "Montgomery on the Bow BIA",
+      "approved": true,
+      "hosts": [
+        "montgomerybia.com",
+        "www.montgomerybia.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "light-up-montgomery-2026",
+        "input": {
+          "kind": "event",
+          "organizer": "Montgomery on the Bow Business Improvement Area",
+          "venue": "Montgomery Town Square",
+          "address": "Montgomery Town Square, Bowness Road NW, Calgary, AB",
+          "neighbourhood": "Montgomery",
+          "sourceUrl": "https://www.montgomerybia.com/",
+          "pricing": "free",
+          "title": "Light Up Montgomery",
+          "summary": "Montgomery’s free winter evening: carriage rides, fire pits, hot chocolate, Santa and a petting zoo in Montgomery Town Square.",
+          "description": "Light Up Montgomery returns for its eighth year on Saturday, November 14, 2026, from 5 to 8 p.m. in Montgomery Town Square. The free evening has horse-drawn carriage rides, live entertainment, fire pits, hot chocolate, cider and s’mores, a kids’ area, photos with Santa and a petting zoo from Butterfield Acres. The Montgomery on the Bow BIA runs it with Children’s Cottage.",
+          "categories": [
+            "holiday",
+            "family",
+            "community"
+          ],
+          "tags": [
+            "Light Up Montgomery",
+            "Christmas",
+            "Santa",
+            "free",
+            "Montgomery"
+          ],
+          "start": "2026-11-14T17:00:00-07:00",
+          "end": "2026-11-14T20:00:00-07:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "lake-bonavista-community-association",
+      "name": "Lake Bonavista Community Association",
+      "approved": true,
+      "hosts": [
+        "thelbca.ca",
+        "www.thelbca.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-craft-fair-2026",
+        "input": {
+          "kind": "market",
+          "organizer": "Lake Bonavista Community Association",
+          "venue": "Lake Bonavista Community Centre",
+          "address": "1401 Acadia Drive SE, Calgary, AB T2J 4C6",
+          "neighbourhood": "Lake Bonavista",
+          "sourceUrl": "https://thelbca.ca/events/christmas-craft-fair/",
+          "title": "Lake Bonavista Christmas Craft Fair",
+          "summary": "A free two-day Christmas craft fair at the Lake Bonavista Community Centre, November 21–22.",
+          "description": "The Lake Bonavista Community Association’s Christmas Craft Fair fills the community centre with local makers and holiday gifts. It runs Saturday, November 21 and Sunday, November 22, 2026, from 10 a.m. to 3 p.m. Admission is free.",
+          "categories": [
+            "markets",
+            "holiday",
+            "shopping"
+          ],
+          "tags": [
+            "craft fair",
+            "Christmas market",
+            "makers",
+            "free",
+            "Lake Bonavista"
+          ],
+          "amenities": [
+            "Indoor"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-21",
+              "start": "2026-11-21T10:00:00-07:00",
+              "end": "2026-11-21T15:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-11-22",
+              "start": "2026-11-22T10:00:00-07:00",
+              "end": "2026-11-22T15:00:00-07:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-reggaefest",
+      "name": "Calgary ReggaeFest",
+      "approved": true,
+      "hosts": [
+        "reggaefest.ca",
+        "www.reggaefest.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "reggaefest-2027",
+        "input": {
+          "kind": "event",
+          "organizer": "Calgary ReggaeFest",
+          "address": "Calgary, AB",
+          "sourceUrl": "https://reggaefest.ca/",
+          "pricing": "paid",
+          "ticketSaleStatus": "not-on-sale",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true,
+          "title": "Calgary ReggaeFest 2027",
+          "summary": "Calgary’s summer reggae festival returns August 27–28, 2027. Lineup and venue to come.",
+          "description": "The Calgary Reggae Festival Society has confirmed Calgary ReggaeFest for August 27–28, 2027. The lineup, venue and tickets haven’t been announced yet. The 2026 festival ran at The Rise on St. Patrick’s Island with tickets through Showpass. Check reggaefest.ca for updates.",
+          "categories": [
+            "music",
+            "festivals",
+            "outdoor"
+          ],
+          "tags": [
+            "reggae",
+            "festival",
+            "Caribbean",
+            "summer",
+            "ReggaeFest"
+          ],
+          "start": "2027-08-27T00:00:00-06:00",
+          "end": "2027-08-29T00:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "protospace",
+      "name": "Protospace",
+      "approved": true,
+      "hosts": [
+        "protospace.ca",
+        "www.protospace.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "open-house-2026-11-03",
+        "input": {
+          "kind": "event",
+          "organizer": "Protospace",
+          "venue": "Protospace",
+          "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+          "neighbourhood": "Meridian",
+          "sourceUrl": "https://protospace.ca/",
+          "pricing": "free",
+          "title": "Protospace Tuesday Open House",
+          "summary": "Tour Calgary’s volunteer-run makerspace and see the tools. Free, every Tuesday 7–9 p.m.",
+          "description": "Protospace opens its doors to the public every Tuesday from 7 to 9 p.m. Drop in for a tour of the makerspace’s woodworking, metal, electronics, 3D printing and laser cutting areas, meet members, and sign up for a membership if you’d like. It’s free, and Protospace is run entirely by volunteers.",
+          "categories": [
+            "community",
+            "learning",
+            "indoor"
+          ],
+          "tags": [
+            "makerspace",
+            "open house",
+            "free",
+            "tour",
+            "Protospace"
+          ],
+          "start": "2026-11-03T19:00:00-07:00",
+          "end": "2026-11-03T21:00:00-07:00"
+        }
+      },
+      {
+        "id": "open-house-2026-11-10",
+        "input": {
+          "kind": "event",
+          "organizer": "Protospace",
+          "venue": "Protospace",
+          "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+          "neighbourhood": "Meridian",
+          "sourceUrl": "https://protospace.ca/",
+          "pricing": "free",
+          "title": "Protospace Tuesday Open House",
+          "summary": "Tour Calgary’s volunteer-run makerspace and see the tools. Free, every Tuesday 7–9 p.m.",
+          "description": "Protospace opens its doors to the public every Tuesday from 7 to 9 p.m. Drop in for a tour of the makerspace’s woodworking, metal, electronics, 3D printing and laser cutting areas, meet members, and sign up for a membership if you’d like. It’s free, and Protospace is run entirely by volunteers.",
+          "categories": [
+            "community",
+            "learning",
+            "indoor"
+          ],
+          "tags": [
+            "makerspace",
+            "open house",
+            "free",
+            "tour",
+            "Protospace"
+          ],
+          "start": "2026-11-10T19:00:00-07:00",
+          "end": "2026-11-10T21:00:00-07:00"
+        }
+      },
+      {
+        "id": "open-house-2026-11-17",
+        "input": {
+          "kind": "event",
+          "organizer": "Protospace",
+          "venue": "Protospace",
+          "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+          "neighbourhood": "Meridian",
+          "sourceUrl": "https://protospace.ca/",
+          "pricing": "free",
+          "title": "Protospace Tuesday Open House",
+          "summary": "Tour Calgary’s volunteer-run makerspace and see the tools. Free, every Tuesday 7–9 p.m.",
+          "description": "Protospace opens its doors to the public every Tuesday from 7 to 9 p.m. Drop in for a tour of the makerspace’s woodworking, metal, electronics, 3D printing and laser cutting areas, meet members, and sign up for a membership if you’d like. It’s free, and Protospace is run entirely by volunteers.",
+          "categories": [
+            "community",
+            "learning",
+            "indoor"
+          ],
+          "tags": [
+            "makerspace",
+            "open house",
+            "free",
+            "tour",
+            "Protospace"
+          ],
+          "start": "2026-11-17T19:00:00-07:00",
+          "end": "2026-11-17T21:00:00-07:00"
+        }
+      },
+      {
+        "id": "open-house-2026-11-24",
+        "input": {
+          "kind": "event",
+          "organizer": "Protospace",
+          "venue": "Protospace",
+          "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+          "neighbourhood": "Meridian",
+          "sourceUrl": "https://protospace.ca/",
+          "pricing": "free",
+          "title": "Protospace Tuesday Open House",
+          "summary": "Tour Calgary’s volunteer-run makerspace and see the tools. Free, every Tuesday 7–9 p.m.",
+          "description": "Protospace opens its doors to the public every Tuesday from 7 to 9 p.m. Drop in for a tour of the makerspace’s woodworking, metal, electronics, 3D printing and laser cutting areas, meet members, and sign up for a membership if you’d like. It’s free, and Protospace is run entirely by volunteers.",
+          "categories": [
+            "community",
+            "learning",
+            "indoor"
+          ],
+          "tags": [
+            "makerspace",
+            "open house",
+            "free",
+            "tour",
+            "Protospace"
+          ],
+          "start": "2026-11-24T19:00:00-07:00",
+          "end": "2026-11-24T21:00:00-07:00"
+        }
+      },
+      {
+        "id": "open-house-2026-12-01",
+        "input": {
+          "kind": "event",
+          "organizer": "Protospace",
+          "venue": "Protospace",
+          "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+          "neighbourhood": "Meridian",
+          "sourceUrl": "https://protospace.ca/",
+          "pricing": "free",
+          "title": "Protospace Tuesday Open House",
+          "summary": "Tour Calgary’s volunteer-run makerspace and see the tools. Free, every Tuesday 7–9 p.m.",
+          "description": "Protospace opens its doors to the public every Tuesday from 7 to 9 p.m. Drop in for a tour of the makerspace’s woodworking, metal, electronics, 3D printing and laser cutting areas, meet members, and sign up for a membership if you’d like. It’s free, and Protospace is run entirely by volunteers.",
+          "categories": [
+            "community",
+            "learning",
+            "indoor"
+          ],
+          "tags": [
+            "makerspace",
+            "open house",
+            "free",
+            "tour",
+            "Protospace"
+          ],
+          "start": "2026-12-01T19:00:00-07:00",
+          "end": "2026-12-01T21:00:00-07:00"
+        }
+      },
+      {
+        "id": "open-house-2026-12-08",
+        "input": {
+          "kind": "event",
+          "organizer": "Protospace",
+          "venue": "Protospace",
+          "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+          "neighbourhood": "Meridian",
+          "sourceUrl": "https://protospace.ca/",
+          "pricing": "free",
+          "title": "Protospace Tuesday Open House",
+          "summary": "Tour Calgary’s volunteer-run makerspace and see the tools. Free, every Tuesday 7–9 p.m.",
+          "description": "Protospace opens its doors to the public every Tuesday from 7 to 9 p.m. Drop in for a tour of the makerspace’s woodworking, metal, electronics, 3D printing and laser cutting areas, meet members, and sign up for a membership if you’d like. It’s free, and Protospace is run entirely by volunteers.",
+          "categories": [
+            "community",
+            "learning",
+            "indoor"
+          ],
+          "tags": [
+            "makerspace",
+            "open house",
+            "free",
+            "tour",
+            "Protospace"
+          ],
+          "start": "2026-12-08T19:00:00-07:00",
+          "end": "2026-12-08T21:00:00-07:00"
+        }
+      },
+      {
+        "id": "open-house-2026-12-15",
+        "input": {
+          "kind": "event",
+          "organizer": "Protospace",
+          "venue": "Protospace",
+          "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+          "neighbourhood": "Meridian",
+          "sourceUrl": "https://protospace.ca/",
+          "pricing": "free",
+          "title": "Protospace Tuesday Open House",
+          "summary": "Tour Calgary’s volunteer-run makerspace and see the tools. Free, every Tuesday 7–9 p.m.",
+          "description": "Protospace opens its doors to the public every Tuesday from 7 to 9 p.m. Drop in for a tour of the makerspace’s woodworking, metal, electronics, 3D printing and laser cutting areas, meet members, and sign up for a membership if you’d like. It’s free, and Protospace is run entirely by volunteers.",
+          "categories": [
+            "community",
+            "learning",
+            "indoor"
+          ],
+          "tags": [
+            "makerspace",
+            "open house",
+            "free",
+            "tour",
+            "Protospace"
+          ],
+          "start": "2026-12-15T19:00:00-07:00",
+          "end": "2026-12-15T21:00:00-07:00"
+        }
+      }
+    ]
   }
 ]

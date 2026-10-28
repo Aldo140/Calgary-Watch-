@@ -7915,6 +7915,466 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-25T06:55:57Z",
       "updatedAt": "2026-10-25T06:55:57Z"
+    },
+    {
+      "id": "biz-montgomery-on-the-bow-bia",
+      "kind": "business",
+      "slug": "montgomery-on-the-bow-bia",
+      "title": "Montgomery on the Bow Business Improvement Area",
+      "name": "Montgomery on the Bow Business Improvement Area",
+      "website": "https://www.montgomerybia.com/",
+      "address": "Montgomery, Calgary, AB",
+      "summary": "The business association for Montgomery’s shops, cafés and services along Bowness Road NW, and the host of Light Up Montgomery.",
+      "description": "Montgomery on the Bow BIA represents the local businesses of Montgomery, the northwest Calgary community on the Bow River along Bowness Road NW and 16 Avenue NW. It promotes the district as a place to shop, eat and explore, and runs community events through the year. Its biggest is Light Up Montgomery, a free winter evening in Montgomery Town Square with carriage rides, fire pits, live entertainment and Santa, now in its eighth year.",
+      "categories": [
+        "shopping",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "montgomery",
+        "holiday"
+      ],
+      "sources": [
+        {
+          "name": "Montgomery on the Bow BIA — official website",
+          "url": "https://www.montgomerybia.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        },
+        {
+          "name": "Visit Calgary — Montgomery on the Bow BIA",
+          "url": "https://visitcalgary.com/things-to-do/shopping/montgomery-on-the-bow-bia",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.montgomerybia.com/"
+      },
+      "services": [
+        "District events",
+        "Light Up Montgomery",
+        "Business directory"
+      ],
+      "email": "admin@montgomerybia.com",
+      "phone": "403-629-4566",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-lake-bonavista-community-association",
+      "kind": "business",
+      "slug": "lake-bonavista-community-association",
+      "title": "Lake Bonavista Community Association",
+      "name": "Lake Bonavista Community Association",
+      "website": "https://thelbca.ca/",
+      "address": "1401 Acadia Drive SE, Calgary, AB T2J 4C6",
+      "summary": "The community association for Lake Bonavista in southeast Calgary, with programs, the lake and a public events calendar.",
+      "description": "The Lake Bonavista Community Association runs the community centre at 1401 Acadia Drive SE, the lake facilities, and programs and events for residents and visitors. Its events calendar lists community events open to the public, including the annual Christmas Craft Fair in November. The office is open Monday to Friday, 9 a.m. to 4 p.m.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "community association",
+        "lake-bonavista"
+      ],
+      "sources": [
+        {
+          "name": "Lake Bonavista Community Association — events",
+          "url": "https://thelbca.ca/events/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        },
+        {
+          "name": "Lake Bonavista Community Association — Christmas Craft Fair",
+          "url": "https://thelbca.ca/events/christmas-craft-fair/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thelbca.ca/"
+      },
+      "services": [
+        "Community events",
+        "Programs",
+        "Christmas Craft Fair"
+      ],
+      "phone": "403-271-7107",
+      "hours": {
+        "Monday–Friday": "9 a.m.–4 p.m. (office)"
+      },
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-calgary-reggaefest",
+      "kind": "business",
+      "slug": "calgary-reggaefest",
+      "title": "Calgary ReggaeFest",
+      "name": "Calgary ReggaeFest",
+      "website": "https://reggaefest.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary’s summer reggae festival, run by the Calgary Reggae Festival Society. The 2027 festival is August 27–28.",
+      "description": "Calgary ReggaeFest is an annual outdoor reggae and Caribbean music festival run by the not-for-profit Calgary Reggae Festival Society. The 2026 festival ran August 28–29 at The Rise on St. Patrick’s Island, with tickets through Showpass. The society has told CalgaryWatch the 2027 festival is August 27–28, 2027. The lineup and venue haven’t been announced yet.",
+      "categories": [
+        "music",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "festival",
+        "reggae",
+        "caribbean",
+        "summer"
+      ],
+      "sources": [
+        {
+          "name": "Calgary ReggaeFest — official website",
+          "url": "https://reggaefest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        },
+        {
+          "name": "Calgary ReggaeFest — Facebook",
+          "url": "https://www.facebook.com/CalgaryReggaeFest",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://reggaefest.ca/",
+        "facebook": "https://www.facebook.com/CalgaryReggaeFest",
+        "instagram": "https://www.instagram.com/reggaefest_yyc/"
+      },
+      "services": [
+        "Annual reggae festival",
+        "Live music"
+      ],
+      "email": "crfinfo@reggaefest.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-calgary-allied-arts-foundation",
+      "kind": "business",
+      "slug": "calgary-allied-arts-foundation",
+      "title": "Calgary Allied Arts Foundation",
+      "name": "Calgary Allied Arts Foundation",
+      "website": "https://www.calgaryalliedartsfoundation.ca/",
+      "address": "505 8 Avenue SW, Calgary, AB",
+      "summary": "A Calgary foundation supporting emerging visual artists through a studio residency and Gallery 505, a public window gallery downtown.",
+      "description": "The Calgary Allied Arts Foundation supports emerging visual artists in Calgary. It runs a studio residency with an annual call for artists, and Gallery 505, a window gallery at 505 8 Avenue SW that anyone walking by can see. The foundation posts exhibitions, residency news and calls for artists on Instagram at @calgaryalliedartsfoundation.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "visual art",
+        "gallery",
+        "artist residency",
+        "downtown"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Allied Arts Foundation — official website",
+          "url": "https://www.calgaryalliedartsfoundation.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        },
+        {
+          "name": "Calgary Allied Arts Foundation — Instagram",
+          "url": "https://www.instagram.com/calgaryalliedartsfoundation/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryalliedartsfoundation.ca/",
+        "instagram": "https://www.instagram.com/calgaryalliedartsfoundation/"
+      },
+      "services": [
+        "Artist studio residency",
+        "Gallery 505 window exhibitions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-protospace",
+      "kind": "business",
+      "slug": "protospace",
+      "title": "Protospace",
+      "name": "Protospace",
+      "website": "https://protospace.ca/",
+      "address": "1530 27 Avenue NE, Bay 108, Calgary, AB T2E 7S6",
+      "summary": "Calgary’s volunteer-run makerspace in northeast Calgary, with a free open house and tour every Tuesday evening.",
+      "description": "Protospace is a not-for-profit makerspace run entirely by volunteers, with shared tools for woodworking, metalworking, electronics, 3D printing, laser cutting and more. Members get access to the space and its equipment. The public can visit at the weekly open house on Tuesdays from 7 to 9 p.m., which includes a tour and a chance to sign up for membership.",
+      "categories": [
+        "community",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "makerspace",
+        "hackerspace",
+        "workshop",
+        "tools"
+      ],
+      "sources": [
+        {
+          "name": "Protospace — official website",
+          "url": "https://protospace.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://protospace.ca/"
+      },
+      "services": [
+        "Tuesday open house and tour",
+        "Memberships",
+        "Shared workshop tools"
+      ],
+      "email": "info@protospace.ca",
+      "hours": {
+        "Tuesday": "7–9 p.m. (public open house)"
+      },
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-swintons-art-supplies",
+      "kind": "business",
+      "slug": "swintons-art-supplies",
+      "title": "Swinton’s Art Supplies",
+      "name": "Swinton’s Art Supplies",
+      "website": "https://www.swintonsart.com/",
+      "address": "7160 Fisher Street SE, Calgary, AB",
+      "summary": "A southeast Calgary art supply store with five studios and art workshops for adults and kids.",
+      "description": "Swinton’s Art Supplies sells art materials from its store on Fisher Street SE and runs art workshops in its own studios. Swinton’s describes the building as Alberta’s largest privately owned art facility, with five studios and more than ten instructors teaching painting, drawing and other media. Workshop dates and registration are on its workshops page.",
+      "categories": [
+        "arts",
+        "shopping",
+        "learning"
+      ],
+      "tags": [
+        "organization",
+        "art supplies",
+        "art classes",
+        "workshops"
+      ],
+      "sources": [
+        {
+          "name": "Swinton’s Art Supplies — art workshops",
+          "url": "https://www.swintonsart.com/art-workshops-calgary",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        },
+        {
+          "name": "Swinton’s Art Supplies — official website",
+          "url": "https://www.swintonsart.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.swintonsart.com/"
+      },
+      "services": [
+        "Art supplies",
+        "Art workshops",
+        "Studio rentals"
+      ],
+      "email": "info@swintonsart.com",
+      "phone": "403-258-3500",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-polaris-centre-for-the-performing-arts",
+      "kind": "business",
+      "slug": "polaris-centre-for-the-performing-arts",
+      "title": "Polaris Centre for the Performing Arts",
+      "name": "Polaris Centre for the Performing Arts",
+      "website": "https://www.polariscentre.ca/",
+      "address": "261051 Wagon Wheel View #8, Rocky View County, AB",
+      "summary": "A performing arts centre just east of CrossIron Mills, hosting its own shows and community productions.",
+      "description": "The Polaris Centre for the Performing Arts is a performance venue in Rocky View County, just north of Calgary near CrossIron Mills. It presents its own shows and hosts productions by community theatre, dance and music groups. Its box office sells tickets for all of them through Showpass.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "performing arts",
+        "venue",
+        "rocky-view"
+      ],
+      "sources": [
+        {
+          "name": "Polaris Centre — box office on Showpass",
+          "url": "https://www.showpass.com/o/the-polaris-centre/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.polariscentre.ca/"
+      },
+      "services": [
+        "Theatre and concerts",
+        "Community productions",
+        "Box office"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-greenview-industrial-bia",
+      "kind": "business",
+      "slug": "greenview-industrial-bia",
+      "title": "Greenview Industrial Business Improvement Area",
+      "name": "Greenview Industrial Business Improvement Area",
+      "website": "https://www.greenviewindustrial.com/",
+      "address": "Greenview Industrial Park, Calgary, AB",
+      "summary": "The business association for Greenview Industrial Park in north-central Calgary, home to more than 300 businesses.",
+      "description": "The Greenview Industrial BIA represents more than 300 businesses in Greenview Industrial Park, north of McKnight Boulevard and east of Centre Street N. Since 2017 it has promoted the area’s makers, trades, restaurants and services and worked on making the park safer and better known. It is planning community events for 2027.",
+      "categories": [
+        "shopping",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "greenview",
+        "industrial"
+      ],
+      "sources": [
+        {
+          "name": "Greenview Industrial BIA — official website",
+          "url": "https://www.greenviewindustrial.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        },
+        {
+          "name": "City of Calgary — Business Improvement Areas",
+          "url": "https://www.calgary.ca/for-business/bias-in-calgary.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.greenviewindustrial.com/"
+      },
+      "services": [
+        "District promotion",
+        "Business directory"
+      ],
+      "email": "info@greenviewindustrial.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
+    },
+    {
+      "id": "biz-carifest-calgary",
+      "kind": "business",
+      "slug": "carifest-calgary",
+      "title": "Carifest Calgary",
+      "name": "Carifest Calgary",
+      "website": "https://carifestcalgary.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary’s Caribbean carnival festival, with a parade and a free festival weekend each August.",
+      "description": "Carifest Calgary celebrates Caribbean culture with music, food, dance and costume. The 2026 festival, its 45th year, ran August 14–16 with a parade and a free festival weekend centred on Cowboys Park. Dates for 2027 haven’t been announced yet.",
+      "categories": [
+        "festivals",
+        "music",
+        "food"
+      ],
+      "tags": [
+        "organization",
+        "festival",
+        "caribbean",
+        "carnival",
+        "parade",
+        "summer"
+      ],
+      "sources": [
+        {
+          "name": "Carifest Calgary — official website",
+          "url": "https://carifestcalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T07:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://carifestcalgary.com/"
+      },
+      "services": [
+        "Carnival parade",
+        "Festival weekend"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T07:30:00Z",
+      "updatedAt": "2026-10-28T07:30:00Z"
     }
   ]
 }

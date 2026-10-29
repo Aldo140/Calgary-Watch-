@@ -1,0 +1,27 @@
+name: Collect listing images from org websites
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Read share images from each organization's site
+        run: npx tsx scripts/images/collect-org-images.ts
+      # Results go to a review branch, never main: someone looks at every image before --apply.
+      - name: Push the images and manifest for review
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B bot/org-images
+          git add -f public/images/orgs scripts/images/org-images.json
+          git commit -m "Org website images for review"
+          git push -f origin bot/org-images

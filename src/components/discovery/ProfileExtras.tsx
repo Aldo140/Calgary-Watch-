@@ -9,6 +9,7 @@ import { organizationClaimPath } from '../../lib/claimOrganization';
 import { useVerifiedListing } from '../../lib/claimsApi';
 import { CLAIM_BENEFIT } from '../entity/VerifiedBadge';
 import { GoingButton } from '../plans/GoingButton';
+import { profilePhoto } from '../../lib/organizations';
 import { ProfileCover } from './ProfileCover';
 import { useSeen } from './LocalDirectory';
 
@@ -206,7 +207,7 @@ export function OwnerPitch({ place, name, shelf, number, all, dates, mates }: { 
       <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />For the people who run it</p>
       <h2 id="lp-pitch">Run {name}? <mark>Make this page yours.</mark></h2>
       <div className="lp-pitch-card">
-        <div className="lp-pitch-cover" aria-hidden="true"><ProfileCover id={place.id} title={name} shelf={shelf} mini /><span className="lp-pitch-tick"><BadgeCheck size={20} /></span></div>
+        <div className="lp-pitch-cover" aria-hidden="true"><ProfileCover id={place.id} title={name} shelf={shelf} mini photo={profilePhoto(place)} /><span className="lp-pitch-tick"><BadgeCheck size={20} /></span></div>
         <p className="lp-pitch-now"><b>No. {String(number).padStart(2, '0')}</b> of the people who make Calgary, on the {shelf.label.toLowerCase()} shelf{mates ? ` with ${mates} others` : ''}.</p>
       </div>
       <ul className="lp-pitch-perks">

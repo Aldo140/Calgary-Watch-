@@ -1,4 +1,7 @@
 import { memo } from 'react';
+import type { Market } from '../../types/discovery';
+import { discoveryRepository } from '../../data/discovery';
+import { eventArtwork } from '../../lib/organizations';
 
 /**
  * Generated artwork for listings that have no licensed photo. Everything is drawn from
@@ -88,8 +91,10 @@ export const MarketArt = memo(function MarketArt({ id, title, day }: { id: strin
  * Supplied images are often posters with text on them, so they are fitted, never cropped,
  * over a blurred copy of themselves so any frame shape is filled.
  */
-export function MarketCover({ market, day, eager }: { market: { id: string; title: string; image?: { src: string; alt: string; credit?: string } }; day?: string; eager?: boolean }) {
-  const photo = market.image && /^https:\/\//.test(market.image.src) ? market.image : undefined;
+export function MarketCover({ market, day, eager }: { market: Market; day?: string; eager?: boolean }) {
+  // The market's own image first, then its organizer profile's (both credited where shown in full).
+  const art = eventArtwork(market, discoveryRepository.list());
+  const photo = art && /^https:\/\//.test(art.src) ? art : undefined;
   if (!photo) return <MarketArt id={market.id} title={market.title} day={day} />;
   // Our own assets are referenced absolutely (the inventory requires https); serve them same-origin.
   const src = photo.src.replace(/^https:\/\/(www\.)?calgarywatch\.ca(?=\/)/, '');

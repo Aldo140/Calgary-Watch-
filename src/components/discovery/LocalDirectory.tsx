@@ -4,6 +4,7 @@ import { ArrowUpRight, BadgeCheck, Coffee, Drama, FerrisWheel, Ghost, MapPin, Pa
 import type { Business } from '../../types/discovery';
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
 import { initials, SHELVES, type BoardRow, type Programme, type Shelf, type ShelfId } from '../../lib/localShelves';
+import { profilePhoto } from '../../lib/organizations';
 import { ProfileCover } from './ProfileCover';
 
 export { initials };
@@ -183,7 +184,7 @@ export function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shel
     <li className="ld-card" style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink, ['--i' as string]: Math.min(i, 8) } as CSSProperties}>
       <Link to={entityPath(p)} className="ld-card-main">
         <span className="ld-card-top">
-          <span className="ld-card-cover"><ProfileCover id={p.id} title={p.title} shelf={shelf} mini /></span>
+          <span className="ld-card-cover"><ProfileCover id={p.id} title={p.title} shelf={shelf} mini photo={profilePhoto(p)} /></span>
           <span className="lx-go ld-card-go" aria-hidden="true"><ArrowUpRight size={18} /></span>
         </span>
         <strong className="ld-card-name">{p.title}</strong>

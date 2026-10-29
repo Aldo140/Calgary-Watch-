@@ -1187,8 +1187,9 @@
         }
       ],
       "image": {
-        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        "src": "https://calgarywatch.ca/images/orgs/biz-wilder-institutes-calgary-zoo.webp",
+        "alt": "A visitor watching otters swim past an underwater window",
+        "credit": "Image from calgaryzoo.com"
       },
       "images": [
         {
@@ -11614,7 +11615,12 @@
       "editorialSelection": true,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-15T00:00:00Z"
+      "updatedAt": "2026-10-15T00:00:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-theatre-calgary.webp",
+        "alt": "Theatre Calgary 2026–27 season artwork",
+        "credit": "Image from theatrecalgary.com"
+      }
     },
     {
       "id": "biz-alliance-francaise-calgary",
@@ -11767,7 +11773,12 @@
       ],
       "claimed": false,
       "partner": false,
-      "editorialSelection": false
+      "editorialSelection": false,
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-inglewood-bia.webp",
+        "alt": "The Ironwood Stage and Grill sign on 9th Avenue in Inglewood",
+        "credit": "Image from inglewoodyyc.ca"
+      }
     },
     {
       "id": "biz-dalhousie-community-association",
@@ -14573,7 +14584,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-17T00:44:59.309327Z",
       "email": "programs@triwoodcommunity.com",
-      "phone": "403-282-2677 ext. 103"
+      "phone": "403-282-2677 ext. 103",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-triwood-community-association.webp",
+        "alt": "The Triwood Community hall sign behind hedges",
+        "credit": "Image from triwoodcommunity.com"
+      }
     },
     {
       "id": "biz-acadia-community-association",
@@ -15426,7 +15442,12 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-21T21:36:39Z",
-      "verifiedAt": "2026-10-21T21:36:39Z"
+      "verifiedAt": "2026-10-21T21:36:39Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-international-bluesfest.webp",
+        "alt": "A crowd dancing and cheering at an outdoor blues concert",
+        "credit": "Image from calgarybluesfest.com"
+      }
     },
     {
       "id": "2b9617993bafa202f5af8f0e3f88",
@@ -16048,7 +16069,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-22T19:27:17.122Z",
       "email": "cuff@calgaryundergroundfilm.org",
-      "verifiedAt": "2026-10-22T19:27:17.122Z"
+      "verifiedAt": "2026-10-22T19:27:17.122Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-underground-film-festival.webp",
+        "alt": "CUFF.Docs festival artwork: a cat in 3D glasses beside the November 18 to 22 dates at Globe Cinema",
+        "credit": "Image from calgaryundergroundfilm.org"
+      }
     },
     {
       "id": "42bbaab50dd31676b617a197979d",
@@ -18338,7 +18364,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-23T18:28:37Z",
-      "updatedAt": "2026-10-23T18:28:37Z"
+      "updatedAt": "2026-10-23T18:28:37Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-jupiter-theatre.webp",
+        "alt": "Jupiter Theatre title over an image of the planet Jupiter",
+        "credit": "Image from theatrejupiter.com"
+      }
     },
     {
       "id": "biz-emmedia",
@@ -18730,7 +18761,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-25T06:30:00Z",
-      "updatedAt": "2026-10-25T06:30:00Z"
+      "updatedAt": "2026-10-25T06:30:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-the-shakespeare-company.webp",
+        "alt": "The Shakespeare Company: Calgary's lean and mean classical theatre company, over a stage scene",
+        "credit": "Image from shakespearecompany.com"
+      }
     },
     {
       "id": "biz-the-plaza-theatre",
@@ -19596,7 +19632,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T07:30:00Z",
-      "updatedAt": "2026-10-28T07:30:00Z"
+      "updatedAt": "2026-10-28T07:30:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-montgomery-on-the-bow-bia.webp",
+        "alt": "Montgomery, Life on the Bow, over a street of shops and hanging flowers",
+        "credit": "Image from montgomerybia.com"
+      }
     },
     {
       "id": "biz-lake-bonavista-community-association",
@@ -19805,7 +19846,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T07:30:00Z",
-      "updatedAt": "2026-10-28T07:30:00Z"
+      "updatedAt": "2026-10-28T07:30:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-protospace.webp",
+        "alt": "The Protospace building behind trees in autumn",
+        "credit": "Image from protospace.ca"
+      }
     },
     {
       "id": "biz-swintons-art-supplies",

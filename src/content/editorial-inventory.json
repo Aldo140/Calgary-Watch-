@@ -1186,8 +1186,9 @@
         }
       ],
       "image": {
-        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        "src": "https://calgarywatch.ca/images/orgs/biz-wilder-institutes-calgary-zoo.webp",
+        "alt": "A visitor watching otters swim past an underwater window",
+        "credit": "Image from calgaryzoo.com"
       },
       "images": [
         {
@@ -1375,7 +1376,12 @@
       "editorialSelection": true,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-15T00:00:00Z"
+      "updatedAt": "2026-10-15T00:00:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-theatre-calgary.webp",
+        "alt": "Theatre Calgary 2026–27 season artwork",
+        "credit": "Image from theatrecalgary.com"
+      }
     },
     {
       "id": "biz-alliance-francaise-calgary",
@@ -1528,7 +1534,12 @@
       ],
       "claimed": false,
       "partner": false,
-      "editorialSelection": false
+      "editorialSelection": false,
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-inglewood-bia.webp",
+        "alt": "The Ironwood Stage and Grill sign on 9th Avenue in Inglewood",
+        "credit": "Image from inglewoodyyc.ca"
+      }
     },
     {
       "id": "biz-dalhousie-community-association",
@@ -3060,7 +3071,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-17T00:44:59.309327Z",
       "email": "programs@triwoodcommunity.com",
-      "phone": "403-282-2677 ext. 103"
+      "phone": "403-282-2677 ext. 103",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-triwood-community-association.webp",
+        "alt": "The Triwood Community hall sign behind hedges",
+        "credit": "Image from triwoodcommunity.com"
+      }
     },
     {
       "id": "biz-acadia-community-association",
@@ -3665,7 +3681,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-22T19:27:17.122Z",
       "email": "cuff@calgaryundergroundfilm.org",
-      "verifiedAt": "2026-10-22T19:27:17.122Z"
+      "verifiedAt": "2026-10-22T19:27:17.122Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-underground-film-festival.webp",
+        "alt": "CUFF.Docs festival artwork: a cat in 3D glasses beside the November 18 to 22 dates at Globe Cinema",
+        "credit": "Image from calgaryundergroundfilm.org"
+      }
     },
     {
       "id": "biz-calgary-queer-arts-society",
@@ -3839,7 +3860,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-21T00:32:35.000Z",
       "email": "office@kensingtonyyc.com",
-      "phone": "403-969-3216"
+      "phone": "403-969-3216",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-kensington-bia.webp",
+        "alt": "Kensington from the air with the downtown skyline behind",
+        "credit": "Image from kensingtonyyc.com"
+      }
     },
     {
       "id": "biz-calgary-boys-choir",
@@ -4112,7 +4138,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-21T00:32:35.000Z",
       "email": "info@leightoncentre.org",
-      "phone": "403-931-3633"
+      "phone": "403-931-3633",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-leighton-art-centre.webp",
+        "alt": "The Leighton Art Centre buildings and gardens on a sunny day",
+        "credit": "Image from leightoncentre.org"
+      }
     },
     {
       "id": "biz-calgary-youth-orchestra",
@@ -5113,7 +5144,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-21T20:40:00.000Z",
       "email": "sheilat@downtowncalgary.com",
-      "phone": "403-215-1570"
+      "phone": "403-215-1570",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-downtown-association.webp",
+        "alt": "Calgary's downtown skyline and the Saddledome behind summer grasses",
+        "credit": "Image from downtowncalgary.com"
+      }
     },
     {
       "id": "biz-wallace-galleries",
@@ -5155,7 +5191,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-21T20:40:00.000Z",
       "email": "info@wallacegalleries.com",
-      "phone": "403-262-8050"
+      "phone": "403-262-8050",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-wallace-galleries.webp",
+        "alt": "Exterior of Wallace Galleries on 11 Avenue SW",
+        "credit": "Image from wallacegalleries.com"
+      }
     },
     {
       "id": "biz-alberta-craft-gallery-calgary",
@@ -5565,7 +5606,12 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-21T20:40:00.000Z",
-      "email": "cbmca.president@gmail.com"
+      "email": "cbmca.president@gmail.com",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-cliff-bungalow-mission-community-association.webp",
+        "alt": "The Elbow River in winter at dusk, with snowy banks",
+        "credit": "Image from cliffbungalowmission.com"
+      }
     },
     {
       "id": "biz-bankview-community-association",
@@ -6547,7 +6593,12 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-21T20:40:00.000Z",
       "email": "info@richmondknobhill.ca",
-      "phone": "403-263-6104"
+      "phone": "403-263-6104",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-richmond-knob-hill-community-association.webp",
+        "alt": "The community hall and garden beds on a sunny autumn day",
+        "credit": "Image from richmondknobhill.ca"
+      }
     },
     {
       "id": "biz-evanston-creekside-community-association",
@@ -7361,7 +7412,12 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-21T21:36:39Z",
-      "verifiedAt": "2026-10-21T21:36:39Z"
+      "verifiedAt": "2026-10-21T21:36:39Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-international-bluesfest.webp",
+        "alt": "A crowd dancing and cheering at an outdoor blues concert",
+        "credit": "Image from calgarybluesfest.com"
+      }
     },
     {
       "id": "biz-the-new-gallery",
@@ -7619,7 +7675,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-23T18:28:37Z",
-      "updatedAt": "2026-10-23T18:28:37Z"
+      "updatedAt": "2026-10-23T18:28:37Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-jupiter-theatre.webp",
+        "alt": "Jupiter Theatre title over an image of the planet Jupiter",
+        "credit": "Image from theatrejupiter.com"
+      }
     },
     {
       "id": "biz-emmedia",
@@ -7853,7 +7914,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-25T06:30:00Z",
-      "updatedAt": "2026-10-25T06:30:00Z"
+      "updatedAt": "2026-10-25T06:30:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-the-shakespeare-company.webp",
+        "alt": "The Shakespeare Company: Calgary's lean and mean classical theatre company, over a stage scene",
+        "credit": "Image from shakespearecompany.com"
+      }
     },
     {
       "id": "biz-the-plaza-theatre",
@@ -7981,7 +8047,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T07:30:00Z",
-      "updatedAt": "2026-10-28T07:30:00Z"
+      "updatedAt": "2026-10-28T07:30:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-montgomery-on-the-bow-bia.webp",
+        "alt": "Montgomery, Life on the Bow, over a street of shops and hanging flowers",
+        "credit": "Image from montgomerybia.com"
+      }
     },
     {
       "id": "biz-lake-bonavista-community-association",
@@ -8190,7 +8261,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T07:30:00Z",
-      "updatedAt": "2026-10-28T07:30:00Z"
+      "updatedAt": "2026-10-28T07:30:00Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-protospace.webp",
+        "alt": "The Protospace building behind trees in autumn",
+        "credit": "Image from protospace.ca"
+      }
     },
     {
       "id": "biz-swintons-art-supplies",
@@ -8880,7 +8956,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@europeincalgary.org"
+      "email": "info@europeincalgary.org",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-european-cultural-society-of-calgary.webp",
+        "alt": "Collage of European landmarks and the Calgary Tower with dancers in folk costume",
+        "credit": "Image from europeincalgary.org"
+      }
     },
     {
       "id": "biz-wm-dance-projects",
@@ -9108,7 +9189,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "taproom@toolshed.beer"
+      "email": "taproom@toolshed.beer",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-tool-shed-brewing.webp",
+        "alt": "Burgers, mac and cheese, salad and beers on a wooden table, seen from above",
+        "credit": "Image from toolshedbrewing.com"
+      }
     },
     {
       "id": "biz-bow-river-brewing",
@@ -9196,7 +9282,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@railyard.ca"
+      "email": "info@railyard.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-railyard-brewing.webp",
+        "alt": "The Railyard Brewing taproom with a long bar and a chandelier",
+        "credit": "Image from railyardbrewing.ca"
+      }
     },
     {
       "id": "biz-establishment-brewing",
@@ -9240,7 +9331,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@establishmentbrewing.ca"
+      "email": "info@establishmentbrewing.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-establishment-brewing.webp",
+        "alt": "The taproom bar with stools and wooden barrels behind it",
+        "credit": "Image from establishmentbrewing.ca"
+      }
     },
     {
       "id": "biz-irish-cultural-society-of-calgary",
@@ -9287,7 +9383,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "admin@calgaryics.org"
+      "email": "admin@calgaryics.org",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-irish-cultural-society-of-calgary.webp",
+        "alt": "A field of green shamrocks",
+        "credit": "Image from calgaryics.org"
+      }
     },
     {
       "id": "biz-turkish-canadian-cultural-association-of-calgary",
@@ -9375,7 +9476,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@finlandiacalgary.com"
+      "email": "info@finlandiacalgary.com",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-finlandia-cultural-association.webp",
+        "alt": "Birch trees in autumn colour at sunset",
+        "credit": "Image from finlandiacalgary.com"
+      }
     },
     {
       "id": "biz-improv-guild",
@@ -9682,7 +9788,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@dmeinc.ca"
+      "email": "info@dmeinc.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-kensington-night-market.webp",
+        "alt": "A packed street market under yellow tents between downtown towers",
+        "credit": "Image from thedowntownmarkets.ca"
+      }
     },
     {
       "id": "biz-calgary-night-market",
@@ -9955,7 +10066,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "landsendmusic@gmail.com"
+      "email": "landsendmusic@gmail.com",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-lands-end-ensemble.webp",
+        "alt": "Land's End Ensemble: a pianist, cellist and violinist posed on stage",
+        "credit": "Image from landsendensemble.ca"
+      }
     },
     {
       "id": "biz-calgary-folk-arts-council",
@@ -10317,7 +10433,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "kaleigh.goehringer@calgaryhumane.ca"
+      "email": "kaleigh.goehringer@calgaryhumane.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-humane-society.webp",
+        "alt": "A black and tan dog smiling outdoors",
+        "credit": "Image from calgaryhumane.ca"
+      }
     },
     {
       "id": "biz-showpass",
@@ -10403,7 +10524,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@samru.ca"
+      "email": "info@samru.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-samru.webp",
+        "alt": "The Wyckham House student centre at Mount Royal University",
+        "credit": "Image from samru.ca"
+      }
     },
     {
       "id": "biz-centre-for-newcomers",
@@ -10448,7 +10574,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@centrefornewcomers.ca"
+      "email": "info@centrefornewcomers.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-centre-for-newcomers.webp",
+        "alt": "Tipis and festival tents in a park below the Calgary skyline",
+        "credit": "Image from centrefornewcomers.ca"
+      }
     },
     {
       "id": "biz-arusha-centre",
@@ -10765,7 +10896,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "HelloYYC@UnisonAlberta.com"
+      "email": "HelloYYC@UnisonAlberta.com",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-unison-at-kerby-centre.webp",
+        "alt": "An older couple dancing in front of a live band",
+        "credit": "Image from unisonalberta.com"
+      }
     },
     {
       "id": "biz-alberta-food-tours",
@@ -10807,7 +10943,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "info@albertafoodtours.ca"
+      "email": "info@albertafoodtours.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-alberta-food-tours.webp",
+        "alt": "A table of shared plates and drinks with many hands reaching in",
+        "credit": "Image from albertafoodtours.ca"
+      }
     },
     {
       "id": "biz-88-brewing",
@@ -10852,7 +10993,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "events@88brewing.ca"
+      "email": "events@88brewing.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-88-brewing.webp",
+        "alt": "Friends sharing drinks and a bowl of chips at a pink table, seen from above",
+        "credit": "Image from 88brewing.ca"
+      }
     },
     {
       "id": "biz-cabin-brewing",
@@ -11336,7 +11482,12 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
-      "email": "curtis@tipsytrivia.ca"
+      "email": "curtis@tipsytrivia.ca",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-tipsy-trivia.webp",
+        "alt": "Tipsy Trivia artwork with headphones and question marks on cards",
+        "credit": "Image from tipsytrivia.ca"
+      }
     },
     {
       "id": "biz-calgary-sport-and-social-club",
@@ -11571,7 +11722,12 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T19:40:00.000Z",
-      "updatedAt": "2026-10-28T19:40:00.000Z"
+      "updatedAt": "2026-10-28T19:40:00.000Z",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-strathcona-community-association.webp",
+        "alt": "Strathcona Community Association name over a close-up of a jacket",
+        "credit": "Image from scacalgary.ca"
+      }
     },
     {
       "id": "biz-meadowlark-park-community-association",

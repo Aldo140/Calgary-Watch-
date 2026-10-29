@@ -383,6 +383,11 @@
           "title": "Alberta Ballet: The Nutcracker",
           "summary": "Alberta Ballet’s Nutcracker, with the Calgary Philharmonic playing Tchaikovsky live.",
           "description": "Choreography by artistic director Francesco Ventriglia, costumes by Gianluca Falaschi and sets by Italo Grassi, with the Calgary Philharmonic Orchestra playing the score live. Calgary shows Dec. 11–24: evenings at 6 or 7 pm and 1 pm matinees (Dec. 24 is a matinee only). Tickets through Ticketmaster.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/nutcracker-calgary-2026.webp",
+            "alt": "Young ballet dancers in tutus, seen from behind",
+            "credit": "Image from albertaballet.com"
+          },
           "address": "Southern Alberta Jubilee Auditorium, 1415 14 Ave NW, Calgary, AB",
           "venue": "Southern Alberta Jubilee Auditorium",
           "sourceUrl": "https://www.albertaballet.com/shows/the-nutcracker",
@@ -1100,6 +1105,11 @@
           "title": "ZOOLIGHTS at the Calgary Zoo",
           "summary": "The zoo’s winter light walk turns 30: nightly from Nov. 13, 2026 to Jan. 3, 2027.",
           "description": "ZOOLIGHTS runs nightly from November 13, 2026 to January 3, 2027, 5:30 to 9:30 p.m., with last admission at 9 p.m. It is closed December 25 and open on New Year’s Eve. This is the event’s 30th year.\n\nAnimal buildings are closed during ZOOLIGHTS. The West Gate stays closed for construction, so plan to use the main entrance. Daytime visitors who arrive before 1 p.m. can stay on into the lights; later arrivals need the zoo’s combo ticket. Tickets and timed entry are on the zoo’s ZOOLIGHTS page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/zoolights-2026.webp",
+            "alt": "Two visitors walking through a neon light tunnel at ZOOLIGHTS",
+            "credit": "Image from calgaryzoo.com"
+          },
           "address": "210 St. George's Drive NE, Calgary, AB",
           "venue": "Wilder Institute’s Calgary Zoo",
           "neighbourhood": "Bridgeland",
@@ -2286,6 +2296,11 @@
           "title": "Calgary Folk Music Festival 2027",
           "summary": "July 22–25, 2027. Tickets are not currently on sale; the lineup is still being built.",
           "description": "Calgary Folk Music Festival confirmed July 22–25, 2027 in its partner response. Tickets are not currently on sale and the 2027 lineup is still being built. Check the official festival website for later lineup, ticket and venue updates. Daily performance times have not been supplied.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/calgary-folk-music-festival-2027.webp",
+            "alt": "Crowd on the lawn in front of the Prince’s Island Park main stage at sunset",
+            "credit": "Image from calgaryfolkfest.com"
+          },
           "address": "Calgary, Alberta",
           "organizer": "Calgary Folk Music Festival",
           "sourceUrl": "https://www.calgaryfolkfest.com/",
@@ -2727,6 +2742,11 @@
           "title": "Shawnessy YMCA Winter Market",
           "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Shawnessy YMCA. Branch contact: shawnessy@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
           "description": "Free-to-attend 2026 winter market featuring local vendors and products at Shawnessy YMCA. Branch contact: shawnessy@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/shawnessy-winter-2026.webp",
+            "alt": "Shoppers walking past vendor tables in a long YMCA hallway",
+            "credit": "Image from ymcacalgary.org"
+          },
           "address": "400-333 Shawville Boulevard SE, Calgary, AB T2Y 4H3",
           "venue": "Shawnessy YMCA",
           "organizer": "YMCA Calgary",
@@ -2760,6 +2780,11 @@
           "title": "Brookfield Residential YMCA at Seton Winter Market",
           "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Brookfield Residential YMCA at Seton. Branch contact: seton@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
           "description": "Free-to-attend 2026 winter market featuring local vendors and products at Brookfield Residential YMCA at Seton. Branch contact: seton@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/seton-winter-2026.webp",
+            "alt": "Shoppers walking past vendor tables in a long YMCA hallway",
+            "credit": "Image from ymcacalgary.org"
+          },
           "address": "4995 Market Street SE, Calgary, AB T3M 2P9",
           "venue": "Brookfield Residential YMCA at Seton",
           "organizer": "YMCA Calgary",
@@ -2793,6 +2818,11 @@
           "title": "Remington YMCA in Quarry Park Winter Market",
           "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Remington YMCA in Quarry Park. Branch contact: quarrypark@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
           "description": "Free-to-attend 2026 winter market featuring local vendors and products at Remington YMCA in Quarry Park. Branch contact: quarrypark@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/quarrypark-winter-2026.webp",
+            "alt": "Shoppers walking past vendor tables in a long YMCA hallway",
+            "credit": "Image from ymcacalgary.org"
+          },
           "address": "108 Quarry Park Road SE, Calgary, AB T2C 5R1",
           "venue": "Remington YMCA in Quarry Park",
           "organizer": "YMCA Calgary",
@@ -2826,6 +2856,11 @@
           "title": "Shane Homes YMCA at Rocky Ridge Winter Market",
           "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Shane Homes YMCA at Rocky Ridge. Branch contact: rockyridge@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
           "description": "Free-to-attend 2026 winter market featuring local vendors and products at Shane Homes YMCA at Rocky Ridge. Branch contact: rockyridge@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/rockyridge-winter-2026.webp",
+            "alt": "Shoppers walking past vendor tables in a long YMCA hallway",
+            "credit": "Image from ymcacalgary.org"
+          },
           "address": "11300 Rocky Ridge Road NW, Calgary, AB T3G 5H3",
           "venue": "Shane Homes YMCA at Rocky Ridge",
           "organizer": "YMCA Calgary",
@@ -3145,6 +3180,12 @@
           "title": "Silver Springs Christmas Craft Market 2026",
           "summary": "A free community market for handmade goods, unique gifts and local crafts.",
           "description": "Saturday, November 14, 10 a.m.–3 p.m. at Silver Springs Community Centre. Browse a curated selection of local vendors under one roof. Free to attend and open to all. Contact administration@silverspringscommunity.ca for association inquiries.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/christmas-craft-market-2026.webp",
+            "alt": "Candles and jars on a craft market table",
+            "credit": "Image from silverspringscommunity.ca",
+            "presentation": "poster"
+          },
           "address": "5720 Silver Ridge Drive NW, Calgary, AB T3B 5E5",
           "venue": "Silver Springs Community Centre",
           "organizer": "Silver Springs Community Association",
@@ -3651,6 +3692,11 @@
           "title": "Otipemisiwak Fantasy — Riel Starr",
           "summary": "Riel Starr explores contemporary Métis culture through an Indigiqueer and Two-Spirit perspective at The New Gallery.",
           "description": "Riel Starr’s Otipemisiwak Fantasy runs October 23–December 12, 2026 in The New Gallery’s Main Space. The exhibition brings together historical and contemporary ways of making in a boudoir-like setting to consider Métis identity, gender, spirituality and imagined futures.\n\nThis is an exhibition date range, not continuous opening hours. Regular gallery visiting hours are Wednesday–Saturday, noon–6 p.m. Admission is free. A separate opening reception takes place October 23, 6:30–9 p.m.; see its event listing and the official exhibition page for details.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/otipemisiwak-fantasy-riel-starr-2026.webp",
+            "alt": "A beaded bowl in turquoise and red held in a hand",
+            "credit": "Image from thenewgallery.org"
+          },
           "start": "2026-10-23T00:00:00-06:00",
           "end": "2026-12-13T00:00:00-06:00",
           "schedulePrecision": "date",
@@ -4004,6 +4050,11 @@
           "title": "FunnyFest Wednesday Comedy Workshop — class 2 of 6",
           "summary": "Class 2 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
           "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 2, on 2026-11-04. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/wednesday-workshop-2026-2026-11-04.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Wednesday Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4032,6 +4083,11 @@
           "title": "FunnyFest Wednesday Comedy Workshop — class 3 of 6",
           "summary": "Class 3 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
           "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 3, on 2026-11-11. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/wednesday-workshop-2026-2026-11-11.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Wednesday Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4060,6 +4116,11 @@
           "title": "FunnyFest Wednesday Comedy Workshop — class 4 of 6",
           "summary": "Class 4 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
           "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 4, on 2026-11-18. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/wednesday-workshop-2026-2026-11-18.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Wednesday Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4088,6 +4149,11 @@
           "title": "FunnyFest Wednesday Comedy Workshop — class 5 of 6",
           "summary": "Class 5 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
           "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 5, on 2026-11-25. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/wednesday-workshop-2026-2026-11-25.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Wednesday Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4116,6 +4182,11 @@
           "title": "FunnyFest Wednesday Comedy Workshop — class 6 of 6",
           "summary": "Class 6 of the six-week Wednesday stand-up and comedy-writing course at Capitol Hill Community Association.",
           "description": "FunnyFest’s Wednesday stand-up and comedy-writing course meets weekly from October 28 through December 2, 2026, from 7 to 9 p.m. at Capitol Hill Community Association. This listing covers class 6, on 2026-12-02. It is a separate Wednesday course, not the Tuesday cohort.\n\nThe course combines writing, performance and public-speaking techniques in a supportive group setting. Registration covers the six-class course. Check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned, but its date and venue are not confirmed here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/wednesday-workshop-2026-2026-12-02.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Wednesday Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4159,6 +4230,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2026-10-31.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4188,6 +4265,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2026-11-07.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4217,6 +4300,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-01-16.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4246,6 +4335,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-01-30.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4275,6 +4370,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-02-13.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4304,6 +4405,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-02-27.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4333,6 +4440,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-03-06.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4362,6 +4475,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-03-20.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4391,6 +4510,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-04-03.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4420,6 +4545,12 @@
           "title": "Winging It! — An Improvised Fantasy Comedy",
           "summary": "An audience-shaped fantasy adventure from Jupiter Theatre at Theatre 1308.",
           "description": "Jupiter Theatre presents Winging It!, an improvised fantasy comedy combining role-playing adventure with short- and long-form improv. Audience suggestions help create each performance. Each night is a standalone adventure, with continuing characters rewarding repeat visits.\n\nRecommended for ages 14 and older because of language and suggestive humour. This listing covers one performance, not the whole season. The direct Showpass link selects this date; confirm current availability and admission details there. Morpheus Community Box Office handles ticketing, while Jupiter Theatre is the presenter.\n\nShow time is taken from this performance’s current Showpass page. Theatre 1308’s entrance is on Edmonton Trail.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/winging-it-2027-04-17.webp",
+            "alt": "Winging It! poster: a red dragon breathing fire around a twenty-sided die",
+            "credit": "Image from wingingit.ca",
+            "presentation": "poster"
+          },
           "organizer": "Jupiter Theatre",
           "address": "1308 Edmonton Trail, Calgary, AB T2E 3K7",
           "venue": "Theatre 1308",
@@ -4670,6 +4801,11 @@
           "title": "FunnyFest Weekend Comedy Workshop — day 1 of 2",
           "summary": "Day 1 of FunnyFest’s two-day stand-up and comedy-writing workshop at Capitol Hill Community Association.",
           "description": "FunnyFest’s weekend stand-up comedy workshop runs November 7 and 8, 2026, from 10 a.m. to 4 p.m. each day at Capitol Hill Community Association. This listing covers day 1, on 2026-11-07; the workshop is not open overnight.\n\nThe course combines comedy-writing and performance techniques, practice and course materials. Registration covers the weekend course. Check the organizer’s official ticket page for current availability, fees and any graduation showcase arrangements; no separate showcase date is published here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_3.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Weekend Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4700,6 +4836,11 @@
           "title": "FunnyFest Weekend Comedy Workshop — day 2 of 2",
           "summary": "Day 2 of FunnyFest’s two-day stand-up and comedy-writing workshop at Capitol Hill Community Association.",
           "description": "FunnyFest’s weekend stand-up comedy workshop runs November 7 and 8, 2026, from 10 a.m. to 4 p.m. each day at Capitol Hill Community Association. This listing covers day 2, on 2026-11-08; the workshop is not open overnight.\n\nThe course combines comedy-writing and performance techniques, practice and course materials. Registration covers the weekend course. Check the organizer’s official ticket page for current availability, fees and any graduation showcase arrangements; no separate showcase date is published here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_3-2026-11-08.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Weekend Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4744,6 +4885,11 @@
           "title": "FunnyFest Stand Up Comedy Workshop — class 6 of 6",
           "summary": "Class 6 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
           "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 6, on 2026-12-01, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-12-01.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Stand Up Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4802,6 +4948,11 @@
           "title": "FunnyFest Stand Up Comedy Workshop — class 2 of 6",
           "summary": "Class 2 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
           "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 2, on 2026-11-03, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-03.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Stand Up Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4831,6 +4982,11 @@
           "title": "FunnyFest Stand Up Comedy Workshop — class 4 of 6",
           "summary": "Class 4 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
           "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 4, on 2026-11-17, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-17.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Stand Up Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4860,6 +5016,11 @@
           "title": "FunnyFest Stand Up Comedy Workshop — class 3 of 6",
           "summary": "Class 3 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
           "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 3, on 2026-11-10, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-10.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Stand Up Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4889,6 +5050,11 @@
           "title": "FunnyFest Stand Up Comedy Workshop — class 5 of 6",
           "summary": "Class 5 of FunnyFest’s six-week Tuesday evening stand-up and comedy-writing course.",
           "description": "FunnyFest’s six-class stand-up comedy and writing course meets Tuesdays, 7–9 p.m., from October 27 through December 1, 2026 at Capitol Hill Community Association. This listing is class 5, on 2026-11-24, rather than a continuously running six-week event.\n\nThe course covers joke writing, performance and applying comedy techniques in a supportive group setting. Registration is for the course; check the official Eventbrite page for availability, current fees and attendance requirements. A graduation showcase is mentioned by the organizer, but no separate showcase date is published here.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_2-2026-11-24.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Stand Up Comedy Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "1531 21 Avenue NW, Calgary, AB T2M 1L9",
           "venue": "Capitol Hill Community Association",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4932,6 +5098,11 @@
           "title": "FunnyFest Comedy Writing Workshop",
           "summary": "A three-hour Saturday comedy-writing workshop at The Canadian Brewhouse in University District.",
           "description": "FunnyFest’s Comedy Writing Workshop takes place November 28, 2026, from 1 to 4 p.m. at The Canadian Brewhouse in University District. The interactive course focuses on comedy-writing methods and applying humour to performances, presentations and public speaking. Check the official ticket page for registration, current prices and course details.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_5.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Comedy Writing Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "#220, 3953 University Avenue NW, Calgary, AB T3B 6K3",
           "venue": "The Canadian Brewhouse — University District",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -4975,6 +5146,11 @@
           "title": "FunnyFest Halloween Comedy and Dance Party",
           "summary": "Three comedians, a DJ dance party and costume prizes at Offside Pub on Halloween.",
           "description": "FunnyFest presents a Halloween comedy and dance party at Offside Pub on October 31, 2026. The comedy show starts at 7 p.m., followed by a DJ dance party at 9 p.m. The organizer advertises three comedians and costume prizes.\n\nThe latest organizer submission lists the evening ending at 11:30 p.m. Check the official Eventbrite page for current ticket prices, entry details and any schedule changes.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-21_1.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Halloween Comedy and Dance Party",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "2820 Centre Street North, Calgary, AB T2E 2V8",
           "venue": "Offside Pub",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -5017,6 +5193,11 @@
           "title": "FunnyFest Emcee / MC Workshop",
           "summary": "An evening workshop on hosting events, public speaking and engaging an audience at The Canadian Brewhouse in University District.",
           "description": "FunnyFest’s Emcee / MC workshop takes place November 26, 2026, from 6 to 8:30 p.m. at The Canadian Brewhouse in University District. The official event page confirms a two-and-a-half-hour session covering techniques for hosting events, connecting with an audience and keeping a programme moving. Check its official ticket page for current availability, fees and course details.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/submission-AbJ3WG5jlRemIMXTGttnICrLkjf2_2026-10-22_4.webp",
+            "alt": "FunnyFest flyer for the FunnyFest Emcee / MC Workshop",
+            "credit": "Image from eventbrite.ca"
+          },
           "address": "#220, 3953 University Avenue NW, Calgary, AB T3B 6K3",
           "venue": "The Canadian Brewhouse — University District",
           "organizer": "FunnyFest Calgary Comedy Festival",
@@ -5543,6 +5724,11 @@
           "title": "The Rocky Horror Picture Show",
           "summary": "The Plaza Theatre’s Halloween run of the 1975 cult musical, October 22–31, 2026 in Kensington.",
           "description": "The Plaza Theatre brings back The Rocky Horror Picture Show for Halloween. The 1975 cult musical is rated 14A and runs about 100 minutes.\n\nThe run is listed for October 22–31, 2026. This listing covers the run, not a single screening: check the Plaza’s screening page for showtimes, prices and tickets before you go. The Plaza says special events like this one are not refundable or exchangeable.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/rocky-horror-picture-show-2026.webp",
+            "alt": "Frank-N-Furter in a still from The Rocky Horror Picture Show",
+            "credit": "Image from theplaza.ca"
+          },
           "categories": [
             "arts",
             "holiday",
@@ -6071,6 +6257,11 @@
           "title": "JazzYYC Canadian Jazz Festival",
           "summary": "Six days of Canadian jazz across Calgary, Nov. 3–8, headlined by Dawn Pemberton.",
           "description": "JazzYYC’s Canadian Jazz Festival runs November 3 to 8, 2026 at venues around the city and along the Music Mile. Dawn Pemberton headlines. Opening night on November 3 is at Studio Bell, presented with the National Music Centre, and the festival closes with a Sunday JazzWalk.\n\nShows are spread across many venues with their own times and prices, from free jams to ticketed concerts. The full lineup and tickets are on JazzYYC’s festival page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/canadian-jazz-festival-2026.webp",
+            "alt": "JazzYYC Canadian Jazz Fest, November 3 to 8, 2026",
+            "credit": "Image from jazzyyc.com"
+          },
           "address": "Various venues, Calgary, AB",
           "venue": "Studio Bell and venues along the Music Mile",
           "sourceUrl": "https://www.jazzyyc.com/canadian-jazz-fest/",
@@ -6162,6 +6353,11 @@
           "title": "A Christmas Carol Radio Play Live",
           "summary": "Three actors play every part of Dickens’s story and make the sound effects live, Dec. 1–24.",
           "description": "Lunchbox Theatre’s holiday show, adapted and directed by Bronwyn Steinberg: three actors voice the characters of A Christmas Carol and create the foley sound effects live on stage. Runs December 1 to 24, 2026 in the studio theatre at cSPACE Marda Loop, Lunchbox’s new home.\n\nTickets were listed at $27 to $37. Check Lunchbox Theatre’s site for showtimes.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/christmas-carol-radio-play-2026.webp",
+            "alt": "Lunchbox Theatre's 2026–27 season titles, including A Christmas Carol Radio Play Live",
+            "credit": "Image from lunchboxtheatre.com"
+          },
           "address": "1721 29 Avenue SW, Calgary, AB",
           "venue": "cSPACE Marda Loop Studio Theatre",
           "neighbourhood": "Marda Loop",

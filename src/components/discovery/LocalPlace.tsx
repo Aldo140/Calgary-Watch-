@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, CalendarDays, PhoneCall, Check, Clock, ExternalLink, Globe, Layers, MapPin, Navigation, Phone, Mail, Quote, Search, Share2, Store, Ticket } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
-import { organizerEvents, organizerMarkets, organizationVisitAddress, publicOrganizationEvents } from '../../lib/organizations';
+import { organizerEvents, organizerMarkets, organizationVisitAddress, profilePhoto, publicOrganizationEvents } from '../../lib/organizations';
 import { localLinks } from '../../lib/localLinks';
 import { communityFor, directionsUrl } from '../../lib/marketDays';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
@@ -149,7 +149,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
               <SkyDateline sky={sky} where={place.neighbourhood || 'Calgary'} />
               <figure className="lp-m-cover" aria-hidden="true">
                 <span className="lp-m-glow" />
-                <ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} />
+                <ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} photo={profilePhoto(place)} />
               </figure>
               <div className="lp-tags">
                 <p className={`lp-status${place.partner ? ' is-partner' : ''}`}>{status}</p>
@@ -380,7 +380,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
       <div className="lp-dock" role="group" aria-label="Visit" data-show={docked || undefined}>
         <i className="lp-dock-bar" aria-hidden="true" />
         <button type="button" className="lp-dock-now" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label={`Back to the top of ${name}`}>
-          <span className="lp-dock-cover" aria-hidden="true"><ProfileCover id={place.id} title={name} shelf={shelf} mini /></span>
+          <span className="lp-dock-cover" aria-hidden="true"><ProfileCover id={place.id} title={name} shelf={shelf} mini photo={profilePhoto(place)} /></span>
           <span className="lp-dock-meta" aria-hidden="true"><b>{name}</b><small>{dockLine}</small></span>
         </button>
         {hasVisitAddress ? <a href={directionsUrl(place)} target="_blank" rel="noopener noreferrer" className="is-main" aria-label="Directions"><Navigation size={19} aria-hidden="true" /></a> : upcoming.length ? <a href="#lp-programme" className="is-main" aria-label="Events"><CalendarDays size={19} aria-hidden="true" /></a> : markets.length ? <a href="#lp-market-locations" className="is-main" aria-label="Markets"><Store size={19} aria-hidden="true" /></a> : null}

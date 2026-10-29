@@ -20,7 +20,7 @@ import { Seal } from '../discovery/LocalDirectory';
 import { ProfileCover } from '../discovery/ProfileCover';
 import { iconFor, StorySpread, useSectionReveal } from '../discovery/ProfileSections';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
-import { organizerMarkets } from '../../lib/organizations';
+import { eventArtwork, organizerMarkets } from '../../lib/organizations';
 import { shelfOf, SHELVES } from '../../lib/localShelves';
 import { isOwnerVerified } from '../../lib/verified';
 import { useVerifiedListing } from '../../lib/claimsApi';
@@ -46,6 +46,7 @@ const amenityIcon = (a: string): LucideIcon => /accessib/i.test(a) ? Accessibili
  * The facts come first, then the connections out to the rest of the site.
  */
 export function MarketDetail({ market, all, occurrences }: { market: Market; all: readonly DiscoveryEntity[]; occurrences: readonly MarketOccurrence[] }) {
+  const art = eventArtwork(market, all);
   const [now] = useState(() => new Date());
   const [shared, setShared] = useState(false);
   const [allDates, setAllDates] = useState(false);
@@ -191,9 +192,9 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
             cover={<ProfileCover id={market.id} title={shortName(market)} shelf={{ ...MARKETS_SHELF, label: kind ? `${kind} market` : 'Market' }} number={number} stamp={stamp} brand="Markets" />}
             caption={`Cover art for ${shortName(market)}, drawn for CalgaryWatch Markets.`}
             eyebrow={<><MapPin size={15} aria-hidden="true" />{[market.neighbourhood, q].filter(Boolean).join(' ') || 'Calgary'} · No. {String(number).padStart(2, '0')}</>}
-            links={organizerSite || market.image?.credit ? <p className="lp-spread-links">
+            links={organizerSite || art?.credit ? <p className="lp-spread-links">
               {organizerSite ? <a className="mk-organizer" href={organizerSite} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} aria-hidden="true" /> {market.organizer}’s site</a> : null}
-              {market.image?.credit ? <span className="mk-muted mk-photo-credit">Top image supplied by the organizer. {market.image.credit}</span> : null}
+              {art?.credit ? <span className="mk-muted mk-photo-credit">Top image: {art.credit}</span> : null}
             </p> : undefined}
           />
 

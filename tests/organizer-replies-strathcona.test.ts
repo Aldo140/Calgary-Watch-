@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
 import domain from '../functions/discovery-domain.cjs';
@@ -57,6 +57,9 @@ describe('Meadowlark Park and Two Rivers replies', () => {
     // MAG runs the market; the association hosts it, so the organizer stays MAG.
     assert.equal(entity.organizer, 'MAG Holiday Market');
     assert.equal(entity.venue, 'Meadowlark Park Community Hall');
+    // Amanda's poster (sent Oct 29) is served from our own assets with organizer credit.
+    assert.equal(entity.image?.src, 'https://calgarywatch.ca/images/markets/mag-holiday-market-2026.webp');
+    assert.ok(existsSync(new URL('public/images/markets/mag-holiday-market-2026.webp', root)));
   });
 
   it('takes the Two Rivers Distillery profile down', () => {

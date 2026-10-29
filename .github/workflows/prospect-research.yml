@@ -1,0 +1,24 @@
+name: Prospect research (one-off)
+on:
+  push:
+    branches: [bot/prospects]
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: "!contains(github.event.head_commit.message, 'results')"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node research/prospects.mjs
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/prospects.json
+          git commit -m "results"
+          git push origin HEAD:bot/prospects
+        working-directory: .

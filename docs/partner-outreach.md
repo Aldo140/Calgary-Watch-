@@ -318,3 +318,51 @@ Before sending, every address was checked against Outlook (all folders), the STO
 | Partnership | City & Country Winery | `biz-city-and-country-winery` | `info@cityandcountrywine.com` |
 | Partnership | Calgary Curling Club | `biz-calgary-curling-club` | `info@calgarycurlingclub.com` |
 | Partnership | University of Calgary Students' Union | `biz-ucalgary-students-union` | `reception@su.ucalgary.ca` |
+
+## Outlook invite-only and partnership batch (2026-10-30)
+
+A morning batch on 2026-10-30 went to 36 organizations that had never been contacted. As with the Oct 28 batch, each profile was published first, and each email carries its profile link and a personal claim link (`via=outlook-oct30`).
+
+- **Invite-only listings (28):** a short custom note, the profile link and the claim link.
+- **Partnership pitches (8):** one concrete co-hosted idea, with the profile and claim link as a P.S.
+
+Every address was checked against Outlook (all mail, including the Oct 28 community-association batch), the STOP list, `brand/partner-prospects.json`, existing profiles and earlier batch files. Two organizations were dropped because big breweries own them: Wild Rose (Sleeman) and Banded Peak (Labatt). The batch is recorded in the project file `organizer-replies/2026-10-30-invite-and-partnership-outreach.md`.
+
+| Track | Organization | Entity | Contact |
+|---|---|---|---|
+| Invite | Huntington Hills Community Association | `biz-huntington-hills-community-association` | `reception@huntingtonhillscalgary.com` |
+| Invite | Highwood Community Association | `biz-highwood-community-association` | `admin@highwoodcommunity.com` |
+| Invite | Somerset-Bridlewood Community Association | `biz-somerset-bridlewood-community-association` | `sbcagardencalgary@gmail.com` |
+| Invite | Glenbrook Community Association | `biz-glenbrook-community-association` | `glenbrook.community@shaw.ca` |
+| Invite | Springbank Hill Community Association | `biz-springbank-hill-community-association` | `springbankpark@springbankpark.com` |
+| Invite | Ramsay Community Association | `biz-ramsay-community-association` | `general@ramsaycalgary.ca` |
+| Invite | Shawnee-Evergreen Community Association | `biz-shawnee-evergreen-community-association` | `info@yourseca.ca` |
+| Invite | Erin Woods Community Association | `biz-erin-woods-community-association` | `erinwood@telus.net` |
+| Invite | Edgemont Community Association | `biz-edgemont-community-association` | `office@edgemont.ab.ca` |
+| Invite | The Dandy Brewing Company | `biz-dandy-brewing` | `info@thedandybrewingcompany.com` |
+| Partnership | Citizen Brewing Company | `biz-citizen-brewing` | `beer@citizenbrewingcompany.com` |
+| Invite | Verb Theatre | `biz-verb-theatre` | `info@verbtheatre.com` |
+| Invite | Workshop Theatre | `biz-workshop-theatre` | `info@workshoptheatre.org` |
+| Invite | Adult Recreational Choir Society | `biz-adult-recreational-choir-society` | `info@archoirs.org` |
+| Invite | Kantorei Choral Society | `biz-kantorei` | `general.manager@kantorei.ca` |
+| Invite | Calgary Multicultural Choir | `biz-calgary-multicultural-choir` | `info@calgarymulticulturalchoir.ca` |
+| Invite | The Festival Chorus | `biz-festival-chorus` | `president@thefestivalchorus.com` |
+| Invite | Raga Mala Music Society of Calgary | `biz-raga-mala-music-society` | `info@ragamala.ca` |
+| Invite | Gli Azzurri Calgary Italian Dancers | `biz-gli-azzurri-calgary-italian-dancers` | `calgaryitaliandancers@shaw.ca` |
+| Partnership | Calgary Reads | `biz-calgary-reads` | `info@calgaryreads.com` |
+| Invite | Calgary Jazz Orchestra | `biz-calgary-jazz-orchestra` | `info@calgaryjazzorchestra.com` |
+| Partnership | THIRD ACTion Film Festival | `biz-third-action-film-festival` | `admin@thirdactionfilmfest.ca` |
+| Invite | Calgary International Children's Festival | `biz-calgary-international-childrens-festival` | `admin@calgarychildfest.org` |
+| Partnership | Between Friends | `biz-between-friends` | `exedirec@betweenfriends.ab.ca` |
+| Invite | Calgary Canoe Club | `biz-calgary-canoe-club` | `calgarycanoeclubinfo@gmail.com` |
+| Invite | Weaselhead/Glenmore Park Preservation Society | `biz-weaselhead-glenmore-park-preservation-society` | `weasel@weaselhead.org` |
+| Invite | Romanian Canadian Cultural Association of Calgary | `biz-romanian-canadian-cultural-association-of-calgary` | `contact@romanianscalgary.ca` |
+| Invite | The Calgary Games Society | `biz-calgary-games-society` | `thecalgarygamessociety@gmail.com` |
+| Partnership | ACFA régionale de Calgary | `biz-acfa-calgary` | `info.calgary@acfa.ab.ca` |
+| Invite | 5th Dimension Outdoor Club | `biz-fifth-dimension-outdoor-club` | `5thdimensionoc@gmail.com` |
+| Partnership | Picture This Film Festival | `biz-picture-this-film-festival` | `director@ptff.org` |
+| Invite | Pure Motion Dance | `biz-pure-motion-dance` | `info@puremotiondance.ca` |
+| Partnership | Friends of Fish Creek Provincial Park Society | `biz-friends-of-fish-creek` | `info@friendsoffishcreek.org` |
+| Partnership | Alberta Wilderness Association | `biz-alberta-wilderness-association` | `awa@abwild.ca` |
+| Invite | Calgary Animated Objects Society | `biz-calgary-animated-objects-society` | `production@animatedobjects.ca` |
+| Invite | Calgary Arab Festival | `biz-calgary-arab-festival` | `calgaryarabfest@gmail.com` |

@@ -11773,6 +11773,1586 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:50:00.000Z",
       "updatedAt": "2026-10-28T20:50:00.000Z"
+    },
+    {
+      "id": "biz-huntington-hills-community-association",
+      "kind": "business",
+      "slug": "huntington-hills-community-association",
+      "title": "Huntington Hills Community Association",
+      "name": "Huntington Hills Community Association",
+      "website": "https://www.huntingtonhillscalgary.com/",
+      "address": "Huntington Hills, Calgary, AB",
+      "summary": "Community association for Huntington Hills in NW Calgary.",
+      "description": "The Huntington Hills Community Association is the volunteer-run association for residents of Huntington Hills in NW Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "nw"
+      ],
+      "sources": [
+        {
+          "name": "Huntington Hills Community Association",
+          "url": "https://www.huntingtonhillscalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/huntington-hills-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.huntingtonhillscalgary.com/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "reception@huntingtonhillscalgary.com"
+    },
+    {
+      "id": "biz-highwood-community-association",
+      "kind": "business",
+      "slug": "highwood-community-association",
+      "title": "Highwood Community Association",
+      "name": "Highwood Community Association",
+      "website": "https://www.highwoodcommunity.com/",
+      "address": "Highwood, Calgary, AB",
+      "summary": "Community association for Highwood in NW Calgary.",
+      "description": "The Highwood Community Association is the volunteer-run association for residents of Highwood in NW Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "nw"
+      ],
+      "sources": [
+        {
+          "name": "Highwood Community Association",
+          "url": "https://www.highwoodcommunity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/highwood-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.highwoodcommunity.com/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "admin@highwoodcommunity.com"
+    },
+    {
+      "id": "biz-somerset-bridlewood-community-association",
+      "kind": "business",
+      "slug": "somerset-bridlewood-community-association",
+      "title": "Somerset-Bridlewood Community Association",
+      "name": "Somerset-Bridlewood Community Association",
+      "address": "Somerset and Bridlewood, Calgary, AB",
+      "summary": "Community association for Somerset and Bridlewood in SW Calgary.",
+      "description": "The Somerset-Bridlewood Community Association is the volunteer-run association for residents of Somerset and Bridlewood in SW Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "sw"
+      ],
+      "sources": [
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/somerset-bridlewood-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "sbcagardencalgary@gmail.com"
+    },
+    {
+      "id": "biz-glenbrook-community-association",
+      "kind": "business",
+      "slug": "glenbrook-community-association",
+      "title": "Glenbrook Community Association",
+      "name": "Glenbrook Community Association",
+      "address": "Glenbrook, Calgary, AB",
+      "summary": "Community association for Glenbrook in SW Calgary.",
+      "description": "The Glenbrook Community Association is the volunteer-run association for residents of Glenbrook in SW Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "sw"
+      ],
+      "sources": [
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/glenbrook-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "glenbrook.community@shaw.ca"
+    },
+    {
+      "id": "biz-springbank-hill-community-association",
+      "kind": "business",
+      "slug": "springbank-hill-community-association",
+      "title": "Springbank Hill Community Association",
+      "name": "Springbank Hill Community Association",
+      "website": "https://www.springbankpark.com/",
+      "address": "Springbank Hill, Calgary, AB",
+      "summary": "Community association for Springbank Hill in SW Calgary.",
+      "description": "The Springbank Hill Community Association is the volunteer-run association for residents of Springbank Hill in SW Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "sw"
+      ],
+      "sources": [
+        {
+          "name": "Springbank Hill Community Association",
+          "url": "https://www.springbankpark.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/springbank-hill-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.springbankpark.com/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "springbankpark@springbankpark.com"
+    },
+    {
+      "id": "biz-ramsay-community-association",
+      "kind": "business",
+      "slug": "ramsay-community-association",
+      "title": "Ramsay Community Association",
+      "name": "Ramsay Community Association",
+      "website": "https://www.ramsaycalgary.ca/",
+      "address": "Ramsay, Calgary, AB",
+      "summary": "Community association for Ramsay in SE Calgary.",
+      "description": "The Ramsay Community Association is the volunteer-run association for residents of Ramsay in SE Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "se"
+      ],
+      "sources": [
+        {
+          "name": "Ramsay Community Association",
+          "url": "https://www.ramsaycalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/ramsay-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ramsaycalgary.ca/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "general@ramsaycalgary.ca"
+    },
+    {
+      "id": "biz-shawnee-evergreen-community-association",
+      "kind": "business",
+      "slug": "shawnee-evergreen-community-association",
+      "title": "Shawnee-Evergreen Community Association",
+      "name": "Shawnee-Evergreen Community Association",
+      "website": "https://www.yourseca.ca/",
+      "address": "Shawnee Slopes and Evergreen Estates, Calgary, AB",
+      "summary": "Community association for Shawnee Slopes and Evergreen Estates in SW Calgary.",
+      "description": "The Shawnee-Evergreen Community Association is the volunteer-run association for residents of Shawnee Slopes and Evergreen Estates in SW Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "sw"
+      ],
+      "sources": [
+        {
+          "name": "Shawnee-Evergreen Community Association",
+          "url": "https://www.yourseca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/shawnee-evergreen-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.yourseca.ca/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@yourseca.ca"
+    },
+    {
+      "id": "biz-erin-woods-community-association",
+      "kind": "business",
+      "slug": "erin-woods-community-association",
+      "title": "Erin Woods Community Association",
+      "name": "Erin Woods Community Association",
+      "address": "Erin Woods, Calgary, AB",
+      "summary": "Community association for Erin Woods in SE Calgary.",
+      "description": "The Erin Woods Community Association is the volunteer-run association for residents of Erin Woods in SE Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "se"
+      ],
+      "sources": [
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/erin-woods-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "erinwood@telus.net"
+    },
+    {
+      "id": "biz-edgemont-community-association",
+      "kind": "business",
+      "slug": "edgemont-community-association",
+      "title": "Edgemont Community Association",
+      "name": "Edgemont Community Association",
+      "website": "https://www.edgemont.ab.ca/",
+      "address": "Edgemont, Calgary, AB",
+      "summary": "Community association for Edgemont in NW Calgary.",
+      "description": "The Edgemont Community Association is the volunteer-run association for residents of Edgemont in NW Calgary. It runs community events and programs and speaks for the neighbourhood on local issues. Current events and membership details are on the association's own channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "community-association",
+        "nw"
+      ],
+      "sources": [
+        {
+          "name": "Edgemont Community Association",
+          "url": "https://www.edgemont.ab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/edgemont-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.edgemont.ab.ca/"
+      },
+      "services": [
+        "Community events",
+        "Programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "office@edgemont.ab.ca"
+    },
+    {
+      "id": "biz-dandy-brewing",
+      "kind": "business",
+      "slug": "dandy-brewing",
+      "title": "The Dandy Brewing Company",
+      "name": "The Dandy Brewing Company",
+      "website": "https://www.thedandybrewingcompany.com/",
+      "address": "Calgary, AB",
+      "summary": "Independent Calgary craft brewery with a taproom.",
+      "description": "The Dandy Brewing Company is an independent Calgary craft brewery with its own taproom. Check its site for current hours, releases and events.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "The Dandy Brewing Company",
+          "url": "https://www.thedandybrewingcompany.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Barnivore listing",
+          "url": "https://www.barnivore.com/beer/5330/The-Dandy-Brewing-Company",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thedandybrewingcompany.com/"
+      },
+      "services": [
+        "Craft beer",
+        "Taproom"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@thedandybrewingcompany.com"
+    },
+    {
+      "id": "biz-citizen-brewing",
+      "kind": "business",
+      "slug": "citizen-brewing",
+      "title": "Citizen Brewing Company",
+      "name": "Citizen Brewing Company",
+      "website": "https://www.citizenbrewingcompany.com/",
+      "address": "227 35 Ave NE, Calgary, AB",
+      "summary": "Northeast Calgary brewpub at 227 35 Ave NE.",
+      "description": "Citizen Brewing Company is a Calgary brewery and brewpub at 227 35 Ave NE, serving its own beer alongside a food menu. Check its site for hours and events.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "brewpub",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "Citizen Brewing Company",
+          "url": "https://www.citizenbrewingcompany.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Calgary Citizen — breweries and distilleries",
+          "url": "https://calgarycitizen.com/p/calgary-breweries-distilleries",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.citizenbrewingcompany.com/"
+      },
+      "services": [
+        "Craft beer",
+        "Brewpub"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "beer@citizenbrewingcompany.com"
+    },
+    {
+      "id": "biz-verb-theatre",
+      "kind": "business",
+      "slug": "verb-theatre",
+      "title": "Verb Theatre",
+      "name": "Verb Theatre",
+      "website": "https://www.verbtheatre.com/",
+      "address": "Calgary, AB",
+      "summary": "Independent Calgary theatre company.",
+      "description": "Verb Theatre is an independent Calgary theatre company creating and presenting its own productions. Check its site for what's coming up.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "independent-theatre"
+      ],
+      "sources": [
+        {
+          "name": "Verb Theatre",
+          "url": "https://www.verbtheatre.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.verbtheatre.com/"
+      },
+      "services": [
+        "Productions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@verbtheatre.com"
+    },
+    {
+      "id": "biz-workshop-theatre",
+      "kind": "business",
+      "slug": "workshop-theatre",
+      "title": "Workshop Theatre",
+      "name": "Workshop Theatre",
+      "website": "https://www.workshoptheatre.org/",
+      "address": "Calgary, AB",
+      "summary": "Calgary community theatre company.",
+      "description": "Workshop Theatre is a Calgary community theatre company staging productions with local performers and volunteers. Check its site for the current season and auditions.",
+      "categories": [
+        "arts",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "community-theatre"
+      ],
+      "sources": [
+        {
+          "name": "Workshop Theatre",
+          "url": "https://www.workshoptheatre.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.workshoptheatre.org/"
+      },
+      "services": [
+        "Productions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@workshoptheatre.org"
+    },
+    {
+      "id": "biz-adult-recreational-choir-society",
+      "kind": "business",
+      "slug": "adult-recreational-choir-society",
+      "title": "Adult Recreational Choir Society",
+      "name": "Adult Recreational Choir Society",
+      "website": "https://www.archoirs.org/",
+      "address": "Calgary, AB",
+      "summary": "Recreational choirs for adults in Calgary.",
+      "description": "The Adult Recreational Choir Society runs recreational choirs for adults in Calgary, with concerts through the year. Check its site for choirs, registration and concert dates.",
+      "categories": [
+        "arts",
+        "music",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "choir",
+        "singing"
+      ],
+      "sources": [
+        {
+          "name": "Adult Recreational Choir Society",
+          "url": "https://www.archoirs.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.archoirs.org/"
+      },
+      "services": [
+        "Choirs for adults",
+        "Concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@archoirs.org"
+    },
+    {
+      "id": "biz-kantorei",
+      "kind": "business",
+      "slug": "kantorei",
+      "title": "Kantorei Choral Society",
+      "name": "Kantorei Choral Society",
+      "website": "https://www.kantorei.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary choir presenting a concert season.",
+      "description": "Kantorei is a Calgary choir that presents a season of choral concerts. Check its site for concert dates, venues and tickets.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "choir"
+      ],
+      "sources": [
+        {
+          "name": "Kantorei Choral Society",
+          "url": "https://www.kantorei.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kantorei.ca/"
+      },
+      "services": [
+        "Choral concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "general.manager@kantorei.ca"
+    },
+    {
+      "id": "biz-calgary-multicultural-choir",
+      "kind": "business",
+      "slug": "calgary-multicultural-choir",
+      "title": "Calgary Multicultural Choir",
+      "name": "Calgary Multicultural Choir",
+      "website": "https://www.calgarymulticulturalchoir.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary choir singing music from many cultures.",
+      "description": "The Calgary Multicultural Choir sings music from cultures and languages around the world. Check its site for concerts and how to join.",
+      "categories": [
+        "arts",
+        "music",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "choir",
+        "multicultural"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Multicultural Choir",
+          "url": "https://www.calgarymulticulturalchoir.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarymulticulturalchoir.ca/"
+      },
+      "services": [
+        "Concerts",
+        "Choir membership"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@calgarymulticulturalchoir.ca"
+    },
+    {
+      "id": "biz-festival-chorus",
+      "kind": "business",
+      "slug": "festival-chorus",
+      "title": "The Festival Chorus",
+      "name": "The Festival Chorus",
+      "website": "https://www.thefestivalchorus.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary choir presenting choral concerts.",
+      "description": "The Festival Chorus is a Calgary choir that presents choral concerts through the year. Check its site for upcoming concerts and membership.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "choir"
+      ],
+      "sources": [
+        {
+          "name": "The Festival Chorus",
+          "url": "https://www.thefestivalchorus.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thefestivalchorus.com/"
+      },
+      "services": [
+        "Choral concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "president@thefestivalchorus.com"
+    },
+    {
+      "id": "biz-raga-mala-music-society",
+      "kind": "business",
+      "slug": "raga-mala-music-society",
+      "title": "Raga Mala Music Society of Calgary",
+      "name": "Raga Mala Music Society of Calgary",
+      "website": "https://www.ragamala.ca/",
+      "address": "Calgary, AB",
+      "summary": "Presents Indian classical music and dance in Calgary.",
+      "description": "The Raga Mala Music Society presents concerts of Indian classical music and dance in Calgary. Check its site for the current season.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "indian-classical",
+        "music",
+        "concerts"
+      ],
+      "sources": [
+        {
+          "name": "Raga Mala Music Society of Calgary",
+          "url": "https://www.ragamala.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ragamala.ca/"
+      },
+      "services": [
+        "Indian classical concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@ragamala.ca"
+    },
+    {
+      "id": "biz-gli-azzurri-calgary-italian-dancers",
+      "kind": "business",
+      "slug": "gli-azzurri-calgary-italian-dancers",
+      "title": "Gli Azzurri Calgary Italian Dancers",
+      "name": "Gli Azzurri Calgary Italian Dancers",
+      "address": "Calgary, AB",
+      "summary": "Calgary Italian folk dance group.",
+      "description": "Gli Azzurri are a Calgary Italian folk dance group that performs at cultural festivals and community events.",
+      "categories": [
+        "arts",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "dance",
+        "folk-dance",
+        "italian"
+      ],
+      "sources": [],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Folk dance performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "calgaryitaliandancers@shaw.ca"
+    },
+    {
+      "id": "biz-calgary-reads",
+      "kind": "business",
+      "slug": "calgary-reads",
+      "title": "Calgary Reads",
+      "name": "Calgary Reads",
+      "website": "https://www.calgaryreads.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary charity focused on early literacy.",
+      "description": "Calgary Reads is a Calgary charity working on early childhood literacy, with programs for families and volunteers. Check its site for programs and events.",
+      "categories": [
+        "learning",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "literacy",
+        "books",
+        "volunteer"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Reads",
+          "url": "https://www.calgaryreads.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryreads.com/"
+      },
+      "services": [
+        "Early literacy programs",
+        "Book sales"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@calgaryreads.com"
+    },
+    {
+      "id": "biz-calgary-jazz-orchestra",
+      "kind": "business",
+      "slug": "calgary-jazz-orchestra",
+      "title": "Calgary Jazz Orchestra",
+      "name": "Calgary Jazz Orchestra",
+      "website": "https://www.calgaryjazzorchestra.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary big band jazz orchestra with themed concerts.",
+      "description": "The Calgary Jazz Orchestra is a big band that plays themed concerts of original arrangements through the season. Check its site for upcoming shows.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "jazz",
+        "big-band",
+        "concerts"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Jazz Orchestra",
+          "url": "https://www.calgaryjazzorchestra.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryjazzorchestra.com/"
+      },
+      "services": [
+        "Big band concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@calgaryjazzorchestra.com"
+    },
+    {
+      "id": "biz-third-action-film-festival",
+      "kind": "business",
+      "slug": "third-action-film-festival",
+      "title": "THIRD ACTion Film Festival",
+      "name": "THIRD ACTion Film Festival",
+      "website": "https://www.thirdactionfilmfest.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary film festival about aging and older adults on screen.",
+      "description": "The THIRD ACTion Film Festival is a Calgary film festival centred on aging and older adults, on screen and behind the camera. Check its site for festival dates and screenings.",
+      "categories": [
+        "arts",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "festival",
+        "older-adults"
+      ],
+      "sources": [
+        {
+          "name": "THIRD ACTion Film Festival",
+          "url": "https://www.thirdactionfilmfest.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thirdactionfilmfest.ca/"
+      },
+      "services": [
+        "Film festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "admin@thirdactionfilmfest.ca"
+    },
+    {
+      "id": "biz-calgary-international-childrens-festival",
+      "kind": "business",
+      "slug": "calgary-international-childrens-festival",
+      "title": "Calgary International Children's Festival",
+      "name": "Calgary International Children's Festival",
+      "website": "https://www.calgarychildfest.org/",
+      "address": "Calgary, AB",
+      "summary": "Performing arts festival for children and families.",
+      "description": "The Calgary International Children's Festival presents theatre, music and dance for children and families, along with school programs. Check its site for festival dates.",
+      "categories": [
+        "arts",
+        "family",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "festival",
+        "kids",
+        "performing-arts"
+      ],
+      "sources": [
+        {
+          "name": "Calgary International Children's Festival",
+          "url": "https://www.calgarychildfest.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Canada Volunteer Directory",
+          "url": "https://www.canadian-universities.net/Volunteer/Calgary-International-Childrens-Festival-Society.html",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarychildfest.org/"
+      },
+      "services": [
+        "Children's performing arts festival",
+        "School programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "admin@calgarychildfest.org"
+    },
+    {
+      "id": "biz-between-friends",
+      "kind": "business",
+      "slug": "between-friends",
+      "title": "Between Friends",
+      "name": "Between Friends",
+      "website": "https://www.betweenfriends.ab.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary non-profit running recreation and social programs for people with disabilities.",
+      "description": "Between Friends is a Calgary non-profit that runs recreation, social and camp programs for people with disabilities. Check its site for programs and volunteering.",
+      "categories": [
+        "community",
+        "recreation"
+      ],
+      "tags": [
+        "organization",
+        "accessibility",
+        "disability",
+        "recreation"
+      ],
+      "sources": [
+        {
+          "name": "Between Friends",
+          "url": "https://www.betweenfriends.ab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.betweenfriends.ab.ca/"
+      },
+      "services": [
+        "Recreation and social programs",
+        "Camps"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "exedirec@betweenfriends.ab.ca"
+    },
+    {
+      "id": "biz-calgary-canoe-club",
+      "kind": "business",
+      "slug": "calgary-canoe-club",
+      "title": "Calgary Canoe Club",
+      "name": "Calgary Canoe Club",
+      "address": "Glenmore Reservoir, Calgary, AB",
+      "summary": "Paddling club on the Glenmore Reservoir.",
+      "description": "The Calgary Canoe Club is a paddling club on the Glenmore Reservoir with programs for canoe and kayak paddlers. Check with the club for programs and membership.",
+      "categories": [
+        "recreation"
+      ],
+      "tags": [
+        "organization",
+        "paddling",
+        "canoe",
+        "kayak"
+      ],
+      "sources": [],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Paddling programs",
+        "Club membership"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "calgarycanoeclubinfo@gmail.com"
+    },
+    {
+      "id": "biz-weaselhead-glenmore-park-preservation-society",
+      "kind": "business",
+      "slug": "weaselhead-glenmore-park-preservation-society",
+      "title": "Weaselhead/Glenmore Park Preservation Society",
+      "name": "Weaselhead/Glenmore Park Preservation Society",
+      "website": "https://www.weaselhead.org/",
+      "address": "Weaselhead Flats, Calgary, AB",
+      "summary": "Society caring for the Weaselhead natural area in southwest Calgary.",
+      "description": "The Weaselhead/Glenmore Park Preservation Society works to protect the Weaselhead natural area in southwest Calgary through stewardship, education and nature walks. Check its site for events.",
+      "categories": [
+        "recreation",
+        "learning",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "nature",
+        "conservation",
+        "walks"
+      ],
+      "sources": [
+        {
+          "name": "Weaselhead/Glenmore Park Preservation Society",
+          "url": "https://www.weaselhead.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.weaselhead.org/"
+      },
+      "services": [
+        "Nature walks",
+        "Stewardship",
+        "Education"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "weasel@weaselhead.org"
+    },
+    {
+      "id": "biz-romanian-canadian-cultural-association-of-calgary",
+      "kind": "business",
+      "slug": "romanian-canadian-cultural-association-of-calgary",
+      "title": "Romanian Canadian Cultural Association of Calgary",
+      "name": "Romanian Canadian Cultural Association of Calgary",
+      "website": "https://romanianscalgary.ca/",
+      "address": "Calgary, AB",
+      "summary": "Romanian cultural association in Calgary.",
+      "description": "The Romanian Canadian Cultural Association of Calgary brings Romanian culture and community to Calgary through cultural events and gatherings.",
+      "categories": [
+        "community",
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "culture",
+        "romanian"
+      ],
+      "sources": [
+        {
+          "name": "Romanian Canadian Cultural Association of Calgary",
+          "url": "https://romanianscalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Ceva Românesc listing",
+          "url": "https://www.cevaromanesc.com/romanian-canadian-cultural-association-of-calgary-rccac/",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://romanianscalgary.ca/"
+      },
+      "services": [
+        "Cultural events",
+        "Community gatherings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "contact@romanianscalgary.ca"
+    },
+    {
+      "id": "biz-calgary-games-society",
+      "kind": "business",
+      "slug": "calgary-games-society",
+      "title": "The Calgary Games Society",
+      "name": "The Calgary Games Society",
+      "address": "Calgary, AB",
+      "summary": "Calgary society running community events, including a ceilidh.",
+      "description": "The Calgary Games Society is a Calgary non-profit that runs community events, including a ceilidh fundraiser.",
+      "categories": [
+        "community",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "community-events",
+        "ceilidh"
+      ],
+      "sources": [
+        {
+          "name": "Zeffy organization page",
+          "url": "https://www.zeffy.com/organizations/the-calgary-games-society",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events",
+        "Fundraisers"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "thecalgarygamessociety@gmail.com"
+    },
+    {
+      "id": "biz-acfa-calgary",
+      "kind": "business",
+      "slug": "acfa-calgary",
+      "title": "ACFA régionale de Calgary",
+      "name": "ACFA régionale de Calgary",
+      "website": "https://calgary.acfa.ab.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's francophone community association.",
+      "description": "The ACFA régionale de Calgary is the francophone community association for the Calgary region, with cultural events and community programs in French.",
+      "categories": [
+        "community",
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "francophone",
+        "culture"
+      ],
+      "sources": [
+        {
+          "name": "ACFA régionale de Calgary",
+          "url": "https://calgary.acfa.ab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgary.acfa.ab.ca/"
+      },
+      "services": [
+        "Francophone events",
+        "Community programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info.calgary@acfa.ab.ca"
+    },
+    {
+      "id": "biz-fifth-dimension-outdoor-club",
+      "kind": "business",
+      "slug": "fifth-dimension-outdoor-club",
+      "title": "5th Dimension Outdoor Club",
+      "name": "5th Dimension Outdoor Club",
+      "address": "Calgary, AB",
+      "summary": "Calgary hiking and outdoor club.",
+      "description": "5th Dimension is a Calgary hiking and outdoor club with organized group trips for members. Check with the club for its trip schedule and membership.",
+      "categories": [
+        "recreation",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "hiking",
+        "outdoors",
+        "club"
+      ],
+      "sources": [
+        {
+          "name": "10Adventures — Calgary hiking clubs",
+          "url": "https://www.10adventures.com/calgary-hiking-clubs/",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Group hikes",
+        "Outdoor trips"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "5thdimensionoc@gmail.com"
+    },
+    {
+      "id": "biz-picture-this-film-festival",
+      "kind": "business",
+      "slug": "picture-this-film-festival",
+      "title": "Picture This Film Festival",
+      "name": "Picture This Film Festival",
+      "website": "https://www.ptff.org/",
+      "address": "Calgary, AB",
+      "summary": "Calgary film festival about disability, run by Calgary SCOPE Society.",
+      "description": "Picture This Film Festival is a Calgary film festival of films about disability, presented by Calgary SCOPE Society. Check its site for festival dates.",
+      "categories": [
+        "arts",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "festival",
+        "disability-arts"
+      ],
+      "sources": [
+        {
+          "name": "Picture This Film Festival",
+          "url": "https://www.ptff.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ptff.org/"
+      },
+      "services": [
+        "Film festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "director@ptff.org"
+    },
+    {
+      "id": "biz-pure-motion-dance",
+      "kind": "business",
+      "slug": "pure-motion-dance",
+      "title": "Pure Motion Dance",
+      "name": "Pure Motion Dance",
+      "website": "https://www.puremotiondance.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary dance studio and company.",
+      "description": "Pure Motion Dance is a Calgary dance studio and company with classes and performances. Check its site for classes and show dates.",
+      "categories": [
+        "arts",
+        "learning",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "dance",
+        "classes",
+        "studio"
+      ],
+      "sources": [
+        {
+          "name": "Pure Motion Dance",
+          "url": "https://www.puremotiondance.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Calgary's Child family guide",
+          "url": "https://mydigitalpublication.com/article/Dance/3282880/559214/article.html",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.puremotiondance.ca/"
+      },
+      "services": [
+        "Dance classes",
+        "Performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@puremotiondance.ca"
+    },
+    {
+      "id": "biz-friends-of-fish-creek",
+      "kind": "business",
+      "slug": "friends-of-fish-creek",
+      "title": "Friends of Fish Creek Provincial Park Society",
+      "name": "Friends of Fish Creek Provincial Park Society",
+      "website": "https://friendsoffishcreek.org/",
+      "address": "Bow Valley Ranch, Fish Creek Provincial Park, Calgary, AB",
+      "summary": "Charity supporting Fish Creek Provincial Park with walks, talks and stewardship.",
+      "description": "The Friends of Fish Creek Provincial Park Society supports Fish Creek Provincial Park through education programs, guided walks, talks and volunteer stewardship. Its office is in the Cookhouse at Bow Valley Ranch.",
+      "categories": [
+        "recreation",
+        "learning",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "nature",
+        "park",
+        "volunteer"
+      ],
+      "sources": [
+        {
+          "name": "Friends of Fish Creek Provincial Park Society",
+          "url": "https://friendsoffishcreek.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://friendsoffishcreek.org/"
+      },
+      "services": [
+        "Guided walks",
+        "Education programs",
+        "Stewardship"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "info@friendsoffishcreek.org"
+    },
+    {
+      "id": "biz-alberta-wilderness-association",
+      "kind": "business",
+      "slug": "alberta-wilderness-association",
+      "title": "Alberta Wilderness Association",
+      "name": "Alberta Wilderness Association",
+      "website": "https://albertawilderness.ca/",
+      "address": "455 12 St NW, Calgary, AB",
+      "summary": "Alberta's oldest wilderness conservation group, based in Hillhurst.",
+      "description": "The Alberta Wilderness Association is Alberta's oldest wilderness conservation group. Its office is in the Hillhurst Cottage School at 455 12 St NW, and it runs talks, hikes and events on Alberta's wild places.",
+      "categories": [
+        "learning",
+        "recreation",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "conservation",
+        "wilderness",
+        "talks"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Wilderness Association",
+          "url": "https://albertawilderness.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://albertawilderness.ca/"
+      },
+      "services": [
+        "Talks",
+        "Hikes",
+        "Conservation advocacy"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "awa@abwild.ca"
+    },
+    {
+      "id": "biz-calgary-animated-objects-society",
+      "kind": "business",
+      "slug": "calgary-animated-objects-society",
+      "title": "Calgary Animated Objects Society",
+      "name": "Calgary Animated Objects Society",
+      "website": "https://www.animatedobjects.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary society for puppetry and animation, behind the Festival of Animated Objects.",
+      "description": "The Calgary Animated Objects Society (CAOS) supports puppetry and animated-object art in Calgary and presents the International Festival of Animated Objects.",
+      "categories": [
+        "arts",
+        "festivals"
+      ],
+      "tags": [
+        "organization",
+        "puppetry",
+        "animation",
+        "festival"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Animated Objects Society",
+          "url": "https://www.animatedobjects.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.animatedobjects.ca/"
+      },
+      "services": [
+        "Puppetry and animation",
+        "Festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "production@animatedobjects.ca"
+    },
+    {
+      "id": "biz-calgary-arab-festival",
+      "kind": "business",
+      "slug": "calgary-arab-festival",
+      "title": "Calgary Arab Festival",
+      "name": "Calgary Arab Festival",
+      "address": "Calgary, AB",
+      "summary": "Calgary festival of Arab culture, food and music.",
+      "description": "The Calgary Arab Festival is a community festival celebrating Arab culture in Calgary with food, music and performances. Check its channels for the next festival's dates.",
+      "categories": [
+        "festivals",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "festival",
+        "arab",
+        "culture"
+      ],
+      "sources": [
+        {
+          "name": "Global News event listing",
+          "url": "https://globalnews.ca/event/4334098/calgary-arab-festival/",
+          "kind": "editorial",
+          "retrievedAt": "2026-10-29T09:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Cultural festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-29T09:00:00Z",
+      "email": "calgaryarabfest@gmail.com"
     }
   ]
 }

@@ -11,7 +11,7 @@
  * Apply copies the manifest into editorial-inventory.json and reviewed-sources.json with a
  * visible credit to the site it came from, skipping any id listed in `rejected`.
  */
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import sharp from 'sharp';
 
 const EDITORIAL = 'src/content/editorial-inventory.json';
@@ -98,7 +98,9 @@ async function collectOne(t: Target, seen: Map<string, string[]>): Promise<Entry
 
 async function collect() {
   mkdirSync(OUT, { recursive: true });
-  const list = targets();
+  // Images someone already turned down stay turned down on later runs.
+  const rejected: string[] = existsSync(MANIFEST) ? json(MANIFEST).rejected ?? [] : [];
+  const list = targets().filter(t => !rejected.includes(t.id));
   const seen = new Map<string, string[]>();
   const entries: Entry[] = []; const skipped: Manifest['skipped'] = [];
   let next = 0;
@@ -112,12 +114,12 @@ async function collect() {
   // A share image used by an event that its organizer's site also uses is the site default, not the event's.
   const profileImages = new Set(entries.filter(e => e.scope === 'profile').map(e => e.image));
   const kept = entries.filter(e => {
-    if (e.scope === 'reviewed' && profileImages.has(e.image)) { skipped.push({ id: e.id, page: e.page, reason: 'site default image' }); return false; }
+    if (e.scope === 'reviewed' && profileImages.has(e.image)) { rmSync(e.file); skipped.push({ id: e.id, page: e.page, reason: 'site default image' }); return false; }
     return true;
   });
   kept.sort((a, b) => a.id.localeCompare(b.id));
   skipped.sort((a, b) => a.id.localeCompare(b.id));
-  save(MANIFEST, { collectedAt: new Date().toISOString(), entries: kept, skipped, rejected: [] } satisfies Manifest);
+  save(MANIFEST, { collectedAt: new Date().toISOString(), entries: kept, skipped, rejected } satisfies Manifest);
   console.log(`${list.length} targets, ${kept.length} images, ${skipped.length} skipped`);
 }
 

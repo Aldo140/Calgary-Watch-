@@ -34,15 +34,26 @@ export function associateOrganizers<T extends { id: string; kind: string; title?
   });
 }
 
-export function organizerProfile(event: Event, all: readonly DiscoveryEntity[]): Business | undefined {
+export function organizerProfile(event: Event | Market, all: readonly DiscoveryEntity[]): Business | undefined {
   return all.find((e): e is Business => e.kind === 'business' && e.id === event.organizerEntityId && publishedInventory(e));
 }
 
-/** Event artwork wins. A credited organizer poster is the fallback only when the event has none. */
-export function eventArtwork(event: Event, all: readonly DiscoveryEntity[]): EntityImage | undefined {
+/** Stock art we placed before an organization had an image of its own; it never stands in for them. */
+const STOCK_ART = /^\/images\/(illustration|photo)\//;
+export function ownImage(image: EntityImage | undefined): EntityImage | undefined {
+  return image && !STOCK_ART.test(listingImageSrc(image)) ? image : undefined;
+}
+
+/** A profile's own photo (from its website or sent by the organization), for its cover. Posters get their own section. */
+export function profilePhoto(place: { image?: EntityImage }): EntityImage | undefined {
+  const image = ownImage(place.image);
+  return image?.presentation === 'poster' ? undefined : image;
+}
+
+/** The listing's own artwork wins. Its organizer profile's credited image is the fallback when it has none. */
+export function eventArtwork(event: Event | Market, all: readonly DiscoveryEntity[]): EntityImage | undefined {
   if (event.image) return event.image;
-  const image = organizerProfile(event, all)?.image;
-  return image?.presentation === 'poster' ? image : undefined;
+  return ownImage(organizerProfile(event, all)?.image);
 }
 
 /** CalgaryWatch-owned images stay same-origin in previews and production. */

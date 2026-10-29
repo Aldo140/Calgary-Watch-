@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
+import type { EntityImage } from '../../types/discovery';
 import type { Shelf, ShelfId } from '../../lib/localShelves';
+import { listingImageSrc } from '../../lib/organizations';
 import { initials } from '../../lib/localShelves';
 
 const MARK = '/images/brand/calgarywatch-city-spark-v2.webp';
@@ -131,19 +133,23 @@ function Motif({ shelf, seed }: { shelf: ShelfId | 'streets'; seed: number }) {
  * profile has a striking piece of art whether or not it sent us a photo. Its shelf
  * picks the colour and the drawing; its initials and name make it its own.
  */
-export function ProfileCover({ id, title, shelf, number, stamp, mini, brand = 'Local', motif }: {
+export function ProfileCover({ id, title, shelf, number, stamp, mini, brand = 'Local', motif, photo }: {
   id: string; title: string; shelf: Shelf; number?: number; stamp?: string; mini?: boolean;
   /** The section named beside the mark, and a drawing to use instead of the shelf's. Neighbourhoods and markets reuse the cover this way. */
   brand?: string; motif?: 'streets';
+  /** The organization's own photo. It replaces the drawing and initials; the shelf colour still frames it. Credit it beside the cover. */
+  photo?: EntityImage;
 }) {
   const seed = seedOf(id);
   const style = { '--tone': shelf.tone, '--tink': shelf.ink, '--tilt': `${((seed % 5) - 2) * 0.6}deg` } as CSSProperties;
   return (
-    <div className={`pc pc-${shelf.id}${mini ? ' is-mini' : ''}`} style={style} aria-hidden="true">
-      <Motif shelf={motif ?? shelf.id} seed={seed} />
+    <div className={`pc pc-${shelf.id}${mini ? ' is-mini' : ''}${photo ? ' has-photo' : ''}`} style={style} aria-hidden="true">
+      {photo
+        ? <><img className="pc-photo" src={listingImageSrc(photo)} alt="" loading="lazy" decoding="async" /><span className="pc-shade" /></>
+        : <Motif shelf={motif ?? shelf.id} seed={seed} />}
       <span className="pc-mark"><img src={MARK} alt="" width="40" height="40" loading="lazy" />{brand}</span>
       {number ? <span className="pc-no">No. {String(number).padStart(2, '0')}</span> : null}
-      <span className="pc-big">{initials(title)}</span>
+      {photo ? null : <span className="pc-big">{initials(title)}</span>}
       {stamp ? <span className="pc-stamp">{stamp}</span> : null}
       <span className="pc-foot"><small>{shelf.label}</small><b>{title}</b></span>
     </div>

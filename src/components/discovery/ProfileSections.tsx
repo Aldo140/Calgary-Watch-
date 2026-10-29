@@ -7,6 +7,7 @@ import { boardRows, programmeOf, shelfMates, shelfOf, SHELVES, type ProfileNext,
 import { isOpen, nextOpen, schedulePattern, statusLine, upcoming, weekdayShort } from '../../lib/marketDays';
 import { MarketCover } from './ListingArt';
 import { dayOf, Flap, ProfileCard, Seal, statusOf, timeOf, useSeen } from './LocalDirectory';
+import { profilePhoto } from '../../lib/organizations';
 import { ProfileCover } from './ProfileCover';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { isOwnerVerified } from '../../lib/verified';
@@ -171,6 +172,7 @@ export function ProfileSpread({ place, name, shelf, number, quadrant, since, lin
   const verified = useVerifiedListing(place.id, isOwnerVerified(place));
   const stamp = place.partner ? 'Partner' : verified ? 'Verified' : place.editorialSelection ? 'Our pick' : undefined;
   const official = place.sources.find(src => src.kind === 'official');
+  const photo = profilePhoto(place);
   const facts: [string, ReactNode][] = [
     ['Shelf', <Link key="s" to={`/local#shelf-${shelf.id}`}>{shelf.label}</Link>],
     ['Area', [place.neighbourhood, quadrant ? `${quadrant} Calgary` : null].filter(Boolean).join(' · ') || (shelf.id === 'day-trips' ? 'Outside Calgary' : 'Across Calgary')],
@@ -182,8 +184,8 @@ export function ProfileSpread({ place, name, shelf, number, quadrant, since, lin
   return (
     <StorySpread
       id="lp-about" headingId="lp-story" name={name} text={place.description || place.summary} offers={place.services} links={links} facts={facts}
-      cover={<ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} />}
-      caption={`Cover art for ${name}, drawn for CalgaryWatch Local.`}
+      cover={<ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} photo={photo} />}
+      caption={photo ? `${name}. ${photo.credit ?? 'Photo from the organization'}.` : `Cover art for ${name}, drawn for CalgaryWatch Local.`}
       eyebrow={<><Seal title={place.title} tone={shelf} size="s" />{place.sources.every(src => src.kind === 'official') ? 'From their own site' : 'From their site and public listings'}</>}
     />
   );

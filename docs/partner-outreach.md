@@ -366,3 +366,87 @@ Every address was checked against Outlook (all mail, including the Oct 28 commun
 | Partnership | Alberta Wilderness Association | `biz-alberta-wilderness-association` | `awa@abwild.ca` |
 | Invite | Calgary Animated Objects Society | `biz-calgary-animated-objects-society` | `production@animatedobjects.ca` |
 | Invite | Calgary Arab Festival | `biz-calgary-arab-festival` | `calgaryarabfest@gmail.com` |
+
+## Outlook local-business batch (2026-10-30, afternoon)
+
+An afternoon batch on 2026-10-30 went to 75 independent Calgary bars, arts venues, shops, cafés and restaurants that had never been contacted. Each profile was published first, and each email carries its profile link and a personal claim link (`via=outlook-oct30b`). Prospects came from the OpenStreetMap pool on `bot/prospects`, and every address appears on the business's own homepage. Each address was also checked against all Outlook mail before sending.
+
+The pitches offer only what CalgaryWatch can deliver: listings kept current on the events map and weekly picks, editorial Spotlight write-ups, neighbourhood-page features and hand-picked Date Night suggestions. They make no promises about bringing crowds and offer no co-hosted nights. The batch is recorded in the project file `organizer-replies/2026-10-30b-local-business-outreach.md`.
+
+| Type | Organization | Entity | Contact |
+|---|---|---|---|
+| Bar | Galaxy Karaoke | `biz-galaxy-karaoke` | `info@galaxykaraokebar.com` |
+| Bar | The Wednesday Room | `biz-the-wednesday-room` | `info@wednesdayroom.com` |
+| Bar | Bottlescrew Bill's | `biz-bottlescrew-bills` | `info@bottlescrewbill.com` |
+| Bar | Burn Block Social Club | `biz-burn-block-social-club` | `info@burnblocksocial.com` |
+| Bar | Pour Decisions | `biz-pour-decisions` | `info@pourdecisionsyyc.com` |
+| Bar | The Artist Lounge | `biz-the-artist-lounge` | `info@theartistlounge.ca` |
+| Bar | PinBar | `biz-pinbar` | `info@pinbaryyc.com` |
+| Bar | Lounge Eighteen | `biz-lounge-eighteen` | `info@loungeeighteen.com` |
+| Bar | One Night Stan's | `biz-one-night-stans` | `info@onenightstans.ca` |
+| Bar | Spanky's Saloon | `biz-spankys-saloon` | `info@spankyssaloon.ca` |
+| Bar | Business & Pleasure | `biz-business-and-pleasure` | `seriousstuff@itsbusinessandpleasure.com` |
+| Bar | Prohibition Bar & Lounge | `biz-prohibition-bar-and-lounge` | `ProhibitionYYC@gmail.com` |
+| Bar | Sidehustle | `biz-sidehustle` | `hello@sidehustleyyc.com` |
+| Bar | The Workbench Bar & Grill | `biz-the-workbench-bar-and-grill` | `info@theworkbenchbar.ca` |
+| Bar | Bitter Sisters | `biz-bitter-sisters` | `info@bittersisters.co` |
+| Bar | Civic Tavern | `biz-civic-tavern` | `civictavern@gmail.com` |
+| Bar | Newcastle Pub | `biz-newcastle-pub` | `info@newcastlepub.ca` |
+| Arts | Sparrow Artspace | `biz-sparrow-artspace` | `sparrowcommunityart@gmail.com` |
+| Arts | The Grand | `biz-the-grand-yyc` | `info@thegrandyyc.ca` |
+| Arts | West Village Theatre | `biz-west-village-theatre` | `info@westvillagetheatre.com` |
+| Arts | Norberg Hall | `biz-norberg-hall` | `info@norberghall.com` |
+| Arts | Globe Cinema | `biz-globe-cinema` | `info@globecinema.ca` |
+| Arts | The Hangar Flight Museum | `biz-the-hangar-flight-museum` | `info@thehangarmuseum.ca` |
+| Shop | Passion for Glass | `biz-passion-for-glass` | `info@passionforglass.ca` |
+| Shop | Blackbyrd Myoozik | `biz-blackbyrd-myoozik` | `info@blackbyrd.ca` |
+| Shop | Neon Taste Records | `biz-neon-taste-records` | `josh@neontasterecords.ca` |
+| Shop | CD Trader | `biz-cd-trader` | `dave16882000@gmail.com` |
+| Shop | Stash Lounge | `biz-stash-lounge` | `questions@stashlounge.com` |
+| Shop | Destination Art | `biz-destination-art` | `shop@destination-art.com` |
+| Shop | Sunnyside Art Supplies | `biz-sunnyside-art-supplies` | `info@sunnysideartsupplies.com` |
+| Shop | Inglewood Art Supplies | `biz-inglewood-art-supplies` | `info@inglewoodart.com` |
+| Shop | Beadles Beads & Jewellery | `biz-beadles-beads-and-jewellery` | `beadlesbeadscalgary@gmail.com` |
+| Shop | Eastridge Sports Cards & Games | `biz-eastridge-sports-cards-and-games` | `sales@ersportscards.ca` |
+| Shop | Overtime Sports Cards & Grading | `biz-overtime-sports-cards` | `overtimesportscards@shaw.ca` |
+| Shop | Nerd Roller Skates | `biz-nerd-roller-skates` | `info@nerdskates.com` |
+| Shop | DSV Studios | `biz-dsv-studios` | `hello@dsvstudios.ca` |
+| Shop | Smithbilt Hats | `biz-smithbilt-hats` | `info@smithbilthats.com` |
+| Cafe | Purple Perk | `biz-purple-perk` | `purpleperk@shaw.ca` |
+| Cafe | Neighbour Coffee | `biz-neighbour-coffee` | `hello@nhbrcoffee.com` |
+| Cafe | Alforno Bakery & Cafe | `biz-alforno-bakery-and-cafe` | `info@alforno.ca` |
+| Cafe | Poésie Co. | `biz-poesie-co` | `contact@poesieco.ca` |
+| Cafe | Hutch Cafe | `biz-hutch-cafe` | `info@hutch-cafe.com` |
+| Cafe | Primal Grounds Cafe and Soup Co. | `biz-primal-grounds-cafe` | `info@primalgroundscafe.com` |
+| Cafe | Pocket Coffee | `biz-pocket-coffee` | `hello@pocketcoffee.ca` |
+| Cafe | The Bullet Coffee House | `biz-the-bullet-coffee-house` | `contact@thebulletcoffeehouse.com` |
+| Cafe | Nove Nine | `biz-nove-nine-diner` | `noveninediner@outlook.com` |
+| Cafe | Chocolate Lab | `biz-chocolate-lab` | `hello@chocolatelab.ca` |
+| Cafe | Hermana Chocolate | `biz-hermana-chocolate` | `hello@hermanachocolate.ca` |
+| Cafe | My Favorite Ice Cream Shoppe | `biz-my-favorite-ice-cream-shoppe` | `mficscalgary@gmail.com` |
+| Cafe | Biscettes | `biz-biscettes` | `biscettescookies@gmail.com` |
+| Cafe | Begonia Bakehouse | `biz-begonia-bakehouse` | `info@begoniabakehouse.com` |
+| Cafe | Mari Bakeshop | `biz-mari-bakeshop` | `info@maribakeshop.ca` |
+| Cafe | Choux&C | `biz-choux-and-c` | `choux.and.c@gmail.com` |
+| Cafe | Sip A Tea | `biz-sip-a-tea` | `info@sipatea.ca` |
+| Restaurant | Porch | `biz-porch-yyc` | `info@porchyyc.com` |
+| Restaurant | Minas Steakhouse | `biz-minas-steakhouse` | `Info@minassteakhouse.com` |
+| Restaurant | Ibu | `biz-ibu-restaurant` | `info@ibuyyc.com` |
+| Restaurant | Annabelle's Kitchen | `biz-annabelles-kitchen` | `info@annabelleskitchen.ca` |
+| Restaurant | Fonda Fora | `biz-fonda-fora` | `hello@fondafora.com` |
+| Restaurant | South Block BBQ & Brewing Company | `biz-south-block-bbq-and-brewing` | `ben@southblockbbq.com` |
+| Restaurant | Pegasus Greek Restaurant | `biz-pegasus-greek-restaurant` | `info@pegasuscalgary.com` |
+| Restaurant | Lusi Italian Kitchen & Market | `biz-lusi-italian-kitchen` | `info@lusiyyc.ca` |
+| Restaurant | Ramen Taka | `biz-ramen-taka` | `ramentaka.calgary@gmail.com` |
+| Restaurant | Sherpa Kitchen and Bar | `biz-sherpa-kitchen-and-bar` | `info@sherpakitchenandbar.com` |
+| Restaurant | Sorella | `biz-sorella-trattoria` | `info@sorellacalgary.ca` |
+| Restaurant | Aurora | `biz-aurora-italiana` | `info@auroraitaliana.ca` |
+| Restaurant | Korilla | `biz-korilla` | `info@Korilla.ca` |
+| Restaurant | Masala Bhavan | `biz-masala-bhavan` | `info@masalabhavan.com` |
+| Restaurant | La Viena Italian Restaurant | `biz-la-viena-italian` | `laviena.italian@yahoo.com` |
+| Restaurant | Latin Food | `biz-latin-food-specialties` | `latinfoodspecialties@gmail.com` |
+| Restaurant | Island Experience | `biz-island-experience` | `islandexperienceyyc@gmail.com` |
+| Restaurant | Seoul Gamasot | `biz-seoul-gamasot` | `seoulgamasot@gmail.com` |
+| Shop | Sunday State | `biz-sunday-state` | `info@sundaystate.ca` |
+| Shop | all things gq | `biz-all-things-gq` | `allthingsgqvintage@gmail.com` |
+| Shop | Son of the Pharaoh | `biz-son-of-the-pharaoh` | `info@sonofthepharaoh.com` |

@@ -10989,10 +10989,10 @@
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
-      "status": "published",
+      "status": "archived",
       "verification": "source-checked",
       "verifiedAt": "2026-10-28T20:00:00.000Z",
-      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-29T21:40:00.000Z",
       "email": "events@88brewing.ca",
       "image": {
         "src": "https://calgarywatch.ca/images/orgs/biz-88-brewing.webp",

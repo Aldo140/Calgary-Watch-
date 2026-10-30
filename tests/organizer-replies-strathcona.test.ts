@@ -76,3 +76,12 @@ describe('reviewed event times', () => {
     assert.deepEqual(stale, []);
   });
 });
+
+// Oct 29: Adam Buck (Eighty-Eight Brewing) asked us to pull the profile until they decide on an event; reach out in the new year.
+describe('Eighty-Eight Brewing reply', () => {
+  it('takes the profile down', () => {
+    const brewery = editorial.entities.find(e => e.id === 'biz-88-brewing')!;
+    assert.equal(brewery.status, 'archived');
+    assert.ok(!publishedInventory(brewery));
+  });
+});

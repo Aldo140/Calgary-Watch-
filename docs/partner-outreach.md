@@ -302,7 +302,7 @@ Before sending, every address was checked against Outlook (all folders), the STO
 | Partnership | Calgary Justice Film Festival | `biz-calgary-justice-film-festival` | `program@justicefilmfestival.ca` |
 | Partnership | Unison at Kerby Centre | `biz-unison-at-kerby-centre` | `HelloYYC@UnisonAlberta.com` |
 | Partnership | Alberta Food Tours | `biz-alberta-food-tours` | `info@albertafoodtours.ca` |
-| Partnership | 88 Brewing Company | `biz-88-brewing` | `events@88brewing.ca` |
+| Partnership | 88 Brewing Company | `biz-88-brewing` | `events@88brewing.ca` (archived Oct 29 at their request; they go by Eighty-Eight Brewing or '88 Brewing; reach out in the new year) |
 | Partnership | Cabin Brewing Company | `biz-cabin-brewing` | `taproom@cabinbrewing.ca` |
 | Partnership | Bolder Climbing Community | `biz-bolder-climbing-community` | `info@bolderclimbing.com` |
 | Partnership | Shelf Life Books | `biz-shelf-life-books` | `contact@shelflifebooks.ca` |

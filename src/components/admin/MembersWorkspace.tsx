@@ -89,7 +89,7 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
 
   return (
     <div className="space-y-4">
-      <WorkspaceTabs label="Member tools" value={view} onChange={setView} items={[{id:'directory',label:'Member directory',description:'Accounts, organizations and dashboards'},{id:'activity',label:'Sign-ins & email activity',description:'Recent logins and digest correlation'},{id:'insights',label:'Audience insights',description:'Subscriptions, interests and plans'}]} />
+      <WorkspaceTabs label="Member tools" value={view} onChange={setView} items={[{id:'directory',label:'Member directory',description:'Accounts, organizations and dashboards'},{id:'activity',label:'Sign-ups & returns',description:'New accounts, returning members and email follow-through'},{id:'insights',label:'Audience insights',description:'Subscriptions, interests and plans'}]} />
       {view==='directory'?<MembersDirectory />:view==='activity'?<MemberActivity/>:<>
       {Object.entries(readErrors).map(([name,error])=><p role="alert" key={name}>{name}: {error}</p>)}
       <StatGrid>

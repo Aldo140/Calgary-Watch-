@@ -16184,8 +16184,9 @@
       "title": "Island Experience",
       "name": "Island Experience",
       "website": "https://www.islandexperiencerestaurant.ca/",
-      "summary": "Caribbean restaurant in northeast Calgary.",
-      "description": "Island Experience is a Caribbean restaurant in northeast Calgary.",
+      "address": "6A-2316 27 Avenue NE, Calgary, AB",
+      "summary": "Caribbean restaurant on 27 Avenue NE.",
+      "description": "Island Experience is a Caribbean restaurant on 27 Avenue NE.",
       "categories": [
         "food"
       ],
@@ -16212,7 +16213,7 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-31T23:55:00Z",
+      "updatedAt": "2026-11-02T05:20:00Z",
       "email": "islandexperienceyyc@gmail.com"
     },
     {

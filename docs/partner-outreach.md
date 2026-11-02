@@ -450,3 +450,60 @@ The pitches offer only what CalgaryWatch can deliver: listings kept current on t
 | Shop | Sunday State | `biz-sunday-state` | `info@sundaystate.ca` |
 | Shop | all things gq | `biz-all-things-gq` | `allthingsgqvintage@gmail.com` |
 | Shop | Son of the Pharaoh | `biz-son-of-the-pharaoh` | `info@sonofthepharaoh.com` |
+
+## Outlook local-business batch (2026-11-02)
+
+On 2026-11-02, a batch went to 50 independent Calgary restaurants, cafés, pubs and shops that had never been contacted. Each profile was published first, and each email carries its profile link and a personal claim link (`via=outlook-nov02`). Prospects came from the OpenStreetMap pool on `bot/prospects`, and every address appears on the business's own homepage. Each address was also checked against all Outlook mail before sending, and chains were left out. Each email ends with one concrete ask, such as a dish for Date Night, three Spotlight questions or the business's weekly nights. The batch is recorded in the project file `organizer-replies/2026-11-02-local-business-outreach.md`.
+
+| Type | Organization | Entity | Contact |
+|---|---|---|---|
+| Restaurant | Monsoon Izakaya | `biz-monsoon-izakaya` | `monsoon.kekitchen@gmail.com` |
+| Restaurant | Comery Block Barbecue | `biz-comery-block-barbecue` | `ben@comeryblock.com` |
+| Restaurant | Rise & Dine Restaurant | `biz-rise-and-dine-restaurant` | `risendine.ca@gmail.com` |
+| Pub | Joyce on 4th Irish Pub | `biz-joyce-on-4th-irish-pub` | `joyceon4th@calgarysbestpubs.com` |
+| Restaurant | Pho Anh | `biz-pho-anh` | `phoanhyyc.service@gmail.com` |
+| Café | Lakeview Bakery | `biz-lakeview-bakery` | `lakeviewbakery@hotmail.com` |
+| Shop | Murphy's Mid-Century | `biz-murphys-mid-century` | `murphysmcm@gmail.com` |
+| Restaurant | Taste of India | `biz-taste-of-india-14-street` | `tasteofindiayyc@gmail.com` |
+| Shop | Urban Butcher | `biz-urban-butcher` | `info@urbanbutcher.ca` |
+| Shop | The Shoe Closet | `biz-the-shoe-closet` | `theshoecloset@live.ca` |
+| Restaurant | PB and J YYC | `biz-pb-and-j-yyc` | `pbandjyyc@gmail.com` |
+| Restaurant | Pho Mr. Q | `biz-pho-mr-q` | `phomrq@gmail.com` |
+| Restaurant | Saigon Chef | `biz-saigon-chef` | `hello@saigonchef.com` |
+| Shop | Limitless | `biz-limitless-calgary` | `enquire@limitless-calgary.com` |
+| Restaurant | Chine Hotpot & Noodles | `biz-chine-hotpot-and-noodles` | `chinehotpotcalgary@gmail.com` |
+| Shop | Friday Sock Co | `biz-friday-sock-co` | `customerservice@fridaysocks.com` |
+| Shop | Plantation Garden Centre | `biz-plantation-garden-centre` | `plantationgc@telus.net` |
+| Shop | A Sewing Sensation | `biz-a-sewing-sensation` | `info@sewingsensation.ca` |
+| Restaurant | Sho Sushi | `biz-sho-sushi` | `info@shosushi.ca` |
+| Restaurant | Kan Sushi and Grill | `biz-kan-sushi-and-grill` | `Kansushicalgary@gmail.com` |
+| Restaurant | District 5 | `biz-district-5` | `district5canada@gmail.com` |
+| Shop | Aeolian Strings | `biz-aeolian-strings` | `aeolianstrings@hotmail.com` |
+| Shop | Espresso Works | `biz-espresso-works` | `service@espressoworks.ca` |
+| Restaurant | Banzai Sushi | `biz-banzai-sushi` | `banzaiyyc@gmail.com` |
+| Shop | Emmanuel Meat Shop | `biz-emmanuel-meat-shop` | `a.meat2023@yahoo.com` |
+| Restaurant | Curry Craft | `biz-curry-craft` | `info@currycraft.ca` |
+| Shop | 2nd Chance Sports | `biz-2nd-chance-sports` | `info@2ndchancesports.ca` |
+| Restaurant | Ari Sushi | `biz-ari-sushi` | `arisushicanada@gmail.com` |
+| Shop | Garden Retreat | `biz-garden-retreat` | `sales@gardenretreat.ca` |
+| Shop | Absolute Audio | `biz-absolute-audio` | `info@absoluteaudio.ca` |
+| Shop | 17th Ave Thrift | `biz-17th-ave-thrift` | `17thavethrift@gmail.com` |
+| Shop | Showhome Furniture | `biz-showhome-furniture` | `showhomehelp@gmail.com` |
+| Shop | 2Dimensional Life | `biz-2dimensional-life` | `sales@2dimensionallife.com` |
+| Café | Cococo | `biz-cococo-chocolatiers` | `CustomerService@Cococoinc.com` |
+| Café | Black Sheep | `biz-black-sheep-fine-foods` | `contact@black-sheep.ca` |
+| Café | Good Trade Coffee Company Kensington | `biz-good-trade-coffee` | `hello@goodtrade.org` |
+| Café | Barrow Coffee Roasters | `biz-barrow-coffee-roasters` | `info@barrowespresso.com` |
+| Restaurant | Monki Breakfast Club & Bistro | `biz-monki-breakfast-club` | `beltline@monkibistro.ca` |
+| Restaurant | Park by Sidewalk Citizen | `biz-park-by-sidewalk-citizen` | `park@sidewalkcitizenbakery.com` |
+| Restaurant | L'Olivo | `biz-lolivo` | `lolivo@linasmarket.com` |
+| Restaurant | Clive Burger | `biz-clive-burger` | `eat@cliveburger.com` |
+| Pub | Alumni | `biz-alumni-sandwiches` | `hello@alumnisandwiches.com` |
+| Shop | Fieldstudy General Store | `biz-fieldstudy-general-store` | `hello@fieldstudyshop.com` |
+| Shop | Vine Arts | `biz-vine-arts-17th` | `17th@vinearts.ca` |
+| Shop | The Scottish Shoppe & A Little Bit of Ireland | `biz-the-scottish-shoppe` | `kiltman@scottishshoppe.net` |
+| Restaurant | Jerusalem Shawarma | `biz-jerusalem-shawarma` | `contact@jerusalemshawarma.ca` |
+| Restaurant | Burnin Bird Nashville Hot Chicken | `biz-burnin-bird` | `info@burninbird.ca` |
+| Shop | 5 Vines | `biz-5-vines-bridgeland` | `bridgeland@5vines.com` |
+| Café | Seed N Salt | `biz-seed-n-salt` | `info@seednsalt.com` |
+| Restaurant | Bahar Kebab | `biz-bahar-kebab` | `baharkabab@gmail.com` |

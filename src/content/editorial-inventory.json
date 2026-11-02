@@ -16374,6 +16374,2017 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-30T18:00:00Z",
       "email": "info@sonofthepharaoh.com"
+    },
+    {
+      "id": "biz-monsoon-izakaya",
+      "kind": "business",
+      "slug": "monsoon-izakaya",
+      "title": "Monsoon Izakaya",
+      "name": "Monsoon Izakaya",
+      "website": "https://monsoonizakaya.com/",
+      "address": "6920 Macleod Trail SE, Calgary, AB",
+      "summary": "Japanese izakaya on Macleod Trail SE.",
+      "description": "Monsoon Izakaya is a Japanese izakaya on Macleod Trail SE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "japanese",
+        "izakaya"
+      ],
+      "sources": [
+        {
+          "name": "Monsoon Izakaya",
+          "url": "https://monsoonizakaya.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://monsoonizakaya.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "monsoon.kekitchen@gmail.com"
+    },
+    {
+      "id": "biz-comery-block-barbecue",
+      "kind": "business",
+      "slug": "comery-block-barbecue",
+      "title": "Comery Block Barbecue",
+      "name": "Comery Block Barbecue",
+      "website": "https://www.comeryblock.com/",
+      "address": "638 17 Avenue SW, Calgary, AB",
+      "summary": "Barbecue restaurant on 17 Avenue SW.",
+      "description": "Comery Block Barbecue is a barbecue restaurant on 17 Avenue SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "barbecue"
+      ],
+      "sources": [
+        {
+          "name": "Comery Block Barbecue",
+          "url": "https://www.comeryblock.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.comeryblock.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "ben@comeryblock.com"
+    },
+    {
+      "id": "biz-rise-and-dine-restaurant",
+      "kind": "business",
+      "slug": "rise-and-dine-restaurant",
+      "title": "Rise & Dine Restaurant",
+      "name": "Rise & Dine Restaurant",
+      "website": "https://risendine.ca/",
+      "address": "8302 Fairmount Drive SE, Calgary, AB",
+      "summary": "Homestyle breakfast, lunch and dinner on Fairmount Drive SE.",
+      "description": "Rise & Dine in southeast Calgary serves homestyle breakfast, lunch and dinner for the whole family.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "breakfast",
+        "family"
+      ],
+      "sources": [
+        {
+          "name": "Rise & Dine Restaurant",
+          "url": "https://risendine.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://risendine.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "risendine.ca@gmail.com"
+    },
+    {
+      "id": "biz-joyce-on-4th-irish-pub",
+      "kind": "business",
+      "slug": "joyce-on-4th-irish-pub",
+      "title": "Joyce on 4th Irish Pub",
+      "name": "Joyce on 4th Irish Pub",
+      "website": "https://calgarysbestpubs.com/joyce/",
+      "address": "506 24 Avenue SW, Calgary, AB",
+      "summary": "Irish pub on 4 Street SW in Mission.",
+      "description": "The Joyce on 4th is an Irish pub on 4 Street SW in Mission.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "irish pub"
+      ],
+      "sources": [
+        {
+          "name": "Joyce on 4th Irish Pub",
+          "url": "https://calgarysbestpubs.com/joyce/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarysbestpubs.com/joyce/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "joyceon4th@calgarysbestpubs.com"
+    },
+    {
+      "id": "biz-pho-anh",
+      "kind": "business",
+      "slug": "pho-anh",
+      "title": "Pho Anh",
+      "name": "Pho Anh",
+      "website": "https://www.phoanhyyc.com/",
+      "address": "400 Crowfoot Crescent NW, Calgary, AB",
+      "summary": "Vietnamese pho restaurant in Crowfoot.",
+      "description": "Pho Anh is a Vietnamese pho restaurant in Crowfoot.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vietnamese",
+        "pho"
+      ],
+      "sources": [
+        {
+          "name": "Pho Anh",
+          "url": "https://www.phoanhyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.phoanhyyc.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "phoanhyyc.service@gmail.com"
+    },
+    {
+      "id": "biz-lakeview-bakery",
+      "kind": "business",
+      "slug": "lakeview-bakery",
+      "title": "Lakeview Bakery",
+      "name": "Lakeview Bakery",
+      "website": "https://www.lakeviewbakerycalgary.com/",
+      "address": "6449 Crowchild Trail SW, Calgary, AB",
+      "summary": "Neighbourhood bakery on Crowchild Trail SW.",
+      "description": "Lakeview Bakery is a neighbourhood bakery on Crowchild Trail SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery"
+      ],
+      "sources": [
+        {
+          "name": "Lakeview Bakery",
+          "url": "https://www.lakeviewbakerycalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lakeviewbakerycalgary.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "lakeviewbakery@hotmail.com"
+    },
+    {
+      "id": "biz-murphys-mid-century",
+      "kind": "business",
+      "slug": "murphys-mid-century",
+      "title": "Murphy's Mid-Century",
+      "name": "Murphy's Mid-Century",
+      "website": "https://murphysmidcentury.com/",
+      "address": "1221 9 Avenue SE, Calgary, AB",
+      "summary": "Mid-century furniture shop in Inglewood.",
+      "description": "Murphy's Mid-Century is a mid-century furniture shop in Inglewood.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "vintage",
+        "furniture"
+      ],
+      "sources": [
+        {
+          "name": "Murphy's Mid-Century",
+          "url": "https://murphysmidcentury.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://murphysmidcentury.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "murphysmcm@gmail.com"
+    },
+    {
+      "id": "biz-taste-of-india-14-street",
+      "kind": "business",
+      "slug": "taste-of-india-14-street",
+      "title": "Taste of India",
+      "name": "Taste of India",
+      "website": "https://tasteofindia.ca/",
+      "address": "1101 14 Street SW, Calgary, AB",
+      "summary": "Indian restaurant on 14 Street SW.",
+      "description": "Taste of India serves Indian cuisine on 14 Street SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "indian"
+      ],
+      "sources": [
+        {
+          "name": "Taste of India",
+          "url": "https://tasteofindia.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://tasteofindia.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "tasteofindiayyc@gmail.com"
+    },
+    {
+      "id": "biz-urban-butcher",
+      "kind": "business",
+      "slug": "urban-butcher",
+      "title": "Urban Butcher",
+      "name": "Urban Butcher",
+      "website": "https://urbanbutcher.ca/",
+      "address": "2100 4 Street SW, Calgary, AB",
+      "summary": "Butcher shop on 4 Street SW in Mission.",
+      "description": "Urban Butcher is a butcher shop on 4 Street SW in Mission.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "butcher"
+      ],
+      "sources": [
+        {
+          "name": "Urban Butcher",
+          "url": "https://urbanbutcher.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://urbanbutcher.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@urbanbutcher.ca"
+    },
+    {
+      "id": "biz-the-shoe-closet",
+      "kind": "business",
+      "slug": "the-shoe-closet",
+      "title": "The Shoe Closet",
+      "name": "The Shoe Closet",
+      "website": "https://theshoeclosets.com/",
+      "address": "1404 9 Avenue SE, Calgary, AB",
+      "summary": "Shoe shop on 9 Avenue SE in Inglewood.",
+      "description": "The Shoe Closet is a shoe shop on 9 Avenue SE in Inglewood.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "shoes"
+      ],
+      "sources": [
+        {
+          "name": "The Shoe Closet",
+          "url": "https://theshoeclosets.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://theshoeclosets.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "theshoecloset@live.ca"
+    },
+    {
+      "id": "biz-pb-and-j-yyc",
+      "kind": "business",
+      "slug": "pb-and-j-yyc",
+      "title": "PB and J YYC",
+      "name": "PB and J YYC",
+      "website": "https://www.pbandjyyc.ca/",
+      "address": "1145 Kensington Crescent NW, Calgary, AB",
+      "summary": "Kensington sandwich shop with freshly ground peanut butter and grilled sandwiches.",
+      "description": "PB and J in Kensington makes grilled sandwiches with freshly ground peanut butter, jams, real cheddar and meats.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "sandwiches"
+      ],
+      "sources": [
+        {
+          "name": "PB and J YYC",
+          "url": "https://www.pbandjyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.pbandjyyc.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "pbandjyyc@gmail.com"
+    },
+    {
+      "id": "biz-pho-mr-q",
+      "kind": "business",
+      "slug": "pho-mr-q",
+      "title": "Pho Mr. Q",
+      "name": "Pho Mr. Q",
+      "website": "https://phomrq.com/",
+      "address": "20 Crowfoot Crescent NW, Calgary, AB",
+      "summary": "Vietnamese pho restaurant in Crowfoot.",
+      "description": "Pho Mr. Q is a Vietnamese pho restaurant in Crowfoot.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vietnamese",
+        "pho"
+      ],
+      "sources": [
+        {
+          "name": "Pho Mr. Q",
+          "url": "https://phomrq.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://phomrq.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "phomrq@gmail.com"
+    },
+    {
+      "id": "biz-saigon-chef",
+      "kind": "business",
+      "slug": "saigon-chef",
+      "title": "Saigon Chef",
+      "name": "Saigon Chef",
+      "website": "https://www.saigonchef.com/",
+      "address": "3213 17 Avenue SE, Calgary, AB",
+      "summary": "Vietnamese restaurant on 17 Avenue SE.",
+      "description": "Saigon Chef serves Vietnamese food on 17 Avenue SE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vietnamese"
+      ],
+      "sources": [
+        {
+          "name": "Saigon Chef",
+          "url": "https://www.saigonchef.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.saigonchef.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "hello@saigonchef.com"
+    },
+    {
+      "id": "biz-limitless-calgary",
+      "kind": "business",
+      "slug": "limitless-calgary",
+      "title": "Limitless",
+      "name": "Limitless",
+      "website": "https://limitless-calgary.com/",
+      "address": "1015 9 Avenue SE, Calgary, AB",
+      "summary": "Modern furniture shop in Inglewood.",
+      "description": "Limitless is a modern furniture shop on 9 Avenue SE in Inglewood.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "furniture",
+        "design"
+      ],
+      "sources": [
+        {
+          "name": "Limitless",
+          "url": "https://limitless-calgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://limitless-calgary.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "enquire@limitless-calgary.com"
+    },
+    {
+      "id": "biz-chine-hotpot-and-noodles",
+      "kind": "business",
+      "slug": "chine-hotpot-and-noodles",
+      "title": "Chine Hotpot & Noodles",
+      "name": "Chine Hotpot & Noodles",
+      "website": "https://www.chinehotpot.com/",
+      "address": "8971 Bonaventure Drive SE, Calgary, AB",
+      "summary": "Szechuan-style hot pot on Bonaventure Drive SE.",
+      "description": "Chine Hotpot & Noodles serves Szechuan-style hot pot on Bonaventure Drive SE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "hot pot",
+        "chinese"
+      ],
+      "sources": [
+        {
+          "name": "Chine Hotpot & Noodles",
+          "url": "https://www.chinehotpot.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.chinehotpot.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "chinehotpotcalgary@gmail.com"
+    },
+    {
+      "id": "biz-friday-sock-co",
+      "kind": "business",
+      "slug": "friday-sock-co",
+      "title": "Friday Sock Co",
+      "name": "Friday Sock Co",
+      "website": "https://www.fridaysocks.com/",
+      "address": "428 28 Street NE, Calgary, AB",
+      "summary": "Calgary small business making mismatched socks designed in Canada.",
+      "description": "Friday Sock Co is a Canadian small business making mismatched socks, designed in Canada and ethically made in Italy.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "socks",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Friday Sock Co",
+          "url": "https://www.fridaysocks.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.fridaysocks.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "customerservice@fridaysocks.com"
+    },
+    {
+      "id": "biz-plantation-garden-centre",
+      "kind": "business",
+      "slug": "plantation-garden-centre",
+      "title": "Plantation Garden Centre",
+      "name": "Plantation Garden Centre",
+      "website": "https://www.plantationgardencentre.ca/",
+      "address": "Calgary, AB",
+      "summary": "Neighbourhood garden centre in Calgary.",
+      "description": "Plantation Garden Centre is a friendly neighbourhood garden centre in Calgary.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "garden centre"
+      ],
+      "sources": [
+        {
+          "name": "Plantation Garden Centre",
+          "url": "https://www.plantationgardencentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.plantationgardencentre.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "plantationgc@telus.net"
+    },
+    {
+      "id": "biz-a-sewing-sensation",
+      "kind": "business",
+      "slug": "a-sewing-sensation",
+      "title": "A Sewing Sensation",
+      "name": "A Sewing Sensation",
+      "website": "https://www.sewingsensation.ca/",
+      "address": "136 71 Avenue SE, Calgary, AB",
+      "summary": "Sewing shop on 71 Avenue SE.",
+      "description": "A Sewing Sensation is a sewing shop on 71 Avenue SE.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "sewing",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "A Sewing Sensation",
+          "url": "https://www.sewingsensation.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sewingsensation.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@sewingsensation.ca"
+    },
+    {
+      "id": "biz-sho-sushi",
+      "kind": "business",
+      "slug": "sho-sushi",
+      "title": "Sho Sushi",
+      "name": "Sho Sushi",
+      "website": "https://shosushi.ca/",
+      "address": "7212 Macleod Trail SE, Calgary, AB",
+      "summary": "Sushi restaurant on Macleod Trail SE.",
+      "description": "Sho Sushi is a sushi restaurant on Macleod Trail SE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "sushi",
+        "japanese"
+      ],
+      "sources": [
+        {
+          "name": "Sho Sushi",
+          "url": "https://shosushi.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://shosushi.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@shosushi.ca"
+    },
+    {
+      "id": "biz-kan-sushi-and-grill",
+      "kind": "business",
+      "slug": "kan-sushi-and-grill",
+      "title": "Kan Sushi and Grill",
+      "name": "Kan Sushi and Grill",
+      "website": "https://kansushiyyc.ca",
+      "address": "500 Royal Oak Drive NW, Calgary, AB",
+      "summary": "Sushi and grill restaurant in Royal Oak.",
+      "description": "Kan Sushi & Grill is a sushi and grill restaurant in Royal Oak.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "sushi",
+        "japanese"
+      ],
+      "sources": [
+        {
+          "name": "Kan Sushi and Grill",
+          "url": "https://kansushiyyc.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://kansushiyyc.ca"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "Kansushicalgary@gmail.com"
+    },
+    {
+      "id": "biz-district-5",
+      "kind": "business",
+      "slug": "district-5",
+      "title": "District 5",
+      "name": "District 5",
+      "website": "https://district5eats.ca/",
+      "address": "6307 Bowness Road NW, Calgary, AB",
+      "summary": "Saigon-inspired Vietnamese street food in Bowness.",
+      "description": "District 5 in Bowness serves Vietnamese street food inspired by Saigon and crafted in Calgary.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vietnamese",
+        "street food"
+      ],
+      "sources": [
+        {
+          "name": "District 5",
+          "url": "https://district5eats.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://district5eats.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "district5canada@gmail.com"
+    },
+    {
+      "id": "biz-aeolian-strings",
+      "kind": "business",
+      "slug": "aeolian-strings",
+      "title": "Aeolian Strings",
+      "name": "Aeolian Strings",
+      "website": "https://www.aeolianstrings.com/",
+      "address": "6229 Centre Street SW, Calgary, AB",
+      "summary": "Stringed instrument shop with repairs and restoration by a master luthier.",
+      "description": "Aeolian Strings sells high-quality stringed instruments brought in by master luthier H. Ross Hill, with repairs and restoration.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "music",
+        "instruments"
+      ],
+      "sources": [
+        {
+          "name": "Aeolian Strings",
+          "url": "https://www.aeolianstrings.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.aeolianstrings.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "aeolianstrings@hotmail.com"
+    },
+    {
+      "id": "biz-espresso-works",
+      "kind": "business",
+      "slug": "espresso-works",
+      "title": "Espresso Works",
+      "name": "Espresso Works",
+      "website": "https://espressoworks.ca/",
+      "address": "6229 Centre Street SW, Calgary, AB",
+      "summary": "Espresso machine and grinder shop with authorized service.",
+      "description": "Espresso Works carries one of Calgary's best selections of espresso machines and coffee grinders, with authorized service.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "coffee",
+        "espresso"
+      ],
+      "sources": [
+        {
+          "name": "Espresso Works",
+          "url": "https://espressoworks.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://espressoworks.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "service@espressoworks.ca"
+    },
+    {
+      "id": "biz-banzai-sushi",
+      "kind": "business",
+      "slug": "banzai-sushi",
+      "title": "Banzai Sushi",
+      "name": "Banzai Sushi",
+      "website": "https://www.banzaiyyc.ca/",
+      "address": "1104 20 Avenue NW, Calgary, AB",
+      "summary": "Sushi restaurant on 20 Avenue NW.",
+      "description": "Banzai Sushi is a sushi restaurant on 20 Avenue NW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "sushi",
+        "japanese"
+      ],
+      "sources": [
+        {
+          "name": "Banzai Sushi",
+          "url": "https://www.banzaiyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.banzaiyyc.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "banzaiyyc@gmail.com"
+    },
+    {
+      "id": "biz-emmanuel-meat-shop",
+      "kind": "business",
+      "slug": "emmanuel-meat-shop",
+      "title": "Emmanuel Meat Shop",
+      "name": "Emmanuel Meat Shop",
+      "website": "https://emmanuelmeat.ca/",
+      "address": "920 36 Street NE, Calgary, AB",
+      "summary": "Butcher shop on 36 Street NE.",
+      "description": "Emmanuel Meat Shop is a butcher on 36 Street NE.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "butcher"
+      ],
+      "sources": [
+        {
+          "name": "Emmanuel Meat Shop",
+          "url": "https://emmanuelmeat.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://emmanuelmeat.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "a.meat2023@yahoo.com"
+    },
+    {
+      "id": "biz-curry-craft",
+      "kind": "business",
+      "slug": "curry-craft",
+      "title": "Curry Craft",
+      "name": "Curry Craft",
+      "website": "https://www.currycraft.ca/",
+      "address": "16327 Somercrest Street SW, Calgary, AB",
+      "summary": "Indian restaurant in Somerset.",
+      "description": "Curry Craft is an Indian restaurant in Somerset.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "indian"
+      ],
+      "sources": [
+        {
+          "name": "Curry Craft",
+          "url": "https://www.currycraft.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.currycraft.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@currycraft.ca"
+    },
+    {
+      "id": "biz-2nd-chance-sports",
+      "kind": "business",
+      "slug": "2nd-chance-sports",
+      "title": "2nd Chance Sports",
+      "name": "2nd Chance Sports",
+      "website": "https://www.2ndchancesports.ca/",
+      "address": "2010 Edmonton Trail NE, Calgary, AB",
+      "summary": "Used sports equipment shop on Edmonton Trail NE.",
+      "description": "2nd Chance Sports on Edmonton Trail NE sells quality used sports equipment, with a huge selection of gear.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "sports",
+        "used gear"
+      ],
+      "sources": [
+        {
+          "name": "2nd Chance Sports",
+          "url": "https://www.2ndchancesports.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.2ndchancesports.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@2ndchancesports.ca"
+    },
+    {
+      "id": "biz-ari-sushi",
+      "kind": "business",
+      "slug": "ari-sushi",
+      "title": "Ari Sushi",
+      "name": "Ari Sushi",
+      "website": "https://arisushi.ca/",
+      "address": "1201 9 Avenue SE, Calgary, AB",
+      "summary": "Japanese sushi restaurant in Inglewood.",
+      "description": "Ari Sushi is a Japanese sushi restaurant in Inglewood.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "sushi",
+        "japanese"
+      ],
+      "sources": [
+        {
+          "name": "Ari Sushi",
+          "url": "https://arisushi.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://arisushi.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "arisushicanada@gmail.com"
+    },
+    {
+      "id": "biz-garden-retreat",
+      "kind": "business",
+      "slug": "garden-retreat",
+      "title": "Garden Retreat",
+      "name": "Garden Retreat",
+      "website": "https://www.gardenretreat.ca/",
+      "address": "6510 1A Street SW, Calgary, AB",
+      "summary": "Garden centre on 1A Street SW.",
+      "description": "Garden Retreat is a garden centre on 1A Street SW.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "garden centre"
+      ],
+      "sources": [
+        {
+          "name": "Garden Retreat",
+          "url": "https://www.gardenretreat.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.gardenretreat.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "sales@gardenretreat.ca"
+    },
+    {
+      "id": "biz-absolute-audio",
+      "kind": "business",
+      "slug": "absolute-audio",
+      "title": "Absolute Audio",
+      "name": "Absolute Audio",
+      "website": "https://www.absoluteaudio.ca/",
+      "address": "6303 Bowness Road NW, Calgary, AB",
+      "summary": "High-fidelity audio shop in Bowness.",
+      "description": "Absolute Audio Video in Bowness is a Calgary home for high-fidelity audio.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "audio",
+        "hi-fi"
+      ],
+      "sources": [
+        {
+          "name": "Absolute Audio",
+          "url": "https://www.absoluteaudio.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.absoluteaudio.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@absoluteaudio.ca"
+    },
+    {
+      "id": "biz-17th-ave-thrift",
+      "kind": "business",
+      "slug": "17th-ave-thrift",
+      "title": "17th Ave Thrift",
+      "name": "17th Ave Thrift",
+      "website": "https://17thavethrift.ca/",
+      "address": "2631 17 Avenue SW, Calgary, AB",
+      "summary": "Thrift store on 17 Avenue SW supporting local animal rescues.",
+      "description": "17th Ave Thrift is a thrift store on 17 Avenue SW whose mission is to support local animal rescues and shelters.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "thrift",
+        "second hand"
+      ],
+      "sources": [
+        {
+          "name": "17th Ave Thrift",
+          "url": "https://17thavethrift.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://17thavethrift.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "17thavethrift@gmail.com"
+    },
+    {
+      "id": "biz-showhome-furniture",
+      "kind": "business",
+      "slug": "showhome-furniture",
+      "title": "Showhome Furniture",
+      "name": "Showhome Furniture",
+      "website": "https://showhome-furniture.com/",
+      "address": "1616 14th Ave NW, Calgary, AB",
+      "summary": "Custom Canadian furniture shop on 14 Avenue NW.",
+      "description": "Showhome Furniture on 14 Avenue NW sells custom Canadian furniture.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "furniture"
+      ],
+      "sources": [
+        {
+          "name": "Showhome Furniture",
+          "url": "https://showhome-furniture.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://showhome-furniture.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "showhomehelp@gmail.com"
+    },
+    {
+      "id": "biz-2dimensional-life",
+      "kind": "business",
+      "slug": "2dimensional-life",
+      "title": "2Dimensional Life",
+      "name": "2Dimensional Life",
+      "website": "https://2dimensionallife.com/",
+      "address": "1632 14 Avenue NW, Calgary, AB",
+      "summary": "One of Canada's largest action figure and hobby stores.",
+      "description": "2Dimensional Life is one of Canada's largest hobby action figure stores, with more than 5,000 product lines.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "collectibles",
+        "toys"
+      ],
+      "sources": [
+        {
+          "name": "2Dimensional Life",
+          "url": "https://2dimensionallife.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://2dimensionallife.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "sales@2dimensionallife.com"
+    },
+    {
+      "id": "biz-cococo-chocolatiers",
+      "kind": "business",
+      "slug": "cococo-chocolatiers",
+      "title": "Cococo",
+      "name": "Cococo",
+      "website": "https://cococochocolatiers.com/",
+      "address": "2320 2 Avenue SE, Calgary, AB",
+      "summary": "Calgary chocolatier making award-winning chocolates, including Bernard Callebaut.",
+      "description": "Cococo makes award-winning chocolates and fine cocoa confections in Calgary, including Chocolaterie Bernard Callebaut.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "chocolate"
+      ],
+      "sources": [
+        {
+          "name": "Cococo",
+          "url": "https://cococochocolatiers.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cococochocolatiers.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "CustomerService@Cococoinc.com"
+    },
+    {
+      "id": "biz-black-sheep-fine-foods",
+      "kind": "business",
+      "slug": "black-sheep-fine-foods",
+      "title": "Black Sheep",
+      "name": "Black Sheep",
+      "website": "https://www.black-sheep.ca/",
+      "address": "815 17 Avenue SW, Calgary, AB",
+      "summary": "French pastries and croissants on 17 Avenue SW.",
+      "description": "Black Sheep Fine Foods on 17 Avenue SW is known for French pastries and croissants.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pastry",
+        "bakery"
+      ],
+      "sources": [
+        {
+          "name": "Black Sheep",
+          "url": "https://www.black-sheep.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.black-sheep.ca/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "contact@black-sheep.ca"
+    },
+    {
+      "id": "biz-good-trade-coffee",
+      "kind": "business",
+      "slug": "good-trade-coffee",
+      "title": "Good Trade Coffee Company Kensington",
+      "name": "Good Trade Coffee Company Kensington",
+      "website": "https://www.goodtrade.org/",
+      "address": "1154 Kensington Crescent NW, Calgary, AB",
+      "summary": "Direct-trade coffee company working with Colombian farmers, in Kensington.",
+      "description": "Good Trade Coffee is a socially enterprising coffee company working directly with Colombian farmers and their communities.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "direct trade"
+      ],
+      "sources": [
+        {
+          "name": "Good Trade Coffee Company Kensington",
+          "url": "https://www.goodtrade.org/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.goodtrade.org/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "hello@goodtrade.org"
+    },
+    {
+      "id": "biz-barrow-coffee-roasters",
+      "kind": "business",
+      "slug": "barrow-coffee-roasters",
+      "title": "Barrow Coffee Roasters",
+      "name": "Barrow Coffee Roasters",
+      "website": "https://www.barrowespresso.com",
+      "address": "74 Mount Royal Circle SW, Calgary, AB",
+      "summary": "Calgary coffee roaster with cafés.",
+      "description": "Barrow Coffee Roasters is a Calgary roaster of high-quality coffee and espresso, focused on craftsmanship.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "roaster"
+      ],
+      "sources": [
+        {
+          "name": "Barrow Coffee Roasters",
+          "url": "https://www.barrowespresso.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.barrowespresso.com"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@barrowespresso.com"
+    },
+    {
+      "id": "biz-monki-breakfast-club",
+      "kind": "business",
+      "slug": "monki-breakfast-club",
+      "title": "Monki Breakfast Club & Bistro",
+      "name": "Monki Breakfast Club & Bistro",
+      "website": "https://www.monkibistro.ca/location/breakfast-beltline-calgary/",
+      "address": "1301 10 Avenue SW, Calgary, AB",
+      "summary": "Breakfast restaurant in the Beltline.",
+      "description": "Monki Breakfast Club & Bistro's flagship is a rustic, cozy breakfast spot in the Beltline.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "breakfast",
+        "brunch"
+      ],
+      "sources": [
+        {
+          "name": "Monki Breakfast Club & Bistro",
+          "url": "https://www.monkibistro.ca/location/breakfast-beltline-calgary/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.monkibistro.ca/location/breakfast-beltline-calgary/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "beltline@monkibistro.ca"
+    },
+    {
+      "id": "biz-park-by-sidewalk-citizen",
+      "kind": "business",
+      "slug": "park-by-sidewalk-citizen",
+      "title": "Park by Sidewalk Citizen",
+      "name": "Park by Sidewalk Citizen",
+      "website": "https://parkbysidewalk.com",
+      "address": "340 13 Avenue SW, Calgary, AB",
+      "summary": "Mediterranean-inspired, chef-driven restaurant in Central Memorial Park.",
+      "description": "Park by Sidewalk Citizen is a Mediterranean-inspired restaurant with a local, chef-driven menu in Central Memorial Park.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "mediterranean"
+      ],
+      "sources": [
+        {
+          "name": "Park by Sidewalk Citizen",
+          "url": "https://parkbysidewalk.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://parkbysidewalk.com"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "park@sidewalkcitizenbakery.com"
+    },
+    {
+      "id": "biz-lolivo",
+      "kind": "business",
+      "slug": "lolivo",
+      "title": "L'Olivo",
+      "name": "L'Olivo",
+      "website": "https://www.lolivo.ca/",
+      "address": "1023 9 Avenue SE, Calgary, AB",
+      "summary": "Inglewood restaurant from Lina's Italian Market.",
+      "description": "L'Olivo is a restaurant on 9 Avenue SE in Inglewood, part of Lina's Italian Market.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian"
+      ],
+      "sources": [
+        {
+          "name": "L'Olivo",
+          "url": "https://www.lolivo.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lolivo.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "lolivo@linasmarket.com"
+    },
+    {
+      "id": "biz-clive-burger",
+      "kind": "business",
+      "slug": "clive-burger",
+      "title": "Clive Burger",
+      "name": "Clive Burger",
+      "website": "https://www.cliveburger.com",
+      "address": "Calgary, AB",
+      "summary": "Natural Alberta beef burgers on Stephen Avenue.",
+      "description": "Clive Burger makes 100% natural Alberta beef burgers with fresh, hand-cut ingredients, now on Stephen Avenue.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "burgers"
+      ],
+      "sources": [
+        {
+          "name": "Clive Burger",
+          "url": "https://www.cliveburger.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cliveburger.com"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "eat@cliveburger.com"
+    },
+    {
+      "id": "biz-alumni-sandwiches",
+      "kind": "business",
+      "slug": "alumni-sandwiches",
+      "title": "Alumni",
+      "name": "Alumni",
+      "website": "https://alumnisandwiches.com/",
+      "address": "725 17 Avenue SW, Calgary, AB",
+      "summary": "Sandwich and liquor bar on 17 Avenue SW.",
+      "description": "Alumni is a sandwich and liquor bar on 17 Avenue SW.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "sandwiches",
+        "bar"
+      ],
+      "sources": [
+        {
+          "name": "Alumni",
+          "url": "https://alumnisandwiches.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://alumnisandwiches.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "hello@alumnisandwiches.com"
+    },
+    {
+      "id": "biz-fieldstudy-general-store",
+      "kind": "business",
+      "slug": "fieldstudy-general-store",
+      "title": "Fieldstudy General Store",
+      "name": "Fieldstudy General Store",
+      "website": "https://fieldstudyshop.com/",
+      "address": "1812 4 Street SW, Calgary, AB",
+      "summary": "Boutique for sustainably made clothing and home goods from independent designers.",
+      "description": "Fieldstudy General Store on 4 Street SW carries thoughtfully selected, sustainably made clothing, accessories and home goods from independent designers.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "boutique",
+        "sustainable"
+      ],
+      "sources": [
+        {
+          "name": "Fieldstudy General Store",
+          "url": "https://fieldstudyshop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://fieldstudyshop.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "hello@fieldstudyshop.com"
+    },
+    {
+      "id": "biz-vine-arts-17th",
+      "kind": "business",
+      "slug": "vine-arts-17th",
+      "title": "Vine Arts",
+      "name": "Vine Arts",
+      "website": "https://vinearts.ca/pages/contact-17-ave",
+      "address": "932 17 Avenue SW, Calgary, AB",
+      "summary": "Curated wines, spirits and cocktail supplies on 17 Avenue SW.",
+      "description": "Vine Arts on 17 Avenue SW carries curated wines, spirits and cocktail supplies.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "wine",
+        "spirits"
+      ],
+      "sources": [
+        {
+          "name": "Vine Arts",
+          "url": "https://vinearts.ca/pages/contact-17-ave",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://vinearts.ca/pages/contact-17-ave"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "17th@vinearts.ca"
+    },
+    {
+      "id": "biz-the-scottish-shoppe",
+      "kind": "business",
+      "slug": "the-scottish-shoppe",
+      "title": "The Scottish Shoppe & A Little Bit of Ireland",
+      "name": "The Scottish Shoppe & A Little Bit of Ireland",
+      "website": "https://www.thescottishshoppe.com/",
+      "address": "106A 10 Street NW, Calgary, AB",
+      "summary": "Celtic goods and kilts in Kensington since 1971.",
+      "description": "The Scottish Shoppe in Kensington has carried authentic Scottish, Irish, English, Welsh and Celtic goods, kilts included, since 1971.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "celtic",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "The Scottish Shoppe & A Little Bit of Ireland",
+          "url": "https://www.thescottishshoppe.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thescottishshoppe.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "kiltman@scottishshoppe.net"
+    },
+    {
+      "id": "biz-jerusalem-shawarma",
+      "kind": "business",
+      "slug": "jerusalem-shawarma",
+      "title": "Jerusalem Shawarma",
+      "name": "Jerusalem Shawarma",
+      "website": "https://jerusalemshawarma.ca/",
+      "address": "923 17 Avenue SW, Calgary, AB",
+      "summary": "Award-winning shawarma and donair on 17 Avenue SW.",
+      "description": "Jerusalem Shawarma serves award-winning shawarma and donair, with a location on 17 Avenue SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "shawarma",
+        "mediterranean"
+      ],
+      "sources": [
+        {
+          "name": "Jerusalem Shawarma",
+          "url": "https://jerusalemshawarma.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://jerusalemshawarma.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "contact@jerusalemshawarma.ca"
+    },
+    {
+      "id": "biz-burnin-bird",
+      "kind": "business",
+      "slug": "burnin-bird",
+      "title": "Burnin Bird Nashville Hot Chicken",
+      "name": "Burnin Bird Nashville Hot Chicken",
+      "website": "https://burninbird.ca/",
+      "address": "606 17 Avenue SW, Calgary, AB",
+      "summary": "Nashville hot chicken on 17 Avenue SW.",
+      "description": "Burnin Bird serves Nashville hot chicken on 17 Avenue SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "fried chicken"
+      ],
+      "sources": [
+        {
+          "name": "Burnin Bird Nashville Hot Chicken",
+          "url": "https://burninbird.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://burninbird.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@burninbird.ca"
+    },
+    {
+      "id": "biz-5-vines-bridgeland",
+      "kind": "business",
+      "slug": "5-vines-bridgeland",
+      "title": "5 Vines",
+      "name": "5 Vines",
+      "website": "https://bridgeland.5vines.com/",
+      "address": "53 9 Street NE, Calgary, AB",
+      "summary": "Wine and spirits shop in Bridgeland.",
+      "description": "5 Vines is a wine and spirits shop in Bridgeland.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "wine"
+      ],
+      "sources": [
+        {
+          "name": "5 Vines",
+          "url": "https://bridgeland.5vines.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bridgeland.5vines.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "bridgeland@5vines.com"
+    },
+    {
+      "id": "biz-seed-n-salt",
+      "kind": "business",
+      "slug": "seed-n-salt",
+      "title": "Seed N Salt",
+      "name": "Seed N Salt",
+      "website": "https://www.seednsalt.com/",
+      "address": "2008 4 Street SW, Calgary, AB",
+      "summary": "Salad and bowl café on 4 Street SW.",
+      "description": "Seed N Salt on 4 Street SW is a salad and bowl café with smoothies, toasts, breakfast, soups and sweets.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "healthy",
+        "cafe"
+      ],
+      "sources": [
+        {
+          "name": "Seed N Salt",
+          "url": "https://www.seednsalt.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.seednsalt.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "info@seednsalt.com"
+    },
+    {
+      "id": "biz-bahar-kebab",
+      "kind": "business",
+      "slug": "bahar-kebab",
+      "title": "Bahar Kebab",
+      "name": "Bahar Kebab",
+      "website": "https://baharkabab.ca/",
+      "address": "1040 12 Avenue SW, Calgary, AB",
+      "summary": "Afghan kebab restaurant on 12 Avenue SW.",
+      "description": "Bahar Kebab serves authentic Afghan cuisine on 12 Avenue SW, with freshly grilled kebabs.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "afghan",
+        "kebab"
+      ],
+      "sources": [
+        {
+          "name": "Bahar Kebab",
+          "url": "https://baharkabab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-02T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://baharkabab.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-02T19:30:00Z",
+      "email": "baharkabab@gmail.com"
     }
   ]
 }

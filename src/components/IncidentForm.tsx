@@ -1,4 +1,6 @@
 import { useForm } from 'react-hook-form';
+import CommunityPicker, { NOT_LISTED } from '@/src/components/map/CommunityPicker';
+import { resolveReportNeighbourhood } from '@/src/lib/reportNeighbourhood';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { X, Loader2, Navigation, MapPin, ExternalLink, WifiOff, Siren, AlertCircle, Car, Construction, CloudRain, ArrowRight, ArrowLeft, Check, Phone } from 'lucide-react';
@@ -26,43 +28,6 @@ type ReportStep = 'what' | 'choose' | 'pinning' | 'details' | 'photo';
 const STEP_ORDER: ReportStep[] = ['what', 'choose', 'details', 'photo'];
 const STEP_LABELS = ['What', 'Where', 'Details', 'Photo'];
 
-// Approximate neighbourhood centres for Calgary.
-// Returns the closest neighbourhood name or '' if outside all radii.
-const NEIGHBOURHOODS = [
-  { name: 'Downtown', lat: 51.0478, lng: -114.0625 },
-  { name: 'Beltline', lat: 51.0381, lng: -114.0680 },
-  { name: 'Kensington', lat: 51.0603, lng: -114.0903 },
-  { name: 'Bridgeland', lat: 51.0602, lng: -114.0412 },
-  { name: 'Mission', lat: 51.0347, lng: -114.0670 },
-  { name: 'Inglewood', lat: 51.0406, lng: -114.0201 },
-  { name: 'Bowness', lat: 51.0975, lng: -114.1807 },
-  { name: 'Saddleridge', lat: 51.1494, lng: -113.9670 },
-  { name: 'Evanston', lat: 51.1902, lng: -114.0792 },
-  { name: 'Mahogany', lat: 50.9011, lng: -113.9603 },
-  { name: 'Auburn Bay', lat: 50.9099, lng: -114.0010 },
-  { name: 'Signal Hill', lat: 51.0660, lng: -114.2161 },
-  { name: 'Tuscany', lat: 51.1303, lng: -114.2208 },
-  { name: 'Royal Oak', lat: 51.1303, lng: -114.1827 },
-  { name: 'Panorama Hills', lat: 51.1655, lng: -114.0448 },
-  { name: 'Midnapore', lat: 50.9497, lng: -114.0683 },
-  { name: 'Shawnessy', lat: 50.9251, lng: -114.1245 },
-  { name: 'McKenzie Towne', lat: 50.9083, lng: -113.9534 },
-  { name: 'Cranston', lat: 50.8986, lng: -113.9836 },
-  { name: 'Copperfield', lat: 50.9141, lng: -113.9951 },
-] as const;
-
-function detectNeighbourhood(lat: number, lng: number): string {
-  const MAX_DIST = 0.035; // ~3 km in degrees
-  let best = { name: '', dist: Infinity };
-  for (const n of NEIGHBOURHOODS) {
-    const dLat = lat - n.lat;
-    const dLng = (lng - n.lng) * Math.cos(n.lat * (Math.PI / 180));
-    const dist = Math.sqrt(dLat * dLat + dLng * dLng);
-    if (dist < MAX_DIST && dist < best.dist) best = { name: n.name, dist };
-  }
-  return best.name;
-}
-
 // Swear word filter — only thing blocking submissions
 const PROFANITY = [
   /\bfuck(ing|er|s)?\b/i, /\bshit\b/i, /\bass(hole)?\b/i, /\bbitch\b/i,
@@ -83,7 +48,7 @@ const incidentSchema = z.object({
     .max(1000, 'Description is too long')
     .refine(v => !hasProfanity(v), 'Please keep it clean'),
   category: z.enum(INCIDENT_CATEGORY_VALUES),
-  neighborhood: z.string().trim().min(2, 'Please choose a neighbourhood from the list'),
+  neighborhood: z.string().trim().min(2, 'Type and pick a community, or choose “Not one of these”'),
   anonymous: z.boolean(),
 });
 
@@ -223,6 +188,8 @@ export default function IncidentForm({
   const watchedCategory = watch('category');
   const watchedDescription = watch('description');
   const [neighborhoodOverride, setNeighborhoodOverride] = useState(false);
+  const [locatingArea, setLocatingArea] = useState(false);
+  const [areaByHand, setAreaByHand] = useState(false);
 
   // When pin mode exits without confirmation (Cancel), close the form via onClose so
   // the parent can clean up in a separate render from when isPinMode cleared.
@@ -260,11 +227,18 @@ export default function IncidentForm({
   // Auto-detect neighbourhood whenever the active location changes
   useEffect(() => {
     if (!activeLocation) return;
-    const detected = detectNeighbourhood(activeLocation.lat, activeLocation.lng);
-    if (detected) {
-      setValue('neighborhood', detected, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      setNeighborhoodOverride(false);
-    }
+    let live = true;
+    setLocatingArea(true);
+    resolveReportNeighbourhood(activeLocation.lat, activeLocation.lng).then(({ name }) => {
+      if (!live) return;
+      setLocatingArea(false);
+      if (name) {
+        setValue('neighborhood', name, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setNeighborhoodOverride(false);
+        setAreaByHand(false);
+      }
+    });
+    return () => { live = false; };
   }, [activeLocation?.lat, activeLocation?.lng, setValue]);
 
   // Free the decoded photo when the form goes away with one still attached.
@@ -545,22 +519,27 @@ export default function IncidentForm({
             <FieldLabel htmlFor="rf-neighbourhood">Neighbourhood</FieldLabel>
             {activeLocation && watchedNeighborhood && !neighborhoodOverride ? (
               <div className="lv-rf-auto">
-                <span><b>{watchedNeighborhood}</b><small>Auto-detected</small></span>
+                <span><b>{watchedNeighborhood === NOT_LISTED ? 'Outside Calgary or not sure' : watchedNeighborhood}</b><small>{areaByHand ? 'Your pick' : pinLocation ? 'From your pin' : 'From your location'}</small></span>
                 <button type="button" onClick={() => setNeighborhoodOverride(true)} className="lv-o-btn lv-o-btn-ghost">
                   Change
                 </button>
               </div>
-            ) : (
-              <div className="lv-rf-select">
-                <select id="rf-neighbourhood" {...register('neighborhood')} className="lv-o-input" aria-invalid={errors.neighborhood ? 'true' : undefined}>
-                  <option value="">Select area</option>
-                  {NEIGHBOURHOODS.map((n) => (
-                    <option key={n.name} value={n.name}>{n.name}</option>
-                  ))}
-                  <option value="Other">Other / Not listed</option>
-                </select>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            ) : locatingArea && !neighborhoodOverride ? (
+              <div className="lv-rf-auto lv-rf-auto-wait" aria-live="polite">
+                <span><b>Finding the community…</b></span>
               </div>
+            ) : (
+              <CommunityPicker
+                id="rf-neighbourhood"
+                value={neighborhoodOverride ? '' : watchedNeighborhood ?? ''}
+                invalid={Boolean(errors.neighborhood)}
+                autoFocus={neighborhoodOverride}
+                onChange={(name) => {
+                  setValue('neighborhood', name, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+                  setNeighborhoodOverride(false);
+                  setAreaByHand(true);
+                }}
+              />
             )}
             {fieldError(errors.neighborhood?.message)}
           </div>

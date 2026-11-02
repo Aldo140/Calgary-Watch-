@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { eventArtwork, listingImageSrc, organizerProfile } from '../../lib/organizations';
+import { eventArtwork, listingImageSrc, organizerEvents, organizerProfile } from '../../lib/organizations';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, ArrowUpRight, CalendarPlus, Check, Clock, ExternalLink, Map as MapIcon, MapPin, Navigation,
@@ -128,6 +128,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const orgShelf = organization ? SHELVES.find(sh => sh.id === shelfOf(organization)) : undefined;
   const lead = event.summary && event.summary !== event.title && !event.summary.startsWith(`${event.title}, listed by`) ? event.summary : '';
   const description = event.description && event.description !== event.summary ? event.description : lead || event.description;
+  const orgNext = organization ? organizerEvents(organization.id, all, now).filter(e => e.id !== event.id) : [];
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);
   const more = moreLikeThis(event, all, now, 5).filter(e => !alsoOn.some(a => a.id === e.id)).slice(0, 4);
@@ -210,7 +211,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
 
           {organization && orgShelf ? (
             <section className="mk-dsec mk-runby" data-reveal aria-labelledby="ld-runby">
-              <header className="mk-sec-head"><h2 id="ld-runby"><span>Who’s behind it</span></h2><p>{orgShelf.label} on Local</p></header>
+              <header className="mk-sec-head"><h2 id="ld-runby"><span>Who’s behind it</span></h2><p>{orgNext.length ? `${orgNext.length} more ${orgNext.length === 1 ? 'date' : 'dates'} from them` : `${orgShelf.label} on Local`}</p></header>
               <Link className="mk-runby-card" to={entityPath(organization)}>
                 <Seal title={organization.title} tone={orgShelf} />
                 <span className="mk-runby-copy">
@@ -220,6 +221,11 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
                 </span>
                 <span className="mk-runby-go">Their profile <ArrowUpRight size={16} aria-hidden="true" /></span>
               </Link>
+              {orgNext.length ? (
+                <ul className="mk-runby-sisters" aria-label={`More from ${organization.title}`}>
+                  {orgNext.slice(0, 3).map(e => <li key={e.id}><Link to={entityPath(e)}><b>{e.title}</b><small>{pickWhen(e.start)}{e.venue ? ` · ${e.venue}` : ''}</small><ArrowUpRight size={15} aria-hidden="true" /></Link></li>)}
+                </ul>
+              ) : null}
             </section>
           ) : null}
 

@@ -5,45 +5,12 @@ import { CATEGORY, LIVE } from '@/src/lib/tokens';
 import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, Phone, ArrowRight, Check } from 'lucide-react';
 import '@/src/styles/map-overlays.css';
 import { uploadIncidentPhoto } from '@/src/lib/storage';
+import CommunityPicker from '@/src/components/map/CommunityPicker';
+import { resolveReportNeighbourhood } from '@/src/lib/reportNeighbourhood';
 import ReportPhoto, { releasePhoto, type PreparedPhoto } from '@/src/components/map/ReportPhoto';
 
 /** The longest an SOS waits on its photo before it goes without it. */
 const SOS_PHOTO_WAIT_MS = 8000;
-
-const NEIGHBOURHOODS = [
-  { name: 'Downtown', lat: 51.0478, lng: -114.0625 },
-  { name: 'Beltline', lat: 51.0381, lng: -114.0680 },
-  { name: 'Kensington', lat: 51.0603, lng: -114.0903 },
-  { name: 'Bridgeland', lat: 51.0602, lng: -114.0412 },
-  { name: 'Mission', lat: 51.0347, lng: -114.0670 },
-  { name: 'Inglewood', lat: 51.0406, lng: -114.0201 },
-  { name: 'Bowness', lat: 51.0975, lng: -114.1807 },
-  { name: 'Saddleridge', lat: 51.1494, lng: -113.9670 },
-  { name: 'Evanston', lat: 51.1902, lng: -114.0792 },
-  { name: 'Mahogany', lat: 50.9011, lng: -113.9603 },
-  { name: 'Auburn Bay', lat: 50.9099, lng: -114.0010 },
-  { name: 'Signal Hill', lat: 51.0660, lng: -114.2161 },
-  { name: 'Tuscany', lat: 51.1303, lng: -114.2208 },
-  { name: 'Royal Oak', lat: 51.1303, lng: -114.1827 },
-  { name: 'Panorama Hills', lat: 51.1655, lng: -114.0448 },
-  { name: 'Midnapore', lat: 50.9497, lng: -114.0683 },
-  { name: 'Shawnessy', lat: 50.9251, lng: -114.1245 },
-  { name: 'McKenzie Towne', lat: 50.9083, lng: -113.9534 },
-  { name: 'Cranston', lat: 50.8986, lng: -113.9836 },
-  { name: 'Copperfield', lat: 50.9141, lng: -113.9951 },
-] as const;
-
-function detectNeighbourhood(lat: number, lng: number): string {
-  const MAX_DIST = 0.035;
-  let best = { name: '', dist: Infinity };
-  for (const n of NEIGHBOURHOODS) {
-    const dLat = lat - n.lat;
-    const dLng = (lng - n.lng) * Math.cos(n.lat * (Math.PI / 180));
-    const dist = Math.sqrt(dLat * dLat + dLng * dLng);
-    if (dist < MAX_DIST && dist < best.dist) best = { name: n.name, dist };
-  }
-  return best.name;
-}
 
 // The severity ramp from tokens, not five unrelated Tailwind hues — these are
 // the same colours the pins carry on the map.
@@ -126,8 +93,11 @@ export default function EmergencyModal({
   // Auto-detect neighbourhood whenever active location changes
   useEffect(() => {
     if (!activeLocation) return;
-    const detected = detectNeighbourhood(activeLocation.lat, activeLocation.lng);
-    if (detected) setNeighborhood(detected);
+    let live = true;
+    resolveReportNeighbourhood(activeLocation.lat, activeLocation.lng).then(({ name }) => {
+      if (live && name) setNeighborhood(name);
+    });
+    return () => { live = false; };
   }, [activeLocation?.lat, activeLocation?.lng]);
 
   // Advance to form when a pin is confirmed while we're choosing
@@ -317,21 +287,7 @@ export default function EmergencyModal({
                     {/* Neighbourhood */}
                     <div>
                       <label className="lv-o-label" htmlFor="sos-neighbourhood">Neighbourhood</label>
-                      <div className="lv-rf-select">
-                        <select
-                          id="sos-neighbourhood"
-                          value={neighborhood}
-                          onChange={(e) => setNeighborhood(e.target.value)}
-                          className="lv-o-input"
-                        >
-                          <option value="">Select area…</option>
-                          {NEIGHBOURHOODS.map((n) => (
-                            <option key={n.name} value={n.name}>{n.name}</option>
-                          ))}
-                          <option value="Other">Other / Not Listed</option>
-                        </select>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-                      </div>
+                      <CommunityPicker id="sos-neighbourhood" value={neighborhood} onChange={setNeighborhood} />
                     </div>
 
                     {/* Description */}

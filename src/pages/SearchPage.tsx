@@ -11,6 +11,7 @@ import { bestPicks, nearbyListings, searchListings, serviceFor } from '../lib/li
 import { answerCount, bareStreetGuess, normalizeWords, parseSearchIntent } from '../lib/searchIntent';
 import { useStreetLookup } from '../hooks/useStreetLookup';
 import { recordSearch } from '../lib/searchDemand';
+import { POPULAR_VIA, TRENDING, popularHref, primeByDemand } from '../lib/searchTrends';
 import { BEST_CATEGORIES, type BestCategory } from '../content/bestOf';
 import { bestForQuery, bestPath, isRanked } from '../lib/bestOf';
 import { SAFETY_TOPICS } from '../content/safetyTopics';
@@ -31,6 +32,8 @@ const NEWS = crimeNews as CrimeNewsFile;
 const NEWS_WORDS = /\b(?:police|crime|crimes|news|safety)\b/i;
 const bestLabel = (c: BestCategory) => c.kind === 'food' ? `Best ${c.noun} in Calgary` : `${c.label} in Calgary`;
 const bestNote = (c: BestCategory) => `${c.places.length} ${c.kind === 'food' ? 'spots' : 'companies'}, ${isRanked(c) ? 'ranked by how many guides name them' : 'A–Z with a source for every fact'}`;
+/** What an empty box offers: the places Calgary searched for most lately. */
+const POPULAR: Suggestion[] = TRENDING.slice(0, 6).map(t => ({ label: t.label, note: t.note, to: popularHref(t.to) }));
 const COMMUNITY_KEYS = CALGARY_COMMUNITIES.flatMap(c => [c.name, ...(c.aliases ?? [])].map(raw => ({ label: raw.replace(/\b\p{Ll}/gu, ch => ch.toUpperCase()), key: normalizeWords(raw).join(' '), c })));
 
 /**
@@ -42,6 +45,8 @@ export default function SearchPage() {
   useOrganizationLive();
   const [params] = useSearchParams();
   const q = normalizeSearch(params.get('q') ?? '');
+  // A tap on a popular pick isn't new demand: counting it would let the list feed itself.
+  const fromPopular = params.get('via') === POPULAR_VIA;
   const all = discoveryRepository.list();
   const occurrences = useMemo(() => discoveryRepository.occurrences(), []);
   const now = useMemo(() => Date.now(), [q]);
@@ -83,11 +88,11 @@ export default function SearchPage() {
   const pending = useRef<{ q: string; n: number } | null>(null);
   useEffect(() => {
     // Wait for the street register so "madigan" is counted once, with its real answer.
-    if (!q || bareLookup.status === 'loading') return;
+    if (!q || fromPopular || bareLookup.status === 'loading') return;
     pending.current = { q, n: resultCount };
     const t = window.setTimeout(() => { pending.current = null; recordSearch(q, resultCount); }, 1200);
     return () => clearTimeout(t);
-  }, [q, resultCount, bareLookup.status]);
+  }, [q, fromPopular, resultCount, bareLookup.status]);
   // Opening a result (or searching again) inside that wait used to drop the search.
   useEffect(() => () => {
     const p = pending.current;
@@ -126,14 +131,15 @@ export default function SearchPage() {
       seen.add(title);
       out.push({ label: e.title, note: KIND[e.kind], to: entityPath(e) });
     }
-    return out;
+    // What Calgary searches for most rises to the top; the rest keep their order.
+    return primeByDemand(out);
   }, [all, occurrences]);
 
   return (
     <SiteLayout>
       <SearchBoard key={q} q={q} best={best} bestLists={bestLists} safety={safety} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
         listingCount={results.total} resultCount={resultCount} answers={answers}
-        partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} nearby={nearby} />
+        partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} popular={POPULAR} nearby={nearby} />
     </SiteLayout>
   );
 }

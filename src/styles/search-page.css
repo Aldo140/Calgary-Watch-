@@ -50,6 +50,7 @@
 .sx-browse strong { font: 800 18px/1.15 var(--display); letter-spacing: -.02em; }
 .sx-browse small { font: 400 13.5px/1.35 Inter, sans-serif; color: var(--muted); }
 .sx-browse .sx-arrow { top: 18px; right: 14px; }
+.sx-popular-n { font: 800 17px/1 var(--display); }
 
 /* Results: a sticky count-and-filter bar, one spotlight card for the best
    match, then picture-led rows grouped by kind. */
@@ -194,6 +195,10 @@
   box-shadow: 6px 6px 0 var(--cyan); text-align: left;
 }
 .sx .cw-suggest[hidden] { display: none; }
+/* An empty box offers what Calgary searches for most, under a small label. */
+.sx .cw-suggest[data-popular]::before {
+  content: 'Popular right now'; display: block; padding: 10px 14px 6px; font: 700 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted);
+}
 .sx .cw-suggest li {
   display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 44px; padding: 11px 14px; border-radius: 14px; cursor: pointer;
 }

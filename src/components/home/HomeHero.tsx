@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GlobalSearch } from '../site/GlobalSearch';
+import { TRENDING, popularHref } from '../../lib/searchTrends';
 import type { AgendaDay } from '../../lib/discoveryCalendar';
 import type { CalgaryWeather } from '../../hooks/useCalgaryWeather';
 import { describeSky, type SkyIcon } from '../../lib/weatherCodes';
@@ -18,6 +19,9 @@ const INTENTS: Array<{ label: string; to: string; live?: boolean }> = [
   { label: 'Markets', to: '/markets' },
   { label: 'Neighbourhoods', to: '/neighbourhoods' },
 ];
+
+/** Up to three places Calgary searched for most lately, by their own names (searchTrends.ts). */
+const POPULAR = TRENDING.slice(0, 3);
 
 const dateline = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
 const shortDate = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
@@ -146,6 +150,12 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
         <nav className="h-intents" aria-label="Jump to">
           {INTENTS.map(i => <Link key={i.label} to={i.to} className={i.live ? 'h-intent-live' : undefined}>{i.live ? <span className="h-intent-dot" aria-hidden="true" /> : null}{i.label}</Link>)}
         </nav>
+        {POPULAR.length ? (
+          <p className="h-popular">
+            <span>Calgary’s searching</span>
+            {POPULAR.map((t, i) => <Fragment key={t.to}>{i ? <span aria-hidden="true"> · </span> : null}<Link to={popularHref(t.to)}>{t.label}</Link></Fragment>)}
+          </p>
+        ) : null}
       </div>
       <TowBanner />
       <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">

@@ -9,6 +9,7 @@ import type { DiscoveryEntity } from '../../types/discovery';
 import type { SafetyHeadline } from '../../lib/safetyNews';
 import { DISCOVERY_SECTIONS, entityPath } from '../../lib/discovery';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
+import { tryChips } from '../../lib/searchTrends';
 import '../../styles/search-page.css';
 
 /** One-tap searches for what people most often come looking for. */
@@ -70,10 +71,12 @@ export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: Discove
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best, bestLists = [], safety }: {
+export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   listingCount: number; resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
+  /** What Calgary searched for most lately (searchTrends.ts), most first. */
+  popular?: Suggestion[];
   /** For a community search with no listings of its own: what's on nearby. */
   nearby?: { title: ReactNode; items: DiscoveryEntity[] };
   /** Listed places for a "best pho" search. */
@@ -102,8 +105,8 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
         kicker={q ? 'Search results' : 'Search CalgaryWatch'}
         title={q ? <>Results for <span>“{q}”</span></> : <>Ask about <span>Calgary.</span></>}
         lead={q ? undefined : 'A neighbourhood, a street, what happened last night, or something to do this weekend. Answers come from the live map and every listing on the site.'}
-        ctas={<div className="sx-box"><GlobalSearch initial={q} suggest={suggest} /></div>}
-        facts={<>{TRY.map(t => <li key={t}><Link to={`/search?q=${encodeURIComponent(t)}`}>{t}</Link></li>)}</>}
+        ctas={<div className="sx-box"><GlobalSearch initial={q} suggest={suggest} popular={popular} /></div>}
+        facts={<>{tryChips(popular, TRY).map(t => <li key={t.to}><Link to={t.to}>{t.label}</Link></li>)}</>}
       />
 
       <div className="cw-wrap">
@@ -202,11 +205,12 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                 <Rows rows={collapseRepeats(nearby.items)} />
               </section>
             ) : null}
-            {!resultCount && !best ? <Starters title="Try one of these" /> : null}
+            {!resultCount && !best ? <>{popular.length ? <Popular items={popular} title={<>Others found <span>these.</span></>} /> : null}<Starters title="Try one of these" /></> : null}
           </>
         ) : (
           <>
-            <Starters title={<>What people <span>ask most.</span></>} />
+            {popular.length ? <Popular items={popular} title={<>What Calgary <span>searches for.</span></>} /> : null}
+            <Starters title={popular.length ? <>Quick <span>answers.</span></> : <>What people <span>ask most.</span></>} />
             <section className="bp-section" aria-labelledby="sx-browse">
               <div className="bp-head"><h2 id="sx-browse">Or just <span>browse.</span></h2><p>Every section, checked against its source.</p></div>
               <ul className="sx-browse">
@@ -281,6 +285,20 @@ function Rows({ rows }: { rows: Array<{ e: DiscoveryEntity; more: number }> }) {
         );
       })}
     </ul>
+  );
+}
+
+/** Popular right now: where recent searches landed, named by the site. */
+function Popular({ items, title }: { items: Suggestion[]; title: ReactNode }) {
+  return (
+    <section className="bp-section" aria-labelledby="sx-popular">
+      <div className="bp-head"><h2 id="sx-popular">{title}</h2><p>Where searches on CalgaryWatch landed most this month.</p></div>
+      <ul className="sx-browse sx-popular">
+        {items.map((p, i) => (
+          <li key={p.to}><Link to={p.to}><span className="sx-browse-icon sx-popular-n" aria-hidden="true">{i + 1}</span><strong>{p.label}</strong><small>{p.note}</small><ArrowUpRight size={18} aria-hidden="true" className="sx-arrow" /></Link></li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

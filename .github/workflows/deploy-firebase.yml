@@ -92,6 +92,16 @@ jobs:
         continue-on-error: true
         run: npm run news:crime
 
+      # "Popular right now" in the search boxes, from the last 30 days of
+      # anonymous searches (at most 1,500 reads). Logs counts, never terms.
+      - name: Export popular searches
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+        run: npm run search:trends
+
       - name: Build Site
         env:
           VITE_BASE_PATH: /
@@ -146,6 +156,10 @@ jobs:
       # The next deploy merges into this copy, so headlines outlive the feeds' short windows.
       - name: Publish the safety headlines
         run: cp src/generated/crime-news.json dist/crime-news.json
+
+      # The next deploy falls back to this copy when Firestore can't be read.
+      - name: Publish the popular searches
+        run: cp src/generated/search-trends.json dist/search-trends.json
 
       # Publish the UI before backend provisioning. This keeps ordinary site
       # releases available even when a Google Cloud IAM or Secret Manager

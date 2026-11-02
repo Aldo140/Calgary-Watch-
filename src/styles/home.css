@@ -120,6 +120,10 @@
 .cw-home2 .h-intents a:hover { background: #fff; transform: translateY(-1px); }
 .cw-home2 .h-hero[data-tone='light'] .h-intents a { background: rgba(255, 255, 255, .13); color: #fff; border: 1px solid rgba(255, 255, 255, .22); }
 .cw-home2 .h-hero[data-tone='light'] .h-intents a:hover { background: rgba(255, 255, 255, .24); }
+/* "Calgary's searching": the top search destinations, as quiet text links under the chips. */
+.cw-home2 .h-popular { margin: 14px 0 0; font: 500 14px/1.6 Inter, sans-serif; color: var(--h-ink); }
+.cw-home2 .h-popular > span:first-child { margin-right: 8px; font: 700 11px/1 var(--mono, ui-monospace, monospace); text-transform: uppercase; letter-spacing: .1em; opacity: .8; }
+.cw-home2 .h-popular a { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-color: var(--h-cyan); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 
 .cw-home2 .h-date-short, .cw-home2 .h-mark-slot { display: none; }
 .cw-home2 .h-dateline-live {

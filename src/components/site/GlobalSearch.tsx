@@ -1,4 +1,4 @@
-import { useId, useRef, useEffect, useState, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useId, useRef, useEffect, useState, type ChangeEvent, type FocusEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ArrowRight } from 'lucide-react';
 import { normalizeSearch } from '../../lib/discovery';
@@ -9,14 +9,23 @@ export interface Suggestion { label: string; note?: string; to: string }
 /**
  * The site search box. With `suggest`, it becomes a combobox that offers
  * communities, sections and listings as you type (arrow keys, Enter, Escape).
+ * With `popular` too, an empty box offers what Calgary searches for most.
  */
-export function GlobalSearch({ initial = '', suggest }: { initial?: string; suggest?: (q: string) => Suggestion[] }) {
+export function GlobalSearch({ initial = '', suggest, popular = [] }: { initial?: string; suggest?: (q: string) => Suggestion[]; popular?: Suggestion[] }) {
   const navigate = useNavigate();
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [options, setOptions] = useState<Suggestion[]>([]);
   const [active, setActive] = useState(-1);
+  const [showingPopular, setShowingPopular] = useState(false);
   const open = !!suggest && options.length > 0;
+  const offer = (typed: string) => {
+    if (!suggest) return;
+    const empty = !typed.trim();
+    setShowingPopular(empty && popular.length > 0);
+    setOptions(empty ? popular : suggest(typed));
+    setActive(-1);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -87,7 +96,8 @@ export function GlobalSearch({ initial = '', suggest }: { initial?: string; sugg
           'aria-expanded': open,
           'aria-controls': `${id}-list`,
           'aria-activedescendant': active >= 0 ? `${id}-opt-${active}` : undefined,
-          onChange: (e: ChangeEvent<HTMLInputElement>) => { setOptions(suggest(e.target.value)); setActive(-1); },
+          onChange: (e: ChangeEvent<HTMLInputElement>) => offer(e.target.value),
+          onFocus: (e: FocusEvent<HTMLInputElement>) => { if (!e.target.value.trim()) offer(''); },
           onKeyDown,
           onBlur: () => window.setTimeout(close, 120),
         } : {})}
@@ -96,7 +106,7 @@ export function GlobalSearch({ initial = '', suggest }: { initial?: string; sugg
         <ArrowRight size={22} />
       </button>
       {suggest ? (
-        <ul className="cw-suggest" id={`${id}-list`} role="listbox" aria-label="Suggestions" hidden={!open}>
+        <ul className="cw-suggest" id={`${id}-list`} role="listbox" aria-label={showingPopular ? 'Popular right now' : 'Suggestions'} data-popular={showingPopular || undefined} hidden={!open}>
           {options.map((s, i) => (
             <li key={`${s.to}-${i}`} id={`${id}-opt-${i}`} role="option" aria-selected={i === active}
               onMouseDown={e => e.preventDefault()} onClick={() => go(s)} onMouseEnter={() => setActive(i)}>

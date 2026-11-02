@@ -184,3 +184,43 @@ export function startsIn(start: number, now: number): string {
   const h = Math.floor(mins / 60), m = mins % 60;
   return h >= 4 || !m ? `in ${h} h` : `in ${h} h ${m} min`;
 }
+
+/**
+ * The swipe deck on phones: events picked for this member over the next ten
+ * days that they haven't said yes to yet, one card each (a listing shows once
+ * even when it repeats), in the order they were ranked. Only events, because
+ * "I'm going" is what a right swipe records. Anything already over is out.
+ */
+export function deckFor(picks: readonly PickItem[], going: ReadonlySet<string>, now: number, max = 15): PickItem[] {
+  const seen = new Set<string>();
+  const out: PickItem[] = [];
+  for (const p of picks) {
+    if (p.kind !== 'event' || going.has(p.entityId) || seen.has(p.entityId) || Date.parse(p.end) <= now) continue;
+    seen.add(p.entityId);
+    out.push(p);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+/** Where today sits between sunrise and sunset, for the phone hero's sun ribbon. */
+export interface Daylight {
+  phase: 'before' | 'day' | 'after';
+  /** 0 at sunrise, 1 at sunset; clamped. */
+  progress: number;
+  /** "Sunset in 2 h 41 min", "Sunrise in 40 min", "Dark since 4:52". */
+  headline: string;
+}
+
+export function daylight(now: number, rise: number, set: number, clock: (t: number) => string): Daylight {
+  const span = (ms: number) => {
+    const mins = Math.max(1, Math.round(ms / 60_000));
+    if (mins < 60) return `${mins} min`;
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return m ? `${h} h ${m} min` : `${h} h`;
+  };
+  const progress = Math.min(1, Math.max(0, (now - rise) / (set - rise)));
+  if (now < rise) return { phase: 'before', progress: 0, headline: `Sunrise in ${span(rise - now)}` };
+  if (now < set) return { phase: 'day', progress, headline: `Sunset in ${span(set - now)}` };
+  return { phase: 'after', progress: 1, headline: `Dark since ${clock(set)}` };
+}

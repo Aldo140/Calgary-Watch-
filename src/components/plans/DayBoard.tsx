@@ -1,7 +1,8 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, ArrowUpRight, Bell, Check, Compass, MapPin, Navigation, Pencil, Sparkles, Ticket } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Bell, CalendarPlus, Check, Compass, MapPin, Navigation, Pencil, Share2, Sparkles, Ticket } from 'lucide-react';
+import { icsFile } from '../../lib/calendarFile';
 import { RadarArt } from '../home/HomeYours';
 import { EnvelopeArt } from './SignupFlow';
 import { GoingButton } from './GoingButton';
@@ -104,6 +105,7 @@ function Spot(p: DayBoardProps) {
         <div className="pd-db-acts">
           <Link to={item.path} className="pd-db-btn">Details <ArrowUpRight size={16} aria-hidden="true" /></Link>
           {where && (s.kind === 'today' || s.kind === 'now') ? <a className="pd-db-btn" data-k="ghost" href={directions(item)} target="_blank" rel="noopener noreferrer"><Navigation size={15} aria-hidden="true" /> Directions</a> : null}
+          <PlanTools item={item} when={when} />
           {s.more ? <a className="pd-db-more" href="#pd-next">+{s.more} more plan{s.more === 1 ? '' : 's'} <ArrowRight size={15} aria-hidden="true" /></a> : null}
         </div>
       </div>
@@ -195,5 +197,42 @@ function EmailMini(p: DayBoardProps) {
       </span>
       <span className="pd-db-mini-go">{p.emailAction ?? <Bell size={15} />}</span>
     </div>
+  );
+}
+
+/**
+ * Two small tools on the plan you're going to next: put it in your own
+ * calendar (an .ics file, which phones open straight into Calendar), and
+ * send it to whoever you're going with (the share sheet on phones, a copied
+ * link elsewhere).
+ */
+function PlanTools({ item, when }: { item: PickItem; when: string }) {
+  const [copied, setCopied] = useState(false);
+  const url = typeof window === 'undefined' ? item.path : new URL(item.path, window.location.origin).toString();
+  const where = placeOf(item);
+  const addToCalendar = () => {
+    const file = icsFile({ id: item.key, title: item.title, start: item.start, end: item.end, location: where ? `${where}, Calgary` : undefined, url });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([file], { type: 'text/calendar;charset=utf-8' }));
+    a.download = `${item.title.replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase().slice(0, 60) || 'plan'}.ics`;
+    document.body.appendChild(a); a.click(); a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  };
+  const share = async () => {
+    const text = `${item.title} · ${when}${where ? ` · ${where}` : ''}`;
+    try {
+      if (navigator.share) { await navigator.share({ title: item.title, text, url }); return; }
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      setCopied(true); window.setTimeout(() => setCopied(false), 2200);
+    } catch { /* closed the share sheet */ }
+  };
+  return (
+    <span className="pd-db-tools">
+      <button type="button" className="pd-db-tool" onClick={addToCalendar} aria-label={`Add ${item.title} to your calendar`} title="Add to calendar"><CalendarPlus size={17} aria-hidden="true" /></button>
+      <button type="button" className="pd-db-tool" onClick={() => void share()} aria-label={copied ? 'Link copied' : `Share ${item.title}`} title="Share" data-done={copied || undefined}>
+        {copied ? <Check size={17} aria-hidden="true" /> : <Share2 size={17} aria-hidden="true" />}
+      </button>
+      <span className="cw-sr" role="status">{copied ? 'Link copied' : ''}</span>
+    </span>
   );
 }

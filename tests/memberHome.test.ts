@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { emailPlan, nearHome, nextSend, partOfDay, setupPercent, setupSteps } from '../src/lib/memberHome.ts';
+import { daylight, deckFor, emailPlan, nearHome, nextSend, partOfDay, setupPercent, setupSteps } from '../src/lib/memberHome.ts';
 
 const MON_8AM = Date.parse('2026-10-12T14:00:00Z'); // Monday 08:00 Calgary (UTC-6)
 const MON_10AM = Date.parse('2026-10-12T16:00:00Z');
@@ -65,5 +65,36 @@ describe('near home', () => {
   it('greets by the Calgary clock', () => {
     assert.equal(partOfDay(MON_8AM), 'Morning');
     assert.equal(partOfDay(Date.parse('2026-10-12T21:00:00Z')), 'Afternoon');
+  });
+});
+
+describe('phone swipe deck', () => {
+  const item = (id: string, kind: 'event' | 'market', start: string, end: string, key = id) => ({
+    key, entityId: id, kind, title: id, summary: '', path: `/events/${id}`, start, end, free: false, interests: [], matched: [], distanceM: null,
+  });
+  const NOW = Date.parse('2026-11-02T20:00:00Z');
+  it('keeps unanswered events in rank order, once each, and drops markets, plans and finished ones', () => {
+    const picks = [
+      item('a', 'event', '2026-11-03T02:00:00Z', '2026-11-03T05:00:00Z'),
+      item('m', 'market', '2026-11-04T16:00:00Z', '2026-11-04T22:00:00Z'),
+      item('b', 'event', '2026-11-04T02:00:00Z', '2026-11-04T05:00:00Z'),
+      item('a', 'event', '2026-11-05T02:00:00Z', '2026-11-05T05:00:00Z', 'a-2'),
+      item('old', 'event', '2026-11-01T02:00:00Z', '2026-11-01T05:00:00Z'),
+      item('c', 'event', '2026-11-06T02:00:00Z', '2026-11-06T05:00:00Z'),
+    ];
+    assert.deepEqual(deckFor(picks, new Set(['b']), NOW).map((p) => p.key), ['a', 'c']);
+    assert.equal(deckFor(picks, new Set(), NOW, 2).length, 2);
+  });
+});
+
+describe('sun ribbon', () => {
+  const clock = (t: number) => new Date(t - 6 * 3600_000).toISOString().slice(11, 16);
+  const rise = Date.parse('2026-11-02T14:30:00Z'), set = Date.parse('2026-11-02T23:52:00Z');
+  it('counts down to sunrise, then sunset, then says when it got dark', () => {
+    assert.deepEqual(daylight(Date.parse('2026-11-02T13:50:00Z'), rise, set, clock), { phase: 'before', progress: 0, headline: 'Sunrise in 40 min' });
+    const day = daylight(Date.parse('2026-11-02T21:11:00Z'), rise, set, clock);
+    assert.equal(day.headline, 'Sunset in 2 h 41 min');
+    assert.ok(day.progress > 0.7 && day.progress < 0.72);
+    assert.equal(daylight(Date.parse('2026-11-03T02:00:00Z'), rise, set, clock).headline, 'Dark since 17:52');
   });
 });

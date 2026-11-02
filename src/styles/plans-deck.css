@@ -1,0 +1,144 @@
+/*
+ * "Swipe your week" (phones): the launcher tile in Picked for you and the
+ * full-screen card deck. The deck is portalled to <body>, outside the
+ * dashboard's .cw-home2 wrapper, so it carries its own copy of the tokens.
+ */
+.pd-deck {
+  --b-ink: #151515; --b-yellow: #ffdf4f; --b-cyan: #00c2e0; --b-blue: #1554d1; --b-paper: #faf8f3;
+  --h-navy: #06162f; --h-display: 'Bricolage Grotesque', Inter, sans-serif; --h-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  position: fixed; inset: 0; z-index: 1200; display: flex; flex-direction: column; overflow: hidden;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  background-color: var(--h-navy); color: #fff;
+  background-image: radial-gradient(rgba(255, 255, 255, .09) 1.2px, transparent 1.4px); background-size: 14px 14px;
+  font-family: Inter, sans-serif; overscroll-behavior: contain; touch-action: pan-y;
+  animation: pd-deck-in .32s cubic-bezier(.2, 1.1, .4, 1);
+}
+@keyframes pd-deck-in { from { opacity: 0; transform: translateY(24px); } }
+.pd-deck button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.pd-deck button:disabled { opacity: .35; cursor: default; }
+.pd-deck :focus-visible { outline: 3px solid var(--b-yellow); outline-offset: 3px; }
+
+.pd-deck-head { display: flex; align-items: center; gap: 10px; }
+.pd-deck-head p { flex: 1; display: flex; flex-direction: column; gap: 3px; margin: 0; min-width: 0; }
+.pd-deck-head small { display: inline-flex; align-items: center; gap: 6px; font: 700 10.5px/1 var(--h-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--b-cyan); }
+.pd-deck-head b { font: 800 22px/1 var(--h-display); letter-spacing: -.02em; }
+.pd-deck-going { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 999px; background: var(--b-yellow); color: var(--b-ink); border: 2px solid var(--b-ink); font: 800 15px/1 var(--h-display); }
+.pd-deck-x { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .5) !important; }
+
+.pd-deck-progress { display: flex; gap: 3px; margin: 12px 0 0; padding: 0; list-style: none; }
+.pd-deck-progress li { flex: 1; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .2); transition: background .25s; }
+.pd-deck-progress li[data-state='go'] { background: var(--b-yellow); }
+.pd-deck-progress li[data-state='skip'] { background: rgba(255, 255, 255, .55); }
+.pd-deck-progress li[data-state='now'] { background: var(--b-cyan); }
+
+/* The stack: cards sit on top of each other in one grid cell. */
+.pd-deck-stack { position: relative; flex: 1; display: grid; min-height: 0; margin: 16px 0 34px; }
+.pd-deck-card {
+  grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+  border: 2.5px solid var(--b-ink); border-radius: 26px; background: #fff; color: var(--b-ink);
+  box-shadow: 6px 6px 0 var(--b-yellow), 6px 6px 0 2.5px var(--b-ink);
+  touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; will-change: transform;
+}
+.pd-deck-card:active { cursor: grabbing; }
+.pd-deck-card[data-depth='1'] { transform: translateY(30px) scale(.94); box-shadow: 4px 4px 0 var(--b-ink); filter: brightness(.94); }
+.pd-deck-card[data-depth='2'] { transform: translateY(58px) scale(.88); box-shadow: 4px 4px 0 var(--b-ink); filter: brightness(.86); }
+.pd-deck-card[data-depth='1'], .pd-deck-card[data-depth='2'] { pointer-events: none; transition: transform .3s cubic-bezier(.2, 1.1, .4, 1); }
+
+.pd-deck-art { position: relative; flex: 1 1 auto; min-height: 120px; border-bottom: 2.5px solid var(--b-ink); }
+.pd-deck-art .pd-art { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: 0; background: var(--bg); color: var(--ink); overflow: hidden; }
+.pd-deck-art .pd-art img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.pd-deck-art .pd-art svg { width: 72px; height: 72px; }
+.pd-deck-body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 18px; }
+.pd-deck-when { align-self: flex-start; padding: 5px 10px; border-radius: 999px; background: var(--b-ink); color: var(--b-yellow); font: 700 11px/1 var(--h-mono); letter-spacing: .05em; text-transform: uppercase; }
+.pd-deck-title { font: 800 26px/1.02 var(--h-display); letter-spacing: -.03em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pd-deck-where { display: flex; align-items: center; gap: 6px; font: 500 14px/1.3 Inter, sans-serif; color: #50545b; }
+.pd-deck-where svg { flex: none; }
+.pd-deck-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.pd-deck-tags b { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px; border-radius: 999px; border: 1.5px solid var(--b-ink); font: 700 11.5px/1 Inter, sans-serif; background: #fff; }
+.pd-deck-tags b[data-k='free'] { background: var(--b-yellow); }
+.pd-deck-tags b[data-k='ok'] { background: var(--b-blue); color: #fff; border-color: var(--b-blue); }
+
+.pd-deck-stamp {
+  position: absolute; z-index: 3; top: 18px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+  border: 3px solid currentColor; border-radius: 12px; font: 800 22px/1 var(--h-display); letter-spacing: .02em; text-transform: uppercase;
+  background: rgba(255, 255, 255, .92); pointer-events: none;
+}
+.pd-deck-stamp[data-k='go'] { left: 16px; color: #0f7a4a; transform: rotate(-10deg); }
+.pd-deck-stamp[data-k='skip'] { right: 16px; color: #c2372d; transform: rotate(10deg); }
+
+.pd-deck-hint { margin: 10px 0 0; text-align: center; font: 500 12.5px/1.4 Inter, sans-serif; color: rgba(255, 255, 255, .72); }
+.pd-deck-hint b { color: var(--b-yellow); }
+.pd-deck-acts { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; }
+.pd-deck .pd-deck-btn {
+  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: #fff; text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, .45); transition: transform .15s;
+}
+.pd-deck .pd-deck-btn:active:not(:disabled) { transform: scale(.92); }
+.pd-deck .pd-deck-btn[data-k='skip'], .pd-deck .pd-deck-btn[data-k='go'] { width: 68px; height: 68px; border: 2.5px solid var(--b-ink); box-shadow: 4px 4px 0 var(--b-ink); }
+.pd-deck .pd-deck-btn[data-k='skip'] { background: #fff; color: #c2372d; box-shadow: 4px 4px 0 #ff5a4e, 4px 4px 0 2.5px var(--b-ink); }
+.pd-deck .pd-deck-btn[data-k='go'] { background: var(--b-yellow); color: var(--b-ink); box-shadow: 4px 4px 0 var(--b-cyan), 4px 4px 0 2.5px var(--b-ink); }
+
+/* The end card. */
+.pd-deck-end { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 12px 4px; overflow-y: auto; }
+.pd-deck-end-mark { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 22px; background: var(--b-yellow); color: var(--b-ink); border: 2.5px solid var(--b-ink); box-shadow: 4px 4px 0 var(--b-cyan), 4px 4px 0 2.5px var(--b-ink); transform: rotate(-6deg); }
+.pd-deck-end h2 { margin: 8px 0 0; font: 800 40px/1 var(--h-display); letter-spacing: -.035em; color: #fff; }
+.pd-deck-end > p { margin: 0; font: 500 15px/1.45 Inter, sans-serif; color: rgba(255, 255, 255, .8); }
+.pd-deck-end-list { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
+.pd-deck-end-list li { display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; border-radius: 16px; background: #fff; color: var(--b-ink); border: 2px solid var(--b-ink); box-shadow: 3px 3px 0 var(--b-yellow), 3px 3px 0 2px var(--b-ink); }
+.pd-deck-end-list svg { flex: none; margin-top: 2px; color: var(--b-blue); }
+.pd-deck-end-list span { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pd-deck-end-list strong { font: 800 15.5px/1.15 var(--h-display); }
+.pd-deck-end-list small { font: 600 11.5px/1.2 var(--h-mono); color: #50545b; }
+.pd-deck-error { padding: 10px 12px; border-radius: 12px; background: #ffe1dd; color: #8a1f17 !important; font-weight: 600 !important; }
+.pd-deck-end-acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.pd-deck .pd-deck-cta { flex: 1 1 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 54px; border-radius: 999px; background: var(--b-yellow); color: var(--b-ink); border: 2.5px solid var(--b-ink); box-shadow: 4px 4px 0 var(--b-cyan), 4px 4px 0 2.5px var(--b-ink); font: 800 16px/1 Inter, sans-serif; text-decoration: none; }
+.pd-deck .pd-deck-ghost { display: inline-flex; align-items: center; gap: 6px; margin: 0 auto; height: 40px; padding: 0 14px; color: rgba(255, 255, 255, .85); font: 700 14px/1 Inter, sans-serif; }
+
+/* Short phones (an SE in landscape-ish browsers, or with the keyboard bar): tighter. */
+@media (max-height: 640px) {
+  .pd-deck-stack { margin-top: 12px; }
+  .pd-deck-body { gap: 6px; padding: 12px 14px 14px; }
+  .pd-deck-title { font-size: 22px; }
+  .pd-deck .pd-deck-btn[data-k='skip'], .pd-deck .pd-deck-btn[data-k='go'] { width: 58px; height: 58px; }
+  .pd-deck-hint { display: none; }
+}
+
+/* ── The launcher tile, inside Picked for you ──────────────────────────── */
+.cw-site .pd .pd-deck-tile {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 112px; align-items: center; gap: 10px; width: 100%;
+  margin: 0 0 16px; padding: 16px 12px 16px 16px; border: 2px solid var(--b-ink); border-radius: 22px; text-align: left; overflow: hidden;
+  background-color: var(--h-navy); color: #fff; box-shadow: 5px 5px 0 var(--b-yellow), 5px 5px 0 2px var(--b-ink);
+  background-image: radial-gradient(rgba(255, 255, 255, .1) 1.2px, transparent 1.4px); background-size: 12px 12px;
+  transition: transform .18s;
+}
+.cw-site .pd .pd-deck-tile:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 var(--b-yellow), 3px 3px 0 2px var(--b-ink); }
+.pd-deck-tile-text { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.pd-deck-tile-text small { display: inline-flex; align-items: center; gap: 6px; font: 700 10.5px/1 var(--h-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--b-cyan); }
+.pd-deck-tile-text strong { font: 800 22px/1.02 var(--h-display); letter-spacing: -.025em; }
+.pd-deck-tile-text > span { font: 500 13px/1.35 Inter, sans-serif; color: rgba(255, 255, 255, .78); }
+.cw-site .pd .pd-deck-tile-text .pd-deck-tile-go { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; height: 38px; padding: 0 16px; border-radius: 999px; background: var(--b-yellow); color: var(--b-ink); border: 2px solid var(--b-ink); font: 800 14px/1 Inter, sans-serif; }
+.pd-deck-tile-fan { position: relative; height: 112px; }
+.pd-deck-tile-card {
+  position: absolute; top: 8px; left: 32px; width: 68px; height: 90px; border: 2px solid var(--b-ink); border-radius: 12px; overflow: hidden; background: #fff;
+  transform: translateX(calc(var(--i) * -12px)) rotate(calc(var(--i) * -9deg + 8deg)); transform-origin: 50% 110%;
+  box-shadow: 2px 2px 0 var(--b-ink); animation: pd-deck-fan 2.8s ease-in-out infinite; animation-delay: calc(var(--i) * .15s);
+}
+.pd-deck-tile-card .pd-art { display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: 0; }
+.pd-deck-tile-card .pd-art img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes pd-deck-fan { 50% { transform: translateX(calc(var(--i) * -15px)) rotate(calc(var(--i) * -12deg + 9deg)); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-deck { animation: none; }
+  .pd-deck-tile-card { animation: none; }
+  .pd-deck-card[data-depth='1'], .pd-deck-card[data-depth='2'] { transition: none; }
+}
+
+/* A long "yes" list on a short screen scrolls from the top instead of centring off-screen. */
+.pd-deck-end { justify-content: flex-start; min-height: 0; }
+.pd-deck-end > :first-child { margin-top: auto; }
+.pd-deck-end > :last-child { margin-bottom: auto; }
+@media (max-height: 640px) {
+  .pd-deck-end-mark { width: 56px; height: 56px; border-radius: 18px; }
+  .pd-deck-end h2 { font-size: 32px; }
+  .pd-deck-end > p { font-size: 14px; }
+}

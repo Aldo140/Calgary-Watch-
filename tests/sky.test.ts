@@ -45,3 +45,16 @@ describe('sky colour mixing', () => {
     assert.equal(mix('#102030', '#305070', 0.5), '#203850');
   });
 });
+
+describe('Calgary sunrise and sunset', () => {
+  it('finds a short November day and a long June one', async () => {
+    const { sunTimes } = await import('../src/lib/sky');
+    const nov = sunTimes(new Date('2026-11-02T20:00:00Z'))!;
+    const local = (t: number) => new Date(t - 6 * 3600_000).toISOString().slice(11, 16);
+    // Calgary on Nov 2: about 8:30 a.m. to 5:55 p.m. on the year-round UTC-6 clock (≈ 9.4 h of daylight).
+    assert.ok(local(nov.rise) >= '08:15' && local(nov.rise) <= '08:45', local(nov.rise));
+    assert.ok(local(nov.set) >= '17:40' && local(nov.set) <= '18:10', local(nov.set));
+    const jun = sunTimes(new Date('2026-06-21T20:00:00Z'))!;
+    assert.ok((jun.set - jun.rise) / 3600_000 > 16, 'June day over 16 h');
+  });
+});

@@ -1,0 +1,160 @@
+/*
+ * Member dashboard on small phones ("pocket": 420px and narrower, so an
+ * iPhone SE / mini at 320-375 and 360px Androids). Not the phone layout
+ * squeezed: answers stack into full-width rows so nothing is cut short,
+ * the dock folds to icons with the current section spelled out, and the
+ * hero gets a sun ribbon. Loaded after plans-dashboard.css.
+ */
+
+/* ── Sun ribbon (all phones) ─────────────────────────────────────────── */
+.pd-sun {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 4px 8px; margin-top: 14px;
+  padding: 9px 12px 8px; border: 2px solid var(--b-ink); border-radius: 16px; background: rgba(255, 255, 255, .92); color: var(--b-ink);
+  box-shadow: 3px 3px 0 var(--b-ink); text-shadow: none;
+}
+.pd-sun[data-phase='after'], .pd-sun[data-phase='before'] { background: rgba(6, 22, 47, .9); color: #fff; }
+.cw-site .pd .pd-sun-head { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0; }
+.pd-sun-head b { font: 800 14px/1.1 Inter, sans-serif; letter-spacing: -.01em; }
+.pd-sun-head small { font: 600 10px/1.1 var(--h-mono); opacity: .7; text-align: right; }
+.pd-sun-end { display: inline-flex; align-items: center; gap: 4px; padding-bottom: 1px; font: 700 10.5px/1 var(--h-mono); white-space: nowrap; }
+.pd-sun-mid { position: relative; display: block; height: 30px; }
+.pd-sun-mid svg { position: absolute; left: 0; right: 0; bottom: 2px; width: 100%; height: 24px; overflow: visible; }
+.pd-sun-arc { fill: none; stroke: currentColor; stroke-opacity: .3; stroke-width: 2; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
+.pd-sun-done { fill: none; stroke: #ff9f1c; stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.pd-sun-horizon { stroke: currentColor; stroke-opacity: .5; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.pd-sun-dot {
+  position: absolute; display: grid; place-items: center; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%;
+  background: var(--b-yellow); color: var(--b-ink); border: 2px solid var(--b-ink); box-shadow: 0 0 0 4px rgba(255, 223, 79, .35);
+}
+.pd-sun[data-phase='after'] .pd-sun-dot, .pd-sun[data-phase='before'] .pd-sun-dot { background: #dfe7ff; box-shadow: 0 0 0 4px rgba(223, 231, 255, .2); }
+
+/* ── Plan tools on the day board (every width) ───────────────────────── */
+.pd-db-tools { display: inline-flex; gap: 8px; }
+.cw-site .pd .pd-db-tool {
+  display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--b-ink); background: #fff; color: var(--b-ink);
+  transition: transform .15s, background .2s;
+}
+.cw-site .pd .pd-db-tool:hover { transform: translate(-1px, -1px); background: var(--b-yellow); }
+.cw-site .pd .pd-db-tool[data-done] { background: #2fb67c; }
+
+/* ── Pocket phones ───────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .cw-site .pd .cw-wrap { padding-left: 16px; padding-right: 16px; }
+
+  /* Hero: a touch tighter, the member chip and the clock can share a line or wrap cleanly. */
+  .pd[data-layout='phone'] .pd-sky { padding-top: 16px; padding-bottom: 92px; }
+  .cw-site .pd-dateline { flex-wrap: wrap; gap: 8px; }
+  .pd-me { max-width: 100%; }
+  .cw-site .pd-sky h1 { margin-top: 14px; font-size: clamp(40px, 12.4vw, 52px); }
+  .pd[data-layout='phone'] .pd-actions { gap: 8px; margin-top: 14px; }
+  .pd[data-layout='phone'] .pd-cta, .pd[data-layout='phone'] .pd-ghost { height: 48px; }
+  .pd[data-layout='phone'] .pd-ghost[aria-label] { width: 48px; }
+
+  /* The yellow card hugs the screen edge a little closer, so its contents get the room. */
+  .pd-sill.cw-wrap { padding-left: 10px; padding-right: 10px; }
+  .pd-today { padding: 14px 10px 12px; border-radius: 22px; box-shadow: 5px 5px 0 var(--b-cyan), 5px 5px 0 2px var(--b-ink); }
+  .pd-db-body { padding: 16px 14px 14px; }
+  .cw-site .pd .pd-db-title { font-size: 23px; }
+  .pd-db-count { padding: 11px 14px; }
+  .pd-db-count b, .pd-db-spot[data-kind='today'] .pd-db-count b, .pd-db-spot[data-kind='now'] .pd-db-count b, .pd-db-count b.pd-db-word { font-size: 40px; }
+  .pd-db-acts { gap: 8px; }
+  .cw-site .pd-db-btn { height: 42px; padding: 0 14px; }
+  .pd-db-more { flex-basis: 100%; }
+
+  /* Near home + next email: full-width rows, not two squeezed columns. Nothing gets an ellipsis. */
+  .pd-db-side { flex-direction: column; gap: 8px; }
+  .pd-db-mini, .pd-db-mini:first-child, .pd-db-mini:last-child {
+    grid-template-columns: 46px minmax(0, 1fr); grid-template-areas: 'art text' 'art go'; align-items: start; gap: 6px 12px;
+    padding: 12px 14px 11px 12px; border-radius: 18px;
+  }
+  .pd-db-mini-art { width: 46px; height: 46px; }
+  .pd-db-mini-art svg { width: 38px; height: 30px; }
+  .pd-db-mini-text { gap: 2px; }
+  .pd-db-mini-text small { white-space: normal; font-size: 9.5px; }
+  .pd-db-mini-text strong { font-size: 18px; }
+  .pd-db-mini-text > span { font-size: 12.5px; -webkit-line-clamp: 2; }
+  .pd-db-mini-go { padding-top: 7px; }
+  .cw-site .pd-db-mini-go, .cw-site .pd-db-mini a.pd-db-mini-go, .cw-site .pd-db-mini button.pd-db-mini-go, .cw-site .pd-db-mini .gl-btn { font-size: 13px; }
+
+  .pd-step { padding: 11px; }
+  .pd-step strong { font-size: 16px; }
+
+  /* Picks: titles get two full lines, the date gets its own line, no clipping. */
+  .pd-days { margin: 0 -16px 12px; padding-left: 16px; padding-right: 16px; gap: 6px; }
+  .cw-site .pd-day { flex-basis: 56px; }
+  .pd-day b { font-size: 20px; }
+  .pd-track { gap: 8px; padding: 10px 10px 10px 10px; }
+  .pd-art { width: 42px; height: 42px; border-radius: 10px; }
+  .pd-track-main { gap: 10px; }
+  .pd-track-main strong { font-size: 15px; }
+  .pd-track-main small { white-space: normal; flex-wrap: wrap; row-gap: 2px; font-size: 11px; }
+  .cw-site .pd .pd-track .cw-going-btn, .cw-site .pd .pd-track .pd-round { width: 40px; min-height: 40px; height: 40px; }
+
+  /* Badges: the button drops under the hint, so the hint gets the full width. */
+  .pd-earn li { grid-template-columns: 40px minmax(0, 1fr); grid-template-areas: 'b text' 'b go'; align-items: start; row-gap: 8px; padding: 10px; }
+  .pd-earn li > .cw-bdg, .pd-earn li > span:first-child { grid-area: b; width: 40px; height: 40px; }
+  .pd-earn-text { grid-area: text; }
+  .cw-site .pd .pd-earn-go { grid-area: go; justify-self: start; height: 36px; padding: 0 14px; font-size: 13px; }
+  .pd-card { padding: 16px 14px; }
+
+  /* Welcome: badges wrap instead of running off the card; the start rows drop their icon. */
+  .pd-welcome { padding: 16px 14px; }
+  .cw-site .pd-welcome h2 { font-size: 36px; }
+  .pd-welcome-badges { flex-wrap: wrap; margin: 12px 0 0 !important; padding: 0; overflow: visible; }
+  .pd-welcome-badges { gap: 6px; }
+  .pd-welcome-badges li { transform: none !important; gap: 6px; padding: 3px 10px 3px 3px; font-size: 12px; }
+  .pd-welcome-badges .cw-bdg, .pd-welcome-badges svg { width: 28px !important; height: 28px !important; }
+  .cw-site .pd-welcome-starts a { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'n text go'; gap: 10px; padding: 11px; }
+  .pd-welcome-starts a > svg:first-of-type { display: none; }
+
+  /* Organizer desk */
+  .pd-biz { padding: 16px 12px 14px; }
+  .cw-site .pd .pd-biz-head h2 { font-size: 30px; }
+  .pd-biz-acts .pd-biz-btn { font-size: 13.5px; }
+  .pd-biz-stats { grid-template-columns: 70px minmax(0, 1fr); }
+
+  /* The dock folds: icons only, and the section you're in spelled out in a yellow pill. */
+  .pd-dock { left: 10px; right: 10px; gap: 2px; padding: 5px; justify-content: space-between; border-radius: 20px; }
+  .cw-site .pd-dock button {
+    flex: 0 0 44px; flex-direction: row; gap: 6px; min-height: 48px; padding: 0; border-radius: 15px;
+    transition: flex-basis .32s cubic-bezier(.2, 1.1, .4, 1), background .2s, color .2s;
+  }
+  .cw-site .pd-dock button > span:not(.pd-dock-ava) { max-width: 0; overflow: hidden; opacity: 0; white-space: nowrap; font-size: 12.5px; transition: max-width .32s, opacity .2s; }
+  .cw-site .pd-dock button[data-on='true'] { flex: 1 1 auto; padding: 0 12px; }
+  .cw-site .pd-dock button[data-on='true'] > span { max-width: 96px; opacity: 1; }
+  .cw-site .pd-dock .pd-dock-me { flex: 0 0 44px; }
+  .cw-site .pd { padding-bottom: 96px; }
+}
+
+/* The narrowest phones (320px): every pixel to the content. */
+@media (max-width: 349px) {
+  .cw-site .pd .cw-wrap { padding-left: 14px; padding-right: 14px; }
+  .pd-sill.cw-wrap { padding-left: 8px; padding-right: 8px; }
+  .pd-today { padding: 12px 8px 10px; }
+  .cw-site .pd-sky h1 { font-size: 40px; }
+  .pd-hello { font-size: .52em; }
+  .pd[data-layout='phone'] .pd-actions { grid-template-columns: minmax(0, 1fr) auto 48px; }
+  .pd[data-layout='phone'] .pd-ghost:not([aria-label]) { padding: 0 12px; }
+  .pd-sun { padding: 7px 9px 8px; gap: 6px; }
+  .pd-sun-end { font-size: 9.5px; }
+  .pd-sun-end svg { display: none; }
+  .pd-sun-head small { display: none; }
+  .cw-site .pd .pd-db-title { font-size: 21px; }
+  .cw-site .pd-db-btn { padding: 0 12px; font-size: 13.5px; }
+  .cw-site .pd .pd-db-tool { width: 40px; height: 40px; }
+  .cw-site .pd-sec-head h2 { font-size: 30px; }
+  .pd-deck-tile { grid-template-columns: minmax(0, 1fr) 84px; }
+  .pd-deck-tile-text strong { font-size: 19px; }
+  .pd-deck-tile-card { width: 58px; height: 78px; left: 22px; }
+  .cw-site .pd-dock button { flex-basis: 40px; }
+  .cw-site .pd-dock .pd-dock-me { flex-basis: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-site .pd-dock button, .cw-site .pd-dock button > span { transition: none; }
+}
+
+@media (max-width: 420px) {
+  .pd-biz-stats dd strong { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pd-biz-acts .pd-biz-btn { text-align: center; line-height: 1.15; }
+}

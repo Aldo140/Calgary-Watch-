@@ -1,7 +1,7 @@
 import {AdminAccessBar} from '../admin/AdminAccessBar';
 import {AdminGoingButton} from './AdminGoingButton';
 import { BusinessListings as BusinessCard } from './BusinessListings';
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import {
@@ -14,6 +14,8 @@ import { GoingButton } from './GoingButton';
 import { EASE_OUT } from './Motion';
 import { briefing } from './Glance';
 import { DayBoard } from './DayBoard';
+import { SunRibbon } from './SunRibbon';
+import { DeckLauncher, SwipeDeck } from './SwipeDeck';
 import { CalgarySky, type SkyVariant } from '../home/CalgarySky';
 import { TEAR } from '../home/HomeHero';
 import { Scribble } from '../home/HomeYours';
@@ -27,11 +29,12 @@ import { calgaryDate } from '../../lib/discovery';
 import { addCalgaryDays } from '../../lib/discoveryCalendar';
 import { BADGES, type BadgeId, type BadgeState } from '../../lib/badges';
 import { EVENT_INTERESTS, isOnNow, nextUp, pickDistance, pickWhen, pickWhenAt, type EventInterestId, type PickItem, type PlanEntry, type PlanTimeline } from '../../lib/eventPicks';
-import { partOfDay, setupPercent, spotlightFor, type EmailPlan, type NearReport, type SetupStep, type SetupStepId } from '../../lib/memberHome';
+import { deckFor, partOfDay, setupPercent, spotlightFor, type EmailPlan, type NearReport, type SetupStep, type SetupStepId } from '../../lib/memberHome';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/home-v3.css';
 import '../../styles/plans-dashboard.css';
+import '../../styles/plans-pocket.css';
 
 /*
  * The signed-in member home, in CalgaryWatch's own look: the homepage's live
@@ -309,14 +312,14 @@ function PhoneDock(p: DashboardProps) {
   const go = (id: string) => sectionOf(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   const name = p.user.displayName || p.first || 'You';
   return (
-    <nav className="pd-dock" aria-label="Jump to" data-shown={scrolled}>
+    <nav className="pd-dock" aria-label="Jump to" data-shown={scrolled} data-count={items.length + 1}>
       {items.map(({ id, label, Icon }) => (
-        <button key={id} type="button" data-on={active === id} aria-current={active === id ? 'true' : undefined} onClick={() => go(id)}>
+        <button key={id} type="button" data-on={active === id} aria-current={active === id ? 'true' : undefined} aria-label={label} onClick={() => go(id)}>
           <Icon size={19} strokeWidth={2.3} aria-hidden="true" />
           <span>{label}</span>
         </button>
       ))}
-      <button type="button" className="pd-dock-me" onClick={() => p.onEdit()}>
+      <button type="button" className="pd-dock-me" onClick={() => p.onEdit()} aria-label="You: area, emails and interests">
         <span className="pd-dock-ava" aria-hidden="true">{p.user.photoURL ? <img src={p.user.photoURL} alt="" referrerPolicy="no-referrer" /> : name.slice(0, 1)}</span>
         <span>You</span>
       </button>
@@ -367,6 +370,7 @@ function Sky(p: DashboardProps & { phone: boolean }) {
           <span className="pd-hello">{hello}{p.first ? `, ${p.first}` : ''}.</span>
           <span className="pd-yours">Your <Scribble>{p.area || 'Calgary'}.</Scribble></span>
         </motion.h1>
+        {p.phone ? <motion.div {...rise(0.1)}><SunRibbon now={now} /></motion.div> : null}
         <motion.p className="pd-lead" {...rise(0.14)}>{briefing({ near: p.near, nearReady: p.nearReady, area: p.area, picks: p.picks.length, next: nextUp(p.going, p.now) })}</motion.p>
         {p.notice && !p.notice.joined ? <Notice {...p.notice} /> : null}
         <motion.div className="pd-actions" {...rise(0.22)}>
@@ -690,6 +694,14 @@ function Tracklist(p: DashboardProps & { phone?: boolean }) {
     : p.picks;
   const mine = day ? planOn(day) : [];
   const dayName = (d: string, i: number) => (i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : fmt(noonOf(d), { weekday: 'long' }));
+  // Phones: the unanswered event picks as a swipe deck. Not for an admin looking at someone else's dashboard.
+  const [deckOpen, setDeckOpen] = useState(false);
+  const deck = useMemo(() => {
+    if (!p.phone || p.adminView != null) return [];
+    const said = new Set([...p.timeline.ahead, ...p.timeline.past].map((e) => e.item.entityId).concat(p.going.map((g) => g.entityId)));
+    return deckFor([...p.picks, ...p.weekPicks], said, p.now);
+  }, [p.phone, p.adminView, p.timeline, p.going, p.picks, p.weekPicks, p.now]);
+  const cardArt = (item: PickItem) => <Art item={item} src={p.imageFor(item.entityId)} />;
 
   return (
     <section className="pd-sec pd-picks" aria-labelledby="pd-picks">
@@ -697,6 +709,13 @@ function Tracklist(p: DashboardProps & { phone?: boolean }) {
         id="pd-picks" kicker={`Next 10 days · ${p.area ? `closest to ${p.area} first` : 'closest first'}`} title={<>Picked <mark>for you</mark></>}
         action={<button type="button" className="pd-pill" onClick={() => p.onEdit('interests')}><Pencil size={14} aria-hidden="true" /> {p.phone ? 'Interests' : 'Change interests'}</button>}
       />
+      {deck.length ? <DeckLauncher deck={deck} art={cardArt} onOpen={() => setDeckOpen(true)} /> : null}
+      {deckOpen ? (
+        <SwipeDeck
+          deck={deck} uid={p.user.uid} now={p.now} preview={p.preview} art={cardArt} onEdit={p.onEdit} onClose={() => setDeckOpen(false)}
+          plansBefore={p.timeline.ahead.length + p.timeline.past.length}
+        />
+      ) : null}
       <div className="pd-days" role="tablist" aria-label="Show picks for">
         <button type="button" role="tab" className="pd-day pd-day-all" aria-selected={!day} onClick={() => setDay(null)}>
           <small>Top</small><b>{p.picks.length}</b><span>picks</span>

@@ -89,3 +89,30 @@ export function skyPalette(altitude: number, cloudCover = 0): SkyPalette {
   const darkness = Math.min(1, Math.max(0, (2 - altitude) / 12));
   return { ...out, darkness, tone: altitude > 4 ? 'dark' : 'light' };
 }
+
+/**
+ * Today's sunrise and sunset in Calgary (the day that contains `date`, by
+ * Calgary's UTC-6 clock), found where the sun's centre crosses -0.833°.
+ * Scans in 10-minute steps, then narrows to the minute. Null at the poles'
+ * equivalent (never happens this far south, but keeps the type honest).
+ */
+export function sunTimes(date: Date, lat = CALGARY.lat, lng = CALGARY.lng): { rise: number; set: number } | null {
+  const HORIZON = -0.833;
+  const OFFSET = 6 * 3600_000; // Calgary is UTC-6 year-round (see calgaryTz).
+  const local = new Date(date.getTime() - OFFSET);
+  const midnight = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()) + OFFSET;
+  const up = (t: number) => sunPosition(new Date(t), lat, lng).altitude > HORIZON;
+  const refine = (a: number, b: number) => {
+    const goingUp = !up(a);
+    while (b - a > 60_000) { const m = (a + b) / 2; if (up(m) === goingUp) b = m; else a = m; }
+    return Math.round(b / 60_000) * 60_000;
+  };
+  let rise: number | null = null, set: number | null = null;
+  const step = 10 * 60_000;
+  for (let t = midnight; t < midnight + 86_400_000; t += step) {
+    const a = up(t), b = up(t + step);
+    if (!a && b && rise === null) rise = refine(t, t + step);
+    if (a && !b && set === null) set = refine(t, t + step);
+  }
+  return rise !== null && set !== null ? { rise, set } : null;
+}

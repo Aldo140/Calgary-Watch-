@@ -54,6 +54,34 @@ export const DATE_PICKS: DatePick[] = [
   },
 ];
 
+/**
+ * Dinner first: places to eat before the show, with the order chosen by the kitchen itself.
+ * Each one is a real /local profile; the dishes and the quote are the owner's own words,
+ * sent to us by email. Never paid for.
+ */
+export interface DinnerStop {
+  /** /local profile slug. */
+  slug: string;
+  name: string;
+  neighbourhood: string;
+  /** What to order, in the kitchen's words. */
+  order: Array<{ dish: string; what: string }>;
+  quote?: { text: string; by: string };
+  /** When the kitchen sent it (ISO date). */
+  added: string;
+}
+
+export const DATE_DINNER: DinnerStop[] = [
+  {
+    slug: 'pb-and-j-yyc', name: 'PB and J YYC', neighbourhood: 'Kensington', added: '2026-11-03',
+    order: [
+      { dish: 'Bazuma', what: 'Italian sourdough, real cheddar, turkey sausage, crispy fried onions, parmesan and herbs.' },
+      { dish: 'Brazen Blueberry', what: 'Italian sourdough, blueberry jam, butterscotch and house-made cashew butter.' },
+    ],
+    quote: { text: 'Share one savoury sandwich and one sweet one for dessert. The Brazen Blueberry tastes like a blueberry cheesecake!', by: 'Carol White, PB and J YYC' },
+  },
+];
+
 /** No tickets needed: evergreen ideas that point at our own guides and neighbourhoods. */
 export const DATE_FREE_IDEAS: Array<{ title: string; body: string; to: string; cta: string; neighbourhood?: string }> = [
   { title: 'Walk the Bow at dusk', body: 'Prince’s Island Park to the Peace Bridge is flat, free and about as close to the river as downtown gets.', to: '/guides/a-day-along-the-bow-river', cta: 'The Bow River walk' },

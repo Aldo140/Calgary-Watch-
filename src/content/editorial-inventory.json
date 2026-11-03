@@ -18385,6 +18385,3029 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-02T19:30:00Z",
       "email": "baharkabab@gmail.com"
+    },
+    {
+      "id": "biz-big-ts-bbq-mcmahon",
+      "kind": "business",
+      "slug": "big-ts-bbq-mcmahon",
+      "title": "Big T's BBQ & Smokehouse",
+      "name": "Big T's BBQ & Smokehouse",
+      "website": "https://bigtsbbq.com/menu/mcmahon/",
+      "address": "2138 Crowchild Trail NW, Calgary, AB",
+      "summary": "Barbecue smokehouse on Crowchild Trail NW.",
+      "description": "Big T's BBQ & Smokehouse is a barbecue smokehouse on Crowchild Trail NW, near McMahon Stadium.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "barbecue"
+      ],
+      "sources": [
+        {
+          "name": "Big T's BBQ & Smokehouse",
+          "url": "https://bigtsbbq.com/menu/mcmahon/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bigtsbbq.com/menu/mcmahon/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@bigtsbbq.com"
+    },
+    {
+      "id": "biz-amici-italian-grill",
+      "kind": "business",
+      "slug": "amici-italian-grill",
+      "title": "Amici Italian Grill & Lounge",
+      "name": "Amici Italian Grill & Lounge",
+      "website": "http://www.amicicalgary.com/",
+      "address": "500 Country Hills Boulevard NE, Calgary, AB",
+      "summary": "Italian grill and lounge on Country Hills Boulevard NE.",
+      "description": "Amici Italian Grill & Lounge is an Italian restaurant and lounge on Country Hills Boulevard NE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian"
+      ],
+      "sources": [
+        {
+          "name": "Amici Italian Grill & Lounge",
+          "url": "http://www.amicicalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "http://www.amicicalgary.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@amicicalgary.com"
+    },
+    {
+      "id": "biz-bonterra-trattoria",
+      "kind": "business",
+      "slug": "bonterra-trattoria",
+      "title": "Bonterra Trattoria",
+      "name": "Bonterra Trattoria",
+      "website": "https://bonterra.ca/",
+      "address": "Calgary, AB",
+      "summary": "Italian trattoria on 8 Street SW.",
+      "description": "Bonterra Trattoria is an Italian trattoria on 8 Street SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian"
+      ],
+      "sources": [
+        {
+          "name": "Bonterra Trattoria",
+          "url": "https://bonterra.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bonterra.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@bonterra.ca"
+    },
+    {
+      "id": "biz-pulcinella-kensington",
+      "kind": "business",
+      "slug": "pulcinella-kensington",
+      "title": "Pulcinella",
+      "name": "Pulcinella",
+      "website": "https://pulcinella.ca/",
+      "address": "1147 Kensington Crescent NW, Calgary, AB",
+      "summary": "Italian pizzeria in Kensington.",
+      "description": "Pulcinella is an Italian pizzeria on Kensington Crescent NW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian",
+        "pizza"
+      ],
+      "sources": [
+        {
+          "name": "Pulcinella",
+          "url": "https://pulcinella.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://pulcinella.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@pulcinella.ca"
+    },
+    {
+      "id": "biz-singapore-sams",
+      "kind": "business",
+      "slug": "singapore-sams",
+      "title": "Singapore Sam's",
+      "name": "Singapore Sam's",
+      "website": "https://singaporesams.com/",
+      "address": "555 11 Avenue SW, Calgary, AB",
+      "summary": "Asian restaurant on 11 Avenue SW.",
+      "description": "Singapore Sam's is an Asian restaurant on 11 Avenue SW in the Beltline.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "asian"
+      ],
+      "sources": [
+        {
+          "name": "Singapore Sam's",
+          "url": "https://singaporesams.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://singaporesams.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@singaporesams.com"
+    },
+    {
+      "id": "biz-the-chick-pea",
+      "kind": "business",
+      "slug": "the-chick-pea",
+      "title": "The Chick Pea",
+      "name": "The Chick Pea",
+      "website": "https://thechickpea.ca/",
+      "address": "736 8 Avenue SW, Calgary, AB",
+      "summary": "Mediterranean restaurant on 8 Avenue SW.",
+      "description": "The Chick Pea serves Mediterranean food on 8 Avenue SW downtown, with catering too.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "mediterranean"
+      ],
+      "sources": [
+        {
+          "name": "The Chick Pea",
+          "url": "https://thechickpea.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thechickpea.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@thechickpea.ca"
+    },
+    {
+      "id": "biz-teatro-calgary",
+      "kind": "business",
+      "slug": "teatro-calgary",
+      "title": "Teatro",
+      "name": "Teatro",
+      "website": "http://www.teatro.ca/",
+      "address": "Calgary, AB",
+      "summary": "Downtown fine dining with an award-winning wine cellar.",
+      "description": "Teatro is a downtown Calgary restaurant known for elevated cuisine and an award-winning wine cellar.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian",
+        "fine dining"
+      ],
+      "sources": [
+        {
+          "name": "Teatro",
+          "url": "http://www.teatro.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "http://www.teatro.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@teatro.ca"
+    },
+    {
+      "id": "biz-model-milk",
+      "kind": "business",
+      "slug": "model-milk",
+      "title": "Model Milk",
+      "name": "Model Milk",
+      "website": "https://www.modelmilk.ca/",
+      "address": "308 17 Avenue SW, Calgary, AB",
+      "summary": "Restaurant on 17 Avenue SW.",
+      "description": "Model Milk is a restaurant on 17 Avenue SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Model Milk",
+          "url": "https://www.modelmilk.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.modelmilk.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@modelmilk.ca"
+    },
+    {
+      "id": "biz-globefish-marda-loop",
+      "kind": "business",
+      "slug": "globefish-marda-loop",
+      "title": "Globefish Sushi & Izakaya",
+      "name": "Globefish Sushi & Izakaya",
+      "website": "https://globefish.ca/",
+      "address": "2009 33 Avenue SW, Calgary, AB",
+      "summary": "Sushi and izakaya in Marda Loop.",
+      "description": "Globefish in Marda Loop serves authentic Japanese cuisine: fresh sushi, izakaya dishes and ramen at lunch.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "japanese",
+        "sushi"
+      ],
+      "sources": [
+        {
+          "name": "Globefish Sushi & Izakaya",
+          "url": "https://globefish.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://globefish.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "mardaloop@globefish.ca"
+    },
+    {
+      "id": "biz-calan-beef-noodle",
+      "kind": "business",
+      "slug": "calan-beef-noodle",
+      "title": "Calan Beef Noodle",
+      "name": "Calan Beef Noodle",
+      "website": "https://www.calanbeefnoodle.ca",
+      "address": "2219 Centre Street N, Calgary, AB",
+      "summary": "Lanzhou hand-pulled noodles on Centre Street N.",
+      "description": "Calan Beef Noodle on Centre Street N serves Lanzhou-style hand-pulled noodles and Halal-certified Chinese cuisine.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "chinese",
+        "noodles"
+      ],
+      "sources": [
+        {
+          "name": "Calan Beef Noodle",
+          "url": "https://www.calanbeefnoodle.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calanbeefnoodle.ca"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "calanbeefnoodle@gmail.com"
+    },
+    {
+      "id": "biz-seasons-of-bowness-park",
+      "kind": "business",
+      "slug": "seasons-of-bowness-park",
+      "title": "Seasons of Bowness Park",
+      "name": "Seasons of Bowness Park",
+      "website": "https://seasonsofbownesspark.ca/",
+      "address": "8900 48 Avenue NW, Calgary, AB",
+      "summary": "Casual fine dining in Bowness Park.",
+      "description": "Seasons of Bowness Park is a casual fine dining restaurant and fresh market take-out inside Bowness Park.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "seasonal",
+        "park"
+      ],
+      "sources": [
+        {
+          "name": "Seasons of Bowness Park",
+          "url": "https://seasonsofbownesspark.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://seasonsofbownesspark.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@seasonsofbownesspark.ca"
+    },
+    {
+      "id": "biz-mestizo-taqueria",
+      "kind": "business",
+      "slug": "mestizo-taqueria",
+      "title": "Mestizo Taqueria",
+      "name": "Mestizo Taqueria",
+      "website": "https://mestizoyyc.com/",
+      "address": "124 10 Street NW, Calgary, AB",
+      "summary": "Mexican street food on 10 Street NW.",
+      "description": "Mestizo Taqueria on 10 Street NW serves authentic, locally crafted Mexican street food.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "mexican",
+        "tacos"
+      ],
+      "sources": [
+        {
+          "name": "Mestizo Taqueria",
+          "url": "https://mestizoyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mestizoyyc.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@mestizoyyc.com"
+    },
+    {
+      "id": "biz-nam-vietnamese-kitchen",
+      "kind": "business",
+      "slug": "nam-vietnamese-kitchen",
+      "title": "NAM Vietnamese Kitchen",
+      "name": "NAM Vietnamese Kitchen",
+      "website": "http://www.namvk.com",
+      "address": "1023 8 Street SW, Calgary, AB",
+      "summary": "Vietnamese kitchen on 8 Street SW.",
+      "description": "NAM Vietnamese Kitchen is a Vietnamese restaurant on 8 Street SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vietnamese"
+      ],
+      "sources": [
+        {
+          "name": "NAM Vietnamese Kitchen",
+          "url": "http://www.namvk.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "http://www.namvk.com"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "hello@namvk.com"
+    },
+    {
+      "id": "biz-charbar",
+      "kind": "business",
+      "slug": "charbar",
+      "title": "Charbar",
+      "name": "Charbar",
+      "website": "https://www.charbar.ca/",
+      "address": "618 Confluence Way SE, Calgary, AB",
+      "summary": "Wood-fire steakhouse in East Village.",
+      "description": "Charbar is a wood-fire steakhouse in East Village, on Confluence Way SE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "steakhouse"
+      ],
+      "sources": [
+        {
+          "name": "Charbar",
+          "url": "https://www.charbar.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.charbar.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@charbar.ca"
+    },
+    {
+      "id": "biz-myung-ga-korean",
+      "kind": "business",
+      "slug": "myung-ga-korean",
+      "title": "Myung Ga Korean Restaurant",
+      "name": "Myung Ga Korean Restaurant",
+      "website": "https://myungga.wixsite.com/restaurant",
+      "address": "8 Weston Drive SW, Calgary, AB",
+      "summary": "Korean restaurant on Weston Drive SW.",
+      "description": "Myung Ga is a Korean restaurant on Weston Drive SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "korean"
+      ],
+      "sources": [
+        {
+          "name": "Myung Ga Korean Restaurant",
+          "url": "https://myungga.wixsite.com/restaurant",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://myungga.wixsite.com/restaurant"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "myunggarestaurant@gmail.com"
+    },
+    {
+      "id": "biz-goro-and-gun",
+      "kind": "business",
+      "slug": "goro-and-gun",
+      "title": "Goro + Gun",
+      "name": "Goro + Gun",
+      "website": "https://www.goroandgun.ca/",
+      "address": "225 7 Avenue SW, Calgary, AB",
+      "summary": "Japanese-inspired restaurant downtown.",
+      "description": "Goro + Gun is a Japanese-inspired restaurant on 7 Avenue SW downtown.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "japanese"
+      ],
+      "sources": [
+        {
+          "name": "Goro + Gun",
+          "url": "https://www.goroandgun.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.goroandgun.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@goroandgun.ca"
+    },
+    {
+      "id": "biz-masa-mama",
+      "kind": "business",
+      "slug": "masa-mama",
+      "title": "Masa Mama",
+      "name": "Masa Mama",
+      "website": "https://masamama.com/",
+      "address": "3429 22 Street SW, Calgary, AB",
+      "summary": "Modern Mexican taqueria in Marda Loop.",
+      "description": "Masa Mama in Marda Loop is a modern Mexican taqueria with tacos, salads, bowls and snacks in an intimate room.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "mexican",
+        "tacos"
+      ],
+      "sources": [
+        {
+          "name": "Masa Mama",
+          "url": "https://masamama.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://masamama.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "hola@masamama.com"
+    },
+    {
+      "id": "biz-osteria-chefs-table",
+      "kind": "business",
+      "slug": "osteria-chefs-table",
+      "title": "Osteria Chef's Table",
+      "name": "Osteria Chef's Table",
+      "website": "https://www.osteria.ca/",
+      "address": "201 10 Street NW, Calgary, AB",
+      "summary": "Italian restaurant in Kensington.",
+      "description": "Osteria is an Italian restaurant on 10 Street NW in Kensington.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian"
+      ],
+      "sources": [
+        {
+          "name": "Osteria Chef's Table",
+          "url": "https://www.osteria.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.osteria.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "osteria@osteria.ca"
+    },
+    {
+      "id": "biz-taste-of-yemen",
+      "kind": "business",
+      "slug": "taste-of-yemen",
+      "title": "Taste of Yemen",
+      "name": "Taste of Yemen",
+      "website": "https://tasteofyemen.ca/",
+      "address": "1033 17 Avenue SW, Calgary, AB",
+      "summary": "Traditional Yemeni cooking on 17 Avenue SW.",
+      "description": "Taste of Yemen on 17 Avenue SW serves traditional Yemeni dishes like lamb mandi and chicken kabsa, with vegetarian options.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "yemeni",
+        "middle eastern"
+      ],
+      "sources": [
+        {
+          "name": "Taste of Yemen",
+          "url": "https://tasteofyemen.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://tasteofyemen.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "tasteofyemenca1@gmail.com"
+    },
+    {
+      "id": "biz-klein-harris",
+      "kind": "business",
+      "slug": "klein-harris",
+      "title": "Klein/Harris",
+      "name": "Klein/Harris",
+      "website": "https://www.kleinharris.com/",
+      "address": "110 8 Avenue SW, Calgary, AB",
+      "summary": "Restaurant on Stephen Avenue downtown.",
+      "description": "Klein / Harris is a restaurant on Stephen Avenue (8 Avenue SW) downtown.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Klein/Harris",
+          "url": "https://www.kleinharris.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kleinharris.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "hello@kleinharris.com"
+    },
+    {
+      "id": "biz-5-senses-ramen",
+      "kind": "business",
+      "slug": "5-senses-ramen",
+      "title": "5 Senses Ramen & Sushi Bar",
+      "name": "5 Senses Ramen & Sushi Bar",
+      "website": "https://5sensesyyc.com/",
+      "address": "634A 17 Avenue SW, Calgary, AB",
+      "summary": "Ramen and sushi bar on 17 Avenue SW.",
+      "description": "5 Senses Ramen & Sushi Bar on 17 Avenue SW is a Japanese fusion restaurant with made-to-order ramen.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "japanese",
+        "ramen"
+      ],
+      "sources": [
+        {
+          "name": "5 Senses Ramen & Sushi Bar",
+          "url": "https://5sensesyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://5sensesyyc.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "satoru@5sensesyyc.com"
+    },
+    {
+      "id": "biz-kama-calgary",
+      "kind": "business",
+      "slug": "kama-calgary",
+      "title": "Kama",
+      "name": "Kama",
+      "website": "https://kamacalgary.com",
+      "address": "211 11 Avenue SW, Calgary, AB",
+      "summary": "Mediterranean mezze and cocktails in the Beltline.",
+      "description": "Kama is a Mediterranean-inspired restaurant in the Beltline, made for sharing mezze and tapas over creative cocktails.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "mediterranean",
+        "cocktails"
+      ],
+      "sources": [
+        {
+          "name": "Kama",
+          "url": "https://kamacalgary.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://kamacalgary.com"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@kamacalgary.com"
+    },
+    {
+      "id": "biz-ten-foot-henry",
+      "kind": "business",
+      "slug": "ten-foot-henry",
+      "title": "Ten Foot Henry",
+      "name": "Ten Foot Henry",
+      "website": "https://www.tenfoothenry.com/",
+      "address": "1209 1 Street SW, Calgary, AB",
+      "summary": "Restaurant on 1 Street SW.",
+      "description": "Ten Foot Henry is a restaurant on 1 Street SW in the Beltline.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Ten Foot Henry",
+          "url": "https://www.tenfoothenry.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tenfoothenry.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "work@tenfoothenry.com"
+    },
+    {
+      "id": "biz-shokunin",
+      "kind": "business",
+      "slug": "shokunin",
+      "title": "Shokunin",
+      "name": "Shokunin",
+      "website": "https://www.shokuninyyc.ca/",
+      "address": "2016 4 Street SW, Calgary, AB",
+      "summary": "Japanese restaurant on 4 Street SW.",
+      "description": "Shokunin is a Japanese restaurant on 4 Street SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "japanese"
+      ],
+      "sources": [
+        {
+          "name": "Shokunin",
+          "url": "https://www.shokuninyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.shokuninyyc.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@shokuninyyc.ca"
+    },
+    {
+      "id": "biz-vin-room",
+      "kind": "business",
+      "slug": "vin-room",
+      "title": "Vin Room",
+      "name": "Vin Room",
+      "website": "http://www.vinroom.com/",
+      "address": "2000 Airport Road NE, Calgary, AB",
+      "summary": "Wine bar with 80+ wines and tapas.",
+      "description": "Vin Room is a wine bar with over 80 wines by the taste or glass, paired with tapas.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "wine",
+        "tapas"
+      ],
+      "sources": [
+        {
+          "name": "Vin Room",
+          "url": "http://www.vinroom.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "http://www.vinroom.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@vinroom.com"
+    },
+    {
+      "id": "biz-connie-and-johns",
+      "kind": "business",
+      "slug": "connie-and-johns",
+      "title": "Connie and John's",
+      "name": "Connie and John's",
+      "website": "https://www.connieandjohns.com/",
+      "address": "482 McLaurin Street NW, Calgary, AB",
+      "summary": "Pizza on McLaurin Street NW.",
+      "description": "Connie and John's is a pizza restaurant on McLaurin Street NW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza"
+      ],
+      "sources": [
+        {
+          "name": "Connie and John's",
+          "url": "https://www.connieandjohns.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.connieandjohns.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@connieandjohns.com"
+    },
+    {
+      "id": "biz-nans-noodle-house",
+      "kind": "business",
+      "slug": "nans-noodle-house",
+      "title": "Nan's Noodle House",
+      "name": "Nan's Noodle House",
+      "website": "https://nansnoodlehouse.com/",
+      "address": "3103b Edmonton Trail NE, Calgary, AB",
+      "summary": "Plant-based noodles on Edmonton Trail NE.",
+      "description": "Nan's Noodle House on Edmonton Trail NE has a chef-driven, plant-based menu of ramen, pho and Pan-Asian dishes.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "plant-based",
+        "noodles"
+      ],
+      "sources": [
+        {
+          "name": "Nan's Noodle House",
+          "url": "https://nansnoodlehouse.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://nansnoodlehouse.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "contact@nansnoodlehouse.com"
+    },
+    {
+      "id": "biz-una-pizza-wine",
+      "kind": "business",
+      "slug": "una-pizza-wine",
+      "title": "UNA Pizza + Wine",
+      "name": "UNA Pizza + Wine",
+      "website": "https://unapizzeria.com/",
+      "address": "4034 University Avenue NW, Calgary, AB",
+      "summary": "Thin crust pizza and wine in University District.",
+      "description": "UNA pizza + wine on University Avenue NW serves California-influenced thin crust pizza and hand-picked wines.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza",
+        "wine"
+      ],
+      "sources": [
+        {
+          "name": "UNA Pizza + Wine",
+          "url": "https://unapizzeria.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://unapizzeria.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "contact@unapizzeria.com"
+    },
+    {
+      "id": "biz-pat-and-betty",
+      "kind": "business",
+      "slug": "pat-and-betty",
+      "title": "Pat & Betty",
+      "name": "Pat & Betty",
+      "website": "https://patandbetty.com/",
+      "address": "1217 1 Street SW, Calgary, AB",
+      "summary": "Restaurant on 1 Street SW.",
+      "description": "Pat & Betty is a restaurant on 1 Street SW in the Beltline.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Pat & Betty",
+          "url": "https://patandbetty.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://patandbetty.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "hello@patandbetty.com"
+    },
+    {
+      "id": "biz-francines",
+      "kind": "business",
+      "slug": "francines",
+      "title": "Francine's",
+      "name": "Francine's",
+      "website": "https://www.francines.ca/",
+      "address": "306 Centre Street SE, Calgary, AB",
+      "summary": "Petite French bar on Centre Street SE.",
+      "description": "Francine's on Centre Street SE is a petite French bar with old-world cocktails and tavern-style, French-accented food.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "french",
+        "cocktails"
+      ],
+      "sources": [
+        {
+          "name": "Francine's",
+          "url": "https://www.francines.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.francines.ca/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@francines.ca"
+    },
+    {
+      "id": "biz-deane-house",
+      "kind": "business",
+      "slug": "deane-house",
+      "title": "Deane House",
+      "name": "Deane House",
+      "website": "https://www.deanehouse.com/",
+      "address": "806 9 Avenue SE, Calgary, AB",
+      "summary": "Restaurant in a historic Inglewood house.",
+      "description": "Deane House is a restaurant in a historic house on 9 Avenue SE in Inglewood.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "historic",
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Deane House",
+          "url": "https://www.deanehouse.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.deanehouse.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@deanehouse.com"
+    },
+    {
+      "id": "biz-flores-and-pine",
+      "kind": "business",
+      "slug": "flores-and-pine",
+      "title": "Flores & Pine",
+      "name": "Flores & Pine",
+      "website": "https://www.floresandpine.com/",
+      "address": "254028 Bearspaw Road, Calgary, AB",
+      "summary": "Elevated casual dining in Bearspaw.",
+      "description": "Flores & Pine is an elevated casual restaurant on Bearspaw Road that also hosts weddings and events.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Flores & Pine",
+          "url": "https://www.floresandpine.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.floresandpine.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@floresandpine.com"
+    },
+    {
+      "id": "biz-pie-junkie-crowfoot",
+      "kind": "business",
+      "slug": "pie-junkie-crowfoot",
+      "title": "Pie Junkie Crowfoot",
+      "name": "Pie Junkie Crowfoot",
+      "website": "https://piejunkie.ca",
+      "address": "826 Crowfoot Crescent NW, Calgary, AB",
+      "summary": "Handmade sweet and savoury pies in Crowfoot.",
+      "description": "Pie Junkie makes sweet and savoury pies by hand from seasonal, fresh ingredients, with a shop in Crowfoot.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pie",
+        "bakery"
+      ],
+      "sources": [
+        {
+          "name": "Pie Junkie Crowfoot",
+          "url": "https://piejunkie.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://piejunkie.ca"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "nancy@piejunkie.ca"
+    },
+    {
+      "id": "biz-analog-coffee-17th",
+      "kind": "business",
+      "slug": "analog-coffee-17th",
+      "title": "Analog Coffee",
+      "name": "Analog Coffee",
+      "website": "https://www.analogcoffee.ca/",
+      "address": "740 17 Avenue SW, Calgary, AB",
+      "summary": "Specialty coffee on 17 Avenue SW.",
+      "description": "Analog Coffee is a specialty coffee bar on 17 Avenue SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "sources": [
+        {
+          "name": "Analog Coffee",
+          "url": "https://www.analogcoffee.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.analogcoffee.ca/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@analogcoffee.ca"
+    },
+    {
+      "id": "biz-village-ice-cream",
+      "kind": "business",
+      "slug": "village-ice-cream",
+      "title": "Village Ice Cream",
+      "name": "Village Ice Cream",
+      "website": "https://villageicecream.com/",
+      "address": "431 10 Avenue SE, Calgary, AB",
+      "summary": "Hand-made ice cream from a Calgary scoop shop.",
+      "description": "Village Ice Cream is a Calgary scoop shop making super-premium ice cream by hand in every shop, with its home on 10 Avenue SE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "ice cream"
+      ],
+      "sources": [
+        {
+          "name": "Village Ice Cream",
+          "url": "https://villageicecream.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://villageicecream.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@villageicecream.com"
+    },
+    {
+      "id": "biz-monogram-coffee",
+      "kind": "business",
+      "slug": "monogram-coffee",
+      "title": "Monogram Coffee",
+      "name": "Monogram Coffee",
+      "website": "https://monogramcoffee.com/",
+      "address": "420 2 Street SW, Calgary, AB",
+      "summary": "Calgary specialty coffee roaster.",
+      "description": "Monogram Coffee is a Calgary specialty roaster, from everyday chocolatey blends to rare competition-grade Geshas, with a café on 2 Street SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "roaster"
+      ],
+      "sources": [
+        {
+          "name": "Monogram Coffee",
+          "url": "https://monogramcoffee.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://monogramcoffee.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "orders@monogramcoffee.com"
+    },
+    {
+      "id": "biz-patisserie-du-soleil",
+      "kind": "business",
+      "slug": "patisserie-du-soleil",
+      "title": "Patisserie du Soleil",
+      "name": "Patisserie du Soleil",
+      "website": "https://www.patisseriedusoleil.com",
+      "address": "2525 Woodview Drive SW, Calgary, AB",
+      "summary": "French bakery and café in Woodbine.",
+      "description": "Patisserie du Soleil is a French bakery and café on Woodview Drive SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "french"
+      ],
+      "sources": [
+        {
+          "name": "Patisserie du Soleil",
+          "url": "https://www.patisseriedusoleil.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.patisseriedusoleil.com"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "catering@patisseriedusoleil.com"
+    },
+    {
+      "id": "biz-coral-cafe",
+      "kind": "business",
+      "slug": "coral-cafe",
+      "title": "Coral Cafe",
+      "name": "Coral Cafe",
+      "website": "https://www.coralcafeyyc.com/",
+      "address": "201 16 Avenue NE, Calgary, AB",
+      "summary": "Café on 16 Avenue NE.",
+      "description": "Coral Cafe is a café on 16 Avenue NE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "cafe"
+      ],
+      "sources": [
+        {
+          "name": "Coral Cafe",
+          "url": "https://www.coralcafeyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.coralcafeyyc.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "hello@coralcafeyyc.com"
+    },
+    {
+      "id": "biz-manuel-latruwe",
+      "kind": "business",
+      "slug": "manuel-latruwe",
+      "title": "Manuel Latruwe",
+      "name": "Manuel Latruwe",
+      "website": "https://manuellatruwe.com/",
+      "address": "1333 1 Street SE, Calgary, AB",
+      "summary": "Belgian-style bakery and café on 1 Street SE.",
+      "description": "Manuel Latruwe Bakery on 1 Street SE bakes timeless and contemporary recipes: coffee and an authentic croissant, dessert, fresh bread.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "croissants"
+      ],
+      "sources": [
+        {
+          "name": "Manuel Latruwe",
+          "url": "https://manuellatruwe.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://manuellatruwe.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "orders@manuellatruwe.com"
+    },
+    {
+      "id": "biz-sought-x-found-coffee",
+      "kind": "business",
+      "slug": "sought-x-found-coffee",
+      "title": "Sought and Found Coffee Roasters",
+      "name": "Sought and Found Coffee Roasters",
+      "website": "https://www.soughtxfound.coffee/",
+      "address": "916 Centre Street N, Calgary, AB",
+      "summary": "Coffee shop and roaster on Centre Street N.",
+      "description": "Sought x Found on Centre Street N is a coffee shop and roaster serving local, ethical, traceable specialty coffee and tea.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "roaster"
+      ],
+      "sources": [
+        {
+          "name": "Sought and Found Coffee Roasters",
+          "url": "https://www.soughtxfound.coffee/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.soughtxfound.coffee/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "meetme@soughtxfound.coffee"
+    },
+    {
+      "id": "biz-regal-cat-cafe",
+      "kind": "business",
+      "slug": "regal-cat-cafe",
+      "title": "Regal Cat Café",
+      "name": "Regal Cat Café",
+      "website": "https://www.regalcatcafe.com/",
+      "address": "303 10 Street NW, Calgary, AB",
+      "summary": "Cat café in Kensington with adoptable cats.",
+      "description": "Regal Cat Café in Kensington is a cat café with coffee, food and adoptable cats, owned by the MEOW Foundation.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "cat cafe",
+        "coffee"
+      ],
+      "sources": [
+        {
+          "name": "Regal Cat Café",
+          "url": "https://www.regalcatcafe.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.regalcatcafe.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@regalcatcafe.com"
+    },
+    {
+      "id": "biz-ladybug-cafe-aspen",
+      "kind": "business",
+      "slug": "ladybug-cafe-aspen",
+      "title": "A Ladybug Bakery & Cafe",
+      "name": "A Ladybug Bakery & Cafe",
+      "website": "https://www.ladybugandcafe.com/",
+      "address": "10 Aspen Stone Boulevard SW, Calgary, AB",
+      "summary": "Bakery café in Aspen Woods.",
+      "description": "A Ladybug Bakery & Cafe is a bakery café in Aspen Woods.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "cafe"
+      ],
+      "sources": [
+        {
+          "name": "A Ladybug Bakery & Cafe",
+          "url": "https://www.ladybugandcafe.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ladybugandcafe.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@ladybugandcafe.com"
+    },
+    {
+      "id": "biz-hey-sugar",
+      "kind": "business",
+      "slug": "hey-sugar",
+      "title": "Hey Sugar",
+      "name": "Hey Sugar",
+      "website": "https://www.iloveheysugar.com",
+      "address": "9737 Macleod Trail SW, Calgary, AB",
+      "summary": "Sweets shop on Macleod Trail SW.",
+      "description": "Hey Sugar is a sweets shop on Macleod Trail SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "sweets"
+      ],
+      "sources": [
+        {
+          "name": "Hey Sugar",
+          "url": "https://www.iloveheysugar.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.iloveheysugar.com"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "stephanie@iloveheysugar.com"
+    },
+    {
+      "id": "biz-sammie-cafe",
+      "kind": "business",
+      "slug": "sammie-cafe",
+      "title": "Sammie Cafe",
+      "name": "Sammie Cafe",
+      "website": "https://sammiecafe.ca/",
+      "address": "2205 33 Avenue SW, Calgary, AB",
+      "summary": "Breakfast, brunch and girl dinner in Marda Loop.",
+      "description": "Sammie Cafe in Marda Loop does breakfast and brunch, and a share-everything girl dinner of dips, bites and carbs.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "brunch",
+        "cafe"
+      ],
+      "sources": [
+        {
+          "name": "Sammie Cafe",
+          "url": "https://sammiecafe.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://sammiecafe.ca/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@sammiecafe.ca"
+    },
+    {
+      "id": "biz-congress-coffee",
+      "kind": "business",
+      "slug": "congress-coffee",
+      "title": "Congress Coffee Company",
+      "name": "Congress Coffee Company",
+      "website": "https://www.congresscoffeeyyc.com/",
+      "address": "215 36 Avenue NE, Calgary, AB",
+      "summary": "Small-batch coffee roaster on 36 Avenue NE.",
+      "description": "Congress Coffee Company roasts small-batch coffee locally on 36 Avenue NE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "roaster"
+      ],
+      "sources": [
+        {
+          "name": "Congress Coffee Company",
+          "url": "https://www.congresscoffeeyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.congresscoffeeyyc.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@congresscoffeeyyc.com"
+    },
+    {
+      "id": "biz-cochu-chocolatier",
+      "kind": "business",
+      "slug": "cochu-chocolatier",
+      "title": "Cōchu Chocolatier",
+      "name": "Cōchu Chocolatier",
+      "website": "https://cochu.ca/",
+      "address": "Calgary, AB",
+      "summary": "Handcrafted award-winning chocolates.",
+      "description": "cōchu is a Calgary chocolatier where Anne Sellmer handcrafts award-winning fresh chocolates and confections.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "chocolate"
+      ],
+      "sources": [
+        {
+          "name": "Cōchu Chocolatier",
+          "url": "https://cochu.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cochu.ca/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@cochu.ca"
+    },
+    {
+      "id": "biz-scotsmans-well",
+      "kind": "business",
+      "slug": "scotsmans-well",
+      "title": "Scotsman's Well",
+      "name": "Scotsman's Well",
+      "website": "https://www.scotsmanswell.com/",
+      "address": "#116-12024 Symons Valley Road NW, Calgary, AB",
+      "summary": "Pub on Symons Valley Road NW.",
+      "description": "Scotsman's Well is a pub on Symons Valley Road NW.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "pub"
+      ],
+      "sources": [
+        {
+          "name": "Scotsman's Well",
+          "url": "https://www.scotsmanswell.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.scotsmanswell.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@scotsmanswell.com"
+    },
+    {
+      "id": "biz-comedy-cave",
+      "kind": "business",
+      "slug": "comedy-cave",
+      "title": "The Comedy Cave",
+      "name": "The Comedy Cave",
+      "website": "https://comedycave.com/",
+      "address": "1020 8 Avenue SW, Calgary, AB",
+      "summary": "Calgary's comedy club, live six nights a week.",
+      "description": "Comedy Cave is Calgary's comedy club, celebrating 25 years with live comedy six nights a week on 8 Avenue SW.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "comedy"
+      ],
+      "sources": [
+        {
+          "name": "The Comedy Cave",
+          "url": "https://comedycave.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://comedycave.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "thecomedycave@gmail.com"
+    },
+    {
+      "id": "biz-the-royal-bankview",
+      "kind": "business",
+      "slug": "the-royal-bankview",
+      "title": "The Royal",
+      "name": "The Royal",
+      "website": "https://royalyyc.ca/",
+      "address": "2905 14 Street SW, Calgary, AB",
+      "summary": "Bankview pub with a dog-friendly patio.",
+      "description": "The Royal is a pub in Bankview with cold pints, wild boar on the menu, 12 TVs and a dog-friendly patio.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "pub"
+      ],
+      "sources": [
+        {
+          "name": "The Royal",
+          "url": "https://royalyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://royalyyc.ca/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@royalyyc.ca"
+    },
+    {
+      "id": "biz-high-line-brewing",
+      "kind": "business",
+      "slug": "high-line-brewing",
+      "title": "High Line Brewing",
+      "name": "High Line Brewing",
+      "website": "http://highlinebrewing.com",
+      "address": "1318 9 Avenue SE, Calgary, AB",
+      "summary": "Craft brewery and live music in Inglewood.",
+      "description": "High Line Brewing is an independent craft brewery on the Music Mile in Inglewood, with pints and live music.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "brewery",
+        "live music"
+      ],
+      "sources": [
+        {
+          "name": "High Line Brewing",
+          "url": "http://highlinebrewing.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "http://highlinebrewing.com"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@highlinebrewing.com"
+    },
+    {
+      "id": "biz-james-joyce-irish-pub",
+      "kind": "business",
+      "slug": "james-joyce-irish-pub",
+      "title": "James Joyce Irish Pub",
+      "name": "James Joyce Irish Pub",
+      "website": "https://jamesjoycepub.com/",
+      "address": "114 8 Avenue SW, Calgary, AB",
+      "summary": "Irish pub on Stephen Avenue.",
+      "description": "The James Joyce Irish Pub serves pub fare, draft and cocktails in a historic building on Stephen Avenue.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "irish pub"
+      ],
+      "sources": [
+        {
+          "name": "James Joyce Irish Pub",
+          "url": "https://jamesjoycepub.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://jamesjoycepub.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "manager@jamesjoycepub.com"
+    },
+    {
+      "id": "biz-proof-cocktail-bar",
+      "kind": "business",
+      "slug": "proof-cocktail-bar",
+      "title": "Proof",
+      "name": "Proof",
+      "website": "https://proofyyc.com",
+      "address": "1302 1 Street SW, Calgary, AB",
+      "summary": "Cocktail bar with 350+ spirits in the Beltline.",
+      "description": "Proof in the Beltline is one of Canada's top cocktail bars, pouring 350+ spirits with small plates and a daily happy hour.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "cocktails"
+      ],
+      "sources": [
+        {
+          "name": "Proof",
+          "url": "https://proofyyc.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://proofyyc.com"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@proofyyc.com"
+    },
+    {
+      "id": "biz-penny-crown-tavern",
+      "kind": "business",
+      "slug": "penny-crown-tavern",
+      "title": "Penny Crown Tavern",
+      "name": "Penny Crown Tavern",
+      "website": "https://www.pennycrownyyc.com/",
+      "address": "1926 34 Avenue SW, Calgary, AB",
+      "summary": "Tavern in Marda Loop.",
+      "description": "Penny Crown Tavern is a tavern on 34 Avenue SW in Marda Loop.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "tavern"
+      ],
+      "sources": [
+        {
+          "name": "Penny Crown Tavern",
+          "url": "https://www.pennycrownyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.pennycrownyyc.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@pennycrownyyc.com"
+    },
+    {
+      "id": "biz-true-wild-distilling",
+      "kind": "business",
+      "slug": "true-wild-distilling",
+      "title": "True Wild Distilling",
+      "name": "True Wild Distilling",
+      "website": "https://truewilddistilling.com/",
+      "address": "3115 11 Street SE, Calgary, AB",
+      "summary": "Distillery, restaurant and bar on 11 Street SE.",
+      "description": "True Wild Distilling on 11 Street SE crafts spirits wrapped in Calgary history, with a restaurant, bar and events.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "distillery",
+        "cocktails"
+      ],
+      "sources": [
+        {
+          "name": "True Wild Distilling",
+          "url": "https://truewilddistilling.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://truewilddistilling.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@truewilddistilling.com"
+    },
+    {
+      "id": "biz-vaycay-brew-co",
+      "kind": "business",
+      "slug": "vaycay-brew-co",
+      "title": "Vaycay Brew Co",
+      "name": "Vaycay Brew Co",
+      "website": "https://www.vaycaybrew.co/",
+      "address": "2248 33 Avenue SW, Calgary, AB",
+      "summary": "Tropical craft brewery in Marda Loop.",
+      "description": "Vaycay Brew Co. in Marda Loop is a tropical craft brewery and taproom with globally inspired beers and chef-driven food.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "brewery"
+      ],
+      "sources": [
+        {
+          "name": "Vaycay Brew Co",
+          "url": "https://www.vaycaybrew.co/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.vaycaybrew.co/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "shanon@vaycaybrew.co"
+    },
+    {
+      "id": "biz-commonwealth-bar-and-stage",
+      "kind": "business",
+      "slug": "commonwealth-bar-and-stage",
+      "title": "Commonwealth Bar & Stage",
+      "name": "Commonwealth Bar & Stage",
+      "website": "https://www.commonwealthbar.ca/",
+      "address": "731 10 Avenue SW, Calgary, AB",
+      "summary": "Two-floor bar and stage in a downtown warehouse.",
+      "description": "Commonwealth Bar & Stage is a converted downtown warehouse with two floors of sound.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "nightlife",
+        "live music"
+      ],
+      "sources": [
+        {
+          "name": "Commonwealth Bar & Stage",
+          "url": "https://www.commonwealthbar.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.commonwealthbar.ca/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@commonwealthbar.ca"
+    },
+    {
+      "id": "biz-the-blues-can",
+      "kind": "business",
+      "slug": "the-blues-can",
+      "title": "The Blues Can",
+      "name": "The Blues Can",
+      "website": "https://www.thebluescan.com/",
+      "address": "2002 16 Avenue NW, Calgary, AB",
+      "summary": "Blues bar on 16 Avenue NW.",
+      "description": "The Blues Can is a blues bar on 16 Avenue NW in Capitol Hill.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "blues",
+        "live music"
+      ],
+      "sources": [
+        {
+          "name": "The Blues Can",
+          "url": "https://www.thebluescan.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thebluescan.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@thebluescan.com"
+    },
+    {
+      "id": "biz-hose-and-hound",
+      "kind": "business",
+      "slug": "hose-and-hound",
+      "title": "The Hose & Hound",
+      "name": "The Hose & Hound",
+      "website": "https://www.thehose.ca/",
+      "address": "1030 9 Avenue SE, Calgary, AB",
+      "summary": "Pub on 9 Avenue SE in Inglewood.",
+      "description": "The Hose & Hound is a pub on 9 Avenue SE in Inglewood.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "pub"
+      ],
+      "sources": [
+        {
+          "name": "The Hose & Hound",
+          "url": "https://www.thehose.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thehose.ca/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@thehose.ca"
+    },
+    {
+      "id": "biz-kensington-pub",
+      "kind": "business",
+      "slug": "kensington-pub",
+      "title": "Kensington Pub",
+      "name": "Kensington Pub",
+      "website": "https://www.kensingtonpub.com/",
+      "address": "207 10A Street NW, Calgary, AB",
+      "summary": "Pub in Kensington.",
+      "description": "Kensington Pub is a pub on 10A Street NW in Kensington.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "pub"
+      ],
+      "sources": [
+        {
+          "name": "Kensington Pub",
+          "url": "https://www.kensingtonpub.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kensingtonpub.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "contact@kensingtonpub.com"
+    },
+    {
+      "id": "biz-cold-garden",
+      "kind": "business",
+      "slug": "cold-garden",
+      "title": "Cold Garden Beverage Company",
+      "name": "Cold Garden Beverage Company",
+      "website": "https://www.coldgarden.ca/",
+      "address": "1100 11 Street SE, Calgary, AB",
+      "summary": "Microbrewery in Inglewood.",
+      "description": "Cold Garden is a microbrewery in Inglewood crafting great beer and even better vibes.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "brewery"
+      ],
+      "sources": [
+        {
+          "name": "Cold Garden Beverage Company",
+          "url": "https://www.coldgarden.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.coldgarden.ca/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "drink@coldgarden.ca"
+    },
+    {
+      "id": "biz-annex-ale-project",
+      "kind": "business",
+      "slug": "annex-ale-project",
+      "title": "Annex Ale Project",
+      "name": "Annex Ale Project",
+      "website": "https://www.annexales.com/",
+      "address": "4323 1 Street SE, Calgary, AB",
+      "summary": "Craft brewery on the Manchester Ale Trail.",
+      "description": "Annex Ale Project brews craft beer and craft soda on the Manchester Ale Trail, with a taproom and patio.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "brewery"
+      ],
+      "sources": [
+        {
+          "name": "Annex Ale Project",
+          "url": "https://www.annexales.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.annexales.com/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@annexales.com"
+    },
+    {
+      "id": "biz-best-of-kin",
+      "kind": "business",
+      "slug": "best-of-kin",
+      "title": "Best of Kin",
+      "name": "Best of Kin",
+      "website": "https://www.bestofkin.ca/",
+      "address": "1059 14 Street SW, Calgary, AB",
+      "summary": "Bar on 14 Street SW.",
+      "description": "Best of Kin is a bar on 14 Street SW.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "bar"
+      ],
+      "sources": [
+        {
+          "name": "Best of Kin",
+          "url": "https://www.bestofkin.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bestofkin.ca/"
+      },
+      "services": [
+        "Bar",
+        "Regular nights"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@bestofkin.ca"
+    },
+    {
+      "id": "biz-castle-toys",
+      "kind": "business",
+      "slug": "castle-toys",
+      "title": "Castle Toys",
+      "name": "Castle Toys",
+      "website": "https://castletoys.ca/",
+      "address": "Calgary, AB",
+      "summary": "Locally owned toy store for 40+ years.",
+      "description": "Castle Toys has been a locally owned Calgary toy store for over 40 years, with toys, games and activities.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "toys",
+        "games"
+      ],
+      "sources": [
+        {
+          "name": "Castle Toys",
+          "url": "https://castletoys.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://castletoys.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "toys@castletoys.ca"
+    },
+    {
+      "id": "biz-map-town",
+      "kind": "business",
+      "slug": "map-town",
+      "title": "Map Town",
+      "name": "Map Town",
+      "website": "https://www.maptown.com/",
+      "address": "400 5 Avenue SW, Calgary, AB",
+      "summary": "Canada's largest map store, since 1989.",
+      "description": "Map Town on 5 Avenue SW has been Canada's largest map store since 1989.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "maps",
+        "travel"
+      ],
+      "sources": [
+        {
+          "name": "Map Town",
+          "url": "https://www.maptown.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.maptown.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "maps@maptown.com"
+    },
+    {
+      "id": "biz-j-webb-wine-merchant",
+      "kind": "business",
+      "slug": "j-webb-wine-merchant",
+      "title": "J. Webb",
+      "name": "J. Webb",
+      "website": "https://www.jwebb.net",
+      "address": "Calgary, AB",
+      "summary": "Calgary wine merchant.",
+      "description": "J. Webb Wine Merchant and The Wine Shop carry red, white and sparkling wines, premium spirits and craft beer.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "wine"
+      ],
+      "sources": [
+        {
+          "name": "J. Webb",
+          "url": "https://www.jwebb.net",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.jwebb.net"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "wine@jwebb.net"
+    },
+    {
+      "id": "biz-iron-bow-fly-shop",
+      "kind": "business",
+      "slug": "iron-bow-fly-shop",
+      "title": "Iron Bow Fly Shop",
+      "name": "Iron Bow Fly Shop",
+      "website": "https://www.ironbowflyshop.com/",
+      "address": "5005 Dalhousie Drive NW, Calgary, AB",
+      "summary": "Fly fishing shop in Dalhousie.",
+      "description": "Iron Bow Fly Shop is a fly fishing shop on Dalhousie Drive NW.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "fly fishing",
+        "outdoors"
+      ],
+      "sources": [
+        {
+          "name": "Iron Bow Fly Shop",
+          "url": "https://www.ironbowflyshop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ironbowflyshop.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@ironbowflyshop.com"
+    },
+    {
+      "id": "biz-spraggs-meat-shop",
+      "kind": "business",
+      "slug": "spraggs-meat-shop",
+      "title": "Spragg's Meat Shop",
+      "name": "Spragg's Meat Shop",
+      "website": "https://www.spraggsmeatshop.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary butcher shop.",
+      "description": "Spragg's Meat Shop is a Calgary butcher shop.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "butcher"
+      ],
+      "sources": [
+        {
+          "name": "Spragg's Meat Shop",
+          "url": "https://www.spraggsmeatshop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.spraggsmeatshop.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "meatshop@spraggsmeatshop.com"
+    },
+    {
+      "id": "biz-guitarworks",
+      "kind": "business",
+      "slug": "guitarworks",
+      "title": "Guitarworks",
+      "name": "Guitarworks",
+      "website": "https://guitarworks.ca/",
+      "address": "7110 Macleod Trail SE, Calgary, AB",
+      "summary": "Guitar store on Macleod Trail SE.",
+      "description": "Guitarworks on Macleod Trail SE is a Calgary guitar store that also carries pianos, drums and ukuleles.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "music",
+        "guitars"
+      ],
+      "sources": [
+        {
+          "name": "Guitarworks",
+          "url": "https://guitarworks.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://guitarworks.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "sales@guitarworks.ca"
+    },
+    {
+      "id": "biz-peasant-cheese",
+      "kind": "business",
+      "slug": "peasant-cheese",
+      "title": "Peasant Cheese Shop",
+      "name": "Peasant Cheese Shop",
+      "website": "https://peasantcheese.com/",
+      "address": "12 Kensington Road NW, Calgary, AB",
+      "summary": "Cheese shop in Kensington with 120+ cheeses.",
+      "description": "Peasant Cheese in Kensington cuts more than 120 cheeses to order, with charcuterie, olives and custom boards.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "cheese",
+        "charcuterie"
+      ],
+      "sources": [
+        {
+          "name": "Peasant Cheese Shop",
+          "url": "https://peasantcheese.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://peasantcheese.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "kensington@peasantcheese.com"
+    },
+    {
+      "id": "biz-melodiya-records",
+      "kind": "business",
+      "slug": "melodiya-records",
+      "title": "Melodiya Records",
+      "name": "Melodiya Records",
+      "website": "https://melodiyarecords.ca/",
+      "address": "2523 17 Avenue SW, Calgary, AB",
+      "summary": "New, vintage and rare vinyl on 17 Avenue SW.",
+      "description": "Melodiya Records on 17 Avenue SW sells new, vintage and rare vinyl.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "records",
+        "vinyl"
+      ],
+      "sources": [
+        {
+          "name": "Melodiya Records",
+          "url": "https://melodiyarecords.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://melodiyarecords.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "melodiyarecords@shaw.ca"
+    },
+    {
+      "id": "biz-kawaii-alley",
+      "kind": "business",
+      "slug": "kawaii-alley",
+      "title": "Kawaii Alley",
+      "name": "Kawaii Alley",
+      "website": "https://kawaiialley.ca/",
+      "address": "6100 Macleod Trail SW, Calgary, AB",
+      "summary": "K-pop, anime and Japanese goods at Chinook Plaza.",
+      "description": "Kawaii Alley sells K-pop albums, lightsticks, anime, Sanrio and Japanese goods, with a shop at Chinook Plaza.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "k-pop",
+        "anime"
+      ],
+      "sources": [
+        {
+          "name": "Kawaii Alley",
+          "url": "https://kawaiialley.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://kawaiialley.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@kawaiialley.ca"
+    },
+    {
+      "id": "biz-the-wheelhouse",
+      "kind": "business",
+      "slug": "the-wheelhouse",
+      "title": "The Wheelhouse",
+      "name": "The Wheelhouse",
+      "website": "https://www.the-wheelhouse.com/",
+      "address": "2136 33 Avenue SW, Calgary, AB",
+      "summary": "Custom bike shop in Marda Loop.",
+      "description": "The Wheelhouse in Marda Loop does custom bike builds, Italian dream bikes, bike fitting and cycling culture.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "bikes",
+        "cycling"
+      ],
+      "sources": [
+        {
+          "name": "The Wheelhouse",
+          "url": "https://www.the-wheelhouse.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.the-wheelhouse.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "ridebikes@the-wheelhouse.com"
+    },
+    {
+      "id": "biz-britannia-kitchen-and-home",
+      "kind": "business",
+      "slug": "britannia-kitchen-and-home",
+      "title": "Britannia Kitchen & Home",
+      "name": "Britannia Kitchen & Home",
+      "website": "https://britanniahome.ca/",
+      "address": "816 49 Avenue SW, Calgary, AB",
+      "summary": "Kitchen and gift store in Britannia.",
+      "description": "Britannia Kitchen & Home on 49 Avenue SW is a kitchen and gift store with cookware, bakeware, dinnerware and gifts.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "kitchen",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Britannia Kitchen & Home",
+          "url": "https://britanniahome.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://britanniahome.ca/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "customerservice@britanniahome.ca"
+    },
+    {
+      "id": "biz-framed-on-fifth",
+      "kind": "business",
+      "slug": "framed-on-fifth",
+      "title": "Framed on Fifth",
+      "name": "Framed on Fifth",
+      "website": "https://www.framedonfifth.com/",
+      "address": "1209 5 Avenue NW, Calgary, AB",
+      "summary": "Custom framing on 5 Avenue NW.",
+      "description": "Framed on Fifth is a custom framing shop on 5 Avenue NW.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "framing",
+        "art"
+      ],
+      "sources": [
+        {
+          "name": "Framed on Fifth",
+          "url": "https://www.framedonfifth.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.framedonfifth.com/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "hannah@framedonfifth.com"
+    },
+    {
+      "id": "biz-under-the-mountain-games",
+      "kind": "business",
+      "slug": "under-the-mountain-games",
+      "title": "Under The Mountain Games",
+      "name": "Under The Mountain Games",
+      "website": "https://underthemountain.games/",
+      "address": "3630 Brentwood Road NW, Calgary, AB",
+      "summary": "Game store in Brentwood.",
+      "description": "Under the Mountain Games in Brentwood carries Magic: The Gathering, Warhammer, paints, board games and RPGs.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "games",
+        "tabletop"
+      ],
+      "sources": [
+        {
+          "name": "Under The Mountain Games",
+          "url": "https://underthemountain.games/",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T16:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://underthemountain.games/"
+      },
+      "services": [
+        "Shop",
+        "Workshops and events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-03T16:00:00Z",
+      "email": "info@underthemountain.games"
     }
   ]
 }

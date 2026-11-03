@@ -507,3 +507,85 @@ On 2026-11-02, a batch went to 50 independent Calgary restaurants, cafés, pubs 
 | Shop | 5 Vines | `biz-5-vines-bridgeland` | `bridgeland@5vines.com` |
 | Café | Seed N Salt | `biz-seed-n-salt` | `info@seednsalt.com` |
 | Restaurant | Bahar Kebab | `biz-bahar-kebab` | `baharkabab@gmail.com` |
+
+## Outlook local-business batch (2026-11-03)
+
+On 2026-11-03, a batch went to 75 independent Calgary restaurants, cafés, pubs and shops that had never been contacted. Each profile was published first, and each email carries its profile link and a personal claim link (`via=outlook-nov03`). The OpenStreetMap email pool was used up, so prospects came from a new scrape on `bot/prospects` (`research/prospects2.mjs`): independent businesses without a brand tag that list a website, with the address taken from their own homepage or contact page. Each address was checked against all Outlook mail before sending, and chains were left out. Each email ends with the same one-line asks as the Nov 2 batch. The batch is recorded in the project file `organizer-replies/2026-11-03-local-business-outreach.md`.
+
+| Type | Organization | Entity | Contact |
+|---|---|---|---|
+| Restaurant | Big T's BBQ & Smokehouse | `biz-big-ts-bbq-mcmahon` | `info@bigtsbbq.com` |
+| Restaurant | Amici Italian Grill & Lounge | `biz-amici-italian-grill` | `info@amicicalgary.com` |
+| Restaurant | Bonterra Trattoria | `biz-bonterra-trattoria` | `info@bonterra.ca` |
+| Restaurant | Pulcinella | `biz-pulcinella-kensington` | `info@pulcinella.ca` |
+| Restaurant | Singapore Sam's | `biz-singapore-sams` | `info@singaporesams.com` |
+| Restaurant | The Chick Pea | `biz-the-chick-pea` | `info@thechickpea.ca` |
+| Restaurant | Teatro | `biz-teatro-calgary` | `info@teatro.ca` |
+| Restaurant | Model Milk | `biz-model-milk` | `info@modelmilk.ca` |
+| Restaurant | Globefish Sushi & Izakaya | `biz-globefish-marda-loop` | `mardaloop@globefish.ca` |
+| Restaurant | Calan Beef Noodle | `biz-calan-beef-noodle` | `calanbeefnoodle@gmail.com` |
+| Restaurant | Seasons of Bowness Park | `biz-seasons-of-bowness-park` | `info@seasonsofbownesspark.ca` |
+| Restaurant | Mestizo Taqueria | `biz-mestizo-taqueria` | `info@mestizoyyc.com` |
+| Restaurant | NAM Vietnamese Kitchen | `biz-nam-vietnamese-kitchen` | `hello@namvk.com` |
+| Restaurant | Charbar | `biz-charbar` | `info@charbar.ca` |
+| Restaurant | Myung Ga Korean Restaurant | `biz-myung-ga-korean` | `myunggarestaurant@gmail.com` |
+| Restaurant | Goro + Gun | `biz-goro-and-gun` | `info@goroandgun.ca` |
+| Restaurant | Masa Mama | `biz-masa-mama` | `hola@masamama.com` |
+| Restaurant | Osteria Chef's Table | `biz-osteria-chefs-table` | `osteria@osteria.ca` |
+| Restaurant | Taste of Yemen | `biz-taste-of-yemen` | `tasteofyemenca1@gmail.com` |
+| Restaurant | Klein/Harris | `biz-klein-harris` | `hello@kleinharris.com` |
+| Restaurant | 5 Senses Ramen & Sushi Bar | `biz-5-senses-ramen` | `satoru@5sensesyyc.com` |
+| Restaurant | Kama | `biz-kama-calgary` | `info@kamacalgary.com` |
+| Restaurant | Ten Foot Henry | `biz-ten-foot-henry` | `work@tenfoothenry.com` |
+| Restaurant | Shokunin | `biz-shokunin` | `info@shokuninyyc.ca` |
+| Restaurant | Vin Room | `biz-vin-room` | `info@vinroom.com` |
+| Restaurant | Connie and John's | `biz-connie-and-johns` | `info@connieandjohns.com` |
+| Restaurant | Nan's Noodle House | `biz-nans-noodle-house` | `contact@nansnoodlehouse.com` |
+| Restaurant | UNA Pizza + Wine | `biz-una-pizza-wine` | `contact@unapizzeria.com` |
+| Restaurant | Pat & Betty | `biz-pat-and-betty` | `hello@patandbetty.com` |
+| Restaurant | Francine's | `biz-francines` | `info@francines.ca` |
+| Restaurant | Deane House | `biz-deane-house` | `info@deanehouse.com` |
+| Restaurant | Flores & Pine | `biz-flores-and-pine` | `info@floresandpine.com` |
+| Café | Pie Junkie Crowfoot | `biz-pie-junkie-crowfoot` | `nancy@piejunkie.ca` |
+| Café | Analog Coffee | `biz-analog-coffee-17th` | `info@analogcoffee.ca` |
+| Café | Village Ice Cream | `biz-village-ice-cream` | `info@villageicecream.com` |
+| Café | Monogram Coffee | `biz-monogram-coffee` | `orders@monogramcoffee.com` |
+| Café | Patisserie du Soleil | `biz-patisserie-du-soleil` | `catering@patisseriedusoleil.com` |
+| Café | Coral Cafe | `biz-coral-cafe` | `hello@coralcafeyyc.com` |
+| Café | Manuel Latruwe | `biz-manuel-latruwe` | `orders@manuellatruwe.com` |
+| Café | Sought and Found Coffee Roasters | `biz-sought-x-found-coffee` | `meetme@soughtxfound.coffee` |
+| Café | Regal Cat Café | `biz-regal-cat-cafe` | `info@regalcatcafe.com` |
+| Café | A Ladybug Bakery & Cafe | `biz-ladybug-cafe-aspen` | `info@ladybugandcafe.com` |
+| Café | Hey Sugar | `biz-hey-sugar` | `stephanie@iloveheysugar.com` |
+| Café | Sammie Cafe | `biz-sammie-cafe` | `info@sammiecafe.ca` |
+| Café | Congress Coffee Company | `biz-congress-coffee` | `info@congresscoffeeyyc.com` |
+| Café | Cōchu Chocolatier | `biz-cochu-chocolatier` | `info@cochu.ca` |
+| Pub | Scotsman's Well | `biz-scotsmans-well` | `info@scotsmanswell.com` |
+| Pub | The Comedy Cave | `biz-comedy-cave` | `thecomedycave@gmail.com` |
+| Pub | The Royal | `biz-the-royal-bankview` | `info@royalyyc.ca` |
+| Pub | High Line Brewing | `biz-high-line-brewing` | `info@highlinebrewing.com` |
+| Pub | James Joyce Irish Pub | `biz-james-joyce-irish-pub` | `manager@jamesjoycepub.com` |
+| Pub | Proof | `biz-proof-cocktail-bar` | `info@proofyyc.com` |
+| Pub | Penny Crown Tavern | `biz-penny-crown-tavern` | `info@pennycrownyyc.com` |
+| Pub | True Wild Distilling | `biz-true-wild-distilling` | `info@truewilddistilling.com` |
+| Pub | Vaycay Brew Co | `biz-vaycay-brew-co` | `shanon@vaycaybrew.co` |
+| Pub | Commonwealth Bar & Stage | `biz-commonwealth-bar-and-stage` | `info@commonwealthbar.ca` |
+| Pub | The Blues Can | `biz-the-blues-can` | `info@thebluescan.com` |
+| Pub | The Hose & Hound | `biz-hose-and-hound` | `info@thehose.ca` |
+| Pub | Kensington Pub | `biz-kensington-pub` | `contact@kensingtonpub.com` |
+| Pub | Cold Garden Beverage Company | `biz-cold-garden` | `drink@coldgarden.ca` |
+| Pub | Annex Ale Project | `biz-annex-ale-project` | `info@annexales.com` |
+| Pub | Best of Kin | `biz-best-of-kin` | `info@bestofkin.ca` |
+| Shop | Castle Toys | `biz-castle-toys` | `toys@castletoys.ca` |
+| Shop | Map Town | `biz-map-town` | `maps@maptown.com` |
+| Shop | J. Webb | `biz-j-webb-wine-merchant` | `wine@jwebb.net` |
+| Shop | Iron Bow Fly Shop | `biz-iron-bow-fly-shop` | `info@ironbowflyshop.com` |
+| Shop | Spragg's Meat Shop | `biz-spraggs-meat-shop` | `meatshop@spraggsmeatshop.com` |
+| Shop | Guitarworks | `biz-guitarworks` | `sales@guitarworks.ca` |
+| Shop | Peasant Cheese Shop | `biz-peasant-cheese` | `kensington@peasantcheese.com` |
+| Shop | Melodiya Records | `biz-melodiya-records` | `melodiyarecords@shaw.ca` |
+| Shop | Kawaii Alley | `biz-kawaii-alley` | `info@kawaiialley.ca` |
+| Shop | The Wheelhouse | `biz-the-wheelhouse` | `ridebikes@the-wheelhouse.com` |
+| Shop | Britannia Kitchen & Home | `biz-britannia-kitchen-and-home` | `customerservice@britanniahome.ca` |
+| Shop | Framed on Fifth | `biz-framed-on-fifth` | `hannah@framedonfifth.com` |
+| Shop | Under The Mountain Games | `biz-under-the-mountain-games` | `info@underthemountain.games` |

@@ -5,7 +5,7 @@ import { SiteLayout } from '../components/site/SiteLayout';
 import { discoveryRepository } from '../data/discovery';
 import { entityPath } from '../lib/discovery';
 import { eveningsThisWeek, resolvePicks, type ResolvedPick } from '../lib/dateNight';
-import { DATE_FREE_IDEAS } from '../content/dateNight';
+import { DATE_DINNER, DATE_FREE_IDEAS } from '../content/dateNight';
 import '../styles/date-night.css';
 import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 
@@ -115,6 +115,7 @@ export default function DateNightPage() {
               <p className="dn-lead">Real plans for two, from the organizers’ own listings: a show, a festival night, somewhere to dress up for. Every date and time is checked at the source. The picks are ours and never paid for.</p>
               <div className="dn-jump">
                 {picks.length ? <a href="#dn-picks">Our picks</a> : null}
+                {DATE_DINNER.length ? <a href="#dn-dinner">Dinner first</a> : null}
                 <a href="#dn-week">Evenings this week</a>
                 <a href="#dn-free">No tickets needed</a>
               </div>
@@ -131,6 +132,31 @@ export default function DateNightPage() {
               <p>Each one links to the full listing and the organizer’s tickets. When a date passes it comes off this page by itself.</p>
             </div>
             <ol className="dn-picks">{picks.map(p => <PickCard key={p.entity.id} pick={p} />)}</ol>
+          </section>
+        ) : null}
+
+        {DATE_DINNER.length ? (
+          <section className="cw-wrap dn-sec" id="dn-dinner" aria-labelledby="dn-dinner-title">
+            <div className="dn-head">
+              <h2 id="dn-dinner-title">Dinner first, <mark>ordered by the kitchen.</mark></h2>
+              <p>Somewhere to eat before the show. We asked each kitchen what they’d send a couple out with, so the order below is theirs, not ours.</p>
+            </div>
+            <ul className="dn-dinner">
+              {DATE_DINNER.map(d => (
+                <li key={d.slug}>
+                  <Link to={`/local/${d.slug}`}>
+                    <span className="dn-dinner-top"><MapPin size={14} aria-hidden="true" /> {d.neighbourhood}</span>
+                    <h3>{d.name}</h3>
+                    <span className="dn-dinner-label">{d.order.length > 1 ? 'Order these to share' : 'Order this'}</span>
+                    <ul className="dn-order">
+                      {d.order.map(o => <li key={o.dish}><b>{o.dish}</b> {o.what}</li>)}
+                    </ul>
+                    {d.quote ? <span className="dn-quote"><Quote size={14} aria-hidden="true" /><span>“{d.quote.text}” <cite>— {d.quote.by}</cite></span></span> : null}
+                    <span className="dn-go">See the profile <ArrowUpRight size={15} aria-hidden="true" /></span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </section>
         ) : null}
 

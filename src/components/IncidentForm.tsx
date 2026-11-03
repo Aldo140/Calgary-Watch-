@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import CommunityPicker, { NOT_LISTED } from '@/src/components/map/CommunityPicker';
+import CommunityPicker, { CommunityStamp } from '@/src/components/map/CommunityPicker';
 import { resolveReportNeighbourhood } from '@/src/lib/reportNeighbourhood';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -518,15 +518,15 @@ export default function IncidentForm({
           <div>
             <FieldLabel htmlFor="rf-neighbourhood">Neighbourhood</FieldLabel>
             {activeLocation && watchedNeighborhood && !neighborhoodOverride ? (
-              <div className="lv-rf-auto">
-                <span><b>{watchedNeighborhood === NOT_LISTED ? 'Outside Calgary or not sure' : watchedNeighborhood}</b><small>{areaByHand ? 'Your pick' : pinLocation ? 'From your pin' : 'From your location'}</small></span>
-                <button type="button" onClick={() => setNeighborhoodOverride(true)} className="lv-o-btn lv-o-btn-ghost">
-                  Change
-                </button>
-              </div>
+              <CommunityStamp
+                name={watchedNeighborhood}
+                source={areaByHand ? 'Your pick' : pinLocation ? 'From your pin' : 'From your location'}
+                action={<button type="button" onClick={() => setNeighborhoodOverride(true)} className="lv-cp-stamp-change">Change</button>}
+              />
             ) : locatingArea && !neighborhoodOverride ? (
-              <div className="lv-rf-auto lv-rf-auto-wait" aria-live="polite">
-                <span><b>Finding the community…</b></span>
+              <div className="lv-cp-stamp lv-cp-stamp-wait" aria-live="polite">
+                <span className="lv-cp-stamp-pin" aria-hidden="true" />
+                <span className="lv-cp-stamp-copy"><small>Reading your pin</small><b>Finding the community…</b></span>
               </div>
             ) : (
               <CommunityPicker

@@ -223,7 +223,18 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
               </Link>
               {orgNext.length ? (
                 <ul className="mk-runby-sisters" aria-label={`More from ${organization.title}`}>
-                  {orgNext.slice(0, 3).map(e => <li key={e.id}><Link to={entityPath(e)}><b>{e.title}</b><small>{pickWhen(e.start)}{e.venue ? ` · ${e.venue}` : ''}</small><ArrowUpRight size={15} aria-hidden="true" /></Link></li>)}
+                  {orgNext.slice(0, 3).map(e => {
+                    const d = new Date(e.start);
+                    return (
+                      <li key={e.id}>
+                        <Link to={entityPath(e)}>
+                          <time className="mk-stub-date" dateTime={e.start}><small>{wkShort.format(d)}</small><b>{dNum.format(d)}</b><small>{monShort.format(d)}</small></time>
+                          <span className="mk-stub-copy"><b>{e.title}</b><small>{e.schedulePrecision === 'date' ? 'All day' : time.format(d)}{e.venue && e.venue !== event.venue ? ` · ${e.venue}` : ''}</small></span>
+                          <ArrowUpRight size={16} aria-hidden="true" />
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : null}
             </section>

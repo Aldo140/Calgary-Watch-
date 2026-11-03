@@ -15631,24 +15631,30 @@
       "id": "biz-ibu-restaurant",
       "kind": "business",
       "slug": "ibu-restaurant",
-      "title": "Ibu",
-      "name": "Ibu",
+      "title": "IBU Restaurant and Bar",
+      "name": "IBU Restaurant and Bar",
       "website": "https://ibuyyc.com/",
       "address": "2915 14 Street SW, Calgary, AB",
-      "summary": "Restaurant and bar on 14 Street SW.",
-      "description": "IBU is a restaurant and bar on 14 Street SW: casual dining, serious food.",
+      "summary": "Chef-driven, Asian-inspired plates, cocktails and a dog-friendly patio on 14 Street SW.",
+      "description": "IBU is a neighbourhood restaurant, patio and bar in South Calgary, across from Our Daily Brett. Father-and-son chefs Jeff and Joel run a contemporary, creative menu with Asian inspirations running through everything from small plates to mains. Come for a laid-back lunch or a lively dinner: the open kitchen keeps you close to the action, the sunny patio is dog-friendly, and the bar pours inventive cocktails, six rotating craft beers on tap and a wine list built for pairing. There's a daily happy hour, free parking, and private events, catering and Christmas parties too.",
       "categories": [
-        "food"
+        "food",
+        "nightlife"
       ],
       "tags": [
-        "restaurant"
+        "restaurant",
+        "asian-inspired",
+        "patio",
+        "cocktails",
+        "happy hour",
+        "date night"
       ],
       "sources": [
         {
           "name": "Ibu",
           "url": "https://ibuyyc.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-30T18:00:00Z"
+          "retrievedAt": "2026-11-03T16:00:00Z"
         }
       ],
       "images": [],
@@ -15656,14 +15662,20 @@
         "website": "https://ibuyyc.com/"
       },
       "services": [
-        "Dining"
+        "Lunch and dinner",
+        "Dog-friendly patio",
+        "Cocktails and craft beer",
+        "Daily happy hour",
+        "Private events",
+        "Catering",
+        "Gift cards"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-30T18:00:00Z",
+      "updatedAt": "2026-11-03T16:00:00Z",
       "email": "info@ibuyyc.com"
     },
     {

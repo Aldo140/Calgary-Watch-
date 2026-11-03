@@ -80,6 +80,13 @@ export const DATE_DINNER: DinnerStop[] = [
     ],
     quote: { text: 'Share one savoury sandwich and one sweet one for dessert. The Brazen Blueberry tastes like a blueberry cheesecake!', by: 'Carol White, PB and J YYC' },
   },
+  {
+    slug: 'mestizo-taqueria', name: 'Mestizo Taqueria', neighbourhood: 'Kensington', added: '2026-11-03',
+    order: [
+      { dish: 'Alambres mar y tierra', what: 'A skillet for two. Mar y tierra means sea and land: shrimp and sirloin.' },
+    ],
+    quote: { text: 'For a perfect date night dish, I’d suggest our alambres, they are skillets for two.', by: 'Alexia García, Mestizo' },
+  },
 ];
 
 /** No tickets needed: evergreen ideas that point at our own guides and neighbourhoods. */

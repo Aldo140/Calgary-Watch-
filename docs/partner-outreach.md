@@ -535,7 +535,7 @@ On 2026-11-03, a batch went to 75 independent Calgary restaurants, cafés, pubs 
 | Restaurant | Taste of Yemen | `biz-taste-of-yemen` | `tasteofyemenca1@gmail.com` |
 | Restaurant | Klein/Harris | `biz-klein-harris` | `hello@kleinharris.com` |
 | Restaurant | 5 Senses Ramen & Sushi Bar | `biz-5-senses-ramen` | `satoru@5sensesyyc.com` |
-| Restaurant | Kama | `biz-kama-calgary` | `info@kamacalgary.com` |
+| Restaurant | Kama | `biz-kama-calgary` | `info@kamacalgary.com` (asked to stop and pull the profile Nov 3; archived, never email) |
 | Restaurant | Ten Foot Henry | `biz-ten-foot-henry` | `work@tenfoothenry.com` |
 | Restaurant | Shokunin | `biz-shokunin` | `info@shokuninyyc.ca` |
 | Restaurant | Vin Room | `biz-vin-room` | `info@vinroom.com` |

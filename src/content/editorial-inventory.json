@@ -20568,14 +20568,16 @@
       "name": "Vaycay Brew Co",
       "website": "https://www.vaycaybrew.co/",
       "address": "2248 33 Avenue SW, Calgary, AB",
-      "summary": "Tropical craft brewery in Marda Loop.",
-      "description": "Vaycay Brew Co. in Marda Loop is a tropical craft brewery and taproom with globally inspired beers and chef-driven food.",
+      "summary": "Tropical brew pub in Marda Loop, open all year.",
+      "description": "Vaycay Brew Co. in Marda Loop is a tropical-themed craft brewery and taproom, open all year, with globally inspired beers and chef-driven food. Mondays are karaoke with $2 oysters, and Wednesdays are trivia and wings.",
       "categories": [
         "nightlife",
         "food"
       ],
       "tags": [
-        "brewery"
+        "brewery",
+        "karaoke",
+        "trivia"
       ],
       "sources": [
         {
@@ -20583,6 +20585,12 @@
           "url": "https://www.vaycaybrew.co/",
           "kind": "official",
           "retrievedAt": "2026-11-03T16:00:00Z"
+        },
+        {
+          "name": "Vaycay Brew Co events",
+          "url": "https://vaycaybrew.co/events",
+          "kind": "official",
+          "retrievedAt": "2026-11-03T23:58:00Z"
         }
       ],
       "images": [],
@@ -20598,7 +20606,7 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-11-03T16:00:00Z",
+      "updatedAt": "2026-11-03T23:58:00Z",
       "email": "shanon@vaycaybrew.co"
     },
     {

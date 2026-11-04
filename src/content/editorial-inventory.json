@@ -22925,7 +22925,7 @@
       "website": "https://maudekids.com/",
       "address": "1812 4 Street SW, Calgary, AB",
       "summary": "Modern kids toys and decor on 4 Street SW.",
-      "description": "Maude Kids Decor on 4 Street SW sells modern baby and kids toys, decor and furnishings sourced from around the world.",
+      "description": "Maude Kids Decor on 4 Street SW sells modern baby and kids toys, decor and furnishings sourced from around the world. Owner Jennifer Forrest calls it \"a beautifully curated experience with the charm and feel of a European boutique,\" made for slowing down and looking around. Her holiday gift pick: the Jellycat Bizzletsomp Bear.",
       "categories": [
         "shopping"
       ],
@@ -22941,7 +22941,18 @@
           "retrievedAt": "2026-11-03T17:00:00Z"
         }
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "https://calgarywatch.ca/images/orgs/biz-maude-kids-decor.webp",
+          "alt": "Inside Maude Kids Decor: wooden shelves of plush animals, felt slippers, picture books and gift wrap under a globe pendant light",
+          "credit": "Photo courtesy of Maude Kids Decor"
+        },
+        {
+          "src": "https://calgarywatch.ca/images/orgs/biz-maude-kids-decor-bear.webp",
+          "alt": "The Jellycat Bizzletsomp Bear, a large brown plush bear, sitting beside an open storybook and a small wooden chair",
+          "credit": "Photo courtesy of Maude Kids Decor"
+        }
+      ],
       "socials": {
         "website": "https://maudekids.com/"
       },
@@ -22954,8 +22965,13 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-11-03T17:00:00Z",
-      "email": "hello@maudekids.com"
+      "updatedAt": "2026-11-04T02:30:00Z",
+      "email": "hello@maudekids.com",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-maude-kids-decor.webp",
+        "alt": "Inside Maude Kids Decor: wooden shelves of plush animals, felt slippers, picture books and gift wrap under a globe pendant light",
+        "credit": "Photo courtesy of Maude Kids Decor"
+      }
     },
     {
       "id": "biz-zoes-store",

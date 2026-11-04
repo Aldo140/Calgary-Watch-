@@ -23503,6 +23503,1556 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-03T17:00:00Z",
       "email": "info@workshopstudios.ca"
+    },
+    {
+      "id": "biz-model-land",
+      "kind": "business",
+      "slug": "model-land",
+      "title": "Model Land",
+      "name": "Model Land",
+      "website": "https://www.modelland.com/",
+      "address": "3409A 26 Avenue SW, Calgary, AB",
+      "summary": "Hobby and model kit shop on 26 Avenue SW.",
+      "description": "Model Land on 26 Avenue SW is a hobby shop for model kits and supplies.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "hobby",
+        "models"
+      ],
+      "sources": [
+        {
+          "name": "Model Land",
+          "url": "https://www.modelland.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.modelland.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@modelland.com"
+    },
+    {
+      "id": "biz-babas-art-haus",
+      "kind": "business",
+      "slug": "babas-art-haus",
+      "title": "Baba's Art Haus",
+      "name": "Baba's Art Haus",
+      "website": "https://www.babasarthaus.com/",
+      "address": "4108 7 Avenue SW, Calgary, AB",
+      "summary": "Art space and gallery in Wildwood.",
+      "description": "Baba's Art Haus is an art space and gallery on 7 Avenue SW in Wildwood.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "art",
+        "gallery"
+      ],
+      "sources": [
+        {
+          "name": "Baba's Art Haus",
+          "url": "https://www.babasarthaus.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.babasarthaus.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "babasarthaus@gmail.com"
+    },
+    {
+      "id": "biz-gravitypope",
+      "kind": "business",
+      "slug": "gravitypope",
+      "title": "gravitypope",
+      "name": "gravitypope",
+      "website": "https://www.gravitypope.com",
+      "address": "1126 17 Avenue SW, Calgary, AB",
+      "summary": "Footwear and clothing on 17 Avenue SW.",
+      "description": "gravitypope on 17 Avenue SW carries more than 200 footwear and clothing brands for women and men.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "shoes",
+        "clothing"
+      ],
+      "sources": [
+        {
+          "name": "gravitypope",
+          "url": "https://www.gravitypope.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.gravitypope.com"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "mailorder@gravitypope.com"
+    },
+    {
+      "id": "biz-doodle-dogs",
+      "kind": "business",
+      "slug": "doodle-dogs",
+      "title": "Doodle Dogs",
+      "name": "Doodle Dogs",
+      "website": "https://www.doodledogsyyc.com/",
+      "address": "841 1 Avenue NE, Calgary, AB",
+      "summary": "Dog food shop in Bridgeland with local delivery.",
+      "description": "Doodle Dogs in Bridgeland sells premium raw, cooked and dry dog food, with daily door-to-door raw delivery in Calgary.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "pets",
+        "dog food"
+      ],
+      "sources": [
+        {
+          "name": "Doodle Dogs",
+          "url": "https://www.doodledogsyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.doodledogsyyc.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@doodledogsyyc.com"
+    },
+    {
+      "id": "biz-cake-it-bakery",
+      "kind": "business",
+      "slug": "cake-it-bakery",
+      "title": "Cake It Bakery",
+      "name": "Cake It Bakery",
+      "website": "https://cakeitcalgary.com/",
+      "address": "920 Northmount Drive NW, Calgary, AB",
+      "summary": "Cake shop on Northmount Drive NW.",
+      "description": "Cake It Bakery on Northmount Drive NW sells all kinds of cakes in-store and online.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "cakes"
+      ],
+      "sources": [
+        {
+          "name": "Cake It Bakery",
+          "url": "https://cakeitcalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cakeitcalgary.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "cakeitcalgary@gmail.com"
+    },
+    {
+      "id": "biz-nanao-kimono",
+      "kind": "business",
+      "slug": "nanao-kimono",
+      "title": "Nanao Kimono",
+      "name": "Nanao Kimono",
+      "website": "https://nanaokimono.com/",
+      "address": "215 10 Street NW, Calgary, AB",
+      "summary": "Japanese giftware in Kensington.",
+      "description": "Nanao Kimono in Kensington is a giftware shop with unique, thoughtful products from Japan.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "gifts",
+        "japanese"
+      ],
+      "sources": [
+        {
+          "name": "Nanao Kimono",
+          "url": "https://nanaokimono.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://nanaokimono.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "nanaokimono@gmail.com"
+    },
+    {
+      "id": "biz-made-by-marcus",
+      "kind": "business",
+      "slug": "made-by-marcus",
+      "title": "Made by Marcus",
+      "name": "Made by Marcus",
+      "website": "https://madebymarcus.ca/",
+      "address": "1013 17 Avenue SW, Calgary, AB",
+      "summary": "Scratch-made ice cream on 17 Avenue SW.",
+      "description": "Made by Marcus on 17 Avenue SW makes ice cream from scratch with dairy from grass-fed cows and real ingredients.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "ice cream",
+        "dessert"
+      ],
+      "sources": [
+        {
+          "name": "Made by Marcus",
+          "url": "https://madebymarcus.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://madebymarcus.ca/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "hello@madebymarcus.com"
+    },
+    {
+      "id": "biz-kent-of-inglewood",
+      "kind": "business",
+      "slug": "kent-of-inglewood",
+      "title": "Kent of Inglewood",
+      "name": "Kent of Inglewood",
+      "website": "https://www.kentofinglewood.com/",
+      "address": "1316 9 Avenue SE, Calgary, AB",
+      "summary": "Shaving, beard care and knives in Inglewood.",
+      "description": "Kent of Inglewood on 9 Avenue SE sells shaving and beard care, axes and pocket knives.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "grooming",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Kent of Inglewood",
+          "url": "https://www.kentofinglewood.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kentofinglewood.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "hello@kentofinglewood.com"
+    },
+    {
+      "id": "biz-bono-coffee-roasters",
+      "kind": "business",
+      "slug": "bono-coffee-roasters",
+      "title": "Bono Coffee Roasters",
+      "name": "Bono Coffee Roasters",
+      "website": "https://bonocoffee.ca/",
+      "address": "733 1 Avenue NE, Calgary, AB",
+      "summary": "Ethiopian coffee roaster in Bridgeland.",
+      "description": "Bono Coffee Roasters in Bridgeland roasts Ethiopian coffee fresh in Calgary.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "roaster"
+      ],
+      "sources": [
+        {
+          "name": "Bono Coffee Roasters",
+          "url": "https://bonocoffee.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bonocoffee.ca/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "order@bonocoffee.ca"
+    },
+    {
+      "id": "biz-campland",
+      "kind": "business",
+      "slug": "campland",
+      "title": "CampLand",
+      "name": "CampLand",
+      "website": "https://campbrandgoods.com/",
+      "address": "1119 10 Avenue SE, Calgary, AB",
+      "summary": "Camp clothing shop on 10 Avenue SE.",
+      "description": "CampLand on 10 Avenue SE is the shop of Camp, a comfortable clothing brand making goods since 2011.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "clothing",
+        "outdoor"
+      ],
+      "sources": [
+        {
+          "name": "CampLand",
+          "url": "https://campbrandgoods.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://campbrandgoods.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "support@campbrandgoods.com"
+    },
+    {
+      "id": "biz-bliss-and-co",
+      "kind": "business",
+      "slug": "bliss-and-co",
+      "title": "Bliss & Co",
+      "name": "Bliss & Co",
+      "website": "https://www.blisscupcakes.com/",
+      "address": "30 Brentwood Common NW, Calgary, AB",
+      "summary": "Cupcakes and treats in Brentwood.",
+      "description": "Bliss & Co in Brentwood Common is a cupcake and treat shop.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "cupcakes"
+      ],
+      "sources": [
+        {
+          "name": "Bliss & Co",
+          "url": "https://www.blisscupcakes.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.blisscupcakes.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "orders@blisscupcakes.com"
+    },
+    {
+      "id": "biz-meirako",
+      "kind": "business",
+      "slug": "meirako",
+      "title": "Meirako",
+      "name": "Meirako",
+      "website": "https://www.meirako.com/",
+      "address": "1907 34 Avenue SW, Calgary, AB",
+      "summary": "Handcrafted jewellery in Marda Loop.",
+      "description": "Meirako on 34 Avenue SW in Marda Loop sells high-quality, expertly handcrafted jewellery.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "jewellery"
+      ],
+      "sources": [
+        {
+          "name": "Meirako",
+          "url": "https://www.meirako.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.meirako.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@meirako.com"
+    },
+    {
+      "id": "biz-northstar-bicycle-co",
+      "kind": "business",
+      "slug": "northstar-bicycle-co",
+      "title": "Northstar Bicycle Co",
+      "name": "Northstar Bicycle Co",
+      "website": "https://www.northstarbicycleyyc.com/",
+      "address": "15220 Shaw Road SE, Calgary, AB",
+      "summary": "Bike shop on Shaw Road SE.",
+      "description": "Northstar Bicycle Co on Shaw Road SE sells and services bikes.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "bikes"
+      ],
+      "sources": [
+        {
+          "name": "Northstar Bicycle Co",
+          "url": "https://www.northstarbicycleyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.northstarbicycleyyc.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "shop@northstarbicycle.ca"
+    },
+    {
+      "id": "biz-accents-at-home",
+      "kind": "business",
+      "slug": "accents-at-home",
+      "title": "Accents@Home",
+      "name": "Accents@Home",
+      "website": "https://accentsathome.ca/pages/calgary-west-hill",
+      "address": "300 Stewart Green SW, Calgary, AB",
+      "summary": "Home décor shop in West Hills.",
+      "description": "Accents@Home in West Hills sells stylish home décor, furniture and unique accents.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "home decor"
+      ],
+      "sources": [
+        {
+          "name": "Accents@Home",
+          "url": "https://accentsathome.ca/pages/calgary-west-hill",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://accentsathome.ca/pages/calgary-west-hill"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "sales@accentsathome.ca"
+    },
+    {
+      "id": "biz-the-moon-tea",
+      "kind": "business",
+      "slug": "the-moon-tea",
+      "title": "Thé Moon",
+      "name": "Thé Moon",
+      "website": "https://www.tmoon.ca/",
+      "address": "Calgary, AB",
+      "summary": "Tea shop.",
+      "description": "Thé Moon is a Calgary tea shop.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "tea"
+      ],
+      "sources": [
+        {
+          "name": "Thé Moon",
+          "url": "https://www.tmoon.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tmoon.ca/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "tmooncanada@gmail.com"
+    },
+    {
+      "id": "biz-labode-shoppe",
+      "kind": "business",
+      "slug": "labode-shoppe",
+      "title": "Labode Shoppe & Interiors",
+      "name": "Labode Shoppe & Interiors",
+      "website": "https://labode.ca/",
+      "address": "Calgary, AB",
+      "summary": "Home décor and interiors shop.",
+      "description": "Labode Shoppe & Interiors sells home décor, furniture and lifestyle furnishings, with interior styling.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "home decor"
+      ],
+      "sources": [
+        {
+          "name": "Labode Shoppe & Interiors",
+          "url": "https://labode.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://labode.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "customerservice@labode.ca"
+    },
+    {
+      "id": "biz-om-organics",
+      "kind": "business",
+      "slug": "om-organics",
+      "title": "OM Organics",
+      "name": "OM Organics",
+      "website": "https://omskin.com/",
+      "address": "1942 33 Avenue SW, Calgary, AB",
+      "summary": "Plant-based skin care in Marda Loop.",
+      "description": "OM Organics in Marda Loop makes pure, plant-based skin care designed for specific skin concerns.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "skin care",
+        "beauty"
+      ],
+      "sources": [
+        {
+          "name": "OM Organics",
+          "url": "https://omskin.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://omskin.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "hello@omskin.com"
+    },
+    {
+      "id": "biz-a-pratte-guitars",
+      "kind": "business",
+      "slug": "a-pratte-guitars",
+      "title": "A Pratte Guitars & Strings",
+      "name": "A Pratte Guitars & Strings",
+      "website": "https://apratteguitars.com/",
+      "address": "2750 3 Avenue NE, Calgary, AB",
+      "summary": "Guitar shop on 3 Avenue NE.",
+      "description": "A Pratte Guitars & Strings on 3 Avenue NE focuses on great guitars and basses under $2,000.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "music",
+        "guitars"
+      ],
+      "sources": [
+        {
+          "name": "A Pratte Guitars & Strings",
+          "url": "https://apratteguitars.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://apratteguitars.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@apratteguitars.com"
+    },
+    {
+      "id": "biz-the-costume-shoppe",
+      "kind": "business",
+      "slug": "the-costume-shoppe",
+      "title": "The Costume Shoppe",
+      "name": "The Costume Shoppe",
+      "website": "https://thecostumeshoppe.com/",
+      "address": "4307 Blackfoot Trail SE, Calgary, AB",
+      "summary": "Year-round costume store, buy or rent.",
+      "description": "The Costume Shoppe on Blackfoot Trail SE is Calgary's year-round costume store, with more than 15,000 costumes to buy or rent.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "costumes"
+      ],
+      "sources": [
+        {
+          "name": "The Costume Shoppe",
+          "url": "https://thecostumeshoppe.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thecostumeshoppe.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "wecare@thecostumeshoppe.com"
+    },
+    {
+      "id": "biz-luna-blue",
+      "kind": "business",
+      "slug": "luna-blue",
+      "title": "Luna Blue",
+      "name": "Luna Blue",
+      "website": "https://www.shoplunablue.com",
+      "address": "2711 14 Street SW, Calgary, AB",
+      "summary": "Boutique on 14 Street SW.",
+      "description": "Luna Blue is a boutique on 14 Street SW.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "clothing",
+        "boutique"
+      ],
+      "sources": [
+        {
+          "name": "Luna Blue",
+          "url": "https://www.shoplunablue.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.shoplunablue.com"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@shoplunablue.com"
+    },
+    {
+      "id": "biz-moonstone-creation",
+      "kind": "business",
+      "slug": "moonstone-creation",
+      "title": "Moonstone Creation",
+      "name": "Moonstone Creation",
+      "website": "https://moonstonecreation.ca/",
+      "address": "1219 10 Avenue SE, Calgary, AB",
+      "summary": "Native gallery and gift shop in Inglewood.",
+      "description": "Moonstone Creation on 10 Avenue SE is a Native gallery and gift shop.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "art",
+        "gifts",
+        "indigenous"
+      ],
+      "sources": [
+        {
+          "name": "Moonstone Creation",
+          "url": "https://moonstonecreation.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://moonstonecreation.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "angela@moonstonecreation.ca"
+    },
+    {
+      "id": "biz-canela-vegan-bakery",
+      "kind": "business",
+      "slug": "canela-vegan-bakery",
+      "title": "Canela Vegan Bakery & Cafe",
+      "name": "Canela Vegan Bakery & Cafe",
+      "website": "https://www.canelayyc.com/",
+      "address": "1319 9 Avenue SE, Calgary, AB",
+      "summary": "All-vegan bakery and café in Inglewood.",
+      "description": "Canela on 9 Avenue SE in Inglewood calls itself Western Canada's first all-vegan bakery and café, making affordable baked goods by hand.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "vegan"
+      ],
+      "sources": [
+        {
+          "name": "Canela Vegan Bakery & Cafe",
+          "url": "https://www.canelayyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.canelayyc.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "communications@canelayyc.ca"
+    },
+    {
+      "id": "biz-suzannes-fashions",
+      "kind": "business",
+      "slug": "suzannes-fashions",
+      "title": "Suzanne's",
+      "name": "Suzanne's",
+      "website": "https://www.suzannesfashions.ca/store-details-806.html",
+      "address": "1632 14 Avenue NW, Calgary, AB",
+      "summary": "Fashion boutique on 14 Avenue NW.",
+      "description": "Suzanne's on 14 Avenue NW is a fashion boutique.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "clothing",
+        "boutique"
+      ],
+      "sources": [
+        {
+          "name": "Suzanne's",
+          "url": "https://www.suzannesfashions.ca/store-details-806.html",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.suzannesfashions.ca/store-details-806.html"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "customerservice@suzannesfashions.ca"
+    },
+    {
+      "id": "biz-the-roasterie",
+      "kind": "business",
+      "slug": "the-roasterie",
+      "title": "The Roasterie",
+      "name": "The Roasterie",
+      "website": "https://roasterie.com/",
+      "address": "314 10 Street NW, Calgary, AB",
+      "summary": "Kensington coffee roaster, almost 40 years.",
+      "description": "The Roasterie on 10 Street NW in Kensington has roasted coffee on site for almost 40 years.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "roaster"
+      ],
+      "sources": [
+        {
+          "name": "The Roasterie",
+          "url": "https://roasterie.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://roasterie.com/"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "roasterieshopify@gmail.com"
+    },
+    {
+      "id": "biz-abbeys-creations",
+      "kind": "business",
+      "slug": "abbeys-creations",
+      "title": "Abbey's Creations",
+      "name": "Abbey's Creations",
+      "website": "https://www.abbeys.net",
+      "address": "4925 Barlow Trail NE, Calgary, AB",
+      "summary": "Artisan ice cream on Barlow Trail NE.",
+      "description": "Abbey's Creations on Barlow Trail NE makes artisan ice cream in exotic flavours, plus ice cream cakes and cupcakes.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "ice cream",
+        "dessert"
+      ],
+      "sources": [
+        {
+          "name": "Abbey's Creations",
+          "url": "https://www.abbeys.net",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.abbeys.net"
+      },
+      "services": [
+        "Cafe",
+        "Takeaway"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@abbeys.net"
+    },
+    {
+      "id": "biz-kickaxe-guitars",
+      "kind": "business",
+      "slug": "kickaxe-guitars",
+      "title": "Kickaxe Guitars",
+      "name": "Kickaxe Guitars",
+      "website": "https://www.kickaxeguitars.com/",
+      "address": "1409A 11 Street SW, Calgary, AB",
+      "summary": "Guitar shop on 11 Street SW.",
+      "description": "Kickaxe Guitars on 11 Street SW is a Calgary guitar shop with a wide selection of quality instruments.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "music",
+        "guitars"
+      ],
+      "sources": [
+        {
+          "name": "Kickaxe Guitars",
+          "url": "https://www.kickaxeguitars.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kickaxeguitars.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "kickaxeguitars@shawbiz.ca"
+    },
+    {
+      "id": "biz-chintz-and-company",
+      "kind": "business",
+      "slug": "chintz-and-company",
+      "title": "Chintz & Company",
+      "name": "Chintz & Company",
+      "website": "https://chintz.com/",
+      "address": "1238 11 Avenue SW, Calgary, AB",
+      "summary": "Decorative furnishings on 11 Avenue SW.",
+      "description": "Chintz & Company on 11 Avenue SW sells decorative furnishings: furniture, lighting, fabric, cushions and botanicals.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "home decor"
+      ],
+      "sources": [
+        {
+          "name": "Chintz & Company",
+          "url": "https://chintz.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://chintz.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "vic@chintz.com"
+    },
+    {
+      "id": "biz-apple-lady-orchard-market",
+      "kind": "business",
+      "slug": "apple-lady-orchard-market",
+      "title": "Apple Lady Orchard Market",
+      "name": "Apple Lady Orchard Market",
+      "website": "https://applelady.ca/",
+      "address": "3109 Palliser Drive SW, Calgary, AB",
+      "summary": "Okanagan fruit market on Palliser Drive SW.",
+      "description": "Apple Lady on Palliser Drive SW sells Okanagan fruit direct from Avalon Orchards and their neighbours.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "fruit",
+        "market"
+      ],
+      "sources": [
+        {
+          "name": "Apple Lady Orchard Market",
+          "url": "https://applelady.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://applelady.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "applelady@applelady.ca"
+    },
+    {
+      "id": "biz-crowfoot-wine-and-spirits",
+      "kind": "business",
+      "slug": "crowfoot-wine-and-spirits",
+      "title": "Crowfoot Wine & Spirits",
+      "name": "Crowfoot Wine & Spirits",
+      "website": "https://www.crowfootliquor.com/",
+      "address": "7414 Crowfoot Rd NW, Calgary, AB",
+      "summary": "Wine and spirits shop in Crowfoot.",
+      "description": "Crowfoot Wine & Spirits on Crowfoot Road NW has a wide selection of wine, spirits and beer.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "wine",
+        "spirits"
+      ],
+      "sources": [
+        {
+          "name": "Crowfoot Wine & Spirits",
+          "url": "https://www.crowfootliquor.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crowfootliquor.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "crowfootmain@crowfootliquor.com"
+    },
+    {
+      "id": "biz-legacy-liquor",
+      "kind": "business",
+      "slug": "legacy-liquor",
+      "title": "Legacy Liquor",
+      "name": "Legacy Liquor",
+      "website": "https://legacyliquor.ca/",
+      "address": "3308 17 Avenue SW, Calgary, AB",
+      "summary": "Private liquor store on 17 Avenue SW.",
+      "description": "Legacy Liquor on 17 Avenue SW is a premium private liquor store with a curated selection.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "wine",
+        "spirits"
+      ],
+      "sources": [
+        {
+          "name": "Legacy Liquor",
+          "url": "https://legacyliquor.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://legacyliquor.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "orders.legacyliquor@gmail.com"
+    },
+    {
+      "id": "biz-the-nash",
+      "kind": "business",
+      "slug": "the-nash",
+      "title": "The Nash",
+      "name": "The Nash",
+      "website": "https://www.thenashyyc.com/",
+      "address": "929 11 Street SE, Calgary, AB",
+      "summary": "Restaurant and bar in Inglewood.",
+      "description": "The Nash is a restaurant and bar on 11 Street SE in Inglewood.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "bar"
+      ],
+      "sources": [
+        {
+          "name": "The Nash",
+          "url": "https://www.thenashyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thenashyyc.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@thenashyyc.com"
+    },
+    {
+      "id": "biz-brouhaha",
+      "kind": "business",
+      "slug": "brouhaha",
+      "title": "Brouhaha",
+      "name": "Brouhaha",
+      "website": "https://thebrouhaha.ca/",
+      "address": "609 14 Street NW, Calgary, AB",
+      "summary": "Neighbourhood restaurant on 14 Street NW.",
+      "description": "Brouhaha on 14 Street NW serves a morning menu on weekdays until 11 am, then lunch and dinner.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "breakfast"
+      ],
+      "sources": [
+        {
+          "name": "Brouhaha",
+          "url": "https://thebrouhaha.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thebrouhaha.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "brouhahacalgary@gmail.com"
+    },
+    {
+      "id": "biz-brix-and-barrel",
+      "kind": "business",
+      "slug": "brix-and-barrel",
+      "title": "Brix + Barrel",
+      "name": "Brix + Barrel",
+      "website": "https://brixbarrel.ca/",
+      "address": "351 4 Avenue SW, Calgary, AB",
+      "summary": "Upscale bar and dining downtown.",
+      "description": "Brix + Barrel on 4 Avenue SW is an upscale bar and dining room downtown.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "bar"
+      ],
+      "sources": [
+        {
+          "name": "Brix + Barrel",
+          "url": "https://brixbarrel.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://brixbarrel.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "reservations@brixbarrel.ca"
+    },
+    {
+      "id": "biz-oodle-noodle",
+      "kind": "business",
+      "slug": "oodle-noodle",
+      "title": "Oodle Noodle",
+      "name": "Oodle Noodle",
+      "website": "https://www.oodlenoodle.ca/",
+      "address": "1244 17 Avenue SW, Calgary, AB",
+      "summary": "Noodle bowls on 17 Avenue SW.",
+      "description": "Oodle Noodle on 17 Avenue SW serves noodle bowls, appetizers and rice dishes.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "noodles"
+      ],
+      "sources": [
+        {
+          "name": "Oodle Noodle",
+          "url": "https://www.oodlenoodle.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.oodlenoodle.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "hello@oodlenoodle.ca"
+    },
+    {
+      "id": "biz-wing-n-it",
+      "kind": "business",
+      "slug": "wing-n-it",
+      "title": "Wing’n It",
+      "name": "Wing’n It",
+      "website": "https://wingnit.ca/locations/wing-n-it---calgary",
+      "address": "1126 Kensington Road NW, Calgary, AB",
+      "summary": "Chicken wings in Kensington.",
+      "description": "Wing'n It on Kensington Road NW is a chicken wing restaurant.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "wings"
+      ],
+      "sources": [
+        {
+          "name": "Wing’n It",
+          "url": "https://wingnit.ca/locations/wing-n-it---calgary",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wingnit.ca/locations/wing-n-it---calgary"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@wingnit.ca"
+    },
+    {
+      "id": "biz-fraser-and-fig",
+      "kind": "business",
+      "slug": "fraser-and-fig",
+      "title": "Fraser & Fig",
+      "name": "Fraser & Fig",
+      "website": "https://www.fraserandfig.com/",
+      "address": "2010 34 Avenue SW, Calgary, AB",
+      "summary": "Cheese and charcuterie boards in Marda Loop.",
+      "description": "Fraser & Fig in Marda Loop makes elevated cheese and charcuterie boards from fresh artisanal provisions.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "charcuterie",
+        "cheese"
+      ],
+      "sources": [
+        {
+          "name": "Fraser & Fig",
+          "url": "https://www.fraserandfig.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.fraserandfig.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "ninfo@fraserandfig.com"
+    },
+    {
+      "id": "biz-lemon-and-ladle",
+      "kind": "business",
+      "slug": "lemon-and-ladle",
+      "title": "Lemon & Ladle",
+      "name": "Lemon & Ladle",
+      "website": "https://www.lemonandladle.com",
+      "address": "1934G 34 Avenue SW, Calgary, AB",
+      "summary": "Take-home comfort food in Marda Loop.",
+      "description": "Lemon & Ladle in Marda Loop makes take-home comfort food from local ingredients.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "take-home",
+        "comfort food"
+      ],
+      "sources": [
+        {
+          "name": "Lemon & Ladle",
+          "url": "https://www.lemonandladle.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lemonandladle.com"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "service@lemonandladle.com"
+    },
+    {
+      "id": "biz-hayden-block",
+      "kind": "business",
+      "slug": "hayden-block",
+      "title": "Hayden Block",
+      "name": "Hayden Block",
+      "website": "https://www.haydenblockyyc.com/",
+      "address": "1136 Kensington Road NW, Calgary, AB",
+      "summary": "Smokehouse and whisky bar in Kensington.",
+      "description": "Hayden Block on Kensington Road NW is a smokehouse and whisky bar.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "barbecue",
+        "whisky"
+      ],
+      "sources": [
+        {
+          "name": "Hayden Block",
+          "url": "https://www.haydenblockyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-04T17:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.haydenblockyyc.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-04T17:00:00Z",
+      "email": "info@haydenblockyyc.com"
     }
   ]
 }

@@ -54,7 +54,7 @@ export const DATE_PICKS: DatePick[] = [
   },
   {
     sourceId: 'vaycay-brew-co', recordId: 'monday-karaoke-2026-11-09', vibe: 'Laugh together',
-    take: 'Karaoke is more fun with someone to cheer you on, and Mondays at Vaycay come with $2 oysters and half-price bottles of wine and bubbles.',
+    take: 'Vaycay’s last karaoke night, so it’s now or never: sing for a $25 gift card over $2 oysters and half-price bottles of wine and bubbles.',
     quote: { text: 'Mondays: Karaoke, 1/2 price bottles of wine, $2 oysters -- perfect for date night.', by: 'Shanon De Ocampo, Vaycay Brew Pub' },
     tip: 'Karaoke runs 6:30 to 9:30 in Marda Loop, and the best singer wins a $25 gift card.',
   },

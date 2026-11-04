@@ -22,6 +22,10 @@ describe('Local shelves', () => {
     assert.equal(shelfOf(shop('g', 'Rosso Coffee Roasters', ['food', 'shopping'], ['coffee'])), 'coffee');
     assert.equal(shelfOf(shop('h', 'Heritage Park Historical Village', ['family', 'heritage'], ['organization'])), 'days-out');
     assert.equal(shelfOf(shop('i', 'Contemporary Calgary', ['arts'], ['organization'])), 'culture');
+    // Owner feedback: a year-round pub is not "seasonal", and a restaurant is not a coffee shop.
+    assert.equal(shelfOf({ ...shop('j', 'Vaycay Brew Co', ['nightlife', 'food'], ['brewery']), services: ['Bar'] }), 'bars');
+    assert.equal(shelfOf({ ...shop('k', 'PB and J YYC', ['food'], ['sandwiches']), services: ['Dining'] }), 'restaurants');
+    assert.equal(shelfOf(shop('l', 'Yuk Yuk’s Calgary', ['nightlife', 'arts'], ['comedy'])), 'stages');
   });
 
   it('puts every published profile on a known shelf', () => {

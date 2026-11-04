@@ -113,7 +113,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const status = place.partner ? 'Featured partner' : note?.pick ?? (place.editorialSelection ? 'Picked by CalgaryWatch' : `${place.categories[0] ? `${place.categories[0][0].toUpperCase()}${place.categories[0].slice(1)} · ` : ''}Local organization`);
   const spot = ahead.onNow ?? ahead.next;
   // A profile with nothing dated shows its shelf's board instead, unless it's a shop: nobody expects a coffee roaster's programme.
-  const noDates = !upcoming.length && !markets.length && shelf.id !== 'coffee';
+  const noDates = !upcoming.length && !markets.length && shelf.id !== 'coffee' && shelf.id !== 'restaurants';
   // Each profile's number in the directory, A to Z, printed on its cover.
   const number = useMemo(() => all.filter(e => e.kind === 'business').sort((a, b) => a.title.localeCompare(b.title)).findIndex(e => e.id === place.id) + 1, [all, place.id]);
   const tabs: ProfileTab[] = [

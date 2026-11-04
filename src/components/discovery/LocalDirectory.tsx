@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, BadgeCheck, Coffee, Drama, FerrisWheel, Ghost, MapPin, Palette, Search, Store, Tractor, Users, X, type LucideIcon } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, Beer, Coffee, Drama, FerrisWheel, Ghost, MapPin, Palette, Search, Store, Tractor, Users, UtensilsCrossed, X, type LucideIcon } from 'lucide-react';
 import type { Business } from '../../types/discovery';
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
 import { initials, SHELVES, type BoardRow, type Programme, type Shelf, type ShelfId } from '../../lib/localShelves';
@@ -15,7 +15,7 @@ import { TEAR } from '../home/HomeHero';
 
 const SPARK = '/images/brand/calgarywatch-city-spark-v2.webp';
 export const SHELF_ICONS: Record<ShelfId, LucideIcon> = {
-  stages: Drama, culture: Palette, markets: Store, coffee: Coffee, 'days-out': FerrisWheel, community: Users, 'day-trips': Tractor, seasonal: Ghost,
+  stages: Drama, culture: Palette, markets: Store, restaurants: UtensilsCrossed, bars: Beer, coffee: Coffee, 'days-out': FerrisWheel, community: Users, 'day-trips': Tractor, seasonal: Ghost,
 };
 
 const tz = { timeZone: 'America/Edmonton' } as const;

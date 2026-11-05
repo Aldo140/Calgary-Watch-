@@ -12660,7 +12660,7 @@
       "website": "https://www.calgaryjazzorchestra.com/",
       "address": "Calgary, AB",
       "summary": "Calgary big band jazz orchestra with themed concerts.",
-      "description": "The Calgary Jazz Orchestra is a big band that plays themed concerts of original arrangements through the season. Check its site for upcoming shows.",
+      "description": "The Calgary Jazz Orchestra is a big band that plays themed concerts of original arrangements through the season. Its Christmas show, A Perfectly Frank Christmas: The Music of Sinatra & the Holidays, directed by Johnny Summers, plays Bella Concert Hall on December 20 at 3 pm and 7 pm and December 21 at 7 pm.",
       "categories": [
         "arts",
         "music"
@@ -12677,9 +12677,21 @@
           "url": "https://www.calgaryjazzorchestra.com/",
           "kind": "official",
           "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Mount Royal University Theatres: The Calgary Jazz Orchestra",
+          "url": "https://tickets.mru.ca/eventperformances.asp?evt=528",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T03:30:00Z"
         }
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "https://calgarywatch.ca/images/orgs/biz-calgary-jazz-orchestra.webp",
+          "alt": "Poster for A Perfectly Frank Christmas: a silhouetted crooner in a fedora at a vintage microphone under Santa's sleigh and reindeer, with the dates December 20-21, 2026 at Bella Concert Hall",
+          "credit": "Artwork courtesy of the Calgary Jazz Orchestra"
+        }
+      ],
       "socials": {
         "website": "https://www.calgaryjazzorchestra.com/"
       },
@@ -12691,8 +12703,13 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-29T09:00:00Z",
-      "email": "info@calgaryjazzorchestra.com"
+      "updatedAt": "2026-11-05T03:30:00Z",
+      "email": "info@calgaryjazzorchestra.com",
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-calgary-jazz-orchestra.webp",
+        "alt": "Poster for A Perfectly Frank Christmas: a silhouetted crooner in a fedora at a vintage microphone under Santa's sleigh and reindeer, with the dates December 20-21, 2026 at Bella Concert Hall",
+        "credit": "Artwork courtesy of the Calgary Jazz Orchestra"
+      }
     },
     {
       "id": "biz-third-action-film-festival",

@@ -14,11 +14,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node research/scan4b.mjs research/retry4.json research/retried4.json
+      - run: node research/osm5.mjs
+      - run: node research/scan4.mjs research/toscan5.json research/scanned5.json
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f research/retried4.json
+          git add -f research/toscan5.json research/scanned5.json
           git commit -m "results"
           git push origin HEAD:bot/prospects
         working-directory: .

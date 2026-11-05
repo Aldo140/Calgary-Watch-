@@ -25070,6 +25070,1794 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-04T17:00:00Z",
       "email": "info@haydenblockyyc.com"
+    },
+    {
+      "id": "biz-the-point-public-house",
+      "kind": "business",
+      "slug": "the-point-public-house",
+      "title": "The Point Public House",
+      "name": "The Point Public House",
+      "website": "https://thepointpub.com/",
+      "address": "2515 90 Avenue SW, Calgary, AB",
+      "summary": "Neighbourhood pub on 90 Avenue SW.",
+      "description": "The Point Public House on 90 Avenue SW calls itself the neighbourhood pub its community calls home.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "pub",
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "The Point Public House",
+          "url": "https://thepointpub.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thepointpub.com/"
+      },
+      "services": [
+        "Drinks",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@thepointpub.com"
+    },
+    {
+      "id": "biz-origin-malting-and-brewing",
+      "kind": "business",
+      "slug": "origin-malting-and-brewing",
+      "title": "Origin Malting & Brewing",
+      "name": "Origin Malting & Brewing",
+      "website": "https://originbrewing.ca/",
+      "address": "943 28 Street NE, Calgary, AB",
+      "summary": "Brewery and taproom on 28 Street NE.",
+      "description": "Origin Malting & Brewing on 28 Street NE is a Calgary brewery and taproom.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "Origin Malting & Brewing",
+          "url": "https://originbrewing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://originbrewing.ca/"
+      },
+      "services": [
+        "Drinks",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@originbrewing.ca"
+    },
+    {
+      "id": "biz-canary-refillery",
+      "kind": "business",
+      "slug": "canary-refillery",
+      "title": "Canary Refillery & Zero Waste Market",
+      "name": "Canary Refillery & Zero Waste Market",
+      "website": "https://canarygoods.ca/",
+      "address": "1120 Kensington Road NW, Calgary, AB",
+      "summary": "Refillery and zero-waste shop in Kensington.",
+      "description": "Canary Refillery & Zero Waste Market on Kensington Road NW sells simple, sustainable goods from brands that make things to last.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "zero waste",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Canary Refillery & Zero Waste Market",
+          "url": "https://canarygoods.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://canarygoods.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@canarygoods.ca"
+    },
+    {
+      "id": "biz-leo-boutique",
+      "kind": "business",
+      "slug": "leo-boutique",
+      "title": "Leo Boutique",
+      "name": "Leo Boutique",
+      "website": "https://leoboutique.com",
+      "address": "810 16 Avenue SW, Calgary, AB",
+      "summary": "Men's and women's designer boutique since 1997.",
+      "description": "Leo Boutique on 16 Avenue SW has curated independent and emerging designer collections for men and women since 1997.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "clothing",
+        "boutique"
+      ],
+      "sources": [
+        {
+          "name": "Leo Boutique",
+          "url": "https://leoboutique.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://leoboutique.com"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@leoboutique.com"
+    },
+    {
+      "id": "biz-butter-beauty-parlour",
+      "kind": "business",
+      "slug": "butter-beauty-parlour",
+      "title": "Butter Beauty Parlour",
+      "name": "Butter Beauty Parlour",
+      "website": "https://www.butterbeautyparlour.com/",
+      "address": "2429 4 Street SW, Calgary, AB",
+      "summary": "Beauty parlour on 4 Street SW.",
+      "description": "Butter Beauty Parlour is a beauty parlour on 4 Street SW.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "beauty"
+      ],
+      "sources": [
+        {
+          "name": "Butter Beauty Parlour",
+          "url": "https://www.butterbeautyparlour.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.butterbeautyparlour.com/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@butterbeautyparlour.com"
+    },
+    {
+      "id": "biz-ha-tien-vietnamese",
+      "kind": "business",
+      "slug": "ha-tien-vietnamese",
+      "title": "Ha Tien Vietnamese",
+      "name": "Ha Tien Vietnamese",
+      "website": "https://hatienrestaurant.com/",
+      "address": "11225 30 Street SW, Calgary, AB",
+      "summary": "Vietnamese restaurant on 30 Street SW.",
+      "description": "Ha Tien is a Vietnamese restaurant on 30 Street SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vietnamese",
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Ha Tien Vietnamese",
+          "url": "https://hatienrestaurant.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://hatienrestaurant.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "hatienyyc@hotmail.com"
+    },
+    {
+      "id": "biz-orchard-restaurant",
+      "kind": "business",
+      "slug": "orchard-restaurant",
+      "title": "Orchard",
+      "name": "Orchard",
+      "website": "https://orchardyyc.com",
+      "summary": "Asian-Mediterranean restaurant downtown.",
+      "description": "Orchard is a downtown Calgary restaurant serving Asian-Mediterranean food in a room full of greenery.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "mediterranean"
+      ],
+      "sources": [
+        {
+          "name": "Orchard",
+          "url": "https://orchardyyc.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://orchardyyc.com"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "hello@orchardyyc.com"
+    },
+    {
+      "id": "biz-anacrusis-music",
+      "kind": "business",
+      "slug": "anacrusis-music",
+      "title": "Anacrusis Music",
+      "name": "Anacrusis Music",
+      "website": "https://anacrusismusic.ca",
+      "address": "1410 11 Avenue SW, Calgary, AB",
+      "summary": "Music lessons on 11 Avenue SW.",
+      "description": "Anacrusis Music on 11 Avenue SW is a Calgary music school.",
+      "categories": [
+        "learning",
+        "music"
+      ],
+      "tags": [
+        "music",
+        "lessons"
+      ],
+      "sources": [
+        {
+          "name": "Anacrusis Music",
+          "url": "https://anacrusismusic.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://anacrusismusic.ca"
+      },
+      "services": [
+        "Lessons",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@anacrusismusic.ca"
+    },
+    {
+      "id": "biz-the-mash",
+      "kind": "business",
+      "slug": "the-mash",
+      "title": "The Mash",
+      "name": "The Mash",
+      "website": "https://www.masheats.ca/",
+      "address": "1126 Kensington Road NW, Calgary, AB",
+      "summary": "Craft pizza and beer in Kensington.",
+      "description": "The Mash makes craft pizza on dough made from upcycled brewing grain, with local craft beer, including on Kensington Road NW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza",
+        "craft beer"
+      ],
+      "sources": [
+        {
+          "name": "The Mash",
+          "url": "https://www.masheats.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.masheats.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "kensington@masheats.ca"
+    },
+    {
+      "id": "biz-barbarella",
+      "kind": "business",
+      "slug": "barbarella",
+      "title": "Barbarella",
+      "name": "Barbarella",
+      "website": "https://www.barbarellabar.ca/",
+      "address": "240 8 Avenue SW, Calgary, AB",
+      "summary": "Coastal Italian restaurant downtown.",
+      "description": "Barbarella on 8 Avenue SW is a downtown restaurant serving coastal Italian food inspired by the Italian south, circa 1968.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian",
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Barbarella",
+          "url": "https://www.barbarellabar.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.barbarellabar.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@barbarellabar.ca"
+    },
+    {
+      "id": "biz-the-collective-clinic",
+      "kind": "business",
+      "slug": "the-collective-clinic",
+      "title": "The Collective Clinic",
+      "name": "The Collective Clinic",
+      "website": "https://www.collectiveclinic.ca/",
+      "address": "69 7A Street NE, Calgary, AB",
+      "summary": "Beauty clinic in Bridgeland.",
+      "description": "The Collective Clinic is a beauty clinic on 7A Street NE in Bridgeland.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "beauty"
+      ],
+      "sources": [
+        {
+          "name": "The Collective Clinic",
+          "url": "https://www.collectiveclinic.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.collectiveclinic.ca/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@collectiveclinic.ca"
+    },
+    {
+      "id": "biz-gabbys-barbershop",
+      "kind": "business",
+      "slug": "gabbys-barbershop",
+      "title": "Gabby's Barbershop",
+      "name": "Gabby's Barbershop",
+      "website": "https://www.gabbysbarbershop.ca/",
+      "address": "815 1 Street SW, Calgary, AB",
+      "summary": "Inclusive barber shop downtown.",
+      "description": "Gabby's Barbershop on 1 Street SW is a queer and trans-owned barber shop offering cuts, fades, beard trims and hot towel shaves.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "barber"
+      ],
+      "sources": [
+        {
+          "name": "Gabby's Barbershop",
+          "url": "https://www.gabbysbarbershop.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.gabbysbarbershop.ca/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@gabbysbarbershop.ca"
+    },
+    {
+      "id": "biz-apt-coffee",
+      "kind": "business",
+      "slug": "apt-coffee",
+      "title": "apt. coffee",
+      "name": "apt. coffee",
+      "website": "https://silladesigns.com/pages/apt-coffee",
+      "summary": "Coffee shop with a design shop inside.",
+      "description": "apt. coffee is a cozy Calgary coffee shop with Silla Designs' shop tucked inside.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "apt. coffee",
+          "url": "https://silladesigns.com/pages/apt-coffee",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://silladesigns.com/pages/apt-coffee"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "customerservice@silladesigns.com"
+    },
+    {
+      "id": "biz-yvonnes-delightful-cakes",
+      "kind": "business",
+      "slug": "yvonnes-delightful-cakes",
+      "title": "Yvonne's Delightful Cakes",
+      "name": "Yvonne's Delightful Cakes",
+      "website": "https://yvonnesdelightfulcakes.com/",
+      "address": "1235 26 Avenue SE, Calgary, AB",
+      "summary": "Cake shop on 26 Avenue SE.",
+      "description": "Yvonne's Delightful Cakes is a cake shop on 26 Avenue SE.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "cakes"
+      ],
+      "sources": [
+        {
+          "name": "Yvonne's Delightful Cakes",
+          "url": "https://yvonnesdelightfulcakes.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://yvonnesdelightfulcakes.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@yvonnesdelightfulcakes.com"
+    },
+    {
+      "id": "biz-greengate-garden-centres",
+      "kind": "business",
+      "slug": "greengate-garden-centres",
+      "title": "Greengate Garden Centres",
+      "name": "Greengate Garden Centres",
+      "website": "https://greengate.ca/",
+      "address": "14111 Macleod Trail SW, Calgary, AB",
+      "summary": "Calgary garden centre since 1992.",
+      "description": "Greengate Garden Centres has been Calgary's garden expert since 1992, with a location on Macleod Trail SW.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "garden",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Greengate Garden Centres",
+          "url": "https://greengate.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://greengate.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@greengate.ca"
+    },
+    {
+      "id": "biz-standing-room-only-bar",
+      "kind": "business",
+      "slug": "standing-room-only-bar",
+      "title": "Standing Room Only Bar",
+      "name": "Standing Room Only Bar",
+      "website": "https://srobar.com/",
+      "address": "318 3 Street SE, Calgary, AB",
+      "summary": "Cocktail bar and event space on 3 Street SE.",
+      "description": "Standing Room Only on 3 Street SE is a cocktail bar and event space connected to Fortuna's Row.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "cocktails",
+        "bar"
+      ],
+      "sources": [
+        {
+          "name": "Standing Room Only Bar",
+          "url": "https://srobar.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://srobar.com/"
+      },
+      "services": [
+        "Drinks",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "hola@srobar.com"
+    },
+    {
+      "id": "biz-just-sweet-enough",
+      "kind": "business",
+      "slug": "just-sweet-enough",
+      "title": "Just Sweet Enough",
+      "name": "Just Sweet Enough",
+      "website": "https://www.justsweetenough.ca/",
+      "address": "138 50 Avenue SE, Calgary, AB",
+      "summary": "Sugar-free and low-carb bakery and shop.",
+      "description": "Just Sweet Enough on 50 Avenue SE stocks sugar-free, gluten-free and low-carb foods and bakes for diabetic and low-sugar diets.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "sugar free"
+      ],
+      "sources": [
+        {
+          "name": "Just Sweet Enough",
+          "url": "https://www.justsweetenough.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.justsweetenough.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@justsweetenough.ca"
+    },
+    {
+      "id": "biz-shibuya-izakaya",
+      "kind": "business",
+      "slug": "shibuya-izakaya",
+      "title": "Shibuya Izakaya",
+      "name": "Shibuya Izakaya",
+      "website": "https://www.shibuyaizakaya.com/",
+      "address": "5010 #2 4 Street NE, Calgary, AB",
+      "summary": "Japanese izakaya on 4 Street NE.",
+      "description": "Shibuya Izakaya on 4 Street NE is a cozy Japanese restaurant serving sushi, ramen, hand rolls and tempura.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "japanese",
+        "sushi"
+      ],
+      "sources": [
+        {
+          "name": "Shibuya Izakaya",
+          "url": "https://www.shibuyaizakaya.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.shibuyaizakaya.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "shibuyaizakaya@icloud.com"
+    },
+    {
+      "id": "biz-northwest-music-academy",
+      "kind": "business",
+      "slug": "northwest-music-academy",
+      "title": "Northwest Music Academy",
+      "name": "Northwest Music Academy",
+      "website": "https://www.nwmusicacademy.com/",
+      "address": "1012 Ranchlands Boulevard NW, Calgary, AB",
+      "summary": "Music lessons in Ranchlands.",
+      "description": "Northwest Music Academy on Ranchlands Boulevard NW teaches piano, guitar, ukulele and voice, with recitals and RCM exam prep.",
+      "categories": [
+        "learning",
+        "music"
+      ],
+      "tags": [
+        "music",
+        "lessons"
+      ],
+      "sources": [
+        {
+          "name": "Northwest Music Academy",
+          "url": "https://www.nwmusicacademy.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.nwmusicacademy.com/"
+      },
+      "services": [
+        "Lessons",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@nwmusicacademy.com"
+    },
+    {
+      "id": "biz-mercato",
+      "kind": "business",
+      "slug": "mercato",
+      "title": "Mercato",
+      "name": "Mercato",
+      "website": "https://www.mercatogourmet.com/restaurant.html",
+      "address": "2224 4 Street SW, Calgary, AB",
+      "summary": "Italian restaurant and market on 4 Street SW.",
+      "description": "Mercato on 4 Street SW is an Italian restaurant and gourmet market.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian",
+        "market"
+      ],
+      "sources": [
+        {
+          "name": "Mercato",
+          "url": "https://www.mercatogourmet.com/restaurant.html",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mercatogourmet.com/restaurant.html"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@mercatogourmet.com"
+    },
+    {
+      "id": "biz-posto-pizzeria",
+      "kind": "business",
+      "slug": "posto-pizzeria",
+      "title": "Posto Pizzeria",
+      "name": "Posto Pizzeria",
+      "website": "https://posto.ca",
+      "summary": "Pizzeria and wine bar.",
+      "description": "Posto calls itself a curious pizzeria and wine bar in Calgary.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza",
+        "wine bar"
+      ],
+      "sources": [
+        {
+          "name": "Posto Pizzeria",
+          "url": "https://posto.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://posto.ca"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@posto.ca"
+    },
+    {
+      "id": "biz-crispy-crust-pizzeria",
+      "kind": "business",
+      "slug": "crispy-crust-pizzeria",
+      "title": "Crispy Crust Pizzeria",
+      "name": "Crispy Crust Pizzeria",
+      "website": "https://www.crispycrust.ca/",
+      "address": "464 Woodbine Boulevard SW, Calgary, AB",
+      "summary": "Pizza in Woodbine.",
+      "description": "Crispy Crust Pizzeria in Woodbine makes fresh, crispy pizza for takeout and delivery.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza"
+      ],
+      "sources": [
+        {
+          "name": "Crispy Crust Pizzeria",
+          "url": "https://www.crispycrust.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crispycrust.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@crispycrust.ca"
+    },
+    {
+      "id": "biz-new-level-brewing",
+      "kind": "business",
+      "slug": "new-level-brewing",
+      "title": "New Level Brewing",
+      "name": "New Level Brewing",
+      "website": "https://www.newlevelbrewing.ca/",
+      "address": "7005 Fairmount Drive SE, Calgary, AB",
+      "summary": "Brewery and taproom on Fairmount Drive SE.",
+      "description": "New Level Brewing on Fairmount Drive SE is a Calgary brewery with a taproom.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "New Level Brewing",
+          "url": "https://www.newlevelbrewing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.newlevelbrewing.ca/"
+      },
+      "services": [
+        "Drinks",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "taproom@newlevelbrewing.com"
+    },
+    {
+      "id": "biz-wellingtons-of-calgary",
+      "kind": "business",
+      "slug": "wellingtons-of-calgary",
+      "title": "Wellington's of Calgary",
+      "name": "Wellington's of Calgary",
+      "website": "https://wellingtonsofcalgary.com/",
+      "summary": "Steakhouse since 1979.",
+      "description": "Wellington's has served steaks and seafood in Calgary since 1979, from its Beef Wellington to modern favourites.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "steakhouse"
+      ],
+      "sources": [
+        {
+          "name": "Wellington's of Calgary",
+          "url": "https://wellingtonsofcalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wellingtonsofcalgary.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "welloscars@shaw.ca"
+    },
+    {
+      "id": "biz-vegan-street-inglewood",
+      "kind": "business",
+      "slug": "vegan-street-inglewood",
+      "title": "Vegan Street",
+      "name": "Vegan Street",
+      "website": "https://veganstreet.ca/inglewood/",
+      "address": "1413 9 Avenue SE, Calgary, AB",
+      "summary": "Vegan restaurant in Inglewood.",
+      "description": "Vegan Street on 9 Avenue SE in Inglewood is a vegan restaurant.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vegan",
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Vegan Street",
+          "url": "https://veganstreet.ca/inglewood/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://veganstreet.ca/inglewood/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@veganstreet.ca"
+    },
+    {
+      "id": "biz-rice-and-noodle",
+      "kind": "business",
+      "slug": "rice-and-noodle",
+      "title": "Rice & Noodle",
+      "name": "Rice & Noodle",
+      "website": "https://www.riceandnoodle.com/",
+      "address": "1252 17 Avenue SW, Calgary, AB",
+      "summary": "Rice and noodle dishes on 17 Avenue SW.",
+      "description": "Rice & Noodle is a restaurant on 17 Avenue SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "noodles"
+      ],
+      "sources": [
+        {
+          "name": "Rice & Noodle",
+          "url": "https://www.riceandnoodle.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.riceandnoodle.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@riceandnoodle.com"
+    },
+    {
+      "id": "biz-madurai-kitchen",
+      "kind": "business",
+      "slug": "madurai-kitchen",
+      "title": "Madurai Kitchen",
+      "name": "Madurai Kitchen",
+      "website": "https://maduraikitchen.ca/",
+      "address": "1440 52 Street NE, Calgary, AB",
+      "summary": "South Indian restaurant on 52 Street NE.",
+      "description": "Madurai Kitchen on 52 Street NE serves South Indian food.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "indian",
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Madurai Kitchen",
+          "url": "https://maduraikitchen.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://maduraikitchen.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@maduraikitchen.ca"
+    },
+    {
+      "id": "biz-eight-ounce-coffee",
+      "kind": "business",
+      "slug": "eight-ounce-coffee",
+      "title": "Eight Ounce Coffee",
+      "name": "Eight Ounce Coffee",
+      "website": "https://eightouncecoffee.ca/",
+      "address": "2600 Portland Street SE, Calgary, AB",
+      "summary": "Specialty coffee gear on Portland Street SE.",
+      "description": "Eight Ounce Coffee on Portland Street SE sells specialty coffee brewing and espresso equipment.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Eight Ounce Coffee",
+          "url": "https://eightouncecoffee.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://eightouncecoffee.ca/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "hello@eightouncecoffee.ca"
+    },
+    {
+      "id": "biz-piknic-cafe",
+      "kind": "business",
+      "slug": "piknic-cafe",
+      "title": "PIKNIC Cafe",
+      "name": "PIKNIC Cafe",
+      "website": "https://www.mypiknic.ca/",
+      "address": "255 Brentwood Place NW, Calgary, AB",
+      "summary": "Korean-style sandwiches in Brentwood.",
+      "description": "PIKNIC in Brentwood makes picnic-inspired Korean-style sandwiches, salads and desserts.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "cafe",
+        "korean"
+      ],
+      "sources": [
+        {
+          "name": "PIKNIC Cafe",
+          "url": "https://www.mypiknic.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mypiknic.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "mypiknic@outlook.com"
+    },
+    {
+      "id": "biz-rockwell-food-and-taps",
+      "kind": "business",
+      "slug": "rockwell-food-and-taps",
+      "title": "Rockwell Food + Taps",
+      "name": "Rockwell Food + Taps",
+      "website": "https://www.rockwellcalgary.com/",
+      "address": "150 Millrise Boulevard SW, Calgary, AB",
+      "summary": "Restaurant and taps in Millrise.",
+      "description": "Rockwell Food + Taps is a restaurant and bar on Millrise Boulevard SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "bar"
+      ],
+      "sources": [
+        {
+          "name": "Rockwell Food + Taps",
+          "url": "https://www.rockwellcalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.rockwellcalgary.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@rockwellcalgary.com"
+    },
+    {
+      "id": "biz-the-cattle-baron",
+      "kind": "business",
+      "slug": "the-cattle-baron",
+      "title": "The Cattle Baron",
+      "name": "The Cattle Baron",
+      "website": "https://www.cattlebaroncalgary.com/",
+      "address": "23 Sunpark Drive SE, Calgary, AB",
+      "summary": "Casual steakhouse in Sundance.",
+      "description": "The Cattle Baron on Sunpark Drive SE is a casual steakhouse and bar inspired by Wellington's.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "steakhouse"
+      ],
+      "sources": [
+        {
+          "name": "The Cattle Baron",
+          "url": "https://www.cattlebaroncalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cattlebaroncalgary.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "l.savoie@cattlebaroncalgary.com"
+    },
+    {
+      "id": "biz-the-living-room",
+      "kind": "business",
+      "slug": "the-living-room",
+      "title": "The Living Room",
+      "name": "The Living Room",
+      "website": "https://livingroomrestaurant.ca/",
+      "address": "514 17 Avenue SW, Calgary, AB",
+      "summary": "Shareable comfort food on 17 Avenue SW.",
+      "description": "The Living Room on 17 Avenue SW serves comfort food with a modern twist, made to be shared.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "The Living Room",
+          "url": "https://livingroomrestaurant.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://livingroomrestaurant.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@thelr.ca"
+    },
+    {
+      "id": "biz-fleetwood-lounge",
+      "kind": "business",
+      "slug": "fleetwood-lounge",
+      "title": "Fleetwood Lounge",
+      "name": "Fleetwood Lounge",
+      "website": "https://fleetwoodlounge.com/",
+      "address": "524 10 Avenue SW, Calgary, AB",
+      "summary": "Cocktail lounge on 10 Avenue SW.",
+      "description": "Fleetwood on 10 Avenue SW is a lounge with classic cocktails and a shareable menu.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "cocktails",
+        "lounge"
+      ],
+      "sources": [
+        {
+          "name": "Fleetwood Lounge",
+          "url": "https://fleetwoodlounge.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://fleetwoodlounge.com/"
+      },
+      "services": [
+        "Drinks",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "events@lucayyc.com"
+    },
+    {
+      "id": "biz-who-cares-wear",
+      "kind": "business",
+      "slug": "who-cares-wear",
+      "title": "Who Cares? Wear",
+      "name": "Who Cares? Wear",
+      "website": "https://whocareswear.com/",
+      "address": "549 Riverfront Avenue SE, Calgary, AB",
+      "summary": "Clothing boutique in East Village.",
+      "description": "Who Cares? Wear on Riverfront Avenue SE is a clothing boutique for the fashion minded.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "clothing",
+        "boutique"
+      ],
+      "sources": [
+        {
+          "name": "Who Cares? Wear",
+          "url": "https://whocareswear.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://whocareswear.com/"
+      },
+      "services": [
+        "Shop",
+        "Gift ideas"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "whocareswear@gmail.com"
+    },
+    {
+      "id": "biz-taj-mahal-restaurant",
+      "kind": "business",
+      "slug": "taj-mahal-restaurant",
+      "title": "Taj Mahal",
+      "name": "Taj Mahal",
+      "website": "https://www.tajmahal-calgary.com/",
+      "address": "4816 Macleod Trail SW, Calgary, AB",
+      "summary": "Indian restaurant since 1973.",
+      "description": "Taj Mahal on Macleod Trail SW has served Indian food in Calgary since 1973.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "indian",
+        "restaurant"
+      ],
+      "sources": [
+        {
+          "name": "Taj Mahal",
+          "url": "https://www.tajmahal-calgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tajmahal-calgary.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "tajmahalcalgary01@gmail.com"
+    },
+    {
+      "id": "biz-leela-eco-spa-marda-loop",
+      "kind": "business",
+      "slug": "leela-eco-spa-marda-loop",
+      "title": "Leela Eco Spa",
+      "name": "Leela Eco Spa",
+      "website": "https://leelaecospa.ca/location-pricing/marda-loop/",
+      "address": "2240 33 Avenue SW, Calgary, AB",
+      "summary": "Spa in Marda Loop.",
+      "description": "Leela Eco Spa in Marda Loop offers massage, facials and spa treatments.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "spa",
+        "massage"
+      ],
+      "sources": [
+        {
+          "name": "Leela Eco Spa",
+          "url": "https://leelaecospa.ca/location-pricing/marda-loop/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://leelaecospa.ca/location-pricing/marda-loop/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info_beltline@leelaecospa.com"
+    },
+    {
+      "id": "biz-the-lui-beauty-atelier",
+      "kind": "business",
+      "slug": "the-lui-beauty-atelier",
+      "title": "The Lui Beauty Atelier",
+      "name": "The Lui Beauty Atelier",
+      "website": "https://www.theluibeautyatelier.ca",
+      "address": "206 8A Street NE, Calgary, AB",
+      "summary": "Beauty studio in Bridgeland.",
+      "description": "The Lui Beauty Atelier is a beauty studio on 8A Street NE in Bridgeland.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "beauty",
+        "hair"
+      ],
+      "sources": [
+        {
+          "name": "The Lui Beauty Atelier",
+          "url": "https://www.theluibeautyatelier.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.theluibeautyatelier.ca"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "the.luihair@gmail.com"
+    },
+    {
+      "id": "biz-glazen-nails",
+      "kind": "business",
+      "slug": "glazen-nails",
+      "title": "Glazen Nails",
+      "name": "Glazen Nails",
+      "website": "https://www.glazennails.ca/",
+      "summary": "Nail salon in Crowfoot.",
+      "description": "Glazen Nails in Crowfoot is a nail salon for manicures, pedicures, gel, acrylic and dip powder.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "nails"
+      ],
+      "sources": [
+        {
+          "name": "Glazen Nails",
+          "url": "https://www.glazennails.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.glazennails.ca/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "glazennails@gmail.com"
+    },
+    {
+      "id": "biz-one8t-wellness",
+      "kind": "business",
+      "slug": "one8t-wellness",
+      "title": "ONE8T Wellness",
+      "name": "ONE8T Wellness",
+      "website": "https://one8t.com/",
+      "address": "1934 33 Avenue SW, Calgary, AB",
+      "summary": "Wellness studio in Marda Loop.",
+      "description": "ONE8T Wellness is a wellness studio on 33 Avenue SW in Marda Loop.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "wellness"
+      ],
+      "sources": [
+        {
+          "name": "ONE8T Wellness",
+          "url": "https://one8t.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://one8t.com/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@one8t.com"
+    },
+    {
+      "id": "biz-mood-hair-and-spa",
+      "kind": "business",
+      "slug": "mood-hair-and-spa",
+      "title": "Mood. Hair and Spa",
+      "name": "Mood. Hair and Spa",
+      "website": "https://cavabienspa.com/",
+      "address": "2049 42 Avenue SW, Calgary, AB",
+      "summary": "Hair salon and day spa on 42 Avenue SW.",
+      "description": "Mood. Hair and Spa, formerly CaVaBien, on 42 Avenue SW offers hair, facials, nails, massage and medispa.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "hair",
+        "spa"
+      ],
+      "sources": [
+        {
+          "name": "Mood. Hair and Spa",
+          "url": "https://cavabienspa.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cavabienspa.com/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "admin@moodspa.ca"
+    },
+    {
+      "id": "biz-wholelifego",
+      "kind": "business",
+      "slug": "wholelifego",
+      "title": "WholeLifeGo",
+      "name": "WholeLifeGo",
+      "website": "https://wholelifego.com/",
+      "address": "340 14 Street NW, Calgary, AB",
+      "summary": "Plant-based sushi on 14 Street NW.",
+      "description": "WholeLifeGo on 14 Street NW serves vegan Japanese fusion and plant-based sushi.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "vegan",
+        "sushi"
+      ],
+      "sources": [
+        {
+          "name": "WholeLifeGo",
+          "url": "https://wholelifego.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wholelifego.com/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "info@wholelifego.com"
+    },
+    {
+      "id": "biz-the-beverly",
+      "kind": "business",
+      "slug": "the-beverly",
+      "title": "The Beverly",
+      "name": "The Beverly",
+      "website": "https://thebeverly.ca/",
+      "address": "7 Parkdale Crescent NW, Calgary, AB",
+      "summary": "Hair salon in Parkdale.",
+      "description": "The Beverly is a hair salon on Parkdale Crescent NW.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "hair"
+      ],
+      "sources": [
+        {
+          "name": "The Beverly",
+          "url": "https://thebeverly.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thebeverly.ca/"
+      },
+      "services": [
+        "Appointments",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "concierge@thebeverly.ca"
+    },
+    {
+      "id": "biz-central-taps-and-food",
+      "kind": "business",
+      "slug": "central-taps-and-food",
+      "title": "Central Taps & Food",
+      "name": "Central Taps & Food",
+      "website": "https://centralrestaurants.ca/",
+      "address": "224 12 Avenue SW, Calgary, AB",
+      "summary": "Food and drinks on 12 Avenue SW.",
+      "description": "Central on 12 Avenue SW is a spot for good food and drinks with your crew.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "bar"
+      ],
+      "sources": [
+        {
+          "name": "Central Taps & Food",
+          "url": "https://centralrestaurants.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://centralrestaurants.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "marketing@centralrestaurants.ca"
+    },
+    {
+      "id": "biz-chairmans-steakhouse",
+      "kind": "business",
+      "slug": "chairmans-steakhouse",
+      "title": "Chairman's Steakhouse",
+      "name": "Chairman's Steakhouse",
+      "website": "https://chairmans.ca/",
+      "summary": "Steakhouse at Westman Village.",
+      "description": "Chairman's Steakhouse at Westman Village is a fine-dining steakhouse from Vintage Group.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "steakhouse"
+      ],
+      "sources": [
+        {
+          "name": "Chairman's Steakhouse",
+          "url": "https://chairmans.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-05T05:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://chairmans.ca/"
+      },
+      "services": [
+        "Dining",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-05T05:30:00Z",
+      "email": "events@chairmans.ca"
     }
   ]
 }

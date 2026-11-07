@@ -3418,6 +3418,62 @@
           "end": "2026-10-30T23:00:00-06:00",
           "pricing": "paid"
         }
+      },
+      {
+        "id": "christmas-market-2026-11-27",
+        "input": {
+          "kind": "event",
+          "summary": "The farm’s 10th annual Christmas market: 200+ local vendors in three heated greenhouses, sleigh rides, fires and a kids zone.",
+          "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+          "venue": "The Saskatoon Farm",
+          "organizer": "The Saskatoon Farm",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "title": "The Saskatoon Farm 10th Annual Christmas Market — First Weekend",
+          "description": "The 2026 market runs November 27–29 and December 4–6. This listing covers November 27–29. The farm’s calendar lists Friday 10 a.m.–6 p.m. and Saturday and Sunday 8 a.m.–4 p.m. Ticketed with no walk-ins: book a half-hour arrival slot, then stay until close. Children 10 and under enter free. Hot food and drinks, outdoor fires, horse-drawn sleigh rides, fresh-cut trees, a kids zone and visits from Santa. This is outside Calgary in Foothills County.",
+          "sourceUrl": "https://www.saskatoonfarm.com/events-1/10th-annual-christmas-market",
+          "tickets": "https://www.saskatoonfarm.com/events-1/10th-annual-christmas-market",
+          "start": "2026-11-27T00:00:00-06:00",
+          "end": "2026-11-30T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-market-2026-12-04",
+        "input": {
+          "kind": "event",
+          "summary": "The farm’s 10th annual Christmas market: 200+ local vendors in three heated greenhouses, sleigh rides, fires and a kids zone.",
+          "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+          "venue": "The Saskatoon Farm",
+          "organizer": "The Saskatoon Farm",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "title": "The Saskatoon Farm 10th Annual Christmas Market — Second Weekend",
+          "description": "The 2026 market runs November 27–29 and December 4–6. This listing covers December 4–6. The farm’s calendar lists Friday 10 a.m.–6 p.m. and Saturday and Sunday 8 a.m.–4 p.m. Ticketed with no walk-ins: book a half-hour arrival slot, then stay until close. Children 10 and under enter free. Hot food and drinks, outdoor fires, horse-drawn sleigh rides, fresh-cut trees, a kids zone and visits from Santa. This is outside Calgary in Foothills County.",
+          "sourceUrl": "https://www.saskatoonfarm.com/events-1/10th-annual-christmas-market-a925a",
+          "tickets": "https://www.saskatoonfarm.com/events-1/10th-annual-christmas-market-a925a",
+          "start": "2026-12-04T00:00:00-06:00",
+          "end": "2026-12-07T00:00:00-06:00"
+        }
       }
     ]
   },

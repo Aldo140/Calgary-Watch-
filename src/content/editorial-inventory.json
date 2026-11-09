@@ -26858,6 +26858,291 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-05T05:30:00Z",
       "email": "events@chairmans.ca"
+    },
+    {
+      "id": "biz-velet-bike-ski-cafe",
+      "kind": "business",
+      "slug": "velet-bike-ski-cafe",
+      "title": "Velet Bike Ski Cafe",
+      "name": "Velet Bike Ski Cafe",
+      "website": "https://www.velet.ca/",
+      "summary": "A bike and ski repair shop and coffee shop under one roof, through the back-alley door on 11 Ave SE.",
+      "description": "Velet is a bike and ski repair shop and a coffee shop in one space, reached through a back-alley entrance at 206 11 Ave SE. The techs handle bike tune-ups, brake and gear adjustments, tire swaps and custom builds, plus ski and snowboard waxing, edge sharpening, binding adjustments and P-tex. Meanwhile the cafe serves handcrafted coffee and tea, fresh pastries and free Wi-Fi. Velet also hosts community meetups for riders and skiers. Open Monday to Friday 8 am to 6 pm and weekends 10 am to 6 pm.",
+      "categories": [
+        "shopping",
+        "food",
+        "recreation"
+      ],
+      "tags": [
+        "coffee",
+        "bike shop",
+        "ski tuning",
+        "cafe"
+      ],
+      "sources": [
+        {
+          "name": "Velet Bike Ski Cafe",
+          "url": "https://www.velet.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.velet.ca/"
+      },
+      "services": [
+        "Bike tune-ups and repairs",
+        "Ski and snowboard tuning",
+        "Coffee and pastries",
+        "Community meetups"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-09T19:45:00Z",
+      "email": "hello@velet.ca",
+      "address": "206 11 Ave SE #105, Calgary, AB T2G 0X8",
+      "neighbourhood": "Beltline"
+    },
+    {
+      "id": "biz-goodbake",
+      "kind": "business",
+      "slug": "goodbake",
+      "title": "Goodbake",
+      "name": "Goodbake",
+      "website": "https://www.goodbake.co/",
+      "summary": "Crunchy chocolate brownie bites made by two Calgary sisters, with no gluten or nut ingredients added.",
+      "description": "Goodbake is a Calgary brand started by sisters Claudia and Kezia Pasaribu around one product: a crunchy brownie bite you can't stop snacking on. The bites are chocolate-first and made in Canada from simple ingredients, with no gluten or nut ingredients added. Find them at the Calgary Farmers' Market or order online, where shipping is free on orders over $50. New to them? The First Stash mixes flavours so you can find your favourite, and Claudia's and Kezia's Favourites bags show off each sister's pick.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "bakery",
+        "gifts",
+        "gluten-free",
+        "snacks"
+      ],
+      "sources": [
+        {
+          "name": "Goodbake",
+          "url": "https://www.goodbake.co/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        },
+        {
+          "name": "Calgary Farmers' Market vendor directory",
+          "url": "https://calgaryfarmersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.goodbake.co/"
+      },
+      "services": [
+        "Brownie bites",
+        "Gift bundles",
+        "Business orders",
+        "Online ordering"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-09T19:45:00Z",
+      "email": "contact@goodbake.co"
+    },
+    {
+      "id": "biz-totalitea",
+      "kind": "business",
+      "slug": "totalitea",
+      "title": "TotaliTea, the Tea Boutique",
+      "name": "TotaliTea, the Tea Boutique",
+      "website": "https://totalitea.com/",
+      "summary": "Family-owned loose-leaf tea shop at the Calgary Farmers' Market with about 200 teas, matcha and tea to go.",
+      "description": "TotaliTea is an independent, family-owned loose-leaf tea business at the Calgary Farmers' Market, curating about 200 teas, handmade blends and matcha. Every tea and matcha is also sold by the cup to go, along with tea lattes and cold-brew iced teas, so you can taste before you buy a bag. The one to try is the organic grade A matcha, on its own or as a latte. They also carry steepers, travel tumblers, tea-ware and handmade pottery.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "tea",
+        "matcha",
+        "gifts",
+        "market vendor"
+      ],
+      "sources": [
+        {
+          "name": "TotaliTea, the Tea Boutique",
+          "url": "https://totalitea.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        },
+        {
+          "name": "Calgary Farmers' Market vendor directory",
+          "url": "https://calgaryfarmersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://totalitea.com/"
+      },
+      "services": [
+        "Loose-leaf tea",
+        "Matcha",
+        "Tea to go",
+        "Tea-ware and pottery"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-09T19:45:00Z",
+      "email": "totalitea@shaw.ca",
+      "phone": "403-668-1426"
+    },
+    {
+      "id": "biz-peaseblossoms-flowers",
+      "kind": "business",
+      "slug": "peaseblossoms-flowers",
+      "title": "Peaseblossoms Flowers & Stuff",
+      "name": "Peaseblossoms Flowers & Stuff",
+      "website": "https://www.peaseblossoms.com/",
+      "summary": "Florist on 11th St SW with fresh flowers, original giftware, studio classes and a house-made lavender eye cloud.",
+      "description": "Peaseblossoms Flowers & Stuff is an independent florist at 1417 11th St SW. It offers fresh flowers daily, full floral services for weddings and corporate clients, original giftware and studio classes. For the holidays, the house-made lavender eye cloud ($28) is a past gift-guide favourite and an easy stocking stuffer.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "florist",
+        "gifts",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "Peaseblossoms Flowers & Stuff",
+          "url": "https://www.peaseblossoms.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.peaseblossoms.com/"
+      },
+      "services": [
+        "Fresh flowers",
+        "Wedding and corporate flowers",
+        "Giftware",
+        "Studio classes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-09T19:45:00Z",
+      "email": "flowers@peaseblossoms.com",
+      "address": "1417 11th St SW, Calgary, AB",
+      "phone": "403-245-1287"
+    },
+    {
+      "id": "biz-10th-street-boxing",
+      "kind": "business",
+      "slug": "10th-street-boxing",
+      "title": "10th Street Boxing",
+      "name": "10th Street Boxing",
+      "website": "https://www.10thstreetboxing.com/",
+      "summary": "Kensington boxing gym that mixes traditional technique with high-intensity training for every fitness level.",
+      "description": "10th Street Boxing is a boxing gym in the heart of Kensington at 306 10th Street. Its classes combine traditional boxing technique with a high-intensity training structure that suits any fitness level, from first-timers to experienced athletes. Holiday gift idea: a 2-for-1 first trial class for $25, so two people can try it together.",
+      "categories": [
+        "recreation"
+      ],
+      "tags": [
+        "boxing",
+        "fitness",
+        "gym",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "10th Street Boxing",
+          "url": "https://www.10thstreetboxing.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.10thstreetboxing.com/"
+      },
+      "services": [
+        "Boxing classes",
+        "Memberships",
+        "Trial classes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-09T19:45:00Z",
+      "email": "teddyreno403@gmail.com",
+      "address": "306 10th St NW, Calgary, AB",
+      "phone": "403-402-2269",
+      "neighbourhood": "Kensington"
+    },
+    {
+      "id": "biz-bottoms-up-scrubs",
+      "kind": "business",
+      "slug": "bottoms-up-scrubs",
+      "title": "Bottoms Up Scrubs",
+      "name": "Bottoms Up Scrubs",
+      "website": "https://www.bottomsupscrubs.ca/",
+      "summary": "Canadian-owned scrubs shop with a Local Makers Market of gifts from small local businesses, all $50 and under.",
+      "description": "Bottoms Up Scrubs is a Canadian-owned medical scrubs and uniform shop. Inside, its Local Makers Market gives small locally owned businesses a storefront, with tea, coffee, self-care, toys, sensory items and more, all $50 and under. Gift cards come in any amount.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "scrubs",
+        "gifts",
+        "local makers"
+      ],
+      "sources": [
+        {
+          "name": "Bottoms Up Scrubs",
+          "url": "https://www.bottomsupscrubs.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T19:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bottomsupscrubs.ca/"
+      },
+      "services": [
+        "Scrubs and uniforms",
+        "Local Makers Market",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-09T19:45:00Z",
+      "email": "bottomsupscrubs@gmail.com",
+      "address": "3949 University Ave NW, Calgary, AB"
     }
   ]
 }

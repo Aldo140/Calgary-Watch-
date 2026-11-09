@@ -27143,6 +27143,57 @@
       "updatedAt": "2026-11-09T19:45:00Z",
       "email": "bottomsupscrubs@gmail.com",
       "address": "3949 University Ave NW, Calgary, AB"
+    },
+    {
+      "id": "biz-kashew-bakery",
+      "kind": "business",
+      "slug": "kashew-bakery",
+      "title": "Kashew Bakery",
+      "name": "Kashew Bakery",
+      "website": "https://www.kashewbakery.com/",
+      "summary": "Calgary vegan bakery with German-trained bread, brioche cinnamon buns, croissants and custom cakes.",
+      "description": "Kashew Bakery is a vegan bakery founded in Calgary in 2019 by Peter and Cindy Wegmann. Peter has baked professionally since 1987, starting in Germany before moving to Canada in 1995, and he still bakes with traditional German methods, just without any animal products. Look for artisan breads, brioche cinnamon buns, croissants, gluten-free lemon tarts and custom cakes, all priced fairly. Find them at the Calgary Farmers' Market West or order online.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "vegan",
+        "gluten-free",
+        "cakes"
+      ],
+      "sources": [
+        {
+          "name": "Kashew Bakery",
+          "url": "https://www.kashewbakery.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T20:50:00Z"
+        },
+        {
+          "name": "Calgary Farmers' Market vendor directory",
+          "url": "https://calgaryfarmersmarket.ca/vendor/kashew-bakery/",
+          "kind": "official",
+          "retrievedAt": "2026-11-09T20:50:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kashewbakery.com/",
+        "instagram": "https://www.instagram.com/kashewbakery/"
+      },
+      "services": [
+        "Vegan breads",
+        "Cinnamon buns and croissants",
+        "Custom cakes",
+        "Online ordering"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-09T20:50:00Z",
+      "email": "kashewbakery@gmail.com"
     }
   ]
 }

@@ -1,7 +1,7 @@
 import type { DiscoveryEntity, EntityKind, MarketOccurrence } from '../types/discovery';
 import { calgaryDate } from './discovery';
 import { matchesTonight } from './discoveryCalendar';
-import { communityByName, editDistance, normalizeWords } from './searchIntent';
+import { communityByName, editDistance, normalizeWords, parseSearchIntent } from './searchIntent';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
 import { verifiedBoost } from './verified';
 import { LOCAL_SERVICES, type LocalService } from '../data/localServices';
@@ -39,7 +39,9 @@ export interface ListingResults {
 
 const STOP = new Set(['a', 'an', 'the', 'in', 'on', 'at', 'near', 'by', 'of', 'for', 'to', 'and', 'or', 'with', 'from', 'around',
   'calgary', 'yyc', 'ab', 'alberta', 'what', 'whats', 'where', 'is', 'are', 'any', 'some', 'my', 'me', 'i', 'us', 'we',
-  'thing', 'do', 'stuff', 'go', 'happening', 'on', 'good', 'best', 'fun', 'cool', 'there', 'open', 'now', 'this', 'next', 'neighbourhood', 'neighborhood', 'area']);
+  'thing', 'do', 'stuff', 'go', 'happening', 'on', 'good', 'best', 'fun', 'cool', 'there', 'open', 'now', 'this', 'next', 'neighbourhood', 'neighborhood', 'area',
+  // Every listing is "live" and sells tickets: "live music tonight" means music tonight.
+  'live', 'ticket', 'tickets']);
 
 const KIND_WORDS: Record<string, EntityKind> = {
   event: 'event', concert: 'event', show: 'event', festival: 'event', festivals: 'event',
@@ -47,25 +49,34 @@ const KIND_WORDS: Record<string, EntityKind> = {
   place: 'business', shop: 'business', store: 'business', business: 'business', local: 'business',
   guide: 'guide', walk: 'guide', itinerary: 'guide',
   neighbourhood: 'neighbourhood', neighborhood: 'neighbourhood', community: 'neighbourhood',
+  // "things to do", "stuff to do this weekend", "activities": someone browsing what's on.
+  thing: 'event', stuff: 'event', activity: 'event', activities: 'event',
 };
 /** Kind words that are only a hint: they still have to match as words too. */
-const KIND_AND_WORD = new Set(['concert', 'show', 'festival', 'festivals', 'farmer', 'farmers', 'shop', 'store', 'walk']);
+const KIND_AND_WORD = new Set(['concert', 'show', 'festival', 'farmer', 'shop', 'store', 'walk']);
 
 /** A word on the left also matches any word on the right. */
 const SYNONYMS: Record<string, string[]> = {
   kid: ['family', 'children'], child: ['family', 'kid'], children: ['family', 'kid'], family: ['kid'],
   concert: ['music', 'live'], gig: ['music', 'live'], band: ['music'], music: ['concert', 'band', 'jazz', 'symphony'],
   eat: ['food', 'restaurant'], brunch: ['breakfast', 'cafe'], breakfast: ['brunch', 'cafe'], food: ['restaurant', 'eat', 'bakery', 'cafe'], restaurant: ['food'], coffee: ['cafe', 'coffee'], cafe: ['coffee'],
-  beer: ['brewery', 'pub', 'craft'], brewery: ['beer'], drink: ['bar', 'pub', 'cocktail', 'brewery'],
+  beer: ['brewery', 'pub', 'taproom'], brewery: ['beer'], drink: ['bar', 'pub', 'cocktail', 'brewery'],
   art: ['arts', 'gallery', 'museum'], theatre: ['theater', 'stage', 'play'], theater: ['theatre'], comedy: ['standup', 'improv'],
   outdoor: ['outdoors', 'park', 'trail', 'hike'], hike: ['trail', 'outdoors'], dog: ['pet', 'dogs'], pet: ['dog'],
   sport: ['sports', 'game', 'hockey', 'football', 'soccer'], hockey: ['flames', 'hitmen', 'wranglers'], football: ['stampeders'],
   talk: ['lecture', 'learning', 'workshop'], workshop: ['class', 'learning'], class: ['workshop'],
+  // Admin Search demand, Nov 2026: seasonal words people type that listings spell another way.
+  christmas: ['holiday', 'festive', 'santa'], holiday: ['christmas', 'festive'], festive: ['christmas', 'holiday'],
+  game: ['vs', 'match'], skating: ['skate', 'rink'], skate: ['skating', 'rink'], lights: ['zoolights', 'lantern', 'illumination'], parade: ['procession'],
 };
 
 /** Short forms Calgarians type for organizations listed under their full name. */
 export const ABBREVIATIONS: Record<string, string> = {
   atp: 'alberta theatre projects',
+  cfm: 'calgary farmers market',
+  cpo: 'calgary philharmonic orchestra',
+  xmas: 'christmas',
+  nye: 'new years eve',
 };
 
 /** The query with known short forms spelled out: "atp" → "alberta theatre projects". */
@@ -113,7 +124,8 @@ export function parseListingQuery(q: string): ListingQuery {
     if (w === 'free') { free = true; return; }
     const kind = KIND_WORDS[w] ?? KIND_WORDS[stem(w)];
     if (kind && !kinds.includes(kind)) kinds.push(kind);
-    if (kind && !KIND_AND_WORD.has(w)) return;
+    // "concerts" and "shows" are words too, not just "show me events".
+    if (kind && !KIND_AND_WORD.has(w) && !KIND_AND_WORD.has(stem(w))) return;
     if (STOP.has(w) || STOP.has(stem(w))) return;
     words.push(stem(w));
   });
@@ -147,15 +159,22 @@ function index(e: DiscoveryEntity): Indexed {
 const cache = new WeakMap<DiscoveryEntity, Indexed>();
 const indexed = (e: DiscoveryEntity) => cache.get(e) ?? (cache.set(e, index(e)), cache.get(e)!);
 
-/** How well one query word matches one indexed word: 1 exact, .8 prefix, .55 typo, 0 none. */
+/** Below this a word match is a typo guess, not something the listing says. */
+const TYPO = 0.55;
+
+/**
+ * How well one query word matches one indexed word: 1 exact, .8 prefix, .55 typo, 0 none.
+ * Typos need two real words of five letters or more ("halal" isn't "hall"), and
+ * two edits only from nine letters up ("shooting" isn't "shopping", "kensinton" is Kensington).
+ */
 function wordMatch(q: string, t: string, loose: boolean): number {
   if (q === t) return 1;
   if (!loose) return 0;
   // Three letters is a whole word, not a prefix: "pho" isn't "photo".
   if (q.length >= 4 && t.startsWith(q)) return 0.8;
-  if (q.length < 5 || q[0] !== t[0]) return 0;
-  const max = q.length >= 8 ? 2 : 1;
-  return editDistance(q, t, max) <= max ? 0.55 : 0;
+  if (q.length < 5 || t.length < 5 || q[0] !== t[0]) return 0;
+  const max = q.length >= 9 ? 2 : 1;
+  return editDistance(q, t, max) <= max ? TYPO : 0;
 }
 
 /**
@@ -163,19 +182,21 @@ function wordMatch(q: string, t: string, loose: boolean): number {
  * the short fields only; the long description and synonyms need an exact word,
  * so "panorama" doesn't find a page that mentions a panoramic view.
  */
-function scoreWord(x: Indexed, w: string): { score: number; strong: boolean } {
+function scoreWord(x: Indexed, w: string, strict = false): { score: number; strong: boolean; sure: boolean } {
   const alts = [[w, 1] as const, ...(SYNONYMS[w] ?? []).map(s => [stem(s), 0.7] as const)];
-  let score = 0; let strong = false;
+  let score = 0; let strong = false; let sure = false;
   for (const [weight, toks] of x.fields) {
     for (const [alt, factor] of alts) {
       for (const t of toks) {
-        const m = wordMatch(alt, t, factor === 1 && weight > FIELD.body) * weight * factor;
+        const q = wordMatch(alt, t, !strict && factor === 1 && weight > FIELD.body);
+        const m = q * weight * factor;
         if (m > score) score = m;
         if (m > 0 && weight > FIELD.body) strong = true;
+        if (q > TYPO) sure = true;
       }
     }
   }
-  return { score, strong };
+  return { score, strong, sure };
 }
 
 // ─── Time ──────────────────────────────────────────────────────────────────
@@ -238,7 +259,10 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
   const empty: ListingResults = { groups: {}, total: 0, partial: false };
   if (!query.words.length && !query.kinds.length && !query.when && !query.free) return empty;
 
-  type Hit = { e: DiscoveryEntity; score: number; matched: number; at: number };
+  // "shooting in beltline", "road closure": a safety search. Listings only answer
+  // it word for word; a near miss ("shopping", "Road Hammers") reads as a joke.
+  const strict = parseSearchIntent(q, now.getTime()).topics.some(t => t !== 'news');
+  type Hit = { e: DiscoveryEntity; score: number; matched: number; sure: number; at: number };
   const hits: Hit[] = [];
   const phrase = normalizeWords(expandAbbreviations(q)).join(' ');
   // "Panorama Hills" is a place, not two keywords: listings have to name it.
@@ -250,8 +274,8 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
     // Only kind words ("markets", "events this weekend"): every listing of that kind.
     if (!query.words.length && query.kinds.length && !query.kinds.includes(e.kind)) continue;
     const x = indexed(e);
-    let score = 0; let matched = 0; let strong = false;
-    for (const w of query.words) { const s = scoreWord(x, w); if (s.score > 0) { matched++; score += s.score; strong ||= s.strong; } }
+    let score = 0; let matched = 0; let sure = 0; let strong = false;
+    for (const w of query.words) { const s = scoreWord(x, w, strict); if (s.score > 0) { matched++; score += s.score; strong ||= s.strong; if (s.sure) sure++; } }
     // At least one word has to land in the title, place, tags or summary.
     if (query.words.length && (!matched || !strong)) continue;
     if (placeName && !normalizeWords([e.title, e.neighbourhood, 'venue' in e ? e.venue : '', e.summary, ...e.tags].join(' ')).join(' ').includes(placeName)) continue;
@@ -261,15 +285,16 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
     score += Math.min(3, (e.scores?.featured ?? 0) + (e.scores?.editorial ?? 0));
     // Verified by the organization: a notch up, never past a better match (verified.ts).
     score += verifiedBoost(e, 'search', now.getTime());
-    hits.push({ e, score, matched, at });
+    hits.push({ e, score, matched, sure, at });
   }
   const need = query.words.length;
   let chosen = hits.filter(h => h.matched === need);
   let partial = false;
   // Nothing matched every word: show listings that match most of them, strongest first.
-  if (!chosen.length && need >= 2) {
-    const most = Math.max(0, ...hits.map(h => h.matched));
-    chosen = most >= Math.ceil(need / 2) ? hits.filter(h => h.matched === most && h.score >= FIELD.tag).slice(0, 12) : [];
+  // Only words the listing really says count here: a typo guess on top of a miss is noise.
+  if (!chosen.length && need >= 2 && !strict) {
+    const most = Math.max(0, ...hits.map(h => h.sure));
+    chosen = most >= Math.ceil(need / 2) ? hits.filter(h => h.sure === most && h.score >= FIELD.tag).sort((a, b) => b.score - a.score).slice(0, 12) : [];
     partial = chosen.length > 0;
   }
   // Ties (same score band) go to whatever happens soonest.
@@ -280,7 +305,7 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
   const groups: ListingResults['groups'] = {};
   for (const kind of order) groups[kind] = chosen.filter(h => h.e.kind === kind).map(h => h.e);
   const result: ListingResults = { groups, total: chosen.length, partial };
-  if (!result.total || partial) {
+  if ((!result.total || partial) && !strict) {
     const fixed = correctQuery(q, entities);
     if (fixed && fixed !== normalizeWords(q).join(' ')) {
       const retry = searchListings(entities, occurrences, fixed, now);
@@ -308,11 +333,12 @@ export function correctQuery(q: string, entities: readonly DiscoveryEntity[]): s
   const words = vocabulary(entities);
   let changed = false;
   const out = normalizeWords(q).map(w => {
-    if (w.length < 4 || words.has(w) || STOP.has(w) || KIND_WORDS[w] || /\d/.test(w)) return w;
+    // Four letters is too short to guess at: "drag" isn't "drug".
+    if (w.length < 5 || words.has(w) || STOP.has(w) || KIND_WORDS[w] || /\d/.test(w)) return w;
     let best: [string, number] | null = null;
     const max = w.length >= 8 ? 2 : 1;
     for (const t of words) {
-      if (t[0] !== w[0] && t[1] !== w[1]) continue;
+      if (t.length < 5 || (t[0] !== w[0] && t[1] !== w[1])) continue;
       const d = editDistance(w, t, max);
       if (d <= max && (!best || d < best[1])) best = [t, d];
     }

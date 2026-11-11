@@ -51,7 +51,12 @@ export default function SearchPage() {
   const occurrences = useMemo(() => discoveryRepository.occurrences(), []);
   const now = useMemo(() => Date.now(), [q]);
   const results = useMemo(() => searchListings(all, occurrences, q, new Date(now)), [all, occurrences, q, now]);
-  const parsed = useMemo(() => parseSearchIntent(q, now), [q, now]);
+  const parsed = useMemo(() => {
+    const p = parseSearchIntent(q, now);
+    // "plumber", "mechanic", "snow removal" with no listing of our own: answer it like
+    // "best plumbers" (the Local service and where to look) instead of an empty page.
+    return !p.best && !p.topics.length && !p.communities.length && (!results.total || results.partial) && serviceFor(q) ? { ...p, best: { thing: q } } : p;
+  }, [q, now, results.total, results.partial]);
   const bestLists = useMemo(() => bestForQuery(q).map(c => ({ to: bestPath(c), label: bestLabel(c), note: bestNote(c) })), [q]);
   // A cited Best of Calgary list beats the "best …" card; the card covers everything else.
   const best = useMemo(() => parsed.best && !bestLists.length

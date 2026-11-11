@@ -27194,6 +27194,828 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-09T20:50:00Z",
       "email": "kashewbakery@gmail.com"
+    },
+    {
+      "id": "biz-fallentimber-meadery",
+      "kind": "business",
+      "slug": "fallentimber-meadery",
+      "title": "Fallentimber Meadery",
+      "name": "Fallentimber Meadery",
+      "website": "https://fallentimbermeadery.ca/",
+      "summary": "Alberta meadery making traditional and sparkling session meads from its own honey near Water Valley.",
+      "description": "Fallentimber Meadery has made mead since 2010 with honey from its own land near Water Valley, Alberta. There are two styles: traditional meads that drink like wine, from classic honey to fruit and whisky-barrel aged, and lighter sparkling session meads that drink more like beer or cider, including low-alcohol options. Every mead is naturally gluten free. Find them at the Calgary Farmers' Market West.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "mead",
+        "honey",
+        "gluten-free",
+        "drinks"
+      ],
+      "sources": [
+        {
+          "name": "Fallentimber Meadery",
+          "url": "https://fallentimbermeadery.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        },
+        {
+          "name": "Calgary Farmers' Market vendor directory",
+          "url": "https://calgaryfarmersmarket.ca/vendor/fallentimber-meadery/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://fallentimbermeadery.ca/",
+        "instagram": "https://www.instagram.com/ftmeadery/"
+      },
+      "services": [
+        "Traditional meads",
+        "Sparkling session meads",
+        "Calgary Farmers' Market West"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "orders@fallentimbermeadery.ca"
+    },
+    {
+      "id": "biz-lil-black-rooster",
+      "kind": "business",
+      "slug": "lil-black-rooster",
+      "title": "Lil' Black Rooster",
+      "name": "Lil' Black Rooster",
+      "website": "https://order.toasttab.com/online/lil-black-rooster",
+      "summary": "Chef-driven sandwiches, salads and soups at the Calgary Farmers' Market West, from the team behind The Sweatered Hen.",
+      "description": "Lil' Black Rooster is the sister spot to Calgary's The Sweatered Hen, founded by Chef Andrea Harling. At the Calgary Farmers' Market West they make sandwiches, salads, soups and rotating features from scratch, using local ingredients whenever they can. Stop in for lunch, pick up dinner to take home, or order ahead online.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "sandwiches",
+        "lunch",
+        "takeout",
+        "local ingredients"
+      ],
+      "sources": [
+        {
+          "name": "Lil' Black Rooster",
+          "url": "https://order.toasttab.com/online/lil-black-rooster",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        },
+        {
+          "name": "Calgary Farmers' Market vendor directory",
+          "url": "https://calgaryfarmersmarket.ca/vendor/lil-black-rooster/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://order.toasttab.com/online/lil-black-rooster",
+        "instagram": "https://www.instagram.com/lilblackroostereats/"
+      },
+      "services": [
+        "Sandwiches, salads and soups",
+        "Chef features",
+        "Online pickup orders"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "hello@heyvburger.com"
+    },
+    {
+      "id": "biz-my-body-couture",
+      "kind": "business",
+      "slug": "my-body-couture",
+      "title": "My Body Couture",
+      "name": "My Body Couture",
+      "website": "https://www.mybodycouture.com/",
+      "summary": "Janis Isaman's Calgary studio for private STOTT Pilates, yin yoga and Yamuna Body Rolling.",
+      "description": "My Body Couture is Janis Isaman's private movement practice in Calgary. She teaches one-on-one STOTT Pilates, yin yoga and Yamuna Body Rolling, with a focus on people living with chronic pain, chronic illness or movement limits, and she also trains Yamuna Body Rolling teachers.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "pilates",
+        "yoga",
+        "body rolling",
+        "private sessions"
+      ],
+      "sources": [
+        {
+          "name": "My Body Couture",
+          "url": "https://www.mybodycouture.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mybodycouture.com/",
+        "instagram": "https://www.instagram.com/mybodycouture/"
+      },
+      "services": [
+        "Private STOTT Pilates",
+        "Yin yoga",
+        "Yamuna Body Rolling",
+        "Teacher training"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "janis@mybodycouture.com"
+    },
+    {
+      "id": "biz-marshasophia",
+      "kind": "business",
+      "slug": "marshasophia",
+      "title": "MarshaSophia",
+      "name": "MarshaSophia",
+      "website": "https://www.marshasophia.ca/",
+      "summary": "Gluten-free bakery and café in Sunnyside from certified gluten-free practitioner Marsha Hebert.",
+      "description": "MarshaSophia is a gluten-free bakery and café at 1081 2 Ave NW in Sunnyside, open since June 2025. It grew out of Eat For Life by Marsha, founded by Marsha Hebert, a certified gluten-free practitioner, so everything on the counter is made for people who can't take chances with gluten.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "gluten-free",
+        "bakery",
+        "cafe"
+      ],
+      "sources": [
+        {
+          "name": "MarshaSophia",
+          "url": "https://www.marshasophia.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.marshasophia.ca/",
+        "instagram": "https://www.instagram.com/marshasophia.ca/"
+      },
+      "services": [
+        "Gluten-free baking",
+        "Café"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "yes@marshasophia.ca",
+      "address": "1081 2 Ave NW, Calgary, AB",
+      "neighbourhood": "Sunnyside"
+    },
+    {
+      "id": "biz-crossfit-pyro",
+      "kind": "business",
+      "slug": "crossfit-pyro",
+      "title": "CrossFit Pyro",
+      "name": "CrossFit Pyro",
+      "website": "https://www.crossfitpyro.com/",
+      "summary": "Coach-led CrossFit, fundamentals and open gym in northeast Calgary.",
+      "description": "CrossFit Pyro runs coach-led CrossFit classes, a fundamentals program for newcomers and open gym time at 3515 2 St NE. The focus is on building strength and confidence in a welcoming community, and new members can start with a free trial class.",
+      "categories": [
+        "recreation",
+        "wellness"
+      ],
+      "tags": [
+        "crossfit",
+        "gym",
+        "fitness"
+      ],
+      "sources": [
+        {
+          "name": "CrossFit Pyro",
+          "url": "https://www.crossfitpyro.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crossfitpyro.com/",
+        "instagram": "https://www.instagram.com/crossfitpyro/"
+      },
+      "services": [
+        "CrossFit classes",
+        "Fundamentals",
+        "Open gym",
+        "Free trial class"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "info@crossfitpyro.com",
+      "address": "3515 2 St NE, Calgary, AB"
+    },
+    {
+      "id": "biz-choklat",
+      "kind": "business",
+      "slug": "choklat",
+      "title": "Choklat",
+      "name": "Choklat",
+      "website": "https://choklat.com/",
+      "summary": "Calgary chocolate maker run by Brad Churchill, with a new line of sugar-free truffles.",
+      "description": "Choklat is a Calgary chocolate maker run by Brad Churchill. Alongside its regular chocolates, Choklat has a new line of sugar-free, diabetic-friendly truffles, so more people at the table can share a box this season.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "chocolate",
+        "truffles",
+        "sugar-free",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Choklat",
+          "url": "https://choklat.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://choklat.com/"
+      },
+      "services": [
+        "Chocolates",
+        "Sugar-free truffles"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "sales@choklat.com"
+    },
+    {
+      "id": "biz-aroma-cafe-bar",
+      "kind": "business",
+      "slug": "aroma-cafe-bar",
+      "title": "Aroma Cafe Bar",
+      "name": "Aroma Cafe Bar",
+      "website": "https://aromacafebar.ca/",
+      "summary": "Mexican food and fresh coffee at cSpace Marda Loop.",
+      "description": "Aroma Cafe Bar brings Mexican flavours and fresh coffee together in the historic cSpace building in Marda Loop, at 1721 29 Ave SW. Come for a coffee, stay for lunch, and ask about catering for your next gathering.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "mexican",
+        "coffee",
+        "cafe",
+        "catering"
+      ],
+      "sources": [
+        {
+          "name": "Aroma Cafe Bar",
+          "url": "https://aromacafebar.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://aromacafebar.ca/",
+        "instagram": "https://www.instagram.com/aromacafebaryyc/"
+      },
+      "services": [
+        "Mexican food",
+        "Coffee",
+        "Catering"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "admin@aromacafebar.ca",
+      "address": "1721 29 Ave SW, Calgary, AB",
+      "neighbourhood": "Marda Loop"
+    },
+    {
+      "id": "biz-uncle-fatihs-pizza",
+      "kind": "business",
+      "slug": "uncle-fatihs-pizza",
+      "title": "Uncle Fatih's Pizza",
+      "name": "Uncle Fatih's Pizza",
+      "website": "https://www.unclefatih.com/",
+      "summary": "Calgary's relaxed pizza-by-the-slice shops.",
+      "description": "Uncle Fatih's Pizza runs cozy, laid-back pizza shops around Calgary, made with non-hydrogenated ingredients. Drop in for a slice, or grab a whole pie to take home.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza",
+        "slices",
+        "takeout"
+      ],
+      "sources": [
+        {
+          "name": "Uncle Fatih's Pizza",
+          "url": "https://www.unclefatih.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.unclefatih.com/",
+        "instagram": "https://www.instagram.com/unclefatih/"
+      },
+      "services": [
+        "Pizza by the slice",
+        "Whole pies",
+        "Takeout"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "support@unclefatih.com"
+    },
+    {
+      "id": "biz-glam-wigs",
+      "kind": "business",
+      "slug": "glam-wigs",
+      "title": "Glam Wigs",
+      "name": "Glam Wigs",
+      "website": "https://glamwigsinc.com/",
+      "summary": "Human-hair wigs, private fittings and hair-loss support on 17 Ave SW.",
+      "description": "Glam Wigs offers premium human-hair wigs and caring support for hair loss, with private fittings at 718 17 Ave SW. If you can't come in, they also offer virtual guidance and ship worldwide.",
+      "categories": [
+        "shopping",
+        "wellness"
+      ],
+      "tags": [
+        "wigs",
+        "hair loss",
+        "private fittings"
+      ],
+      "sources": [
+        {
+          "name": "Glam Wigs",
+          "url": "https://glamwigsinc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://glamwigsinc.com/",
+        "instagram": "https://www.instagram.com/glamwigsinc/"
+      },
+      "services": [
+        "Human-hair wigs",
+        "Private fittings",
+        "Hair-loss support",
+        "Virtual guidance"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "glamwigsinc@gmail.com",
+      "address": "718 17 Ave SW, Calgary, AB"
+    },
+    {
+      "id": "biz-jarman-shop",
+      "kind": "business",
+      "slug": "jarman-shop",
+      "title": "Jarman",
+      "name": "Jarman",
+      "website": "https://jarmanshop.com/",
+      "summary": "Ikebana-inspired florist in Bridgeland with same-day delivery and wedding florals.",
+      "description": "Jarman is a modern, design-forward florist at 1029 1 Ave NE in Bridgeland, with arrangements inspired by ikebana. They do same-day flower delivery around Calgary, wedding florals and custom pieces, and a Jarman gift card works for anything in the shop.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "florist",
+        "flowers",
+        "weddings",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Jarman",
+          "url": "https://jarmanshop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://jarmanshop.com/",
+        "instagram": "https://www.instagram.com/jarmanshop/"
+      },
+      "services": [
+        "Same-day flower delivery",
+        "Wedding florals",
+        "Custom arrangements",
+        "Gift cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "info@jarmanshop.com",
+      "address": "1029 1 Ave NE, Calgary, AB",
+      "neighbourhood": "Bridgeland"
+    },
+    {
+      "id": "biz-joyces-closet",
+      "kind": "business",
+      "slug": "joyces-closet",
+      "title": "Joyce's Closet",
+      "name": "Joyce's Closet",
+      "website": "https://www.joycescloset.ca/",
+      "summary": "Authenticated luxury consignment, dress rental and styling in Calgary since 2013.",
+      "description": "Joyce's Closet has been an authenticated luxury consignment boutique since 2013. Shop designer clothing, handbags, jewelry and vintage pieces, rent a dress for an event, or book a stylist or private shopping session.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "consignment",
+        "luxury",
+        "vintage",
+        "dress rental"
+      ],
+      "sources": [
+        {
+          "name": "Joyce's Closet",
+          "url": "https://www.joycescloset.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.joycescloset.ca/"
+      },
+      "services": [
+        "Luxury consignment",
+        "Dress rental",
+        "Styling services",
+        "Private shopping"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "info@joycescloset.ca"
+    },
+    {
+      "id": "biz-tri-hub",
+      "kind": "business",
+      "slug": "tri-hub",
+      "title": "Tri Hub",
+      "name": "Tri Hub",
+      "website": "https://trihub.ca/",
+      "summary": "Calgary's swimwear and multisport shop: JOLYN, CRAFT running gear and beach bikinis.",
+      "description": "Tri Hub Swimwear & Multisport is Alberta's JOLYN and KULANI KINIS retailer, with performance swimwear, beach and lounge bikinis, and CRAFT running gear. It's a good stop for swimmers, triathletes and anyone shopping for an active Calgarian.",
+      "categories": [
+        "shopping",
+        "recreation"
+      ],
+      "tags": [
+        "swimwear",
+        "triathlon",
+        "running",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Tri Hub",
+          "url": "https://trihub.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://trihub.ca/",
+        "instagram": "https://www.instagram.com/trihub.ca/"
+      },
+      "services": [
+        "Performance swimwear",
+        "Beach swimwear",
+        "Running gear"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "info@trihub.ca"
+    },
+    {
+      "id": "biz-only-nutrition",
+      "kind": "business",
+      "slug": "only-nutrition",
+      "title": "Only Nutrition & Fitness",
+      "name": "Only Nutrition & Fitness",
+      "website": "https://onlynutrition.ca/",
+      "summary": "Women-only fitness club in Calgary focused on real strength training, plus shakes and energy juices.",
+      "description": "Only Nutrition & Fitness is a women-only fitness club in Calgary that focuses on real strength training. Join a class, then grab a protein shake or energy juice on your way out. It's built to be a place where women feel strong and supported.",
+      "categories": [
+        "wellness",
+        "recreation"
+      ],
+      "tags": [
+        "women only",
+        "strength training",
+        "fitness classes",
+        "shakes"
+      ],
+      "sources": [
+        {
+          "name": "Only Nutrition & Fitness",
+          "url": "https://onlynutrition.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://onlynutrition.ca/"
+      },
+      "services": [
+        "Women-only fitness classes",
+        "Strength training",
+        "Protein shakes and energy juices"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "fitlifeduo22@gmail.com"
+    },
+    {
+      "id": "biz-butts-and-co",
+      "kind": "business",
+      "slug": "butts-and-co",
+      "title": "Butts & Co.",
+      "name": "Butts & Co.",
+      "website": "https://www.calvinbuttsbespoke.com/",
+      "summary": "Marda Loop men's lifestyle store and tailor Calvin Butts: custom suits, alterations, ready-to-wear and gifts.",
+      "description": "Butts & Co. is Marda Loop's men's lifestyle store, run by tailor Calvin Butts, who trained under a third-generation Italian tailor. Come in for custom suiting and alterations, or shop resort casual clothing, home goods, bath and body, and accessories. Find it at #105, 3470 18 St SW.",
+      "categories": [
+        "shopping",
+        "services"
+      ],
+      "tags": [
+        "tailor",
+        "menswear",
+        "custom suits",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Butts & Co.",
+          "url": "https://www.calvinbuttsbespoke.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calvinbuttsbespoke.com/"
+      },
+      "services": [
+        "Custom suiting",
+        "Alterations",
+        "Ready-to-wear",
+        "Lifestyle goods"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "calvinbuttsbespoke@gmail.com",
+      "address": "#105, 3470 18 St SW, Calgary, AB",
+      "neighbourhood": "Marda Loop"
+    },
+    {
+      "id": "biz-adola-cafe",
+      "kind": "business",
+      "slug": "adola-cafe",
+      "title": "ADOLA Café",
+      "name": "ADOLA Café",
+      "website": "https://www.adola.ca/",
+      "summary": "Ethiopian coffee roasted near Calgary, an espresso bar and the traditional coffee ceremony.",
+      "description": "ADOLA Café brings Ethiopian coffee to Calgary: single-origin beans roasted in Springbank, an everyday espresso bar, and the traditional Ethiopian coffee ceremony, which you can book. Beans ship across Canada, and they also do catering and wholesale.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "coffee",
+        "ethiopian",
+        "coffee ceremony",
+        "roaster"
+      ],
+      "sources": [
+        {
+          "name": "ADOLA Café",
+          "url": "https://www.adola.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.adola.ca/"
+      },
+      "services": [
+        "Single-origin coffee beans",
+        "Espresso bar",
+        "Coffee ceremony bookings",
+        "Catering and wholesale"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "hello@adola.ca"
+    },
+    {
+      "id": "biz-italiano-please",
+      "kind": "business",
+      "slug": "italiano-please",
+      "title": "Italiano Please!",
+      "name": "Italiano Please!",
+      "website": "https://www.italianoplease.com/",
+      "summary": "Downtown Italian spot known for sandwiches on its own pizza bianca, like the Romolo.",
+      "description": "Italiano Please! is an Italian restaurant downtown at 801 6 Ave SW. They bake their own pizza bianca and use it for sandwiches like the Romolo, with prosciutto and fresh mozzarella.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian",
+        "sandwiches",
+        "pizza bianca",
+        "downtown"
+      ],
+      "sources": [
+        {
+          "name": "Italiano Please!",
+          "url": "https://www.italianoplease.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.italianoplease.com/",
+        "instagram": "https://www.instagram.com/italianoplease.yyc/"
+      },
+      "services": [
+        "Italian sandwiches",
+        "Pizza bianca",
+        "Lunch"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "contactus@italianoplease.com",
+      "address": "200 - 801 6 Ave SW, Calgary, AB",
+      "neighbourhood": "Downtown"
+    },
+    {
+      "id": "biz-reliquary-cards",
+      "kind": "business",
+      "slug": "reliquary-cards",
+      "title": "Reliquary Cards",
+      "name": "Reliquary Cards",
+      "website": "https://www.reliquarycards.com/",
+      "summary": "Bowness trading card game shop with weekly Sunday Commander nights for Magic: The Gathering.",
+      "description": "Reliquary Cards (formerly Bowness Arts) is a trading card game shop at 6326 Bowness Rd NW for players and collectors. The best night to visit is Sunday Commander, the most popular way to play Magic: The Gathering and a friendly way in for new players. They sell preconstructed decks so beginners can start right away, and the tables are welcoming at every level.",
+      "categories": [
+        "shopping",
+        "recreation"
+      ],
+      "tags": [
+        "trading cards",
+        "magic the gathering",
+        "game night",
+        "bowness"
+      ],
+      "sources": [
+        {
+          "name": "Reliquary Cards",
+          "url": "https://www.reliquarycards.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.reliquarycards.com/"
+      },
+      "services": [
+        "Sunday Commander nights",
+        "Preconstructed decks",
+        "Trading cards"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "reliquarycards@gmail.com",
+      "address": "6326 Bowness Rd NW, Calgary, AB",
+      "neighbourhood": "Bowness"
+    },
+    {
+      "id": "biz-pawsitively-natural",
+      "kind": "business",
+      "slug": "pawsitively-natural",
+      "title": "PAWSitively Natural Pet Food & Supplies",
+      "name": "PAWSitively Natural Pet Food & Supplies",
+      "website": "https://www.pawsitivelynatural.ca/",
+      "summary": "Natural pet food and supplies for cats and dogs on 4 St SW, with free parking.",
+      "description": "PAWSitively Natural is an independent pet store at 2100 4 St SW with natural food, treats and supplies for cats and dogs, plus hemp and CBD products for pets. There's free parking, and the team is happy to help you choose.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "pet store",
+        "natural pet food",
+        "cats",
+        "dogs"
+      ],
+      "sources": [
+        {
+          "name": "PAWSitively Natural Pet Food & Supplies",
+          "url": "https://www.pawsitivelynatural.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.pawsitivelynatural.ca/"
+      },
+      "services": [
+        "Natural pet food",
+        "Cat and dog supplies",
+        "Hemp and CBD pet products"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "info@pawsitivelynatural.ca",
+      "address": "2100 4 St SW, Calgary, AB"
     }
   ]
 }

@@ -7,7 +7,7 @@ import { organizerEvents, organizerMarkets } from './organizations';
  * and community halls, and the independent shops we'd send a friend to. Every profile
  * sits on exactly one shelf, so the page reads like a well-kept directory, not a pile.
  */
-export type ShelfId = 'stages' | 'culture' | 'markets' | 'restaurants' | 'bars' | 'coffee' | 'days-out' | 'day-trips' | 'community' | 'seasonal';
+export type ShelfId = 'stages' | 'culture' | 'markets' | 'restaurants' | 'bars' | 'coffee' | 'days-out' | 'day-trips' | 'community' | 'seasonal' | 'shops';
 
 export interface Shelf { id: ShelfId; label: string; line: string; tone: string; ink: string }
 
@@ -17,6 +17,7 @@ export const SHELVES: Shelf[] = [
   { id: 'markets', label: 'Markets & makers', line: 'Farmers’ markets, makers’ fairs and the people who run them.', tone: '#3a8f74', ink: '#fff' },
   { id: 'restaurants', label: 'Restaurants', line: 'Independent kitchens worth booking a table at.', tone: '#e2673a', ink: '#151515' },
   { id: 'bars', label: 'Bars & breweries', line: 'Pubs, taprooms, lounges and the nights they run all year.', tone: '#9c2f5c', ink: '#fff' },
+  { id: 'shops', label: 'Shops & services', line: 'Independent shops, studios and the people who keep a neighbourhood running.', tone: '#2f6f8f', ink: '#fff' },
   { id: 'coffee', label: 'Coffee & corner shops', line: 'Independents worth crossing the river for.', tone: '#c98a2e', ink: '#151515' },
   { id: 'days-out', label: 'Days out', line: 'Big days with the kids, the grandparents or both.', tone: '#00c2e0', ink: '#151515' },
   { id: 'community', label: 'Community groups', line: 'Community associations and the volunteers who run the neighbourhood.', tone: '#1554d1', ink: '#fff' },
@@ -50,6 +51,8 @@ export function shelfOf(p: Pick<Business, 'title' | 'categories' | 'tags'> & { s
   if (has(c, 'nightlife')) return 'bars';
   if (has(t, 'coffee', 'espresso', 'organic coffee') || (has(c, 'food') && !has(t, 'organization', 'organizer'))) return 'coffee';
   if (has(c, 'community')) return 'community';
+  // Shops, studios and services aren't galleries: only arts, music or heritage profiles fall through to culture.
+  if (has(c, 'shopping', 'wellness', 'recreation', 'services') && !has(c, 'arts', 'music', 'heritage', 'learning', 'festivals', 'culture', 'gallery', 'exhibitions', 'theatre')) return 'shops';
   return 'culture';
 }
 

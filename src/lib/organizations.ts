@@ -78,8 +78,8 @@ export function organizerMarkets(id: string, all: readonly DiscoveryEntity[], no
 export function organizationIdentityForName(name:string){const normalize=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');const found=ORGANIZATIONS.find(o=>o.names.some(n=>normalize(n)===normalize(name)));return found?{...found,slug:found.id.replace(/^biz-/,'')}:undefined;}
 
 /** A city-only organization address is not a visitor entrance. */
-export function organizationVisitAddress(address: string): boolean {
-  const value = address.trim();
+export function organizationVisitAddress(address: string | null | undefined): boolean {
+  const value = (address ?? '').trim();
   return Boolean(value && !/^calgary(?:,?\s+(?:ab|alberta))?(?:,?\s+canada)?\.?$/i.test(value));
 }
 

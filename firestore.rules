@@ -462,7 +462,7 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create, update: if isAdmin() &&
                     hasOnlyAllowedFields(['service', 'place', 'placeName', 'checks', 'why', 'status', 'updatedAt', 'publish', 'publishedAt', 'updatedBy']) &&
-                    request.resource.data.service == serviceId &&
+                    request.resource.data['service'] == serviceId &&
                     request.resource.data.place is string && request.resource.data.place.size() <= 32 &&
                     request.resource.data.placeName is string && request.resource.data.placeName.size() <= 120 &&
                     request.resource.data.checks is map &&

@@ -28,8 +28,22 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
           TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+      # A Pick made live, paused or changed on the admin vetting desk. One read.
+      # Skipped while a deploy is running: starting another would cancel it.
+      - name: Check for Pick changes
+        id: picks
+        continue-on-error: true
+        run: |
+          busy="$(gh run list --workflow deploy-firebase.yml --limit 5 --json status --jq '[.[] | select(.status != "completed")] | length' || echo 0)"
+          if [ "$busy" != "0" ]; then echo "A deploy is running; Pick changes ship with it or the next check."; exit 0; fi
+          npx tsx scripts/picks/export-picks.ts --pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
       - name: Publish updated site
-        if: ${{ steps.apply.outputs.publish == 'true' }}
+        if: ${{ steps.apply.outputs.publish == 'true' || steps.picks.outputs.publish == 'true' }}
         run: gh workflow run deploy-firebase.yml --ref main
         env:
           GH_TOKEN: ${{ github.token }}

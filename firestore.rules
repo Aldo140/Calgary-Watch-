@@ -455,6 +455,23 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // The CalgaryWatch Pick vetting desk (src/lib/pickVetting.ts). Admin only:
+    // check dates and private notes. The deploy publishes only dates, the
+    // company and the why (scripts/picks/export-picks.ts).
+    match /pick_vetting/{serviceId} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() &&
+                    hasOnlyAllowedFields(['service', 'place', 'placeName', 'checks', 'why', 'status', 'updatedAt', 'publish', 'publishedAt', 'updatedBy']) &&
+                    request.resource.data.service == serviceId &&
+                    request.resource.data.place is string && request.resource.data.place.size() <= 32 &&
+                    request.resource.data.placeName is string && request.resource.data.placeName.size() <= 120 &&
+                    request.resource.data.checks is map &&
+                    request.resource.data.why is string && request.resource.data.why.size() <= 400 &&
+                    request.resource.data.status in ['vetting', 'live', 'paused'] &&
+                    request.resource.data.updatedAt is number;
+      allow delete: if isAdmin();
+    }
+
     // Anonymous page view analytics – write-only from any visitor, no PII stored.
     match /page_views/{viewId} {
       // Every field is bounded and type-checked. `referrer` holds a bare

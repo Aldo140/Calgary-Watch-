@@ -25,7 +25,7 @@ const ids = (q: string) => Object.values(searchListings(ENTITIES, OCC, q, NOW).g
 
 describe('listing search', () => {
   it('reads time words, "free" and kind words out of the query', () => {
-    assert.deepEqual(parseListingQuery('free things to do this weekend'), { words: [], kinds: [], when: 'this-weekend', free: true });
+    assert.deepEqual(parseListingQuery('free things to do this weekend'), { words: [], kinds: ['event'], when: 'this-weekend', free: true });
     assert.deepEqual(parseListingQuery('farmers markets saturday').when, 'saturday');
     assert.deepEqual(parseListingQuery('events in Kensington'), { words: ['kensington'], kinds: ['event'], when: undefined, free: false });
     assert.equal(stem('markets'), 'market'); assert.equal(stem('galleries'), 'gallery'); assert.equal(stem('glass'), 'glass');
@@ -60,7 +60,7 @@ describe('listing search', () => {
     assert.deepEqual(ids('panoramic hill'), ['ramsay']);
   });
   it('falls back to the closest matches and suggests a spelling', () => {
-    const r = searchListings(ENTITIES, OCC, 'jazz helicopter', NOW);
+    const r = searchListings(ENTITIES, OCC, 'jazz saxophone', NOW);
     assert.equal(r.partial, true);
     assert.equal(correctQuery('jaz lanturn', ENTITIES), 'jaz lantern');
     assert.equal(correctQuery('kensingtn', ENTITIES), 'kensington');
@@ -75,6 +75,24 @@ describe('listing search', () => {
     assert.deepEqual(Object.values(searchListings([atp, photo], [], 'atp', NOW).groups).flat().map(e => e!.id), ['atp']);
     assert.equal(searchListings([atp, photo], [], 'pho', NOW).total, 0, '"pho" is soup, not photos');
     assert.equal(searchListings([atp, photo], [], 'phot', NOW).total, 1);
+  });
+
+  it('reads Search demand words the way people mean them (Nov 2026)', () => {
+    assert.deepEqual(parseListingQuery('concerts').words, ['concert'], 'a plural kind word is still a word, not "every event"');
+    assert.deepEqual(parseListingQuery('things to do').kinds, ['event']);
+    assert.ok(ids('things to do').includes('jazz'));
+    assert.equal(expandAbbreviations('xmas market'), 'christmas market');
+    assert.equal(expandAbbreviations('cfm'), 'calgary farmers market');
+    assert.equal(expandAbbreviations('NYE'), 'new years eve');
+    const shop = event('shop', 'Member-Only Shopping Night', '2026-10-20T02:00:00Z');
+    const hall = { ...base, id: 'hall', slug: 'hall', kind: 'business', title: 'Norberg Hall', name: 'Norberg Hall', categories: [], tags: [], services: [], images: [], socials: {}, claimed: false, partner: false, editorialSelection: false, address: '' } as unknown as DiscoveryEntity;
+    const breakfast = { ...hall, id: 'bf', slug: 'bf', title: 'Monki Breakfast Club', name: 'Monki Breakfast Club' } as unknown as DiscoveryEntity;
+    assert.equal(searchListings([shop, hall], [], 'shooting', NOW).total, 0, '"shooting" isn\'t "shopping"');
+    assert.equal(searchListings([shop, hall], [], 'halal', NOW).total, 0, '"halal" isn\'t "hall"');
+    assert.equal(correctQuery('halal', [hall]), null);
+    assert.equal(correctQuery('drag', [{ ...hall, title: 'Drug Mart' } as DiscoveryEntity]), null, 'four letters is too short to guess at');
+    assert.equal(searchListings([breakfast], [], 'break in', NOW).total, 0, 'a safety search only takes word-for-word listings');
+    assert.equal(searchListings([breakfast], [], 'breakfa', NOW).total, 1, 'prefixes still work elsewhere');
   });
 
   it('answers "best …" from listed places only, and names the Local service', () => {

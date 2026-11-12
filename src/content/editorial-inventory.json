@@ -27495,7 +27495,7 @@
       "name": "Aroma Cafe Bar",
       "website": "https://aromacafebar.ca/",
       "summary": "Mexican food and fresh coffee at cSpace Marda Loop.",
-      "description": "Aroma Cafe Bar brings Mexican flavours and fresh coffee together in the historic cSpace building in Marda Loop, at 1721 29 Ave SW. Come for a coffee, stay for lunch, and ask about catering for your next gathering.",
+      "description": "Aroma Cafe Bar brings Mexican flavours and fresh coffee together in the historic cSpace building in Marda Loop, at 1721 29 Ave SW. Come for a coffee, stay for lunch, and ask about catering for your next gathering. There's a second location, Aroma Cafe at 33 Avenue, at 1845 33 Ave SW.",
       "categories": [
         "food"
       ],
@@ -27528,9 +27528,55 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-11-11T00:30:00Z",
+      "updatedAt": "2026-11-12T19:45:00Z",
       "email": "admin@aromacafebar.ca",
       "address": "1721 29 Ave SW, Calgary, AB",
+      "neighbourhood": "Marda Loop"
+    },
+    {
+      "id": "biz-aroma-cafe-at-33",
+      "kind": "business",
+      "slug": "aroma-cafe-at-33",
+      "title": "Aroma Cafe at 33 Avenue",
+      "name": "Aroma Cafe at 33 Avenue",
+      "website": "https://aromacafebar.ca/",
+      "summary": "Mexican food and fresh coffee on 33 Avenue in Marda Loop.",
+      "description": "Aroma Cafe at 33 Avenue is the second location of Aroma Cafe Bar, serving Mexican flavours and fresh coffee at 1845 33 Ave SW in Marda Loop. Open Monday to Saturday 8 am to 7 pm and Sundays 8 am to 6 pm. Ask about catering for your next gathering. The original cafe is in the cSpace building at 1721 29 Ave SW.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "mexican",
+        "coffee",
+        "cafe",
+        "catering"
+      ],
+      "sources": [
+        {
+          "name": "Aroma Cafe Bar",
+          "url": "https://aromacafebar.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T19:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://aromacafebar.ca/",
+        "instagram": "https://www.instagram.com/aromacafebaryyc/"
+      },
+      "services": [
+        "Mexican food",
+        "Coffee",
+        "Catering"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T19:45:00Z",
+      "email": "admin@aromacafebar.ca",
+      "address": "1845 33 Ave SW, Calgary, AB",
       "neighbourhood": "Marda Loop"
     },
     {

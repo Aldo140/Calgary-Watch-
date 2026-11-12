@@ -173,6 +173,19 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     index: false,
     pageType: 'WebPage',
   },
+  '/picks': {
+    title: 'How CalgaryWatch Picks Work: Vetted Local Services | CalgaryWatch',
+    description: 'One vetted company per service, chosen after seven checks we do ourselves and kept honest by neighbours who hired them. Never bought.',
+    index: false,
+    pageType: 'WebPage',
+    image: DEFAULT_IMAGE,
+  },
+  '/review': {
+    title: 'How did it go? | CalgaryWatch',
+    description: 'Tell CalgaryWatch how a job went.',
+    index: false,
+    pageType: 'WebPage',
+  },
   '/unsubscribe': {
     title: 'Email Preferences | CalgaryWatch',
     description: 'Update Calgary Watch email preferences securely.',

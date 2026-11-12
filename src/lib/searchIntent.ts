@@ -3,6 +3,7 @@ import { calgaryDateTimeFormat } from './calgaryTz';
 import { toSlug } from './communityRank';
 import { pointInPolygon, type CommunityBoundary } from './communityLookup';
 import type { Incident, IncidentCategory } from '../types';
+import { parsePostal, quadrantTypo, QUADRANT_PHRASES, TOWNS, type PostalGuess, type Town } from './searchPlaces';
 
 /**
  * What a resident means by a search, so the page can answer it.
@@ -70,6 +71,12 @@ export interface SearchIntent {
   question: boolean;
   landmark?: Landmark;
   best?: BestAsk;
+  /** "t2k 2e2": the postal area and the communities around it. */
+  postal?: PostalGuess;
+  /** "cochrane": a town next door, not Calgary. */
+  town?: Town;
+  /** "calgary" and nothing else: the whole city. */
+  city?: boolean;
 }
 
 // ─── Words ──────────────────────────────────────────────────────────────────
@@ -229,8 +236,19 @@ function hasPhrase(words: string[], phrase: string): number {
 
 const title = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase());
 
+const CITY_WORDS = new Set(['calgary', 'yyc', 'ab', 'alberta', 'city', 'of', 'the', 'in']);
+
 export function parseSearchIntent(q: string, now = Date.now()): SearchIntent {
   const words = normalizeWords(q);
+  const blank: SearchIntent = { communities: [], time: null, topics: [], street: null, question: false };
+  // "t2k 2e2": a postal code is the whole search.
+  const postal = parsePostal(q);
+  if (postal) {
+    const town = postal.area.town ? TOWNS.find(t => t.name === postal.area.town) : undefined;
+    const communities = postal.area.communities.map(n => communityByName(n)).filter((m): m is CommunityMatch => !!m);
+    return { ...blank, communities: communities.slice(0, 3), postal, ...(postal.area.quadrant ? { quadrant: postal.area.quadrant } : {}), ...(town ? { town } : {}) };
+  }
+  if ((words.includes('calgary') || words.includes('yyc')) && words.every(w => CITY_WORDS.has(w))) return { ...blank, city: true };
   const used = new Array(words.length).fill(false);
   const claim = (phrase: string) => {
     const at = hasPhrase(words, phrase);
@@ -258,13 +276,28 @@ export function parseSearchIntent(q: string, now = Date.now()): SearchIntent {
   }
   const topics = best ? [] : (Object.keys(TOPIC_WORDS) as Topic[]).filter(t => TOPIC_WORDS[t].filter(claim).length > 0);
   const question = ['why', 'what', 'whats', 'how', 'who', 'is'].includes(words[0] ?? '');
-  const quadrantWord = words.find(w => QUADRANTS.has(w));
+  // "north east", "northeast", "ne": said out loud or abbreviated, it's a quadrant.
+  let quadrantWord: string | undefined;
+  for (const [phrase, quad] of QUADRANT_PHRASES) if (!quadrantWord && claim(phrase)) quadrantWord = quad.toLowerCase();
   words.forEach((w, i) => { if (QUADRANTS.has(w) || FILLER.has(w)) used[i] = true; });
+  // "hazelwood crescent sq": a two-letter slip right after a street word is the quadrant.
+  words.forEach((w, i) => {
+    const typo = !used[i] && i > 0 && STREET_SUFFIX[words[i - 1]] ? quadrantTypo(w) : null;
+    if (typo) { used[i] = true; quadrantWord ??= typo.toLowerCase(); }
+  });
 
   // A landmark is the whole of what's left: "westside", "westside rec".
   const leftover = compact(words.filter((_, i) => !used[i]).join(' '));
   const landmark = leftover ? LANDMARKS.find(l => l.keys.some(k => compact(k) === leftover)) : undefined;
   if (landmark) used.fill(true);
+  // "cochrane", "airdrie events": a town next door. Its own words, never a typo guess.
+  // "banff trail" is a community and "cochrane rd" a street, so a town word followed by a street word isn't the town.
+  const townAt = (k: string) => {
+    const at = hasPhrase(words, k);
+    const next = words[at + k.split(' ').length];
+    return at >= 0 && !used[at] && !(next && STREET_SUFFIX[next]) && !INDEX.some(e => e.key === leftover) ? at : -1;
+  };
+  const town = !landmark ? TOWNS.find(t => t.keys.some(k => townAt(k) >= 0 && claim(k))) : undefined;
 
   // Communities: longest unclaimed run first, so "spring bank hill" beats "hill".
   const communities: CommunityMatch[] = [];
@@ -298,12 +331,18 @@ export function parseSearchIntent(q: string, now = Date.now()): SearchIntent {
     const name = nameWords.join(' ');
     const likely = nameWords.length && !/^\d/.test(nameWords[0]) ? communityByStreetPrefix(nameWords[0]) : undefined;
     // Only treat leftovers as a street when something says so; "zoo" isn't one.
-    if (name && (suffix || houseNumber || likely)) {
+    // "apple expert" isn't a street in Applewood: without a suffix or house number, only one word can be a street name.
+    if (name && (suffix || houseNumber || (likely && nameWords.length === 1))) {
       street = { typed: title(body.join(' ')), name: name.toUpperCase(), ...(suffix ? { suffix } : {}), ...(houseNumber ? { houseNumber } : {}), ...(likely ? { likely } : {}) };
     }
   }
 
-  return { communities: communities.slice(0, 3), ...(quadrant ? { quadrant } : {}), time, topics, street, question, ...(landmark ? { landmark } : {}), ...(best ? { best } : {}) };
+  return { communities: communities.slice(0, 3), ...(quadrant ? { quadrant } : {}), time, topics, street, question, ...(landmark ? { landmark } : {}), ...(best ? { best } : {}), ...(town ? { town } : {}) };
+}
+
+/** "north east" on its own: a quadrant and nothing narrower. */
+export function quadrantOnly(intent: SearchIntent): 'NW' | 'NE' | 'SW' | 'SE' | undefined {
+  return !intent.communities.length && !intent.street && !intent.landmark && !intent.town && !intent.postal && !intent.topics.length && !intent.time ? intent.quadrant : undefined;
 }
 
 /**
@@ -313,7 +352,7 @@ export function parseSearchIntent(q: string, now = Date.now()): SearchIntent {
  * use it only when nothing else answered, and show it only when it's found.
  */
 export function bareStreetGuess(intent: SearchIntent, q: string): StreetGuess | null {
-  if (intent.communities.length || intent.street || intent.landmark || intent.best || intent.time || intent.topics.length) return null;
+  if (intent.communities.length || intent.street || intent.landmark || intent.best || intent.time || intent.topics.length || intent.town || intent.postal || intent.city || intent.quadrant) return null;
   const left = normalizeWords(q).filter(w => !FILLER.has(w) && !QUADRANTS.has(w));
   if (left.length !== 1 || !/^[a-z]{5,}$/.test(left[0])) return null;
   return { typed: title(left[0]), name: left[0].toUpperCase(), bare: true };
@@ -321,17 +360,22 @@ export function bareStreetGuess(intent: SearchIntent, q: string): StreetGuess | 
 
 /** A citywide "what's been reported" answer: a topic or a time, but no place. */
 export function showsCitywide(intent: SearchIntent): boolean {
-  return !intent.communities.length && (intent.topics.length > 0 || !!intent.time);
+  return !intent.communities.length && !intent.postal && (intent.topics.length > 0 || !!intent.time || !!intent.city);
 }
 
 /** How many ready-made answers a search gets, counted as results in Search demand. */
 export function answerCount(intent: SearchIntent): number {
-  return intent.communities.length + (intent.street ? 1 : 0) + (intent.landmark ? 1 : 0) + (showsCitywide(intent) ? 1 : 0);
+  return intent.communities.length + (intent.street ? 1 : 0) + (intent.landmark ? 1 : 0) + (showsCitywide(intent) ? 1 : 0)
+    + (intent.postal ? 1 : 0) + (intent.town && !intent.postal ? 1 : 0) + (quadrantOnly(intent) ? 1 : 0);
 }
 
 /** One line on what search now answers for a term, for the admin page. */
 export function describeAnswer(intent: SearchIntent): string | null {
   if (intent.landmark) return intent.landmark.name;
+  if (intent.postal) return `Postal area ${intent.postal.area.fsa}`;
+  if (intent.town) return `${intent.town.name} (next to Calgary)`;
+  if (intent.city) return 'All of Calgary';
+  if (quadrantOnly(intent)) return `${intent.quadrant} Calgary`;
   if (intent.street) return `Street${intent.street.likely ? ` in ${intent.street.likely.community.name}` : ''}`;
   if (intent.communities.length) return intent.communities.map(c => c.community.name).join(', ');
   if (showsCitywide(intent)) return `${intent.time?.label ?? 'Recent'} reports`;
@@ -340,7 +384,7 @@ export function describeAnswer(intent: SearchIntent): string | null {
 
 /** Whether the page should show live reports for this search. */
 export function wantsReports(intent: SearchIntent): boolean {
-  return intent.communities.length > 0 || intent.topics.length > 0 || !!intent.time;
+  return intent.communities.length > 0 || intent.topics.length > 0 || !!intent.time || !!intent.city;
 }
 
 // ─── Reports ────────────────────────────────────────────────────────────────

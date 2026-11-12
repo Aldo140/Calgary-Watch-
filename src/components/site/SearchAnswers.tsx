@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Bell, Building2, FlaskConical, Lightbulb, MapPin, Phone, Signpost, Siren, Star } from 'lucide-react';
+import { ArrowUpRight, Bell, Building2, Compass, FlaskConical, Lightbulb, Mailbox, MapPin, Phone, Signpost, Siren, Star } from 'lucide-react';
 import { INCIDENT_CATEGORIES } from '../../constants';
 import { useLatestReports, type LatestReports } from '../../hooks/useLatestReports';
 import { useStreetLookup } from '../../hooks/useStreetLookup';
@@ -10,8 +10,11 @@ import { formatRelativeTime } from '../../lib/format';
 import { entityPath } from '../../lib/discovery';
 import type { LocalService } from '../../data/localServices';
 import type { DiscoveryEntity } from '../../types/discovery';
+import { CALGARY_COMMUNITIES } from '../../data/calgaryCommunities';
+import { toSlug } from '../../lib/communityRank';
+import { POSTAL_SOURCE, QUADRANT_NAME, type PostalGuess, type Town } from '../../lib/searchPlaces';
 import {
-  communityByName, reportsForIntent, showsCitywide, wantsReports,
+  communityByName, quadrantOnly, reportsForIntent, showsCitywide, wantsReports,
   type CommunityMatch, type Landmark, type SearchIntent, type StreetGuess, type Topic,
 } from '../../lib/searchIntent';
 import type { Incident } from '../../types';
@@ -31,10 +34,14 @@ const categoryColor = (c: string) => INCIDENT_CATEGORIES.find(x => x.value === c
 export function SearchAnswers({ intent, now, best }: { intent: SearchIntent; now: number; best?: BestAnswer }) {
   const reports = useLatestReports(wantsReports(intent) || !!intent.street || !!intent.landmark);
   const boundaries = useBoundaries(intent.communities.length > 0 || !!intent.landmark);
-  if (!intent.communities.length && !intent.street && !intent.landmark && !best && !showsCitywide(intent)) return null;
+  const quad = quadrantOnly(intent);
+  if (!intent.communities.length && !intent.street && !intent.landmark && !best && !showsCitywide(intent) && !intent.postal && !intent.town && !quad) return null;
   return (
     <div className="cw-answers" aria-label="Answers for your search">
       {intent.best && best && <BestCard thing={intent.best.thing} answer={best} where={intent.communities[0]?.community.name} />}
+      {intent.postal && <PostalCard postal={intent.postal} town={intent.town} />}
+      {intent.town && !intent.postal && <TownCard town={intent.town} />}
+      {quad && <QuadrantCard quadrant={quad} />}
       {intent.landmark && <LandmarkCard landmark={intent.landmark} reports={reports} boundaries={boundaries} now={now} />}
       {intent.street && <StreetCard street={intent.street} reports={reports} now={now} />}
       {intent.communities.map(c => <CommunityCard key={c.slug} match={c} intent={intent} reports={reports} boundaries={boundaries} now={now} />)}
@@ -136,6 +143,81 @@ function BestCard({ thing, answer, where }: { thing: string; answer?: BestAnswer
   );
 }
 
+/* ── Postal code: "t2k 2e2" ────────────────────────────────────── */
+
+function PostalCard({ postal, town }: { postal: PostalGuess; town?: Town }) {
+  const { area } = postal;
+  const hoods = area.communities.map(n => communityByName(n)).filter((m): m is CommunityMatch => !!m);
+  const where = town ? town.name : hoods.length ? hoods.map(h => h.community.name).join(', ') : area.quadrant ? `${QUADRANT_NAME[area.quadrant]} Calgary` : 'Calgary';
+  return (
+    <section className="cw-answer cw-answer-place">
+      <div className="cw-answer-head">
+        <p className="cw-answer-eyebrow"><Mailbox size={15} aria-hidden="true" /> Postal code</p>
+        <h2>{postal.code}<span>{town ? town.name : area.quadrant ?? (hoods[0]?.community.quadrant === 'Centre' ? 'Centre' : hoods[0]?.community.quadrant) ?? 'Calgary'}</span></h2>
+        <p className="cw-answer-lead">
+          {town ? <>{area.fsa} is <b>{town.name}</b>, {town.where}. It’s its own town, so CalgaryWatch’s Calgary reports don’t cover it.</>
+            : <>{area.fsa} codes are around <b>{where}</b>{area.note ? <>, plus {area.note}</> : null}. A postal area is bigger than one community, so check the ones below. <a href={POSTAL_SOURCE} target="_blank" rel="noopener noreferrer">Source ↗</a></>}
+        </p>
+        <div className="cw-answer-actions">
+          {hoods[0] ? <Link className="cw-answer-primary" to={`/map?area=${hoods[0].slug}`}>See {hoods[0].community.name} on the live map <ArrowUpRight size={16} aria-hidden="true" /></Link> : null}
+          {hoods.map(h => <Link key={h.slug} to={`/search?q=${encodeURIComponent(h.community.name.toLowerCase())}`}>{h.community.name}</Link>)}
+          {!hoods.length && area.quadrant ? <Link className="cw-answer-primary" to={`/neighbourhoods?quadrant=${area.quadrant}`}>{QUADRANT_NAME[area.quadrant]} neighbourhoods <ArrowUpRight size={16} aria-hidden="true" /></Link> : null}
+          {town?.page ? <Link className="cw-answer-primary" to={town.page.to}>{town.page.label} <ArrowUpRight size={16} aria-hidden="true" /></Link> : null}
+          <Link to="/map?settings=alerts"><Bell size={15} aria-hidden="true" /> Alerts for my area</Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Town next door: "cochrane" ────────────────────────────────── */
+
+function TownCard({ town }: { town: Town }) {
+  const near = town.near.map(n => communityByName(n)).filter((m): m is CommunityMatch => !!m);
+  return (
+    <section className="cw-answer cw-answer-place">
+      <div className="cw-answer-head">
+        <p className="cw-answer-eyebrow"><Signpost size={15} aria-hidden="true" /> Next door</p>
+        <h2>{town.name}<span>Not Calgary</span></h2>
+        <p className="cw-answer-lead">
+          {town.name} is its own town, {town.where}. CalgaryWatch’s live map and reports cover Calgary city limits, so {town.name} news won’t show here{near.length ? <>. The closest of Calgary is <b>{near.map(n => n.community.name).join(' and ')}</b></> : null}. Any {town.name} events and listings we have are below.
+        </p>
+        <div className="cw-answer-actions">
+          {town.page ? <Link className="cw-answer-primary" to={town.page.to}>{town.page.label} <ArrowUpRight size={16} aria-hidden="true" /></Link> : null}
+          {near.map((n, i) => <Link key={n.slug} className={!town.page && i === 0 ? 'cw-answer-primary' : undefined} to={`/search?q=${encodeURIComponent(n.community.name.toLowerCase())}`}>{n.community.name}{!town.page && i === 0 ? <ArrowUpRight size={16} aria-hidden="true" /> : null}</Link>)}
+          <Link className={!town.page && !near.length ? 'cw-answer-primary' : undefined} to={`/neighbourhoods?quadrant=${town.quadrant}`}>{QUADRANT_NAME[town.quadrant]} Calgary</Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Quadrant: "north east" ────────────────────────────────────── */
+
+function QuadrantCard({ quadrant }: { quadrant: 'NW' | 'NE' | 'SW' | 'SE' }) {
+  const hoods = CALGARY_COMMUNITIES.filter(c => c.quadrant === quadrant);
+  return (
+    <section className="cw-answer cw-answer-hood">
+      <div className="cw-answer-head">
+        <p className="cw-answer-eyebrow"><Compass size={15} aria-hidden="true" /> Quadrant</p>
+        <h2>{QUADRANT_NAME[quadrant]} Calgary<span>{quadrant}</span></h2>
+        <p className="cw-answer-lead">{hoods.length} communities. Pick yours for its reports, or see the whole quadrant on the live map.</p>
+        <div className="cw-answer-actions">
+          <Link className="cw-answer-primary" to={`/neighbourhoods?quadrant=${quadrant}`}>{QUADRANT_NAME[quadrant]} neighbourhoods <ArrowUpRight size={16} aria-hidden="true" /></Link>
+          <Link to="/map">Open the live map</Link>
+          <Link to="/map?settings=alerts"><Bell size={15} aria-hidden="true" /> Alerts for my area</Link>
+        </div>
+      </div>
+      <div className="cw-answer-reports is-compact">
+        <h3>Communities in the {quadrant}</h3>
+        <ul className="cw-hood-chips">
+          {hoods.map(c => <li key={c.name}><Link to={`/search?q=${encodeURIComponent(c.name.toLowerCase())}`} data-slug={toSlug(c.name)}>{c.name}</Link></li>)}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 /* ── Landmark: "westside" ──────────────────────────────────────── */
 
 function LandmarkCard({ landmark, reports, boundaries, now }: { landmark: Landmark; reports: LatestReports; boundaries?: CommunityBoundary[]; now: number }) {
@@ -212,15 +294,17 @@ function CitywideCard({ intent, reports, now }: { intent: SearchIntent; reports:
   const answer = useMemo(() => reportsForIntent(reports.incidents, intent, now, undefined, 8), [reports.incidents, intent, now]);
   const safety = intent.topics.some(t => t === 'police' || t === 'helicopter' || t === 'lockdown' || t === 'crime' || t === 'fire');
   const explain = intent.topics.map(t => EXPLAIN[t]).find(Boolean) ?? (intent.question && safety ? EXPLAIN.police : undefined);
-  const what = intent.topics.length ? topicLabel(intent.topics) : 'Everything reported';
+  const what = intent.city ? 'All of Calgary' : intent.topics.length ? topicLabel(intent.topics) : 'Everything reported';
   return (
     <section className="cw-answer cw-answer-city">
       <div className="cw-answer-head">
         <p className="cw-answer-eyebrow"><Siren size={15} aria-hidden="true" /> Across Calgary</p>
         <h2>{what}<span>{answer.window.label}</span></h2>
         {explain && <p className="cw-answer-lead">{explain}</p>}
+        {intent.city && <p className="cw-answer-lead">What’s been reported lately, and every way into the city: the live map, what’s on, the four quadrants and our cited Best of Calgary.</p>}
         <div className="cw-answer-actions">
           <Link className="cw-answer-primary" to="/map">Open the live map <ArrowUpRight size={16} aria-hidden="true" /></Link>
+          {intent.city && <><Link to="/events/this-weekend">This weekend</Link><Link to="/neighbourhoods">Neighbourhoods</Link><Link to="/best">Best of Calgary</Link><Link to="/safety">Safety news</Link></>}
           {safety && <a href={CPS_NEWS} target="_blank" rel="noopener noreferrer">Police news releases ↗</a>}
         </div>
         {safety && <p className="cw-answer-help"><Phone size={14} aria-hidden="true" />Emergency or crime in progress: <a href="tel:911">911</a>. Anything else: <a href="tel:4032661234">403-266-1234</a>.</p>}

@@ -5,6 +5,7 @@ import { BRAND_MARK } from '../components/guides/GuideCover';
 import { BEST_CATEGORIES, type BestCategory, type BestFact, type BestPlace } from '../content/bestOf';
 import { bestCategory, bestPath, directionsUrl, formatPublished, isRanked, publishersOf, rankPlaces, sourceOf, sourcesFor } from '../lib/bestOf';
 import NotFoundPage from './NotFoundPage';
+import { PickBoard } from '../components/picks/PickBoard';
 import '../styles/best-of.css';
 
 const CONTACT = 'aldo@calgarywatch.ca';
@@ -43,6 +44,14 @@ function Motif({ motif }: { motif: BestCategory['motif'] }) {
         <path className="bo-m-cut" d="M132 96h18l12 14h-30Z" />
         <circle className="bo-m-wheel" cx="56" cy="136" r="13" /><circle className="bo-m-wheel" cx="146" cy="136" r="13" />
         <path className="bo-m-soft" d="M40 58l14-18 12 14 16-22 14 26" />
+      </g>
+    );
+    case 'wrench': return (
+      <g>
+        <path className="bo-m-fill" d="M46 150 118 78a34 34 0 1 1 18 18l-72 72a12 12 0 0 1-18-18Z" />
+        <circle className="bo-m-wheel" cx="150" cy="58" r="12" />
+        <path className="bo-m-soft" d="M30 60c14-8 22 8 36 0M30 84c14-8 22 8 36 0" />
+        <path className="bo-m-cut" d="M58 150 128 80" />
       </g>
     );
   }
@@ -148,7 +157,9 @@ function CategoryView({ c }: { c: BestCategory }) {
       <div className="bo-wrap bo-layout">
         <section aria-labelledby="bo-list-title">
           <h2 id="bo-list-title" className="bo-sr">The list</h2>
-          <ol className={`bo-list${isRanked(c) ? '' : ' is-az'}`}>{places.map((p, i) => <PlaceRow key={p.name} c={c} place={p} rank={i + 1} />)}</ol>
+          {c.kind === 'service'
+            ? <PickBoard c={c} via="best" />
+            : <ol className={`bo-list${isRanked(c) ? '' : ' is-az'}`}>{places.map((p, i) => <PlaceRow key={p.name} c={c} place={p} rank={i + 1} />)}</ol>}
         </section>
 
         <aside className="bo-side">
@@ -156,9 +167,10 @@ function CategoryView({ c }: { c: BestCategory }) {
             <h2 id="bo-how-title">How this list works</h2>
             {c.kind === 'food' ? (
               <p>We didn’t taste-test. A place is here because an independent food guide or award named it, and the order is how many different publishers did, then A–Z. Each fact links to where it was published.</p>
-            ) : (
-              <p>We haven’t hired these companies, and no independent guide ranks Calgary {c.noun} yet. So it’s A–Z, and every line is what the company says on its own website. When neighbours’ recommendations and verified owners come in, they’ll set the order.</p>
-            )}
+            ) : (<>
+              <p>No independent guide ranks Calgary {c.noun} yet. So the list is A–Z, and every line is what the company says on its own website.</p>
+              <p><b>The CalgaryWatch Pick</b> is different: one company that passed seven checks we do ourselves (licence, insurance, WCB, local ownership, reviews, a call as a customer, and a signed pledge). If you contact anyone here, you can ask us to check in a week later. Those answers decide whether a Pick keeps its spot. <Link to="/picks">How Picks work</Link></p>
+            </>)}
             <p>Nobody paid to be here or to move up. Paid placements, if they ever exist, will be labelled. <Link to="/partners">How we work with businesses</Link></p>
           </section>
 

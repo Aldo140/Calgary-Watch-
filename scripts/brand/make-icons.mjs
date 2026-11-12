@@ -1,33 +1,39 @@
 /**
- * Rebuilds the favicon and app icon set in public/.
+ * Rebuilds the favicon and app icon set in public/ from the CalgaryWatch badge.
  *
- *   node scripts/brand/make-icons.mjs
+ *   npm run brand:icons
  *
- * Small sizes (tab, bookmarks) come from public/favicon.svg, the city-spark
- * mark simplified so it stays crisp at 16px. Large sizes (home screen, app
- * launcher, install prompts) use the full illustrated mark. Committed output:
- * icons change rarely, and the deploy shouldn't depend on an image pipeline.
+ * Two sources in brand/mark/:
+ * - calgarywatch-badge-small.svg: wave C, sun and spark on navy. Tabs, bookmarks and
+ *   Google's search-result icon, which is drawn at about 16-28px inside a circle.
+ * - calgarywatch-badge.svg: the full badge (dusk over the Rockies, the Calgary Tower,
+ *   downtown). Home screens, install prompts, the Organization logo Google shows
+ *   beside the knowledge panel, and anything 48px or larger that people look at.
+ *
+ * Both are round, so Google's circular crop and Android's maskable crop never cut
+ * them. Committed output: icons change rarely, and the deploy shouldn't depend on an
+ * image pipeline.
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const PUBLIC = join(ROOT, 'public');
-const MARK = join(PUBLIC, 'images/brand/calgarywatch-city-spark-v2.webp');
-const CREAM = '#faf8f3';
+const SMALL = join(ROOT, 'brand/mark/calgarywatch-badge-small.svg');
+const FULL = join(ROOT, 'brand/mark/calgarywatch-badge.svg');
+/** The badge's own outer colour, so a square tile around the round badge has no visible edge. */
 const NAVY = '#06162f';
 
-const fromSvg = (size) => sharp(join(PUBLIC, 'favicon.svg'), { density: Math.ceil((size / 64) * 72 * 4) }).resize(size, size).png({ compressionLevel: 9 }).toBuffer();
+const render = (svg, size) => sharp(svg, { density: Math.ceil((size / 96) * 72 * 4) }).resize(size, size).png({ compressionLevel: 9 }).toBuffer();
 
-/** The full mark centred on a solid square, `scale` of the side (iOS and Android fill transparency with black). */
-async function onSquare(size, scale, background) {
-  const inner = Math.round(size * scale);
-  const mark = await sharp(MARK).resize(inner, inner).png().toBuffer();
-  return sharp({ create: { width: size, height: size, channels: 4, background } })
-    .composite([{ input: mark, gravity: 'centre' }])
+/** The badge centred on a solid navy square, `scale` of the side (iOS and Android fill transparency with black). */
+async function onSquare(size, scale) {
+  const badge = await render(FULL, Math.round(size * scale));
+  return sharp({ create: { width: size, height: size, channels: 4, background: NAVY } })
+    .composite([{ input: badge, gravity: 'centre' }])
     .png({ compressionLevel: 9 })
     .toBuffer();
 }
@@ -54,19 +60,32 @@ function ico(pngs) {
   return Buffer.concat([header, ...pngs.map((p) => p.data)]);
 }
 
-const out = (name, data) => writeFile(join(PUBLIC, name), data).then(() => console.log(`[icons] public/${name} (${(data.length / 1024).toFixed(1)} KB)`));
+const out = async (name, data) => {
+  await mkdir(dirname(join(PUBLIC, name)), { recursive: true });
+  await writeFile(join(PUBLIC, name), data);
+  console.log(`[icons] public/${name} (${(data.length / 1024).toFixed(1)} KB)`);
+};
 
-const sizes = [16, 32, 48];
-const small = await Promise.all(sizes.map(async (size) => ({ size, data: await fromSvg(size) })));
+// Tab and search-result sizes: the simple badge.
+const small = await Promise.all([16, 32, 48].map(async (size) => ({ size, data: await render(SMALL, size) })));
 await out('favicon.ico', ico(small));
 await out('favicon-32.png', small[1].data);
-// Full mark, transparent: Android/Chrome draw it on their own surface.
-await out('icon-192.png', await sharp(MARK).resize(192, 192).png({ compressionLevel: 9 }).toBuffer());
-await out('icon-512.png', await sharp(MARK).resize(512, 512).png({ compressionLevel: 9 }).toBuffer());
-// Maskable: launchers crop to a circle or squircle, so the mark sits inside the middle 80%.
-await out('icon-maskable-512.png', await onSquare(512, 0.72, CREAM));
-// iOS home screen: no transparency allowed, rounded by the OS.
-await out('apple-touch-icon.png', await onSquare(180, 0.84, CREAM));
-// Safari pinned tabs and Windows tiles want a dark tile.
-await out('icon-tile-310.png', await onSquare(310, 0.7, NAVY));
-await readFile(join(PUBLIC, 'favicon.svg')); // fail loudly if the source went missing
+// Google asks for a square favicon that is a multiple of 48px; 96 and 192 cover its high-density slots.
+await out('favicon-96.png', await render(SMALL, 96));
+await out('favicon-192.png', await render(SMALL, 192));
+await copyFile(SMALL, join(PUBLIC, 'favicon.svg'));
+console.log('[icons] public/favicon.svg');
+await copyFile(FULL, join(PUBLIC, 'icon.svg'));
+console.log('[icons] public/icon.svg');
+
+// App sizes: the full badge. Round with a transparent outside, so Chrome and Android draw it on their own surface.
+await out('icon-192.png', await render(FULL, 192));
+await out('icon-512.png', await render(FULL, 512));
+// Maskable: launchers crop to a circle or squircle; the badge's own edge is navy, so the tile reads as one disc.
+await out('icon-maskable-512.png', await onSquare(512, 0.86));
+// iOS home screen: no transparency allowed, corners rounded by the OS.
+await out('apple-touch-icon.png', await onSquare(180, 1));
+// Windows tiles.
+await out('icon-tile-310.png', await onSquare(310, 0.8));
+// Organization logo for structured data: Google wants at least 112px, on a background it can show on white.
+await out('images/brand/calgarywatch-logo-512.png', await render(FULL, 512));

@@ -23,9 +23,10 @@ import { SPOTLIGHT_PATH, spotlightBySlug, spotlightPath } from './spotlights';
 
 export const SHARE_CARD = { width: 1200, height: 630 } as const;
 export const SHARE_ORIGIN = 'https://calgarywatch.ca';
-/** Shown for routes without a card of their own. JPEG: WhatsApp and LinkedIn still trip on WebP previews. */
-export const DEFAULT_SHARE_IMAGE = `${SHARE_ORIGIN}/images/hero/calgarywatch-social-v1.jpg`;
-export const DEFAULT_SHARE_ALT = 'An illustrated Calgary skyline with the Bow River, the Peace Bridge and the Rockies behind, under the CalgaryWatch name.';
+/** Shown for routes without a card of their own: the branded site picture from `npm run brand:social`.
+ * JPEG: WhatsApp and LinkedIn still trip on WebP previews. */
+export const DEFAULT_SHARE_IMAGE = `${SHARE_ORIGIN}/images/hero/calgarywatch-site-wide.jpg`;
+export const DEFAULT_SHARE_ALT = 'The CalgaryWatch badge and name over an illustrated Calgary skyline with the Calgary Tower, the Peace Bridge and the Rockies: What’s happening in Calgary?';
 
 export type CardTheme = 'event' | 'market' | 'local' | 'neighbourhood' | 'guide' | 'best' | 'hub' | 'spotlight';
 

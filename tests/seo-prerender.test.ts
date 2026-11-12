@@ -46,7 +46,7 @@ const SHELL = `<!doctype html>
 describe('renderRouteHtml', () => {
   it('bakes the route title into the static HTML', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
-    assert.match(html, /<title>Calgary Crime Map: Recent Reports Near You \| Calgary Watch<\/title>/);
+    assert.match(html, /<title>Calgary Crime Map: Recent Reports Near You \| CalgaryWatch<\/title>/);
     assert.doesNotMatch(html, /<title>Calgary Watch \| Real-Time Community Safety Map<\/title>/);
   });
 
@@ -69,7 +69,7 @@ describe('renderRouteHtml', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
     assert.equal((html.match(/property=["']og:title["']/g) ?? []).length, 1);
     assert.equal((html.match(/name=["']twitter:title["']/g) ?? []).length, 1);
-    assert.match(html, /<meta property="og:title" content="Calgary Crime Map: Recent Reports Near You \| Calgary Watch" \/>/);
+    assert.match(html, /<meta property="og:title" content="Calgary Crime Map: Recent Reports Near You \| CalgaryWatch" \/>/);
   });
 
   it('leaves the module script intact and places readable content in the app shell', () => {
@@ -141,7 +141,7 @@ describe('renderRouteHtml', () => {
 
   it('gives privacy its own canonical while keeping private utility routes out of search', () => {
     const privacy = renderRouteHtml(SHELL, '/privacy', PRODUCTION_ORIGIN);
-    assert.match(privacy, /<title>Privacy Policy \| Calgary Watch<\/title>/);
+    assert.match(privacy, /<title>Privacy Policy \| CalgaryWatch<\/title>/);
     assert.match(privacy, /canonical" href="https:\/\/calgarywatch\.ca\/privacy/);
     assert.ok(PRERENDER_ROUTES.includes('/privacy'));
     for (const route of ['/unsubscribe', '/admin', '/admin/users', '/admin/incidents']) {

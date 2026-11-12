@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="72" viewBox="0 0 260 72" role="img" aria-labelledby="t">
+  <title id="t">Listed on CalgaryWatch: local Calgary companies, checked</title>
+  <rect x="2" y="2" width="252" height="64" rx="16" fill="#151515"/>
+  <rect x="0" y="0" width="252" height="64" rx="16" fill="#06162f" stroke="#151515" stroke-width="2"/>
+  <circle cx="34" cy="32" r="20" fill="#ffdf4f" stroke="#151515" stroke-width="2"/>
+  <path d="M25 32.5l6 6 12-13" fill="none" stroke="#151515" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="64" y="27" fill="#00c2e0" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="10.5" font-weight="600" letter-spacing="1.6">LISTED ON</text>
+  <text x="64" y="47" fill="#ffffff" font-family="Bricolage Grotesque, Arial, sans-serif" font-size="20" font-weight="800">CalgaryWatch<tspan fill="#00c2e0">.</tspan></text>
+</svg>

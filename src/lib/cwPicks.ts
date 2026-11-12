@@ -1,6 +1,7 @@
 import { BEST_CATEGORIES, type BestPlace } from '../content/bestOf';
 import { sourceOf } from './bestOf';
 import { PICK_CHECKS, PICKS, type CwPick, type PickCheck } from '../content/cwPicks';
+import { DESK_COMPANIES } from '../content/pickDesks';
 import { LOCAL_SERVICES, offersService, serviceById, type LocalService } from '../data/localServices';
 import type { DiscoveryEntity } from '../types/discovery';
 
@@ -93,6 +94,7 @@ export function shelfFor(serviceId: string, entities: readonly DiscoveryEntity[]
   const best = service.best ? BEST_CATEGORIES.find(c => c.slug === service.best) : undefined;
   const out = new Map<string, Contender>();
   for (const p of best?.places ?? []) out.set(placeKey(p), fromBest(p, sourceLabel));
+  for (const p of DESK_COMPANIES[service.id]?.places ?? []) if (!out.has(placeKey(p))) out.set(placeKey(p), fromBest(p, sourceLabel));
   for (const e of entities) {
     if (e.kind !== 'business' || e.developmentOnly || !offersService(e, service)) continue;
     const key = placeKey({ name: e.title });

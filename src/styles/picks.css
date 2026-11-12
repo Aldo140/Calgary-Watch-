@@ -458,3 +458,13 @@
 @media (prefers-reduced-motion: reduce) { .pkh-busy li { animation: none; } }
 .pk-c-site { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pk-c-go .pk-btn svg { flex: none; }
+
+/* ── Desk FAQ: the questions a search lands on, answered from the desk's own data ── */
+.pkd-faq-list { display: grid; gap: 10px; max-width: 860px; }
+.pkd-faq details { border: 2px solid var(--bp-ink, #151515); border-radius: 18px; background: #fff; box-shadow: 4px 4px 0 var(--bp-ink, #151515); overflow: hidden; }
+.pkd-faq summary { list-style: none; cursor: pointer; padding: 16px 52px 16px 18px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 1.05rem; line-height: 1.3; position: relative; }
+.pkd-faq summary::-webkit-details-marker { display: none; }
+.pkd-faq summary::after { content: '+'; position: absolute; right: 16px; top: 50%; translate: 0 -50%; width: 28px; height: 28px; border-radius: 50%; background: #ffdf4f; border: 2px solid #151515; display: grid; place-items: center; font-weight: 800; transition: rotate .25s ease; }
+.pkd-faq details[open] summary::after { rotate: 45deg; }
+.pkd-faq details p { margin: 0; padding: 0 18px 18px; color: #3b3b3b; line-height: 1.6; }
+@media (prefers-reduced-motion: reduce) { .pkd-faq summary::after { transition: none; } }

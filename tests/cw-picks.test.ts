@@ -74,9 +74,9 @@ describe('shelves', () => {
 
   it('Local profiles that offer the service join the shelf, merged by name', () => {
     const biz = (title: string, tags: string[], extra: Partial<DiscoveryEntity> = {}) => ({ id: title, kind: 'business', slug: placeKey({ name: title }), title, tags, website: 'https://x.example', ...extra }) as unknown as DiscoveryEntity;
-    const shelf = shelfFor('electrical', [biz('Bright Spark Electric', ['electrician']), biz('Some Bakery', ['bakery']), biz('Hidden Co', ['electrician'], { developmentOnly: true } as Partial<DiscoveryEntity>)], NOW)!;
-    assert.deepEqual(shelf.contenders.map(c => c.name), ['Bright Spark Electric']);
-    assert.equal(shelf.contenders[0].path, '/local/bright-spark-electric');
+    const shelf = shelfFor('locksmith', [biz('Bright Spark Locks', ['locksmith']), biz('Some Bakery', ['bakery']), biz('Hidden Co', ['locksmith'], { developmentOnly: true } as Partial<DiscoveryEntity>)], NOW)!;
+    assert.deepEqual(shelf.contenders.map(c => c.name), ['Bright Spark Locks']);
+    assert.equal(shelf.contenders[0].path, '/local/bright-spark-locks');
     const merged = shelfFor('plumbing', [biz('Knight Plumbing', ['plumber'])], NOW)!;
     assert.equal(merged.contenders.length, plumbers.places.length, 'a profile for a listed plumber adds a link, not a row');
     assert.equal(merged.contenders.find(c => c.name === 'Knight Plumbing')?.path, '/local/knight-plumbing');

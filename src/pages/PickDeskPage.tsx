@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowDown, ArrowUpRight, BookOpenCheck, Share2, Lightbulb, MessageCircleQuestion, ShieldCheck, UserPlus } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -59,11 +59,7 @@ export default function PickDeskPage() {
           </div>
         </section>
 
-        <nav className="pkd-tabs" aria-label="On this page">
-          <a href="#pkd-list">Who to call <b>{n}</b></a>
-          <a href="#pkd-ask">What to ask</a>
-          <a href="#pkd-year">When to book</a>
-        </nav>
+        <DeskTabs n={n} />
 
         <div className="cw-wrap pkd-layout">
           <section className="pkd-main" id="pkd-list" aria-label={`${s.label} in Calgary`}>
@@ -135,4 +131,29 @@ function ShareDesk({ label }: { label: string }) {
     } catch { /* dismissed */ }
   };
   return <button type="button" className="pkd-share" onClick={() => void share()}><Share2 size={17} aria-hidden="true" /> {done ? 'Link copied' : 'Send to a neighbour'}</button>;
+}
+
+const TABS = [['pkd-list', 'Who to call'], ['pkd-ask-card', 'What to ask'], ['pkd-year-card', 'When to book']] as const;
+
+/** Phones: a sticky segmented bar whose highlight follows the section in view and slides between tabs. */
+function DeskTabs({ n }: { n: number }) {
+  const [on, setOn] = useState(0);
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const els = TABS.map(([id]) => document.getElementById(id)).filter((e): e is HTMLElement => !!e);
+    const io = new IntersectionObserver(entries => {
+      const seen = entries.filter(e => e.isIntersecting).map(e => TABS.findIndex(([id]) => id === e.target.id));
+      if (seen.length) setOn(Math.min(...seen));
+    }, { rootMargin: '-140px 0px -55% 0px' });
+    els.forEach(e => io.observe(e));
+    return () => io.disconnect();
+  }, []);
+  return (
+    <nav className="pkd-tabs" aria-label="On this page" style={{ ['--on' as string]: on }}>
+      <span className="pkd-tabs-pill" aria-hidden="true" />
+      {TABS.map(([id, label], i) => (
+        <a key={id} href={`#${id}`} aria-current={on === i ? 'true' : undefined} onClick={() => setOn(i)}>{label}{i === 0 ? <b>{n}</b> : null}</a>
+      ))}
+    </nav>
+  );
 }

@@ -375,3 +375,49 @@
 @media (prefers-reduced-motion: reduce) {
   .sf *, .sf *::before, .sf *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Calgary at night (dot-matrix city behind the wire) ---------- */
+.sf-stage { position: relative; padding-top: 400px; }
+.sf-city { position: absolute; left: -10%; right: -10%; top: -40px; height: 560px; pointer-events: none; }
+.sf-city canvas { width: 100%; height: 100%; display: block; }
+.sf-city::after { content: ''; position: absolute; inset: 0; background: radial-gradient(closest-side, transparent 70%, var(--night) 140%); opacity: .5; }
+.sf-city-q { position: absolute; font: 600 10.5px/1 var(--mono); letter-spacing: .14em; color: rgba(164, 179, 203, .55); }
+.sf-city-tag { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 0; padding: 7px 11px; border-radius: 999px; background: var(--yellow); color: var(--ink); border: 2px solid var(--ink); font: 800 13px/1 Inter, sans-serif; white-space: nowrap; transform: translate(26px, -50%); box-shadow: 3px 3px 0 var(--ink); }
+.sf-city-tag i { position: absolute; right: 100%; top: 50%; width: 24px; height: 2px; background: var(--yellow); }
+.sf-city-tag.is-flip { transform: translate(calc(-100% - 26px), -50%); }
+.sf-city-tag.is-flip i { right: auto; left: 100%; }
+.sf-city-tag.is-wide { transform: translateX(-50%); background: var(--cyan); }
+.sf-city-tag.is-wide i { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .sf-city-tag { animation: sf-tag .5s .25s var(--ease) both; }
+  .sf-city canvas { animation: sf-fade 1.4s var(--ease) both; }
+}
+@keyframes sf-tag { from { opacity: 0; scale: .6; } }
+@keyframes sf-fade { from { opacity: 0; } }
+.sf-stage .sf-wire { position: relative; z-index: 1; }
+
+.sf-stage.is-topic { padding-top: 0; min-height: 540px; }
+.sf-stage.is-topic .sf-city { top: -20px; height: 540px; }
+.sf-sticker { position: absolute; z-index: 2; left: 4%; top: 18px; display: grid; place-items: center; width: 92px; height: 92px; border-radius: 26px; background: var(--yellow); color: var(--ink); border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--cyan); transform: rotate(-7deg); }
+.sf .sf-stage .sf-badge-note { z-index: 2; right: 0; bottom: 34px; width: min(300px, 70%); transition: border-color .15s; }
+.sf .sf-stage .sf-badge-note:hover { border-color: var(--yellow); }
+.sf-stage-cap { position: absolute; left: 0; right: 0; bottom: 0; font: 500 11.5px/1.35 var(--mono); color: var(--muted); text-align: right; }
+@media (prefers-reduced-motion: no-preference) {
+  .sf-sticker { animation: sf-pop .7s .3s var(--ease) both; }
+  .sf-stage .sf-badge-note { animation: sf-rise .7s .5s var(--ease) both; }
+}
+
+@media (max-width: 960px) {
+  .sf-stage { padding-top: 320px; }
+  .sf-city { height: 440px; top: -10px; left: 0; right: 0; }
+}
+@media (max-width: 640px) {
+  .sf-stage { margin-top: 8px; padding-top: 330px; }
+  .sf-city { left: -16px; right: -16px; height: 420px; top: 0; }
+  .sf-stage.is-topic { min-height: 0; padding-top: 400px; margin-top: 22px; }
+  .sf-stage.is-topic .sf-city { height: 420px; top: 0; }
+  .sf-sticker { width: 66px; height: 66px; border-radius: 20px; left: 0; top: 6px; }
+  .sf-sticker svg { width: 30px; height: 30px; }
+  .sf .sf-stage.is-topic .sf-badge-note { position: relative; right: auto; bottom: auto; width: auto; display: block; margin-top: -10px; }
+  .sf-stage-cap { position: static; margin-top: 10px !important; text-align: left; }
+}

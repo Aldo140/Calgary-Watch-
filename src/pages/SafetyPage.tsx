@@ -12,6 +12,7 @@ import { safetyPath, safetyTopic } from '../lib/safety';
 import { communitiesFor, headlinesFor, type CrimeNewsFile, type SafetyHeadline } from '../lib/safetyNews';
 import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 import news from '../generated/crime-news.json';
+import { CityMap, onCityMap } from '../components/safety/CityMap';
 import NotFoundPage from './NotFoundPage';
 import '../styles/safety.css';
 
@@ -139,7 +140,7 @@ function CountUp({ value, run }: { value: number; run: boolean }) {
 
 /* ---------- the wire (hero card that rotates through the latest headlines) ---------- */
 
-function HeroWire({ items, now }: { items: SafetyHeadline[]; now: number }) {
+function HeroWire({ items, now, onShow }: { items: SafetyHeadline[]; now: number; onShow?: (h: SafetyHeadline) => void }) {
   const reduce = useReducedMotion();
   const deck = items.slice(0, 6);
   const [i, setI] = useState(0);
@@ -152,6 +153,9 @@ function HeroWire({ items, now }: { items: SafetyHeadline[]; now: number }) {
     const t = window.setTimeout(() => setI(n => (n + 1) % deck.length), 5200);
     return () => window.clearTimeout(t);
   }, [running, i, deck.length]);
+
+  const shownUrl = deck[i]?.url;
+  useEffect(() => { if (deck[i]) onShow?.(deck[i]); }, [shownUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!deck.length) {
     return (
@@ -476,6 +480,13 @@ function TopicPage({ topic, now }: { topic: SafetyTopic; now: number }) {
   const latest = all[0];
   const Icon = iconFor(topic.slug);
   const [heroRef, heroIn] = useInView<HTMLElement>('0px');
+  const placeNames = places.map(p => p.community);
+  const [spot, setSpot] = useState(0);
+  useEffect(() => {
+    if (placeNames.length < 2 || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const t = window.setInterval(() => setSpot(n => (n + 1) % placeNames.length), 3200);
+    return () => window.clearInterval(t);
+  }, [placeNames.length]);
   return (
     <div className="sf">
       <header ref={heroRef} className="sf-hero sf-hero-topic" aria-labelledby="sf-title">
@@ -491,16 +502,16 @@ function TopicPage({ topic, now }: { topic: SafetyTopic; now: number }) {
               {latest ? <li><b>{ago(latest.publishedAt, now)}</b> latest headline</li> : null}
             </ul>
           </div>
-          <div className="sf-badge" aria-hidden="true">
-            <span className="sf-badge-ring" />
-            <span className="sf-badge-ring is-2" />
-            <span className="sf-badge-core"><Icon size={64} strokeWidth={1.6} /></span>
+          <div className="sf-stage is-topic">
+            <CityMap lit={placeNames} focus={placeNames[spot]} sweep={!placeNames.length} />
+            <span className="sf-sticker" aria-hidden="true"><Icon size={40} strokeWidth={1.7} /></span>
             {latest ? (
-              <span className="sf-badge-note">
+              <a className="sf-badge-note" href={latest.url} target="_blank" rel="noopener noreferrer">
                 <small>Latest · {latest.source}</small>
                 <span className="sf-badge-t">{latest.title}</span>
-              </span>
+              </a>
             ) : null}
+            <p className="sf-stage-cap">{placeNames.length ? 'Lit: communities named in these headlines. A mention isn’t a measure.' : 'No community named in these headlines yet.'}</p>
           </div>
         </div>
       </header>
@@ -575,6 +586,8 @@ function IndexPage({ now }: { now: number }) {
   const week = NEWS.items.filter(h => Date.parse(h.publishedAt) >= now - 7 * DAY).length;
   const police = NEWS.items.filter(h => h.police && Date.parse(h.publishedAt) >= now - 7 * DAY).length;
   const [heroRef, heroIn] = useInView<HTMLElement>('0px');
+  const [shown, setShown] = useState<SafetyHeadline | undefined>(latest[0]);
+  const weekPlaces = useMemo(() => [...new Set(NEWS.items.filter(h => h.community && Date.parse(h.publishedAt) >= now - 7 * DAY).map(h => h.community!))], [now]);
   return (
     <div className="sf">
       <header ref={heroRef} className="sf-hero" aria-labelledby="sf-title">
@@ -590,7 +603,10 @@ function IndexPage({ now }: { now: number }) {
               <li><b><CountUp value={NEWS_FEEDS.length} run={heroIn} /></b> newsrooms</li>
             </ul>
           </div>
-          <HeroWire items={latest} now={now} />
+          <div className="sf-stage">
+            <CityMap lit={weekPlaces} focus={shown?.community} sweep={!!shown && !onCityMap(shown.community)} />
+            <HeroWire items={latest} now={now} onShow={setShown} />
+          </div>
         </div>
       </header>
 

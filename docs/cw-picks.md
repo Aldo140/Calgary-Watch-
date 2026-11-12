@@ -44,3 +44,14 @@ firestore.rules accepts a review only when the follow-up exists and its key, lis
 ## Moderation
 
 Reviews are never published automatically. Read each one; publish only counts and themes ("27 hired, 93% would hire again"), give the company a right of reply before anything negative appears, and drop reviews with contact details, abuse or signs of a burst.
+
+## Making a Pick live (vetting desk)
+
+Admin → Partners → CalgaryWatch Picks → **Vetting desk**. One row per service, busiest first.
+
+1. Open a service and choose the company (the most contacted one is pre-selected).
+2. Do each check and date it the day it passes. The private note (licence number, insurer, what the mystery call sounded like) stays in Firestore `pick_vetting` and is never published.
+3. Check 7: copy the pledge email, send it, date it when they reply "I agree".
+4. Write the one-line why, then **Make it live**.
+
+`owner-listing-edits.yml` (every 15 minutes) sees the change and starts a deploy unless one is running. The deploy runs `scripts/picks/export-picks.ts`, which writes only the company, check dates, why and lapse date to `src/generated/cw-picks.json`, then marks the change published. A Pick lapses six months after its oldest check. **Pause the Pick** takes the seal off the same way. A Pick written in `src/content/cwPicks.ts` wins over the desk.

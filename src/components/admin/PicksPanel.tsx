@@ -14,6 +14,7 @@ import { PICK_FOLLOWUPS, PICK_REVIEWS, pickDeskPath, shelfFor, type PickReview }
 import { PICKS } from '@/src/content/cwPicks';
 import { contactLine, tallyPickContacts, type PickContactEvent } from '@/src/lib/pickReport';
 import { adminFirestoreActionError } from '@/src/lib/firestoreErrors';
+import { PickVettingDesk } from './PickVettingDesk';
 import { AdminButton, Chip, EmptyState, FilterChip, FilterRow, Panel, SkeletonRows, T, mono } from './ui';
 
 type Followup = { list?: string; place?: string; placeName?: string; status?: string; dueAt?: number; createdAt?: number };
@@ -27,7 +28,8 @@ export function PicksPanel() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState('');
   const load = useCallback(async () => {
-    if (!db) return;
+    // Dev preview with no Firebase: render empty so the layout can be reviewed.
+    if (!db) { setEvents([]); setFollowups([]); setReviews([]); return; }
     setError('');
     try {
       const [ev, fu, rv] = await Promise.all([
@@ -47,6 +49,7 @@ export function PicksPanel() {
 
   const entities = useMemo(() => discoveryRepository.list(), []);
   const tally = useMemo(() => events ? tallyPickContacts(events, { days, entities }) : [], [events, days, entities]);
+  const busiest = useMemo(() => new Map(tally.map(s => [s.id, { contacts: s.contacts, top: s.companies[0]?.name }])), [tally]);
   const total = tally.reduce((n, s) => n + s.contacts, 0);
   const checkIns = tally.reduce((n, s) => n + s.checkIns, 0);
   const status = (followups ?? []).reduce<Record<string, number>>((m, f) => { const k = f.status ?? 'pending'; m[k] = (m[k] ?? 0) + 1; return m; }, {});
@@ -76,6 +79,8 @@ export function PicksPanel() {
         </dl>
         {answered.length ? <p className="text-sm mt-3" style={{ color: T.muted }}>Hired through us: {answered.length}, average {avg.toFixed(1)}★, {Math.round(100 * answered.filter(r => r.again).length / answered.length)}% would hire again.</p> : null}
       </Panel>
+
+      <PickVettingDesk entities={entities} busiest={busiest} />
 
       <Panel title="Who Calgarians reached" subtitle="Busiest desk first. The top company on a desk without a Pick is the one to vet first. Copy a line for outreach." padded={false}>
         {!tally.length ? <EmptyState title={`No contacts in the last ${days} days`} body="Taps show up here as soon as readers call or open a site from a desk." /> : (

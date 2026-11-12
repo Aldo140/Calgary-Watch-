@@ -1,6 +1,7 @@
 // CalgaryWatch Picks (docs/cw-picks.md): one vetted company per service in
 // src/data/localServices.ts. Keyed by service id. Empty until a company has
 // passed every check; the code refuses to show a Pick that hasn't.
+import published from '../generated/cw-picks.json';
 
 /**
  * The CalgaryWatch Pick for a service list (docs/cw-picks.md). One company
@@ -46,8 +47,33 @@ export interface CwPick {
 }
 
 
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
 /**
- * The Picks. Add one only with every check dated (docs/cw-picks.md):
+ * Picks published from the admin vetting desk (Admin → Partners → CalgaryWatch
+ * Picks). scripts/picks/export-picks.ts writes src/generated/cw-picks.json at
+ * every deploy from the Picks marked live there. Anything malformed is dropped,
+ * so a bad row can never put an unvetted company under the seal.
+ */
+export function readPublishedPicks(file: unknown): Record<string, CwPick> {
+  const picks = (file as { picks?: unknown } | null)?.picks;
+  const out: Record<string, CwPick> = {};
+  if (!picks || typeof picks !== 'object') return out;
+  for (const [id, raw] of Object.entries(picks as Record<string, unknown>)) {
+    const p = raw as Partial<CwPick> | null;
+    if (!p || typeof p.place !== 'string' || !p.place || typeof p.why !== 'string' || !p.why || typeof p.until !== 'string' || !DAY.test(p.until)) continue;
+    const checks = p.checks as Record<string, unknown> | undefined;
+    if (!checks || !(Object.keys(PICK_CHECKS) as PickCheck[]).every(k => typeof checks[k] === 'string' && DAY.test(checks[k] as string))) continue;
+    out[id] = { place: p.place, why: p.why, until: p.until, checks: Object.fromEntries((Object.keys(PICK_CHECKS) as PickCheck[]).map(k => [k, checks[k] as string])) as Record<PickCheck, string> };
+  }
+  return out;
+}
+
+/**
+ * The Picks. Normally made live from the admin vetting desk; one written here
+ * wins over a published one for the same service. Every check must be dated:
  *   plumbing: { place: 'Knight Plumbing', why: '…', until: '2027-05-20', checks: { licence: '2026-11-18', … } },
  */
-export const PICKS: Partial<Record<string, CwPick>> = {};
+const IN_CODE: Partial<Record<string, CwPick>> = {};
+
+export const PICKS: Partial<Record<string, CwPick>> = { ...readPublishedPicks(published), ...IN_CODE };

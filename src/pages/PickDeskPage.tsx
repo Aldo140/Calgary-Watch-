@@ -10,7 +10,8 @@ import { discoveryRepository } from '../data/discovery';
 import { inPeak, LOCAL_SERVICES } from '../data/localServices';
 import { bestPath } from '../lib/bestOf';
 import { askFor, pickDeskPath, shelfFor } from '../lib/cwPicks';
-import { deskFaq, deskIndexable, seoNounInline } from '../lib/pickSeo';
+import { alwaysOn, deskFaq, deskIndexable, oldest, seoNounInline } from '../lib/pickSeo';
+import { afterHours, type Shelf } from '../lib/cwPicks';
 import NotFoundPage from './NotFoundPage';
 import '../styles/picks.css';
 
@@ -41,22 +42,19 @@ export default function PickDeskPage() {
       <div className="bp pkd">
         <section className="bp-hero pkd-hero" aria-labelledby="pkd-title">
           <div className="cw-wrap pkd-hero-grid">
-            <div>
-              <nav className="pkd-crumbs" aria-label="Breadcrumb"><Link to="/picks">Who to call</Link><span aria-hidden="true">/</span>{s.label}</nav>
-              <div className="pkd-title">
-                <span className="pkd-ico" aria-hidden="true"><ServiceIcon id={s.id} size={26} /></span>
-                <h1 id="pkd-title">{deskIndexable(shelf) ? <>Best {seoNounInline(s)}</> : s.label} <span>in Calgary.</span></h1>
-              </div>
-              <p className="pkd-lead">{n ? `${n} local ${n === 1 ? 'company' : 'companies'}, each checked against its own site.` : 'The list is being built.'} One tap to call. Nobody pays to be here.</p>
+            <div className="pkd-hero-copy">
+              <nav className="pkd-crumbs" aria-label="Breadcrumb">
+                <span className="pkd-ico" aria-hidden="true"><ServiceIcon id={s.id} size={18} /></span>
+                <Link to="/picks">Who to call</Link><span aria-hidden="true">/</span>{s.label}
+              </nav>
+              <h1 id="pkd-title">{deskIndexable(shelf) ? <>Best {seoNounInline(s)}</> : s.label} <span>in Calgary.</span></h1>
+              <p className="pkd-lead">{n ? `${n} local ${n === 1 ? 'company' : 'companies'}, each checked against its own site. One tap to call. Nobody pays to be here.` : 'The list is being built. Every company goes on only after we check it against its own site, and nobody pays to be here.'}</p>
               <ul className="pkd-chips">
                 {busy ? <li className="is-busy"><i aria-hidden="true" /> Busy in {MONTH_NAMES[month - 1]}</li> : null}
-                <li className={shelf.live ? 'is-live' : ''}>{shelf.live ? <>Pick: {shelf.live.contender.name}</> : <>Pick: vetting 0/7</>}</li>
                 <li><ShareDesk label={s.label} /></li>
               </ul>
             </div>
-            <div className="pkd-hero-seal" aria-hidden="true">
-              <PickSeal state={shelf.live ? 'live' : 'open'} checks={0} size={176} year={shelf.live?.pick.checks.pledge.slice(0, 4)} />
-            </div>
+            {n ? <ShortAnswer shelf={shelf} /> : null}
           </div>
         </section>
 
@@ -103,7 +101,7 @@ export default function PickDeskPage() {
 
         <div className="cw-wrap">
           <section className="bp-section pkd-faq" aria-labelledby="pkd-faq">
-            <div className="bp-head"><h2 id="pkd-faq">Questions <span>Calgarians ask.</span></h2></div>
+            <div className="bp-head"><h2 id="pkd-faq">Questions <span>Calgarians ask.</span></h2><p className="pkd-faq-note">Answered from this desk: the companies’ own sites, what to ask, and when Calgary books it.</p></div>
             <div className="pkd-faq-list">
               {deskFaq(shelf).map((x, i) => (
                 <details key={x.q} open={i === 0}>
@@ -129,6 +127,57 @@ export default function PickDeskPage() {
         </div>
       </div>
     </SiteLayout>
+  );
+}
+
+const CLOCK = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+
+/**
+ * The answer a search came for, before the list: how many, who picks up at
+ * night, who has been here longest. Each row jumps to that company's card.
+ */
+function ShortAnswer({ shelf }: { shelf: Shelf }) {
+  const [now] = useState(() => new Date());
+  const night = alwaysOn(shelf).slice(0, 3);
+  const old = oldest(shelf);
+  const late = afterHours(now.getTime());
+  const n = shelf.contenders.length;
+  const jump = (key: string) => (e: React.MouseEvent) => {
+    const el = document.getElementById(`pk-c-${key}`);
+    if (!el) return;
+    e.preventDefault();
+    el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    el.classList.remove('is-flash'); void el.offsetWidth; el.classList.add('is-flash');
+  };
+  return (
+    <aside className="pkd-answer" aria-label="The short answer">
+      <div className="pkd-answer-head">
+        <p>The short answer</p>
+        <span><i aria-hidden="true" /> {CLOCK.format(now)}<em> in Calgary</em></span>
+      </div>
+      <dl className="pkd-answer-stats">
+        <div><dt>Local companies</dt><dd>{n}</dd></div>
+        <div><dt>Say 24/7</dt><dd>{night.length || '–'}</dd></div>
+        <div><dt>Oldest, since</dt><dd>{old ? old.y : '–'}</dd></div>
+      </dl>
+      {night.length ? (
+        <div className="pkd-answer-rows">
+          <p className="pkd-answer-q">{late ? `It’s after hours. ${night.length === 1 ? 'This one says it picks' : 'These say they pick'} up:` : `Something wrong now? ${night.length === 1 ? 'This one says it answers' : 'These say they answer'} 24/7:`}</p>
+          <ol>{night.map(c => (
+            <li key={c.key}><a href={`#pk-c-${c.key}`} onClick={jump(c.key)}><b>{c.name}</b><small>{c.phone ?? 'Website'}</small><ArrowDown size={16} aria-hidden="true" /></a></li>
+          ))}</ol>
+        </div>
+      ) : old ? (
+        <div className="pkd-answer-rows">
+          <p className="pkd-answer-q">Longest-running, by its own account:</p>
+          <ol><li><a href={`#pk-c-${old.c.key}`} onClick={jump(old.c.key)}><b>{old.c.name}</b><small>Since {old.y}</small><ArrowDown size={16} aria-hidden="true" /></a></li></ol>
+        </div>
+      ) : null}
+      <div className="pkd-answer-foot">
+        <PickSeal state={shelf.live ? 'live' : 'open'} checks={0} size={64} year={shelf.live?.pick.checks.pledge.slice(0, 4)} />
+        <p>{shelf.live ? <><b>The Pick: {shelf.live.contender.name}.</b> Passed all seven checks.</> : <><b>No Pick yet.</b> One company earns the seal after seven checks we do ourselves.</>}</p>
+      </div>
+    </aside>
   );
 }
 
@@ -161,7 +210,10 @@ function DeskTabs({ n }: { n: number }) {
       if (seen.length) setOn(Math.min(...seen));
     }, { rootMargin: '-140px 0px -55% 0px' });
     els.forEach(e => io.observe(e));
-    return () => io.disconnect();
+    // Back at the top nothing is in the observed band, so reset to the first tab.
+    const top = () => { if (window.scrollY < 240) setOn(0); };
+    window.addEventListener('scroll', top, { passive: true });
+    return () => { io.disconnect(); window.removeEventListener('scroll', top); };
   }, []);
   return (
     <nav className="pkd-tabs" aria-label="On this page" style={{ ['--on' as string]: on }}>

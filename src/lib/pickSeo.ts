@@ -62,7 +62,7 @@ export const deskUpdated = (shelf: Shelf) => DESK_COMPANIES[shelf.service.id]?.c
 const list = (names: string[]) => names.length <= 2 ? names.join(' and ') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
 const sortNames = (shelf: Shelf) => shelf.contenders.map(c => c.name);
 export const alwaysOn = (shelf: Shelf) => shelf.contenders.filter(c => proofsFor(c).some(p => p.id === 'always-on'));
-const oldest = (shelf: Shelf) => shelf.contenders
+export const oldest = (shelf: Shelf) => shelf.contenders
   .map(c => ({ c, y: Number(proofsFor(c).find(p => p.id === 'since')?.label.slice(-4)) }))
   .filter(x => x.y > 1800).sort((a, b) => a.y - b.y)[0];
 

@@ -164,7 +164,7 @@ function Card({ c, i, need, onContact }: { c: Contender; i: number; need: Need |
   const proofs = proofsFor(c);
   const lit = (p: Proof) => (need === 'urgent' && p.id === 'always-on') || (need === 'quote' && p.id === 'upfront');
   return (
-    <li className={`pk-c${proofs.some(lit) ? ' is-fit' : ''}`} style={{ ['--i' as string]: i }}>
+    <li id={`pk-c-${c.key}`} className={`pk-c${proofs.some(lit) ? ' is-fit' : ''}`} style={{ ['--i' as string]: i }}>
       <div className="pk-c-top">
         <span className="pk-mono" style={{ ['--h' as string]: hue(c.key) }} aria-hidden="true">{initials(c.name)}</span>
         <div className="pk-c-who">

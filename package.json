@@ -43,6 +43,7 @@
     "search:gaps": "tsx scripts/discovery/search-gaps.ts",
     "search:trends": "tsx scripts/discovery/search-trends.ts",
     "news:crime": "tsx scripts/news/export-crime-news.ts",
+    "safety:dots": "tsx scripts/safety/city-dots.ts",
     "discovery:actions": "tsx scripts/discovery/actions.ts",
     "discovery:preview": "tsx scripts/discovery/preview.ts",
     "claims:invite": "tsx scripts/claims/invite-links.ts",

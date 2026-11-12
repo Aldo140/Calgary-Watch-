@@ -10,6 +10,7 @@ import { discoveryRepository } from '../data/discovery';
 import { inPeak, LOCAL_SERVICES } from '../data/localServices';
 import { bestPath } from '../lib/bestOf';
 import { askFor, pickDeskPath, shelfFor } from '../lib/cwPicks';
+import { deskFaq, deskIndexable, seoNounInline } from '../lib/pickSeo';
 import NotFoundPage from './NotFoundPage';
 import '../styles/picks.css';
 
@@ -44,7 +45,7 @@ export default function PickDeskPage() {
               <nav className="pkd-crumbs" aria-label="Breadcrumb"><Link to="/picks">Who to call</Link><span aria-hidden="true">/</span>{s.label}</nav>
               <div className="pkd-title">
                 <span className="pkd-ico" aria-hidden="true"><ServiceIcon id={s.id} size={26} /></span>
-                <h1 id="pkd-title">{s.label} <span>in Calgary.</span></h1>
+                <h1 id="pkd-title">{deskIndexable(shelf) ? <>Best {seoNounInline(s)}</> : s.label} <span>in Calgary.</span></h1>
               </div>
               <p className="pkd-lead">{n ? `${n} local ${n === 1 ? 'company' : 'companies'}, each checked against its own site.` : 'The list is being built.'} One tap to call. Nobody pays to be here.</p>
               <ul className="pkd-chips">
@@ -91,13 +92,27 @@ export default function PickDeskPage() {
               <h2 id="pkd-more">Know a good one?</h2>
               <p>Tell us who did good work for you. We check them against their own site before they go on the list.</p>
               <div className="pkd-links">
-                <a href={recommend}><UserPlus size={16} aria-hidden="true" /> Recommend a {s.trades[0]}</a>
+                <a href={recommend}><UserPlus size={16} aria-hidden="true" /> Recommend a company</a>
                 <a href={`mailto:${CONTACT}?subject=${encodeURIComponent(`CalgaryWatch Pick vetting: ${s.label}`)}`}><ShieldCheck size={16} aria-hidden="true" /> Ask to be vetted</a>
                 {shelf.bestSlug ? <Link to={bestPath({ slug: shelf.bestSlug })}><BookOpenCheck size={16} aria-hidden="true" /> Sources for this list</Link> : null}
                 <Link to="/picks#pkh-how">How Picks work <ArrowUpRight size={14} aria-hidden="true" /></Link>
               </div>
             </section>
           </aside>
+        </div>
+
+        <div className="cw-wrap">
+          <section className="bp-section pkd-faq" aria-labelledby="pkd-faq">
+            <div className="bp-head"><h2 id="pkd-faq">Questions <span>Calgarians ask.</span></h2></div>
+            <div className="pkd-faq-list">
+              {deskFaq(shelf).map((x, i) => (
+                <details key={x.q} open={i === 0}>
+                  <summary>{x.q}</summary>
+                  <p>{x.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
         </div>
 
         <div className="cw-wrap">

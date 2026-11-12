@@ -1,3 +1,4 @@
+import { oneOf, seoNounInline } from '../../lib/pickSeo';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlarmClock, ArrowUpRight, BadgeCheck, CalendarCheck, CheckCircle2, Clock3, History, Moon, Receipt, Siren, Sparkles, ExternalLink, MessageCircleQuestion, Phone, ShieldCheck, X } from 'lucide-react';
@@ -8,6 +9,7 @@ import '../../styles/picks.css';
 
 const CHECK_KEYS = Object.keys(PICK_CHECKS) as PickCheck[];
 const trade = (s: Shelf) => s.service.trades[0];
+const one = (s: Shelf) => oneOf(s.service);
 
 /**
  * A service as a decision: the CalgaryWatch Pick (or its open slot, honestly
@@ -26,7 +28,7 @@ export function PickBoard({ shelf, via, compact = false }: { shelf: Shelf; via: 
   const [need, setNeed] = useState<Need | null>(() => (late ? 'urgent' : null));
   const ordered = orderFor(others, need);
   const shown = compact ? ordered.slice(0, 3) : ordered;
-  const noun = shelf.service.label.toLowerCase();
+  const noun = seoNounInline(shelf.service);
   return (
     <div className={`pk${compact ? ' is-compact' : ''}`}>
       {recent && recentC ? <RecentStrip r={recent} c={recentC} onContact={kind => setSheet({ c: recentC, kind })} /> : null}
@@ -34,7 +36,7 @@ export function PickBoard({ shelf, via, compact = false }: { shelf: Shelf; via: 
       {shown.length ? (
         <section className="pk-shortlist" aria-label={`${shelf.service.label} in Calgary`}>
           <header className="pk-shortlist-head">
-            <h3>{shelf.live ? 'Also in Calgary' : `${others.length} local ${others.length === 1 ? trade(shelf) : noun}`}</h3>
+            <h3>{shelf.live ? 'Also in Calgary' : `${others.length} local ${others.length === 1 ? one(shelf) : noun}`}</h3>
             <p>{need === 'urgent' ? '24/7 first' : need === 'quote' ? 'Upfront pricing first' : 'A–Z'} · in their own words · nobody pays to be here</p>
           </header>
           {others.length > 1 ? <NeedPicker need={need} late={late} onChange={setNeed} /> : null}
@@ -110,7 +112,7 @@ function PickStatus({ shelf, compact }: { shelf: Shelf; compact: boolean }) {
       <PickSeal state="open" checks={0} size={compact ? 58 : 72} />
       <div className="pk-status-copy">
         <p className="pk-eyebrow">The CalgaryWatch Pick</p>
-        <p><b>Being vetted.</b> One {trade(shelf)} earns the seal by passing seven checks we do ourselves, then keeps it only while the neighbours who hire them say so.</p>
+        <p><b>Being vetted.</b> One {one(shelf)} earns the seal by passing seven checks we do ourselves, then keeps it only while the neighbours who hire them say so.</p>
         {!compact ? (
           <details className="pk-fold">
             <summary>The seven checks</summary>

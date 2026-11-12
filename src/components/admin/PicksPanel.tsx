@@ -15,6 +15,7 @@ import { PICKS } from '@/src/content/cwPicks';
 import { contactLine, tallyPickContacts, type PickContactEvent } from '@/src/lib/pickReport';
 import { adminFirestoreActionError } from '@/src/lib/firestoreErrors';
 import { PickVettingDesk } from './PickVettingDesk';
+import { PickBadgePanel } from './PickBadgePanel';
 import { AdminButton, Chip, EmptyState, FilterChip, FilterRow, Panel, SkeletonRows, T, mono } from './ui';
 
 type Followup = { list?: string; place?: string; placeName?: string; status?: string; dueAt?: number; createdAt?: number };
@@ -110,6 +111,8 @@ export function PicksPanel() {
           })}</ul>
         )}
       </Panel>
+
+      <PickBadgePanel entities={entities} />
 
       <Panel title="What neighbours said" subtitle="Every answer, newest first. Read before anything is used; answers decide whether a Pick keeps its seal." padded={false}>
         {!reviews.length ? <EmptyState title="No answers yet" body={`${status.sent ?? 0} check-in emails sent so far. The first answers arrive about a week after the first opt-ins.`} /> : (

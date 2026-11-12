@@ -28034,6 +28034,989 @@
       "updatedAt": "2026-11-11T00:30:00Z",
       "email": "info@pawsitivelynatural.ca",
       "address": "2100 4 St SW, Calgary, AB"
+    },
+    {
+      "id": "biz-the-bench-yyc",
+      "kind": "business",
+      "slug": "the-bench-yyc",
+      "title": "The Bench",
+      "name": "The Bench",
+      "website": "https://www.thebenchyyc.ca/",
+      "summary": "Family-friendly bar and kitchen upstairs at Cardel Rec South, between Arenas 3 and 4.",
+      "description": "The Bench is a casual, family-friendly bar on the second floor of Cardel Rec South at 333 Shawville Blvd SE, right between Arenas 3 and 4. The menu goes well past rink-side concession food, with fresh dishes, local craft beer and a kids' menu, so it works for a post-game meal or a parents' break during practice.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "family-friendly",
+        "craft beer"
+      ],
+      "sources": [
+        {
+          "name": "The Bench",
+          "url": "https://www.thebenchyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thebenchyyc.ca/",
+        "instagram": "https://www.instagram.com/thebenchrestaurant/"
+      },
+      "services": [
+        "dining",
+        "Kids' menu",
+        "Local craft beer"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@thebenchyyc.ca",
+      "address": "333 Shawville Blvd SE, Calgary, AB",
+      "neighbourhood": "Shawnessy"
+    },
+    {
+      "id": "biz-durand-bridal",
+      "kind": "business",
+      "slug": "durand-bridal",
+      "title": "Durand Bridal",
+      "name": "Durand Bridal",
+      "website": "https://www.durandbridal.com/",
+      "summary": "Bridal boutique on Macleod Trail SW.",
+      "description": "Durand Bridal is a Calgary bridal boutique at 9631 Macleod Trail SW, helping brides find their wedding dress by appointment.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "bridal",
+        "wedding dresses",
+        "boutique"
+      ],
+      "sources": [
+        {
+          "name": "Durand Bridal",
+          "url": "https://www.durandbridal.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.durandbridal.com/",
+        "instagram": "https://www.instagram.com/durandbridal/"
+      },
+      "services": [
+        "Bridal gowns",
+        "Fitting appointments"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "durand@durandbridal.com",
+      "address": "9631 Macleod Trail SW, Calgary, AB"
+    },
+    {
+      "id": "biz-black-forest-wood",
+      "kind": "business",
+      "slug": "black-forest-wood",
+      "title": "Black Forest Wood Company",
+      "name": "Black Forest Wood Company",
+      "website": "https://blackforestwood.com/",
+      "summary": "Woodworking supply store with live-edge slabs, rare lumber, tools and classes.",
+      "description": "Black Forest Wood Company at 603 77 Ave SE stocks one of Western Canada's widest ranges of lumber species, plus live-edge slabs, turning blanks, machinery and tools. It also runs woodworking classes, so it's a good stop for anyone from first-time makers to experienced woodworkers.",
+      "categories": [
+        "shopping",
+        "learning"
+      ],
+      "tags": [
+        "woodworking",
+        "lumber",
+        "live edge",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "Black Forest Wood Company",
+          "url": "https://blackforestwood.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://blackforestwood.com/",
+        "instagram": "https://www.instagram.com/blackforestwoodco/"
+      },
+      "services": [
+        "Lumber and live-edge slabs",
+        "Tools and machinery",
+        "Woodworking classes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@blackforestwood.com",
+      "address": "603 77 Ave SE, Calgary, AB"
+    },
+    {
+      "id": "biz-skycastle-calgary",
+      "kind": "business",
+      "slug": "skycastle-calgary",
+      "title": "SkyCastle",
+      "name": "SkyCastle",
+      "website": "https://www.skycastleab.ca/",
+      "summary": "Indoor family entertainment centre on Macleod Trail SW.",
+      "description": "SkyCastle is an indoor family entertainment centre at 6008 Macleod Trail SW, with play structures for kids and space for birthday parties and group bookings.",
+      "categories": [
+        "family"
+      ],
+      "tags": [
+        "indoor play",
+        "kids",
+        "birthday parties"
+      ],
+      "sources": [
+        {
+          "name": "SkyCastle",
+          "url": "https://www.skycastleab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.skycastleab.ca/",
+        "instagram": "https://www.instagram.com/skycastlecalgary/"
+      },
+      "services": [
+        "Indoor play",
+        "Birthday parties",
+        "Group bookings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "yycpbookings@skycastleab.com",
+      "address": "6008 Macleod Trail SW, Calgary, AB"
+    },
+    {
+      "id": "biz-ancient-arts-yarns",
+      "kind": "business",
+      "slug": "ancient-arts-yarns",
+      "title": "Ancient Arts Yarns",
+      "name": "Ancient Arts Yarns",
+      "website": "https://ancientartsfibre.com/",
+      "summary": "Calgary hand-dyed yarn studio inspired by nature, art and stories.",
+      "description": "Ancient Arts Yarns is an artisan hand-dye company at 607 Manitou Rd SE. They dye premium, ethically sourced yarns with colourways inspired by nature, art and stories, for knitting, crochet, weaving and other fibre crafts.",
+      "categories": [
+        "shopping",
+        "arts"
+      ],
+      "tags": [
+        "yarn",
+        "knitting",
+        "hand-dyed",
+        "crafts"
+      ],
+      "sources": [
+        {
+          "name": "Ancient Arts Yarns",
+          "url": "https://ancientartsfibre.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://ancientartsfibre.com/"
+      },
+      "services": [
+        "Hand-dyed yarn",
+        "Knitting and crochet supplies"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@ancientartsfibre.com",
+      "address": "607 Manitou Rd SE, Calgary, AB"
+    },
+    {
+      "id": "biz-caravan-cafe-yyc",
+      "kind": "business",
+      "slug": "caravan-cafe-yyc",
+      "title": "Caravan Cafe",
+      "name": "Caravan Cafe",
+      "website": "https://caravancafe.ca/",
+      "summary": "Family-run Uzbek kitchen in southeast Calgary: plov, manti and somsa.",
+      "description": "Caravan Cafe is a family-run Uzbek restaurant at 4412 Manilla Rd SE. The menu centres on plov, hand-folded manti, somsa and lagman, made the way they're made at home in Uzbekistan.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "uzbek",
+        "central asian"
+      ],
+      "sources": [
+        {
+          "name": "Caravan Cafe",
+          "url": "https://caravancafe.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://caravancafe.ca/",
+        "instagram": "https://www.instagram.com/caravan_cafe_yyc/"
+      },
+      "services": [
+        "dining",
+        "Takeout"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "hello@caravancafe.ca",
+      "address": "4412 Manilla Rd SE, Calgary, AB"
+    },
+    {
+      "id": "biz-mud-urban-potters",
+      "kind": "business",
+      "slug": "mud-urban-potters",
+      "title": "Mud Urban Potters",
+      "name": "Mud Urban Potters",
+      "website": "https://www.mudpotters.ca/",
+      "summary": "Ceramics studio with pottery classes, workshops and private lessons.",
+      "description": "Mud Urban Potters is a ceramics studio at 4111 13A St SE offering pottery classes, one-off workshops and private lessons. Complete beginners are welcome, and so are potters who already know their way around a wheel.",
+      "categories": [
+        "arts",
+        "learning"
+      ],
+      "tags": [
+        "pottery",
+        "ceramics",
+        "classes",
+        "workshops"
+      ],
+      "sources": [
+        {
+          "name": "Mud Urban Potters",
+          "url": "https://www.mudpotters.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mudpotters.ca/",
+        "instagram": "https://www.instagram.com/mud.potters/"
+      },
+      "services": [
+        "Pottery classes",
+        "Workshops",
+        "Private lessons"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "mudurbanpotters@gmail.com",
+      "address": "4111 13A St SE, Calgary, AB"
+    },
+    {
+      "id": "biz-district-bottle-shop",
+      "kind": "business",
+      "slug": "district-bottle-shop",
+      "title": "District Bottle Shop",
+      "name": "District Bottle Shop",
+      "website": "https://www.bottleshopyyc.ca/",
+      "summary": "Independent bottle shop in Marda Loop.",
+      "description": "District Bottle Shop is an independent liquor store at 1934 34 Ave SW in Marda Loop, with beer, wine and spirits picked by people who'll happily help you find something for dinner or a gift.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "bottle shop",
+        "wine",
+        "craft beer",
+        "spirits"
+      ],
+      "sources": [
+        {
+          "name": "District Bottle Shop",
+          "url": "https://www.bottleshopyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bottleshopyyc.ca/",
+        "instagram": "https://www.instagram.com/districtbottleshop/"
+      },
+      "services": [
+        "Wine, beer and spirits"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@bottleshopyyc.ca",
+      "address": "1934 34 Ave SW, Calgary, AB",
+      "neighbourhood": "Marda Loop"
+    },
+    {
+      "id": "biz-calgary-pizza-master",
+      "kind": "business",
+      "slug": "calgary-pizza-master",
+      "title": "Calgary Pizza Master",
+      "name": "Calgary Pizza Master",
+      "website": "https://calgarypizzamaster.ca/",
+      "summary": "Pizza and Indian food in Erin Woods, SE Calgary.",
+      "description": "Calgary Pizza Master at 404 Erin Woods Dr SE makes fresh pizza, from classic and BBQ to veggie, alongside a menu of Indian dishes.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "pizza",
+        "indian"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Pizza Master",
+          "url": "https://calgarypizzamaster.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarypizzamaster.ca/"
+      },
+      "services": [
+        "dining",
+        "Pizza",
+        "Indian food",
+        "Takeout"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "calgarypizzamaster@gmail.com",
+      "address": "404 Erin Woods Dr SE, Calgary, AB"
+    },
+    {
+      "id": "biz-the-portrait-calgary",
+      "kind": "business",
+      "slug": "the-portrait-calgary",
+      "title": "The Portrait",
+      "name": "The Portrait",
+      "website": "https://www.theportrait.ca/",
+      "summary": "Self-portrait and photobooth studio in the Beltline.",
+      "description": "The Portrait at 224 14 Ave SE is a self-portrait studio where you take your own photos in a professional setup. It also does headshots, passport photos, K-style photobooth sessions and event photobooths.",
+      "categories": [
+        "services",
+        "arts"
+      ],
+      "tags": [
+        "photo studio",
+        "self portrait",
+        "photobooth",
+        "headshots"
+      ],
+      "sources": [
+        {
+          "name": "The Portrait",
+          "url": "https://www.theportrait.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.theportrait.ca/",
+        "instagram": "https://www.instagram.com/theportrait.ca/"
+      },
+      "services": [
+        "Self-portrait sessions",
+        "Headshots",
+        "Passport photos",
+        "Event photobooth"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@theportrait.ca",
+      "address": "224 14 Ave SE, Calgary, AB",
+      "neighbourhood": "Beltline"
+    },
+    {
+      "id": "biz-fuse33-makerspace",
+      "kind": "business",
+      "slug": "fuse33-makerspace",
+      "title": "Fuse33 Makerspace",
+      "name": "Fuse33 Makerspace",
+      "website": "https://www.fuse33.com",
+      "summary": "Shared workshop with tools and equipment for artists, trades and hobbyists.",
+      "description": "Fuse33 Makerspace at 1720 Radisson Dr SE is a shared workshop with the tools and equipment that don't fit in a home garage. Artists, tradespeople and hobbyists can join and get to work.",
+      "categories": [
+        "learning",
+        "arts"
+      ],
+      "tags": [
+        "makerspace",
+        "workshop",
+        "tools",
+        "maker"
+      ],
+      "sources": [
+        {
+          "name": "Fuse33 Makerspace",
+          "url": "https://www.fuse33.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.fuse33.com",
+        "instagram": "https://www.instagram.com/fuse33calgary/"
+      },
+      "services": [
+        "Shared workshop",
+        "Tool access",
+        "Classes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "service@fuse33.com",
+      "address": "1720 Radisson Dr SE, Calgary, AB"
+    },
+    {
+      "id": "biz-le-charme-bistro",
+      "kind": "business",
+      "slug": "le-charme-bistro",
+      "title": "Le Charme",
+      "name": "Le Charme",
+      "website": "https://www.lecharme.ca/",
+      "summary": "Warm French bistro on Edmonton Trail with dinner, brunch and happy hour.",
+      "description": "Le Charme is an intimate French bistro at 804 Edmonton Trail NE, serving seasonal plates and classic bistro favourites made with Alberta ingredients. It's open for dinner, brunch and happy hour, and also hosts events and does catering.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "french",
+        "bistro",
+        "brunch"
+      ],
+      "sources": [
+        {
+          "name": "Le Charme",
+          "url": "https://www.lecharme.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lecharme.ca/",
+        "instagram": "https://www.instagram.com/lecharmebistro/"
+      },
+      "services": [
+        "dining",
+        "Brunch",
+        "Happy hour",
+        "Events and catering"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "matt.drummond@lecharme.ca",
+      "address": "804 Edmonton Trail NE, Calgary, AB",
+      "neighbourhood": "Renfrew"
+    },
+    {
+      "id": "biz-biryani-palace-yyc",
+      "kind": "business",
+      "slug": "biryani-palace-yyc",
+      "title": "Biryani Palace",
+      "name": "Biryani Palace",
+      "website": "https://biryanipalaceyyc.com/",
+      "summary": "Indo-Pak-Lankan biryanis, curries and tandoori in Falconridge.",
+      "description": "Biryani Palace at 5075 Falconridge Blvd NE serves Indo-Pak-Lankan food: aromatic biryanis, curries and tandoori dishes, for dine-in or takeout.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "biryani",
+        "south asian"
+      ],
+      "sources": [
+        {
+          "name": "Biryani Palace",
+          "url": "https://biryanipalaceyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://biryanipalaceyyc.com/"
+      },
+      "services": [
+        "dining",
+        "Takeout"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "pkethees@gmail.com",
+      "address": "5075 Falconridge Blvd NE, Calgary, AB",
+      "neighbourhood": "Falconridge"
+    },
+    {
+      "id": "biz-cafe-karak-yyc",
+      "kind": "business",
+      "slug": "cafe-karak-yyc",
+      "title": "Cafe Karak",
+      "name": "Cafe Karak",
+      "website": "https://cafekarakyyc.com/",
+      "summary": "Karak chai, desi comfort food and halal brunch until midnight in Savanna.",
+      "description": "Cafe Karak at 63 Savanna Blvd NE is a Middle Eastern and desi café known for karak chai and late nights. Halal brunch, lunch and dinner are served daily until midnight.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "cafe",
+        "karak chai",
+        "halal",
+        "late night"
+      ],
+      "sources": [
+        {
+          "name": "Cafe Karak",
+          "url": "https://cafekarakyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cafekarakyyc.com/",
+        "instagram": "https://www.instagram.com/cafekarakyyc/"
+      },
+      "services": [
+        "Karak chai",
+        "Halal brunch",
+        "Open until midnight"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@cafekarakyyc.com",
+      "address": "63 Savanna Blvd NE, Calgary, AB"
+    },
+    {
+      "id": "biz-ebikes-calgary",
+      "kind": "business",
+      "slug": "ebikes-calgary",
+      "title": "eBikes Calgary",
+      "name": "eBikes Calgary",
+      "website": "https://www.ebikescalgary.com/",
+      "summary": "Electric bike and mobility scooter showroom and service in NE Calgary.",
+      "description": "eBikes Calgary at 11127 15 St NE has one of the city's largest showrooms for electric bikes and mobility scooters, with 11 brands and appointment-based service. Open Tuesday to Saturday.",
+      "categories": [
+        "shopping",
+        "recreation"
+      ],
+      "tags": [
+        "e-bikes",
+        "scooters",
+        "bike service"
+      ],
+      "sources": [
+        {
+          "name": "eBikes Calgary",
+          "url": "https://www.ebikescalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ebikescalgary.com/",
+        "instagram": "https://www.instagram.com/ebikescalgary/"
+      },
+      "services": [
+        "E-bike sales",
+        "Mobility scooters",
+        "Service by appointment"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@ebikescalgary.com",
+      "address": "11127 15 St NE, Calgary, AB"
+    },
+    {
+      "id": "biz-phil-and-sebastian",
+      "kind": "business",
+      "slug": "phil-and-sebastian",
+      "title": "Phil & Sebastian Coffee Roasters",
+      "name": "Phil & Sebastian Coffee Roasters",
+      "website": "https://philsebastian.com/",
+      "summary": "Calgary coffee roaster with cafés across the city, named Canada's 2026 national winner.",
+      "description": "Phil & Sebastian is a Calgary coffee roaster with cafés around the city, including Marda Loop at 2043 33 Ave SW. In 2026 it was named Overall National Winner for Canada at the Global Coffee Awards. Visit a café, or order beans online.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "coffee",
+        "roaster",
+        "cafe"
+      ],
+      "sources": [
+        {
+          "name": "Phil & Sebastian Coffee Roasters",
+          "url": "https://philsebastian.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://philsebastian.com/",
+        "instagram": "https://www.instagram.com/philandseb/"
+      },
+      "services": [
+        "Cafés",
+        "Coffee beans online"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@philsebastian.com",
+      "address": "2043 33 Ave SW, Calgary, AB",
+      "neighbourhood": "Marda Loop"
+    },
+    {
+      "id": "biz-betty-lous-library",
+      "kind": "business",
+      "slug": "betty-lous-library",
+      "title": "Betty Lou's Library",
+      "name": "Betty Lou's Library",
+      "website": "https://www.bettylouslibrary.com",
+      "summary": "Prohibition-style speakeasy cocktail bar with a hidden entrance.",
+      "description": "Betty Lou's Library is a speakeasy cocktail lounge in downtown Calgary with the feel of the prohibition era. Finding the hidden entrance is half the fun.",
+      "categories": [
+        "nightlife"
+      ],
+      "tags": [
+        "speakeasy",
+        "cocktails",
+        "lounge"
+      ],
+      "sources": [
+        {
+          "name": "Betty Lou's Library",
+          "url": "https://www.bettylouslibrary.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bettylouslibrary.com",
+        "instagram": "https://www.instagram.com/bettylouslibrary/"
+      },
+      "services": [
+        "Cocktails",
+        "Lounge"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@bettylouslibrary.com",
+      "address": "Calgary, AB"
+    },
+    {
+      "id": "biz-unicorn-on-four",
+      "kind": "business",
+      "slug": "unicorn-on-four",
+      "title": "The Unicorn on 4",
+      "name": "The Unicorn on 4",
+      "website": "https://theunicornonfour.ca/home/",
+      "summary": "Craft beer pub with food and entertainment on 4 St SW.",
+      "description": "The Unicorn on 4 at 1919 4 St SW is a neighbourhood pub with craft beer, good food and entertainment in the Mission and 4th Street strip.",
+      "categories": [
+        "nightlife",
+        "food"
+      ],
+      "tags": [
+        "pub",
+        "craft beer"
+      ],
+      "sources": [
+        {
+          "name": "The Unicorn on 4",
+          "url": "https://theunicornonfour.ca/home/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://theunicornonfour.ca/home/",
+        "instagram": "https://www.instagram.com/theunicornon4/"
+      },
+      "services": [
+        "Craft beer",
+        "Pub food",
+        "Entertainment"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "joel@theunicornonfour.ca",
+      "address": "1919 4 St SW, Calgary, AB",
+      "neighbourhood": "Mission"
+    },
+    {
+      "id": "biz-calcutta-cricket-club",
+      "kind": "business",
+      "slug": "calcutta-cricket-club",
+      "title": "Calcutta Cricket Club",
+      "name": "Calcutta Cricket Club",
+      "website": "https://www.calcuttacricketclub.com/",
+      "summary": "Modern Indian restaurant in the Beltline.",
+      "description": "Calcutta Cricket Club at 1213 1 St SW serves fun, authentic Indian dishes in a comfortable, modern room in the Beltline.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "indian",
+        "cocktails"
+      ],
+      "sources": [
+        {
+          "name": "Calcutta Cricket Club",
+          "url": "https://www.calcuttacricketclub.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calcuttacricketclub.com/",
+        "instagram": "https://www.instagram.com/calcuttacricket/"
+      },
+      "services": [
+        "dining",
+        "Cocktails"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@calcuttacricketclub.com",
+      "address": "1213 1 St SW, Calgary, AB",
+      "neighbourhood": "Beltline"
+    },
+    {
+      "id": "biz-classified-yyc",
+      "kind": "business",
+      "slug": "classified-yyc",
+      "title": "Classified YYC",
+      "name": "Classified YYC",
+      "website": "https://www.classifiedyyc.com/",
+      "summary": "Tactical laser tag missions for groups in NE Calgary.",
+      "description": "Classified YYC at 1305 33 St NE runs tactical laser tag: team missions and strategy challenges for friends, birthdays and work groups. Book ahead.",
+      "categories": [
+        "family",
+        "recreation"
+      ],
+      "tags": [
+        "laser tag",
+        "group activities",
+        "birthday parties"
+      ],
+      "sources": [
+        {
+          "name": "Classified YYC",
+          "url": "https://www.classifiedyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.classifiedyyc.com/",
+        "instagram": "https://www.instagram.com/classifiedyyc/"
+      },
+      "services": [
+        "Tactical laser tag",
+        "Group bookings",
+        "Birthday parties"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@classifiedyeg.com",
+      "address": "1305 33 St NE, Calgary, AB"
+    },
+    {
+      "id": "biz-clay-pot-calgary",
+      "kind": "business",
+      "slug": "clay-pot-calgary",
+      "title": "Clay Pot",
+      "name": "Clay Pot",
+      "website": "https://www.claypotmcmahon.com/",
+      "summary": "Modern pan-Asian kitchen on Crowchild Trail NW.",
+      "description": "Clay Pot at 2122 Crowchild Trail NW serves modern pan-Asian food that blends Chinese and Western cooking.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "asian",
+        "chinese"
+      ],
+      "sources": [
+        {
+          "name": "Clay Pot",
+          "url": "https://www.claypotmcmahon.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.claypotmcmahon.com/",
+        "instagram": "https://www.instagram.com/claypotyyc/"
+      },
+      "services": [
+        "dining",
+        "Takeout"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "claypotcalgary@gmail.com",
+      "address": "2122 Crowchild Trail NW, Calgary, AB"
+    },
+    {
+      "id": "biz-valley-boutique-home",
+      "kind": "business",
+      "slug": "valley-boutique-home",
+      "title": "Valley Boutique & Home",
+      "name": "Valley Boutique & Home",
+      "website": "https://valleyboutiqueandhome.com/",
+      "summary": "Locally owned boutique for clothing, home decor, gifts and Fusion Mineral Paint.",
+      "description": "Valley Boutique & Home at 8435 Bowfort Rd NW is a locally owned shop with boutique clothing, jewelry, shoes, home decor, furniture, gifts and Fusion Mineral Paint. Shop in store or online.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "boutique",
+        "home decor",
+        "gifts"
+      ],
+      "sources": [
+        {
+          "name": "Valley Boutique & Home",
+          "url": "https://valleyboutiqueandhome.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-12T08:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://valleyboutiqueandhome.com/",
+        "instagram": "https://www.instagram.com/valleyboutiqueandhome/"
+      },
+      "services": [
+        "Clothing",
+        "Home decor",
+        "Gifts",
+        "Fusion Mineral Paint"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-12T08:00:00Z",
+      "email": "info@valleyboutiqueandhome.com",
+      "address": "8435 Bowfort Rd NW, Calgary, AB",
+      "neighbourhood": "Bowness"
     }
   ]
 }

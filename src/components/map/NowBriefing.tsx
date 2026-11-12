@@ -10,6 +10,7 @@ import {
 } from '@/src/lib/nowBriefing';
 import { cn } from '@/src/lib/utils';
 import { QUADRANT_VIEW, summarizeQuadrants, type Quadrant } from '@/src/lib/cityQuadrants';
+import { CityPulse, pulseHits } from '@/src/components/map/CityPulse';
 import '@/src/styles/map-feed.css';
 
 export interface NowBriefingProps {
@@ -61,9 +62,11 @@ export default function NowBriefing({
   const communityPct = total ? Math.round((community / total) * 100) : 0;
   const quadrants = useMemo(() => summarizeQuadrants(incidents), [incidents]);
   const quadMax = Math.max(1, ...quadrants.map((q) => q.total));
+  const hits = useMemo(() => pulseHits(incidents, now), [incidents, now]);
 
   return (
     <section className={cn('lv-brief', className)} aria-labelledby={headingId}>
+      {total > 0 && <CityPulse hits={hits} fps={30} glow={0.6} className="lv-brief-city" />}
       <p className="lv-brief-eyebrow">
         <span className="lv-feed-pulse" aria-hidden="true" />
         Live briefing

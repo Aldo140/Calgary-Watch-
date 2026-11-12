@@ -57,7 +57,8 @@ async function main() {
     cells.set(s.name, [Math.round((maxY - cy) / STEP_LAT) * w + Math.round((cx - minX) / STEP_LON)]);
   }
   const names = [...cells.keys()].sort();
-  const out = { w, h, names, cells: names.map(n => cells.get(n)!) };
+  // geo: [west lon, north lat, lon step, lat step] so a lat/lng can be placed on the grid.
+  const out = { w, h, geo: [minX, maxY, STEP_LON, STEP_LAT], names, cells: names.map(n => cells.get(n)!) };
   writeFileSync('src/generated/calgary-dots.json', JSON.stringify(out));
   console.log(`${names.length} communities, ${out.cells.flat().length} dots, grid ${w}×${h}`);
 }

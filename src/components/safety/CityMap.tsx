@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import dots from '../../generated/calgary-dots.json';
 
 /*
  * Calgary at night, as a dot matrix: one dot per ~450 m, from the City's
@@ -12,35 +11,8 @@ import dots from '../../generated/calgary-dots.json';
  * the same things in text. Reduced motion draws still frames only.
  */
 
-const D = dots as { w: number; h: number; names: string[]; cells: number[][] };
-const KEY = new Map<string, number>();
-D.names.forEach((n, i) => {
-  KEY.set(n.toUpperCase(), i);
-  const first = n.split('/')[0].trim().toUpperCase();
-  if (!KEY.has(first)) KEY.set(first, i);
-});
-const indexOf = (community?: string) => (community ? KEY.get(community.toUpperCase()) ?? KEY.get(community.split('/')[0].trim().toUpperCase()) : undefined);
+import { D, indexOf, OWNER, ALL, PHASE, CENTRE, DIST } from '../../lib/cityDots';
 
-const OWNER = new Int16Array(D.w * D.h).fill(-1);
-D.cells.forEach((cs, i) => cs.forEach(c => { OWNER[c] = i; }));
-const ALL: number[] = [];
-for (let c = 0; c < OWNER.length; c++) if (OWNER[c] >= 0) ALL.push(c);
-const PHASE = new Float32Array(OWNER.length).map((_, c) => ((c * 2654435761) % 1000) / 1000);
-const CENTRE = D.cells.map(cs => {
-  let x = 0, y = 0;
-  for (const c of cs) { x += c % D.w; y += Math.floor(c / D.w); }
-  return [x / cs.length, y / cs.length] as const;
-});
-
-// Distance of every dot from downtown, 0–1, for the power-on reveal.
-const CORE = indexOf('Downtown Commercial Core');
-const [DX, DY] = CORE !== undefined ? CENTRE[CORE] : [D.w / 2, D.h / 2];
-const DIST = new Float32Array(OWNER.length);
-{
-  let max = 0;
-  for (const c of ALL) { DIST[c] = Math.hypot((c % D.w) - DX, Math.floor(c / D.w) - DY); max = Math.max(max, DIST[c]); }
-  for (const c of ALL) DIST[c] /= max;
-}
 const BOOT = 1.6; // seconds for the city to light up from downtown
 
 export function CityMap({ lit = [], focus, sweep = false, className = '' }: { lit?: string[]; focus?: string; sweep?: boolean; className?: string }) {

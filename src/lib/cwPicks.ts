@@ -1,4 +1,8 @@
-import { PICK_CHECKS, type BestCategory, type BestPlace, type CwPick, type PickCheck } from '../content/bestOf';
+import { BEST_CATEGORIES, type BestPlace } from '../content/bestOf';
+import { sourceOf } from './bestOf';
+import { PICK_CHECKS, PICKS, type CwPick, type PickCheck } from '../content/cwPicks';
+import { LOCAL_SERVICES, offersService, serviceById, type LocalService } from '../data/localServices';
+import type { DiscoveryEntity } from '../types/discovery';
 
 /**
  * CalgaryWatch Picks (docs/cw-picks.md): one vetted company per service list,
@@ -24,11 +28,11 @@ const DAY = 86_400_000;
 
 export const CONSENT_TEXT = 'Email me once in 7 days to ask how the job went. My answer helps neighbours and decides the CalgaryWatch Pick. One email, no list, and my address is deleted after.';
 
-export type ContactVia = 'search' | 'best';
+export type ContactVia = 'search' | 'best' | 'desk';
 export type ContactKind = 'call' | 'site';
 
 /** A short, stable id for a company inside a list, safe for analytics (no spaces, ≤32 chars). */
-export function placeKey(place: Pick<BestPlace, 'name'>): string {
+export function placeKey(place: { name: string }): string {
   return place.name.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
     .replace(/[’']/g, '').replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 32);
 }
@@ -40,13 +44,98 @@ export function pickChecksComplete(pick: CwPick, now = Date.now()): boolean {
   return (Object.keys(PICK_CHECKS) as PickCheck[]).every(k => /^\d{4}-\d{2}-\d{2}$/.test(pick.checks[k] ?? '') && pick.checks[k] <= today(now));
 }
 
-/** The live Pick for a list: set, fully vetted, not lapsed, and naming a company on the list. */
-export function activePick(c: BestCategory, now = Date.now()): { pick: CwPick; place: BestPlace } | null {
-  if (c.kind !== 'service' || !c.pick) return null;
-  const place = c.places.find(p => p.name === c.pick!.place);
-  if (!place || c.pick.until < today(now) || !pickChecksComplete(c.pick, now)) return null;
-  return { pick: c.pick, place };
+// ─── Shelves ────────────────────────────────────────────────────────────────
+
+/** A company on a service's shelf: from a cited Best of Calgary list or a Local profile. */
+export interface Contender {
+  key: string;
+  name: string;
+  website?: string;
+  phone?: string;
+  /** One line about them, with where it came from. */
+  fact?: { text: string; source: string; label: string };
+  /** Their CalgaryWatch profile, when they have one. */
+  path?: string;
+  area?: string;
+  verified?: boolean;
 }
+
+/** Everything the Pick desk for one service shows. */
+export interface Shelf {
+  service: LocalService;
+  contenders: Contender[];
+  /** The Best of Calgary list behind it, for "sources and tips". */
+  bestSlug?: string;
+  live: { pick: CwPick; contender: Contender } | null;
+}
+
+const collator = new Intl.Collator('en-CA', { sensitivity: 'base', ignorePunctuation: true });
+const sortName = (n: string) => n.replace(/^the\s+/i, '');
+
+function fromBest(p: BestPlace, sourceLabel: (id: string) => { url: string; label: string } | undefined): Contender {
+  const f = p.facts[0];
+  const src = f ? (f.self ? { url: f.source, label: 'their site' } : sourceLabel(f.source)) : undefined;
+  return { key: placeKey(p), name: p.name, website: p.website, phone: p.phone, area: p.area, verified: p.verified,
+    ...(f && src ? { fact: { text: f.text, source: src.url, label: src.label } } : {}) };
+}
+
+const citedSource = (id: string) => { const s = sourceOf(id); return s ? { url: s.url, label: s.publisher } : undefined; };
+
+/**
+ * One service's shelf: its cited Best list plus the Local profiles that offer
+ * it, A–Z, one row per company. Only companies with a way to reach them.
+ */
+export function shelfFor(serviceId: string, entities: readonly DiscoveryEntity[] = [], now = Date.now(), sourceLabel: (id: string) => { url: string; label: string } | undefined = citedSource): Shelf | null {
+  const service = serviceById(serviceId);
+  if (!service) return null;
+  const best = service.best ? BEST_CATEGORIES.find(c => c.slug === service.best) : undefined;
+  const out = new Map<string, Contender>();
+  for (const p of best?.places ?? []) out.set(placeKey(p), fromBest(p, sourceLabel));
+  for (const e of entities) {
+    if (e.kind !== 'business' || e.developmentOnly || !offersService(e, service)) continue;
+    const key = placeKey({ name: e.title });
+    const prev = out.get(key);
+    const path = `/local/${e.slug}`;
+    if (prev) { prev.path = path; continue; }
+    if (!e.website && !e.phone) continue;
+    out.set(key, { key, name: e.title, website: e.website, phone: e.phone, area: e.neighbourhood, path,
+      ...(e.summary ? { fact: { text: e.summary, source: path, label: 'profile' } } : {}) });
+  }
+  const contenders = [...out.values()].sort((a, b) => Number(!!b.verified) - Number(!!a.verified) || collator.compare(sortName(a.name), sortName(b.name)));
+  const pick = PICKS[service.id];
+  const contender = pick ? contenders.find(c => c.name === pick.place) : undefined;
+  const live = pick && contender && pick.until >= today(now) && pickChecksComplete(pick, now) ? { pick, contender } : null;
+  return { service, contenders, ...(best ? { bestSlug: best.slug } : {}), live };
+}
+
+/** Every service, in Local's order, for the /picks hub. */
+export function allShelves(entities: readonly DiscoveryEntity[] = [], now = Date.now()): Shelf[] {
+  return LOCAL_SERVICES.map(s => shelfFor(s.id, entities, now)!).filter(Boolean);
+}
+
+/** The service a search names: "plumber", "snow removal", "window cleaners", "best electrician". */
+export function serviceForQuery(q: string): LocalService | undefined {
+  const norm = (t: string) => t.normalize('NFKD').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
+    .split(' ').filter(w => w && !['best', 'top', 'good', 'calgary', 'yyc', 'in', 'near', 'me', 'a', 'the', 'company', 'companies', 'service', 'services', 'emergency', 'local', 'cheap', 'affordable'].includes(w))
+    .map(w => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w)).join(' ');
+  const key = norm(q);
+  if (!key) return undefined;
+  const best = BEST_CATEGORIES.find(c => c.kind === 'service' && c.keywords.some(k => norm(k) === key));
+  if (best) return LOCAL_SERVICES.find(s => s.best === best.slug);
+  return LOCAL_SERVICES.find(s => [s.label, ...s.trades, ...s.match].some(m => norm(m) === key));
+}
+
+export const pickDeskPath = (serviceId: string) => `/picks/${serviceId}`;
+
+/** Questions that fit any hire, for services without their own. Plain advice, never about one business. */
+export const GENERIC_ASK = [
+  'Can I have the quote in writing, and what would change it?',
+  'Are you insured, and can you send the certificate?',
+  'Who does the work: you, a crew, or a subcontractor?',
+];
+
+/** Three questions worth asking on the phone for this service. */
+export const askFor = (service: LocalService): string[] => service.ask?.length ? service.ask : GENERIC_ASK;
 
 export function telHref(phone: string): string {
   return `tel:+1${phone.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '')}`;
@@ -84,7 +173,7 @@ export function newReviewKey(random: (n: number) => Uint8Array = n => crypto.get
   return [...random(24)].map(b => abc[b & 63]).join('');
 }
 
-export function buildFollowup(input: { list: string; place: BestPlace; email: string; uid?: string | null; via: ContactVia; contact: ContactKind; now?: number; key?: string }): PickFollowup | null {
+export function buildFollowup(input: { list: string; place: { name: string }; email: string; uid?: string | null; via: ContactVia; contact: ContactKind; now?: number; key?: string }): PickFollowup | null {
   const email = input.email.trim().toLowerCase();
   if (!validEmail(email)) return null;
   const now = input.now ?? Date.now();
@@ -96,7 +185,7 @@ export function buildFollowup(input: { list: string; place: BestPlace; email: st
 }
 
 /** Records the tap (anonymous) and, with consent, the follow-up. Never throws into the UI. */
-export async function recordPickContact(input: { list: string; place: BestPlace; via: ContactVia; contact: ContactKind; followupEmail?: string }): Promise<'saved' | 'tap-only' | 'invalid'> {
+export async function recordPickContact(input: { list: string; place: { name: string }; via: ContactVia; contact: ContactKind; followupEmail?: string }): Promise<'saved' | 'tap-only' | 'invalid'> {
   const { logProductEvent } = await import('./productEvents');
   logProductEvent('pick_contact', { list: input.list, place: placeKey(input.place), via: input.via, contact: input.contact, followup: input.followupEmail ? 'yes' : 'no' });
   if (!input.followupEmail) return 'tap-only';
@@ -142,11 +231,11 @@ export function reviewPath(followupId: string, key: string, list: string, place:
   return `/review?${q.toString()}`;
 }
 
-/** The company a review link names, if it's still on that list. */
-export function placeFromLink(list: string, place: string, categories: readonly BestCategory[]): { c: BestCategory; place: BestPlace } | null {
-  const c = categories.find(x => x.slug === list);
-  const p = c?.places.find(x => placeKey(x) === place);
-  return c && p ? { c, place: p } : null;
+/** The company a review link names, if it's still on that service's shelf. */
+export function placeFromLink(list: string, place: string, entities: readonly DiscoveryEntity[] = []): { shelf: Shelf; contender: Contender } | null {
+  const shelf = shelfFor(list, entities);
+  const contender = shelf?.contenders.find(c => c.key === place);
+  return shelf && contender ? { shelf, contender } : null;
 }
 
 /** The reader's answers as a document the rules accept, or a reason it isn't one. */

@@ -1,17 +1,27 @@
 # CalgaryWatch Picks
 
-One vetted company per service list (/best service lists and service searches like "plumber"), an A–Z list under it, and an opt-in check-in a week after a reader contacts a company. Plan: https://claude.ai/artifact/Do7qmZLC1mCaZ8aHtFRsqu
+One vetted company per Local service (all 20 in `src/data/localServices.ts`), an A–Z shortlist under it, and an opt-in check-in a week after a reader contacts a company. Plan: https://claude.ai/artifact/Do7qmZLC1mCaZ8aHtFRsqu
+
+## Where it shows
+
+- `/picks`: hub. Find a service, busy-now first, how a Pick is earned, privacy (`#privacy`), vetting ask for businesses.
+- `/picks/:service`: a desk per service (noindex until Picks exist). Pick card or open slot, the shortlist, what to ask on the phone, booking months.
+- `/search`: `serviceForQuery` turns "plumber", "snow removal", "best electricians calgary" into the compact desk.
+- `/best/<service list>`: the full board above the cited sources.
+- `/local/services`: each card links to its desk ("Who to call").
+
+A shelf is the cited Best of Calgary list for the service (`best` on the service) plus every Local business profile that offers it (`offersService`), merged by name, verified first, then A–Z ignoring "The". Only companies with a phone or website.
 
 ## Setting a Pick
 
-`pick` on a service `BestCategory` in `src/content/bestOf.ts`:
+`PICKS` in `src/content/cwPicks.ts`, keyed by service id:
 
 ```ts
-pick: { place: 'Knight Plumbing', why: 'One sentence, backed by the checks.', until: '2027-05-20',
+plumbing: { place: 'Knight Plumbing', why: 'One sentence, backed by the checks.', until: '2027-05-20',
   checks: { licence: '2026-11-18', insurance: '…', wcb: '…', local: '…', reviews: '…', 'mystery-call': '…', pledge: '…' } }
 ```
 
-`activePick` (src/lib/cwPicks.ts) shows it only when all seven checks have a date on or before today, `until` hasn't passed and `place` is on the list. tests/cw-picks.test.ts fails the build if a list ships a Pick that wouldn't render. Re-vet every 6 months (`until`).
+`shelfFor` (src/lib/cwPicks.ts) shows it only when all seven checks have a date on or before today, `until` hasn't passed and `place` is a contender's exact name on that service's shelf. tests/cw-picks.test.ts fails the build if a list ships a Pick that wouldn't render. Re-vet every 6 months (`until`).
 
 The checks (wording in `PICK_CHECKS`): licence (Alberta Tradesecrets or City licence), insurance certificate, WCB clearance letter, Calgary-area ownership, 50+ public reviews at 4.5+ read for patterns, a mystery call as a customer, and the signed pledge (written quotes, permits pulled, complaints answered in 5 business days, no deposit without an Alberta prepaid contracting licence). Keep the files (screenshots, dates, who checked) outside the public repo.
 

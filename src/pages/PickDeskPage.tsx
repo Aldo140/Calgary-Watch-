@@ -1,0 +1,113 @@
+import { useMemo } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowUpRight, BookOpenCheck, Lightbulb, MessageCircleQuestion, ShieldCheck, UserPlus } from 'lucide-react';
+import { SiteLayout } from '../components/site/SiteLayout';
+import { PageHero } from '../components/site/PageHero';
+import { PickBoard } from '../components/picks/PickBoard';
+import { PickSeal } from '../components/picks/PickSeal';
+import { ServiceIcon } from '../components/picks/ServiceIcon';
+import { discoveryRepository } from '../data/discovery';
+import { inPeak, LOCAL_SERVICES } from '../data/localServices';
+import { bestPath } from '../lib/bestOf';
+import { askFor, pickDeskPath, shelfFor } from '../lib/cwPicks';
+import NotFoundPage from './NotFoundPage';
+import '../styles/picks.css';
+
+const CONTACT = 'aldo@calgarywatch.ca';
+const MONTHS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const calgaryMonth = (d: Date) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
+
+/**
+ * /picks/:service: one service as a decision. The Pick (or its open slot),
+ * every local company A–Z one tap from a call, what to ask on the phone, and
+ * when Calgary books it. The page a search for "plumber" opens into.
+ */
+export default function PickDeskPage() {
+  const { service: id = '' } = useParams();
+  const shelf = useMemo(() => shelfFor(id, discoveryRepository.list()), [id]);
+  if (!shelf) return <NotFoundPage />;
+  const { service: s } = shelf;
+  const now = new Date();
+  const month = calgaryMonth(now);
+  const busy = inPeak(s, month);
+  const n = shelf.contenders.length;
+  const recommend = `mailto:${CONTACT}?subject=${encodeURIComponent(`Recommending a Calgary ${s.trades[0]}`)}&body=${encodeURIComponent('Name and website:\n\nWhat they did for you, and when:\n')}`;
+  const others = LOCAL_SERVICES.filter(o => o.id !== s.id).sort((a, b) => Number(inPeak(b, month)) - Number(inPeak(a, month)));
+
+  return (
+    <SiteLayout>
+      <div className="bp pkd">
+        <PageHero
+          id="pkd-title"
+          kicker={`CalgaryWatch Picks · ${s.label}`}
+          title={<>{s.label} in Calgary, <span>checked.</span></>}
+          lead={<>{n ? `${n} local ${n === 1 ? 'company' : 'companies'}, A–Z, one tap from a call.` : 'The shortlist is being built.'} {shelf.live ? `${shelf.live.contender.name} is the CalgaryWatch Pick.` : 'The Pick is being vetted: seven checks we do ourselves.'} Nobody pays to be here.</>}
+          facts={<>
+            <li><b>{n}</b> local</li>
+            <li><b>{shelf.live ? '1' : '0/7'}</b> {shelf.live ? 'Pick' : 'checks'}</li>
+            {busy ? <li><b>Busy</b> in {MONTH_NAMES[month - 1]}</li> : null}
+          </>}
+          aside={
+            <div className="pkd-hero-seal" aria-hidden="true">
+              <span className="pkd-hero-ico"><ServiceIcon id={s.id} size={30} /></span>
+              <PickSeal state={shelf.live ? 'live' : 'open'} checks={0} size={200} year={shelf.live?.pick.checks.pledge.slice(0, 4)} />
+            </div>
+          }
+        />
+
+        <div className="cw-wrap pkd-layout">
+          <section className="pkd-main" aria-label={`${s.label} in Calgary`}>
+            <PickBoard shelf={shelf} via="desk" />
+          </section>
+
+          <aside className="pkd-side">
+            <section className="pkd-card is-dark" aria-labelledby="pkd-ask">
+              <p className="bp-eyebrow"><MessageCircleQuestion size={14} aria-hidden="true" /> On the phone</p>
+              <h2 id="pkd-ask">Ask these three.</h2>
+              <ol className="pkd-ask">{askFor(s).map((q, i) => <li key={q}><i>{i + 1}</i>{q}</li>)}</ol>
+            </section>
+
+            <section className="pkd-card" aria-labelledby="pkd-year">
+              <p className="bp-eyebrow">When Calgary books it</p>
+              <h2 id="pkd-year">{s.peak.length ? (busy ? 'Busy right now.' : 'Book ahead of the rush.') : 'Steady all year.'}</h2>
+              <ol className="pkd-months" aria-label="Busiest months">
+                {MONTHS.map((m, i) => (
+                  <li key={i} className={`${s.peak.includes(i + 1) ? 'is-peak' : ''}${i + 1 === month ? ' is-now' : ''}`} title={MONTH_NAMES[i]}>
+                    <span aria-hidden="true">{m}</span><span className="pkd-sr">{MONTH_NAMES[i]}{s.peak.includes(i + 1) ? ', busy' : ''}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="pkd-tip"><Lightbulb size={16} aria-hidden="true" /><span>{s.tip}</span></p>
+            </section>
+
+            <section className="pkd-card" aria-labelledby="pkd-more">
+              <p className="bp-eyebrow">Help the list</p>
+              <h2 id="pkd-more">Know a good one?</h2>
+              <p>Tell us who did good work for you. We check them against their own site before they go on the list.</p>
+              <div className="pkd-links">
+                <a href={recommend}><UserPlus size={16} aria-hidden="true" /> Recommend a {s.trades[0]}</a>
+                <a href={`mailto:${CONTACT}?subject=${encodeURIComponent(`CalgaryWatch Pick vetting: ${s.label}`)}`}><ShieldCheck size={16} aria-hidden="true" /> Ask to be vetted</a>
+                {shelf.bestSlug ? <Link to={bestPath({ slug: shelf.bestSlug })}><BookOpenCheck size={16} aria-hidden="true" /> Sources for this list</Link> : null}
+                <Link to="/picks#pkh-how">How Picks work <ArrowUpRight size={14} aria-hidden="true" /></Link>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <div className="cw-wrap">
+          <section className="bp-section pkd-others" aria-labelledby="pkd-others">
+            <div className="bp-head"><h2 id="pkd-others">Something <span>else?</span></h2><Link className="bp-link" to="/picks">Every service</Link></div>
+            <ul>
+              {others.map(o => (
+                <li key={o.id}>
+                  <Link to={pickDeskPath(o.id)}><ServiceIcon id={o.id} size={16} />{o.label}{inPeak(o, month) ? <i>Busy</i> : null}</Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </div>
+    </SiteLayout>
+  );
+}

@@ -16,6 +16,10 @@ export interface LocalService {
   tip: string;
   /** Listing tags or services that put a Local place under this service. */
   match: string[];
+  /** The cited Best of Calgary list for this service (src/content/bestOf.ts), when one exists. */
+  best?: string;
+  /** Three questions to ask on the phone, for the Pick desk. Plain advice, never about one business. */
+  ask?: string[];
 }
 
 export const SERVICE_GROUPS: Record<ServiceGroup, { label: string; blurb: string }> = {
@@ -26,11 +30,14 @@ export const SERVICE_GROUPS: Record<ServiceGroup, { label: string; blurb: string
 };
 
 export const LOCAL_SERVICES: LocalService[] = [
-  { id: 'plumbing', label: 'Plumbers', group: 'home', trades: ['plumber', 'drain cleaning', 'water heaters'], peak: [11, 12, 1, 2], match: ['plumber', 'plumbing', 'drain'],
+  { id: 'plumbing', label: 'Plumbers', group: 'home', trades: ['plumber', 'drain cleaning', 'water heaters'], peak: [11, 12, 1, 2], match: ['plumber', 'plumbing', 'drain'], best: 'plumbers',
+    ask: ['What does the service-call fee cover, and is the repair quoted before you start?', 'Will you pull the City permit if this job needs one?', 'Are you a certified journeyperson, or is someone supervising?'],
     tip: 'Ask whether the job needs a City of Calgary permit and who pulls it. Frozen pipes are a January call, so know where your main shut-off is.' },
   { id: 'electrical', label: 'Electricians', group: 'home', trades: ['electrician', 'panel upgrades', 'EV chargers'], peak: [], match: ['electrician', 'electrical'],
+    ask: ['Who pulls the City electrical permit?', 'Is the quote fixed, or time and materials?', 'Are you a master electrician, or working under one?'],
     tip: 'Most wiring work needs a City permit. A licensed electrician can pull it for you; ask for it in the quote.' },
   { id: 'heating', label: 'Furnace and AC', group: 'home', trades: ['furnace repair', 'HVAC', 'AC installs'], peak: [9, 10, 11, 6, 7], match: ['furnace', 'hvac', 'heating', 'air conditioning'],
+    ask: ['Is the gas fitter licensed in Alberta?', 'What does the tune-up include, line by line?', 'Do you charge more on evenings and weekends?'],
     tip: 'Book a furnace check in September or October, before the first cold snap fills every schedule in the city.' },
   { id: 'roofing', label: 'Roofers and eavestroughs', group: 'home', trades: ['roofer', 'eavestroughs', 'hail repair'], peak: [6, 7, 8, 9], match: ['roofing', 'roofer', 'eavestrough'],
     tip: 'Calgary sits in hail alley. After a big storm, check your insurer’s process first and be wary of crews knocking door to door.' },
@@ -44,6 +51,10 @@ export const LOCAL_SERVICES: LocalService[] = [
     tip: 'Have the model number from the sticker inside the door ready. It saves a second visit for parts.' },
   { id: 'locksmith', label: 'Locksmiths', group: 'home', trades: ['locksmith', 'rekeying', 'lockouts'], peak: [], match: ['locksmith'],
     tip: 'Moved in? Rekeying is usually cheaper than new locks, and you know exactly who has a key.' },
+  { id: 'windows', label: 'Window cleaning', group: 'home', trades: ['window cleaner', 'gutters', 'pressure washing'], peak: [4, 5, 9, 10], match: ['window cleaning', 'window washing'], best: 'window-cleaning',
+    tip: 'Ask whether the price covers inside, outside, screens and tracks. Anyone working at height should show liability insurance and a WCB clearance letter.' },
+  { id: 'junk', label: 'Junk removal', group: 'home', trades: ['junk hauler', 'estate cleanouts', 'hot tub removal'], peak: [4, 5, 6, 9], match: ['junk removal', 'junk hauling'], best: 'junk-removal',
+    tip: 'Pricing is usually by how much of the truck you fill. Ask for the price per load before they start, and where it goes: donation, recycling or the landfill.' },
   { id: 'snow', label: 'Snow removal', group: 'outdoor', trades: ['snow removal', 'sidewalk clearing'], peak: [10, 11, 12, 1, 2, 3, 4], match: ['snow removal', 'snow'],
     tip: 'Calgary’s bylaw gives you 24 hours after the snow stops to clear your sidewalk. A seasonal contract is booked in the fall.' },
   { id: 'yard', label: 'Lawn and yard', group: 'outdoor', trades: ['lawn care', 'aeration', 'tree trimming'], peak: [4, 5, 6, 9], match: ['lawn', 'landscaping', 'yard', 'tree'],

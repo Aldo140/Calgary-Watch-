@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
-import { BEST_CATEGORIES } from '../content/bestOf';
-import { bestPath } from '../lib/bestOf';
-import { buildReview, placeFromLink, PICK_REVIEWS, REVIEW_TEXT_MAX, type Hired } from '../lib/cwPicks';
+import { discoveryRepository } from '../data/discovery';
+import { buildReview, pickDeskPath, placeFromLink, PICK_REVIEWS, REVIEW_TEXT_MAX, type Hired } from '../lib/cwPicks';
 import '../styles/picks.css';
 
 /**
@@ -16,7 +15,7 @@ export default function PickReviewPage() {
   const [params] = useSearchParams();
   const followup = params.get('f') ?? '';
   const key = params.get('k') ?? '';
-  const found = placeFromLink(params.get('l') ?? '', params.get('p') ?? '', BEST_CATEGORIES);
+  const found = placeFromLink(params.get('l') ?? '', params.get('p') ?? '', discoveryRepository.list());
   const [hired, setHired] = useState<Hired | null>(null);
   const [stars, setStars] = useState<number | null>(null);
   const [again, setAgain] = useState<boolean | null>(null);
@@ -38,13 +37,14 @@ export default function PickReviewPage() {
       </SiteLayout>
     );
   }
-  const { c, place } = found;
+  const { shelf, contender: place } = found;
+  const service = shelf.service;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!hired) { setError('Did you hire them?'); return; }
-    const review = buildReview({ followup, key, list: c.slug, place: params.get('p') ?? '', hired, stars, again, onTime, onPrice, text });
+    const review = buildReview({ followup, key, list: service.id, place: params.get('p') ?? '', hired, stars, again, onTime, onPrice, text });
     if (typeof review === 'string') { setError(review); return; }
     setState('sending');
     try {
@@ -69,13 +69,13 @@ export default function PickReviewPage() {
   return (
     <SiteLayout>
       <main className="pr">
-        <p className="pr-kicker">CalgaryWatch Picks · {c.label}</p>
+        <p className="pr-kicker">CalgaryWatch Picks · {service.label}</p>
         <h1>How did {place.name} do?</h1>
         <p className="pr-lead">You contacted them from CalgaryWatch about a week ago. Your answer goes to us first; we never publish your name or email, and we don’t pass it to {place.name}.</p>
         {state === 'done' ? (
           <div className="pr-done" role="status">
             <p><CheckCircle2 size={18} aria-hidden="true" /> <b>Thank you.</b> That’s it: no more emails about this, and we’ve scheduled your address for deletion.</p>
-            <p><Link to={bestPath(c)}>Back to {c.label.toLowerCase()} in Calgary</Link></p>
+            <p><Link to={pickDeskPath(service.id)}>Back to {service.label.toLowerCase()} in Calgary</Link></p>
           </div>
         ) : (
           <form onSubmit={submit} noValidate>

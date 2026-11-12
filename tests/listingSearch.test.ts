@@ -100,7 +100,7 @@ describe('listing search', () => {
     assert.deepEqual(bestPicks(ENTITIES, OCC, 'jazz', NOW), [], 'events are not places to rank');
     assert.equal(serviceFor('plumbers')?.id, 'plumbing');
     assert.equal(serviceFor('snow removal')?.id, 'snow');
-    assert.equal(serviceFor('window cleaners'), undefined, 'not house cleaning');
+    assert.equal(serviceFor('window cleaners')?.id, 'windows', 'its own service, not house cleaning');
     assert.equal(serviceFor('pho'), undefined);
   });
 });

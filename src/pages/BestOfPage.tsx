@@ -6,6 +6,9 @@ import { BEST_CATEGORIES, type BestCategory, type BestFact, type BestPlace } fro
 import { bestCategory, bestPath, directionsUrl, formatPublished, isRanked, publishersOf, rankPlaces, sourceOf, sourcesFor } from '../lib/bestOf';
 import NotFoundPage from './NotFoundPage';
 import { PickBoard } from '../components/picks/PickBoard';
+import { shelfFor } from '../lib/cwPicks';
+import { LOCAL_SERVICES } from '../data/localServices';
+import { discoveryRepository } from '../data/discovery';
 import '../styles/best-of.css';
 
 const CONTACT = 'aldo@calgarywatch.ca';
@@ -135,6 +138,9 @@ function CategoryView({ c }: { c: BestCategory }) {
   const places = rankPlaces(c.places);
   const sources = sourcesFor(c);
   const others = BEST_CATEGORIES.filter(o => o.slug !== c.slug);
+  // A service list is a Pick desk: its cited companies plus the Local profiles that offer the service.
+  const service = c.kind === 'service' ? LOCAL_SERVICES.find(s => s.best === c.slug) : undefined;
+  const shelf = service ? shelfFor(service.id, discoveryRepository.list()) : null;
   return (
     <>
       <section className="bo-hero bo-hero-cat" aria-labelledby="bo-title" style={{ ['--from' as string]: c.from, ['--to' as string]: c.to }}>
@@ -157,8 +163,8 @@ function CategoryView({ c }: { c: BestCategory }) {
       <div className="bo-wrap bo-layout">
         <section aria-labelledby="bo-list-title">
           <h2 id="bo-list-title" className="bo-sr">The list</h2>
-          {c.kind === 'service'
-            ? <PickBoard c={c} via="best" />
+          {shelf
+            ? <PickBoard shelf={shelf} via="best" />
             : <ol className={`bo-list${isRanked(c) ? '' : ' is-az'}`}>{places.map((p, i) => <PlaceRow key={p.name} c={c} place={p} rank={i + 1} />)}</ol>}
         </section>
 

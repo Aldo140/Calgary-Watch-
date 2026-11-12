@@ -16,6 +16,7 @@ import { SAFETY_PATH, SAFETY_TOPICS, SAFETY_UPDATED } from '@/src/content/safety
 import { safetyJsonLd, safetyPath } from './safety';
 import { SPOTLIGHTS } from '@/src/content/spotlights';
 import { spotlightBySlug, spotlightJsonLd, spotlightPath, SPOTLIGHT_PATH } from './spotlights';
+import { LOCAL_SERVICES } from '../data/localServices';
 
 /**
  * Single source of truth for per-route SEO.
@@ -242,6 +243,10 @@ for (const s of SPOTLIGHTS) {
     dateModified: s.updated,
     image: DEFAULT_IMAGE,
   };
+}
+// Pick desks: noindex until each service has a vetted Pick worth ranking.
+for (const s of LOCAL_SERVICES) {
+  ROUTE_SEO[`/picks/${s.id}`] = { title: `${s.label} in Calgary, checked | CalgaryWatch Picks`, description: `Local Calgary ${s.label.toLowerCase()}, A–Z, with what to ask on the phone and when to book. One CalgaryWatch Pick per service, vetted and never bought.`, index: false, pageType: 'CollectionPage', image: DEFAULT_IMAGE };
 }
 ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Search a Calgary neighbourhood or street for recent reports, or find events, markets and local places.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {

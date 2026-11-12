@@ -11,7 +11,7 @@ import { DISCOVERY_SECTIONS, entityPath } from '../../lib/discovery';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { tryChips } from '../../lib/searchTrends';
 import { PickBoard } from '../picks/PickBoard';
-import type { BestCategory } from '../../content/bestOf';
+import type { Shelf } from '../../lib/cwPicks';
 import { bestPath } from '../../lib/bestOf';
 import '../../styles/search-page.css';
 
@@ -74,7 +74,7 @@ export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: Discove
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, picks = [] }: {
+export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, pickShelf }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   listingCount: number; resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
@@ -85,7 +85,8 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
   /** Listed places for a "best pho" search. */
   best?: BestAnswer;
   /** Service lists the search asks for ("plumber"): shown as the Pick and the A–Z list. */
-  picks?: BestCategory[];
+  /** "plumber", "snow removal": the service's Pick desk, compact. */
+  pickShelf?: Shelf | null;
   /** Best of Calgary lists the search asks for ("pho", "junk removal"). */
   bestLists?: Array<{ to: string; label: string; note: string }>;
   /** Safety topic pages and recent headlines for "car theft", "police news Bowness". */
@@ -136,17 +137,17 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
             </div>
             {didYouMean ? <p className="sx-dym">Did you mean <Link to={`/search?q=${encodeURIComponent(didYouMean)}`}>{didYouMean}</Link>?</p> : null}
             {tab === 'all' ? <SearchAnswers intent={intent} now={now} best={best} /> : null}
-            {picks.length && tab === 'all' ? picks.map(c => (
-              <section className="bp-section sx-group" aria-labelledby={`sx-pick-${c.slug}`} key={c.slug}>
-                <div className="bp-head"><h2 id={`sx-pick-${c.slug}`}>{c.label} <span>in Calgary</span></h2><Link className="bp-link" to="/picks">How Picks work <ArrowRight size={15} aria-hidden="true" /></Link></div>
-                <PickBoard c={c} via="search" compact />
+            {pickShelf && tab === 'all' ? (
+              <section className="bp-section sx-group" aria-labelledby="sx-pick">
+                <div className="bp-head"><h2 id="sx-pick">{pickShelf.service.label} <span>in Calgary</span></h2><Link className="bp-link" to="/picks">How Picks work <ArrowRight size={15} aria-hidden="true" /></Link></div>
+                <PickBoard shelf={pickShelf} via="search" compact />
               </section>
-            )) : null}
-            {bestLists.filter(b => !picks.some(c => bestPath(c) === b.to)).length && tab === 'all' ? (
+            ) : null}
+            {bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug })).length && tab === 'all' ? (
               <section className="bp-section sx-group" aria-labelledby="sx-best">
                 <div className="bp-head"><h2 id="sx-best">Best of <span>Calgary</span></h2><Link className="bp-link" to="/best">All lists <ArrowRight size={15} aria-hidden="true" /></Link></div>
                 <ul className="sx-results">
-                  {bestLists.filter(b => !picks.some(c => bestPath(c) === b.to)).map(b => (
+                  {bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug })).map(b => (
                     <li key={b.to}>
                       <Link to={b.to} className="sx-result">
                         <span className="sx-thumb sx-thumb-best" aria-hidden="true"><Trophy size={26} /></span>

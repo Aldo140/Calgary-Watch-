@@ -14,13 +14,13 @@ import { readFileSync } from 'node:fs';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { inventoryDatabase } from '../discovery/firebase';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota.js';
-import { BEST_CATEGORIES } from '../../src/content/bestOf.js';
-import { followupEmail, placeKey, PICK_FOLLOWUPS, PICK_REVIEWS, type FollowupEmail, type PickFollowup } from '../../src/lib/cwPicks.js';
+import { serviceById } from '../../src/data/localServices.js';
+import { followupEmail, shelfFor, PICK_FOLLOWUPS, PICK_REVIEWS, type FollowupEmail, type PickFollowup } from '../../src/lib/cwPicks.js';
 
 const log = (m: string) => console.log(`[picks:followups] ${m}`);
 const sender = JSON.parse(readFileSync(new URL('../../brand/outreach.json', import.meta.url), 'utf8')).sender as { name: string; mailbox: string };
 const RETENTION_MS = 60 * 86_400_000;
-const label = (list: string) => BEST_CATEGORIES.find(c => c.slug === list)?.label;
+const label = (list: string) => serviceById(list)?.label;
 
 async function send(mail: FollowupEmail): Promise<string> {
   const res = await fetch('https://api.resend.com/emails', {
@@ -38,9 +38,9 @@ async function run() {
   const dry = process.env.PICKS_DRY_RUN === '1';
   const sampleTo = (process.env.PICK_EMAIL_SAMPLE_TO ?? '').trim();
   if (sampleTo) {
-    const c = BEST_CATEGORIES.find(x => x.slug === 'plumbers') ?? BEST_CATEGORIES[0];
-    const p = c.places[0];
-    const mail = followupEmail({ email: sampleTo, placeName: p.name, list: c.slug, place: placeKey(p) }, 'SAMPLEsample0000', 'sample-key-not-valid-000', { listLabel: c.label, mailingAddress });
+    const shelf = shelfFor('plumbing')!;
+    const p = shelf.contenders[0];
+    const mail = followupEmail({ email: sampleTo, placeName: p.name, list: shelf.service.id, place: p.key }, 'SAMPLEsample0000', 'sample-key-not-valid-000', { listLabel: shelf.service.label, mailingAddress });
     mail.subject = `[Sample] ${mail.subject}`;
     log(`sample → ${sampleTo}\n${mail.text}`);
     if (dry) return;

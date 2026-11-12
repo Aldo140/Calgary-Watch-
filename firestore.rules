@@ -425,7 +425,7 @@ service cloud.firestore {
                     (request.resource.data.uid == null || (isAuthenticated() && request.resource.data.uid == request.auth.uid)) &&
                     request.resource.data.consent == 'pick-v1' &&
                     request.resource.data.key is string && request.resource.data.key.matches('^[A-Za-z0-9_-]{24}$') &&
-                    request.resource.data.via in ['search', 'best'] &&
+                    request.resource.data.via in ['search', 'best', 'desk'] &&
                     request.resource.data.contact in ['call', 'site'] &&
                     request.resource.data.createdAt is number &&
                     request.resource.data.dueAt is number &&

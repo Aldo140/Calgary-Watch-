@@ -1,28 +1,19 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  ArrowUpRight, Bug, Car, CarFront, CalendarClock, Disc3, Droplets, Fence, Flame, Hammer, House, KeyRound, Lightbulb,
-  PawPrint, Scissors, Snowflake, Sparkles, Sprout, WashingMachine, Wrench, Zap, type LucideIcon,
-} from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, CalendarClock, Lightbulb } from 'lucide-react';
+import { ServiceIcon } from '../picks/ServiceIcon';
+import { pickDeskPath } from '../../lib/cwPicks';
 import type { Business } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { inPeak, LOCAL_SERVICES, offersService, SERVICE_GROUPS, type LocalService, type ServiceGroup } from '../../data/localServices';
 
-const ICONS: Record<string, LucideIcon> = {
-  plumbing: Droplets, electrical: Zap, heating: Flame, roofing: House, handyman: Hammer, cleaning: Sparkles, pest: Bug,
-  appliances: WashingMachine, locksmith: KeyRound, snow: Snowflake, yard: Sprout, fencing: Fence, mechanic: CarFront,
-  tires: Disc3, glass: Car, tailoring: Scissors, repair: Wrench, pets: PawPrint,
-};
 const GROUPS = Object.keys(SERVICE_GROUPS) as ServiceGroup[];
 const MONTH = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long' });
 const calgaryMonth = (d: Date) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
 
 const recommendHref = (s: LocalService) => `mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Recommending a Calgary ${s.trades[0]}`)}&body=${encodeURIComponent('Name and website:\n\nWhy I’d recommend them:\n')}`;
 
-function Icon({ id, size = 20 }: { id: string; size?: number }) {
-  const I = ICONS[id] ?? Wrench;
-  return <I size={size} aria-hidden="true" />;
-}
+const Icon = ServiceIcon;
 
 /** What Calgarians book this month, so the directory answers "what should I sort out now?". */
 function BusyNow({ month, now }: { month: number; now: Date }) {
@@ -31,7 +22,7 @@ function BusyNow({ month, now }: { month: number; now: Date }) {
   return (
     <div className="cw-svc-now">
       <p><CalendarClock size={16} aria-hidden="true" /><b>{MONTH.format(now)} in Calgary:</b> book these before everyone else does</p>
-      <ul>{busy.map(s => <li key={s.id}><Link to={`/local/services#svc-${s.id}`}><Icon id={s.id} size={15} />{s.label}</Link></li>)}</ul>
+      <ul>{busy.map(s => <li key={s.id}><Link to={pickDeskPath(s.id)}><Icon id={s.id} size={15} />{s.label}</Link></li>)}</ul>
     </div>
   );
 }
@@ -138,6 +129,7 @@ export function ServicesDirectory({ places, now = new Date() }: { places: Busine
                     <ul className="cw-svc-listed">{listed.map(p => <li key={p.id}><Link to={entityPath(p)}>{p.title}<small>{p.neighbourhood}</small></Link></li>)}</ul>
                   ) : null}
                   <div className="cw-svc-actions">
+                    <Link className="cw-svc-desk" to={pickDeskPath(s.id)}><BadgeCheck size={14} aria-hidden="true" /> Who to call</Link>
                     <a href={recommendHref(s)}>Recommend one</a>
                     <Link to="/partners">Get listed free <ArrowUpRight size={13} aria-hidden="true" /></Link>
                   </div>

@@ -32,6 +32,17 @@ const CENTRE = D.cells.map(cs => {
   return [x / cs.length, y / cs.length] as const;
 });
 
+// Distance of every dot from downtown, 0–1, for the power-on reveal.
+const CORE = indexOf('Downtown Commercial Core');
+const [DX, DY] = CORE !== undefined ? CENTRE[CORE] : [D.w / 2, D.h / 2];
+const DIST = new Float32Array(OWNER.length);
+{
+  let max = 0;
+  for (const c of ALL) { DIST[c] = Math.hypot((c % D.w) - DX, Math.floor(c / D.w) - DY); max = Math.max(max, DIST[c]); }
+  for (const c of ALL) DIST[c] /= max;
+}
+const BOOT = 1.6; // seconds for the city to light up from downtown
+
 export function CityMap({ lit = [], focus, sweep = false, className = '' }: { lit?: string[]; focus?: string; sweep?: boolean; className?: string }) {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -40,6 +51,12 @@ export function CityMap({ lit = [], focus, sweep = false, className = '' }: { li
   const [reduce, setReduce] = useState(false);
   const litSet = useMemo(() => new Set(lit.map(indexOf).filter((i): i is number => i !== undefined)), [lit]);
   const fi = indexOf(focus);
+  const boot = useRef(0);
+  const [booted, setBooted] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setBooted(true), window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : BOOT * 1000);
+    return () => window.clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -77,6 +94,7 @@ export function CityMap({ lit = [], focus, sweep = false, className = '' }: { li
       return Math.hypot(a % D.w - cx, Math.floor(a / D.w) - cy) - Math.hypot(b % D.w - cx, Math.floor(b / D.w) - cy);
     }) : [];
     const start = performance.now();
+    if (!boot.current) boot.current = start;
     let raf = 0;
 
     const dot = (c: number) => { ctx.moveTo(px(c) + r, py(c)); ctx.arc(px(c), py(c), r, 0, Math.PI * 2); };
@@ -85,10 +103,17 @@ export function CityMap({ lit = [], focus, sweep = false, className = '' }: { li
       ctx.clearRect(0, 0, box.w, box.h);
       // City lights: four brightness buckets so the twinkle costs four fills.
       const buckets: number[][] = [[], [], [], []];
+      const on = reduce ? 2 : (now - boot.current) / 1000 / BOOT;
       for (const c of ALL) {
+        if (DIST[c] > on) continue;
         if (OWNER[c] === fi || litSet.has(OWNER[c])) continue;
         const tw = reduce ? PHASE[c] : 0.5 + 0.5 * Math.sin(t * (0.6 + PHASE[c]) + PHASE[c] * 40);
         buckets[Math.min(3, Math.floor(tw * tw * 4))].push(c);
+      }
+      if (on < 1.15) {
+        ctx.beginPath();
+        for (const c of ALL) if (Math.abs(DIST[c] - on) < 0.06) dot(c);
+        ctx.fillStyle = 'rgba(255,240,180,.95)'; ctx.fill();
       }
       [0.2, 0.32, 0.46, 0.7].forEach((a, k) => {
         ctx.beginPath(); buckets[k].forEach(dot); ctx.fillStyle = `rgba(127,178,255,${a})`; ctx.fill();
@@ -105,10 +130,10 @@ export function CityMap({ lit = [], focus, sweep = false, className = '' }: { li
       }
       // Communities named in recent headlines.
       ctx.beginPath();
-      litSet.forEach(i => { if (i !== fi) D.cells[i].forEach(dot); });
+      litSet.forEach(i => { if (i !== fi) D.cells[i].forEach(c => { if (DIST[c] <= on) dot(c); }); });
       ctx.save(); ctx.shadowColor = 'rgba(0,194,224,.8)'; ctx.shadowBlur = s; ctx.fillStyle = '#2fd8f2'; ctx.fill(); ctx.restore();
       // Focus: fills in from the middle, glows, ripples.
-      if (fi !== undefined) {
+      if (fi !== undefined && on >= 1) {
         if (tag) {
           const pulse = reduce ? 1 : 0.85 + 0.15 * Math.sin(t * 2.2);
           const halo = ctx.createRadialGradient(tag.x, tag.y, 0, tag.x, tag.y, s * 8 * pulse);
@@ -146,15 +171,61 @@ export function CityMap({ lit = [], focus, sweep = false, className = '' }: { li
           <span className="sf-city-q" style={{ right: ox + 6, bottom: oy + 4 }}>SE</span>
         </>
       ) : null}
-      {tag && focus ? (
+      {tag && focus && booted ? (
         <span key={focus} className={`sf-city-tag${flip ? ' is-flip' : ''}`} style={{ left: tag.x, top: tag.y }}>
           <i />{focus}
         </span>
       ) : null}
-      {sweep && fi === undefined && s ? <span className="sf-city-tag is-wide" style={{ left: box.w / 2, top: oy + 6 }}>Citywide</span> : null}
+      {sweep && fi === undefined && s && booted ? <span className="sf-city-tag is-wide" style={{ left: box.w / 2, top: oy + 6 }}>Citywide</span> : null}
     </div>
   );
 }
 
 /** True when the dot map knows this community, so callers can skip the sweep. */
 export const onCityMap = (community?: string) => indexOf(community) !== undefined;
+
+/*
+ * Still images of the city for covers and locator thumbnails, drawn once per
+ * look and cached as data URLs. Browser only; returns '' during prerender.
+ */
+const STILLS = new Map<string, string>();
+export function cityStill({ lit = [], focus, size, accent = '#ffdf4f', base = 'rgba(127,178,255,.28)', pad = 0.06 }: {
+  lit?: string[]; focus?: string; size: number; accent?: string; base?: string; pad?: number;
+}): string {
+  if (typeof document === 'undefined') return '';
+  const key = [lit.join('|'), focus, size, accent, base, pad].join('#');
+  const hit = STILLS.get(key);
+  if (hit !== undefined) return hit;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = Math.round(size * dpr);
+  const ctx = cv.getContext('2d');
+  if (!ctx) return '';
+  ctx.scale(dpr, dpr);
+  const inner = size * (1 - pad * 2);
+  const s = Math.min(inner / D.w, inner / D.h);
+  const ox = (size - s * D.w) / 2, oy = (size - s * D.h) / 2;
+  const r = Math.max(0.6, s * 0.34);
+  const litIdx = new Set(lit.map(indexOf).filter((i): i is number => i !== undefined));
+  const fi = indexOf(focus);
+  const draw = (cells: number[], fill: string, glow = 0) => {
+    ctx.save();
+    if (glow) { ctx.shadowColor = fill; ctx.shadowBlur = glow; }
+    ctx.beginPath();
+    for (const c of cells) { const x = ox + ((c % D.w) + 0.5) * s, y = oy + (Math.floor(c / D.w) + 0.5) * s; ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2); }
+    ctx.fillStyle = fill; ctx.fill(); ctx.restore();
+  };
+  draw(ALL.filter(c => OWNER[c] !== fi && !litIdx.has(OWNER[c])), base);
+  draw([...litIdx].filter(i => i !== fi).flatMap(i => D.cells[i]), accent, s * 1.2);
+  if (fi !== undefined) {
+    const [cx, cy] = CENTRE[fi];
+    const x = ox + (cx + 0.5) * s, y = oy + (cy + 0.5) * s;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, s * 9);
+    g.addColorStop(0, 'rgba(255,223,79,.55)'); g.addColorStop(1, 'rgba(255,223,79,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - s * 10, y - s * 10, s * 20, s * 20);
+    draw(D.cells[fi], '#ffdf4f', s * 2);
+  }
+  const url = cv.toDataURL('image/png');
+  STILLS.set(key, url);
+  return url;
+}

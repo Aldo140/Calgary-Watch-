@@ -12,13 +12,13 @@ import { discoveryRepository } from '../../data/discovery';
 import { EVENT_INTERESTS, normalizeInterests, pickWhen } from '../../lib/eventPicks';
 import { entityPath } from '../../lib/discovery';
 import { RSVPS } from '../../lib/plans';
-import { SUPPLY_DAYS, interestSupply, tallyAreas, tallyPlans, type Planned } from '../../lib/memberInsights';
+import { SUPPLY_DAYS, interestSupply, residentsOnly, tallyAreas, tallyPlans, type Planned } from '../../lib/memberInsights';
 import type { DiscoveryEntity } from '../../types/discovery';
 import { Chip, EmptyState, Figure, Panel, StatGrid, StatTile, T, TimeAgo, mono } from './ui';
 import type { AdminData } from '../../hooks/useAdminData';
 import { MembersDirectory } from './MembersDirectory';
 
-type Counts = { accounts?: number; monday?: number; thursday?: number; withArea?: number; suggestions?: number };
+type Counts = { accounts?: number; monday?: number; thursday?: number; withArea?: number; suggestions?: number; organizers?: number };
 const dayFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
 
 /** Every listing the export knows, including ones that have ended or aged out, so old plans keep their names. */
@@ -55,9 +55,10 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
       getCountFromServer(query(collection(database, 'entity_submissions'), where('status', '==', 'pending')))
         .then((s) => s.data().count)
         .catch(() => getDocs(query(collection(database, 'entity_submissions'), where('status', '==', 'pending'), limit(100))).then((s) => s.size).catch(() => undefined)),
-    ]).then(([accounts, monday, thursday, withArea, suggestions]) => setCounts({ accounts, monday, thursday, withArea, suggestions }));
+      count(query(users, where('signupAs', '==', 'organizer'))),
+    ]).then(([accounts, monday, thursday, withArea, suggestions, organizers]) => setCounts({ accounts, monday, thursday, withArea, suggestions, organizers }));
     getDocs(query(users, where('eventsDigestOptIn', '==', true), limit(500)))
-      .then((s) => setThursday(s.docs.map((x) => x.data())))
+      .then((s) => setThursday(residentsOnly(s.docs.map((x) => x.data()))))
       .catch(e=>fail('Reader interests',e));
     getDocs(query(collection(database, RSVPS), orderBy('start', 'desc'), limit(1000)))
       .then((s) => setPlanned(tallyPlans(s.docs.map((x) => x.data()))))
@@ -71,18 +72,22 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
   }, [thursday]);
   const maxInterest = Math.max(1, ...interestMix.map((i) => i.n));
 
-  const homes = useMemo(() => tallyAreas(d.users), [d.users]);
+  const residents = useMemo(() => residentsOnly(d.users), [d.users]);
+  const homes = useMemo(() => tallyAreas(residents), [residents]);
 
   const entities = discoveryRepository.list();
   const supply = useMemo(() => interestSupply(entities, discoveryRepository.occurrences()), [entities]);
   const titleOf = (id: string) => { const live = entities.find((x) => x.id === id); return { live, title: live?.title ?? exported.get(id)?.title }; };
   // Every tile has a fallback from data admin already holds, so none stays blank.
   const allUsersLoaded = d.usersLoaded && d.users.length < 200 && d.users.length >= d.totalUsers;
+  // Organizer accounts (made on /claim pages) are partners, not readers: the audience leaves them out.
+  const organizers = counts.organizers ?? (allUsersLoaded ? d.users.length - residents.length : undefined);
+  const allAccounts = counts.accounts ?? (allUsersLoaded ? d.totalUsers : undefined);
   const shown = {
-    accounts: counts.accounts ?? (allUsersLoaded ? d.totalUsers : undefined),
+    accounts: allAccounts !== undefined ? allAccounts - (organizers ?? 0) : undefined,
     monday: counts.monday ?? (d.digestSubscribersLoaded ? d.digestSubscribers.length : undefined),
     thursday: counts.thursday ?? (thursday && thursday.length<500?thursday.length:undefined),
-    withArea: counts.withArea ?? (allUsersLoaded ? d.users.filter((u) => (u.neighborhood || u.inferredNeighborhood || '').trim()).length : undefined),
+    withArea: counts.withArea ?? (allUsersLoaded ? residents.filter((u) => (u.neighborhood || u.inferredNeighborhood || '').trim()).length : undefined),
     suggestions: counts.suggestions,
   };
   const pct = (n?: number) => (n !== undefined && shown.accounts ? Math.round((n / shown.accounts) * 100) : undefined);
@@ -93,7 +98,7 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
       {view==='directory'?<MembersDirectory />:view==='activity'?<MemberActivity/>:<>
       {Object.entries(readErrors).map(([name,error])=><p role="alert" key={name}>{name}: {error}</p>)}
       <StatGrid>
-        <StatTile label="Accounts" value={shown.accounts} hint={shown.withArea !== undefined ? `${shown.withArea} with a home area (${pct(shown.withArea)}%)` : undefined} />
+        <StatTile label="Resident accounts" value={shown.accounts} hint={[shown.withArea !== undefined ? `${shown.withArea} with a home area (${pct(shown.withArea)}%)` : '', organizers ? `${organizers} organizer ${organizers === 1 ? 'account' : 'accounts'} not counted` : ''].filter(Boolean).join(' · ') || undefined} />
         <StatTile label="Monday email" value={shown.monday} tone="signal" hint={pct(shown.monday) !== undefined ? `${pct(shown.monday)}% of accounts` : undefined} onClick={() => onOpen('planner')} />
         <StatTile label="Event picks" value={shown.thursday} tone="signal" hint={pct(shown.thursday) !== undefined ? `${pct(shown.thursday)}% of accounts` : undefined} />
         <StatTile label="Event suggestions waiting" value={shown.suggestions} tone={shown.suggestions ? 'attention' : 'neutral'} hint="Review in Events & markets" onClick={() => onOpen('content')} />
@@ -149,7 +154,7 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
         </Panel>
       </div>
 
-      <Panel title="Where members live" subtitle={`Home areas across the ${d.users.length} most recent accounts, matched to Calgary communities`}>
+      <Panel title="Where members live" subtitle={`Home areas across the ${residents.length} most recent resident accounts, matched to Calgary communities`}>
         {homes.areas.length ? (
           <div className="p-4 space-y-3">
             <ul className="flex flex-wrap gap-2" aria-label="By quadrant">

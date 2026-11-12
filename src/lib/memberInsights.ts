@@ -9,6 +9,14 @@ import type { DiscoveryEntity } from '../types/discovery';
 
 export type Planned = { id: string; count: number; start: string };
 
+/**
+ * Organizers make their accounts on /claim pages (users.signupAs = 'organizer'). They are
+ * vendors and partners, not readers, so audience numbers leave them out: a market's
+ * sign-up shouldn't read as a resident in Seton who wants markets.
+ */
+export const isResident = (u: { signupAs?: unknown }) => u.signupAs !== 'organizer';
+export const residentsOnly = <T extends { signupAs?: unknown }>(rows: readonly T[]): T[] => rows.filter(isResident);
+
 /** Window for "what's listed" against what readers asked for: the Thursday email's reach and then some. */
 export const SUPPLY_DAYS = 14;
 

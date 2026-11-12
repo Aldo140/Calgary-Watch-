@@ -142,3 +142,44 @@ textarea.bp-input { resize: vertical; min-height: 104px; }
   .bp *, .bp *::before, .bp *::after { animation: none !important; transition: none !important; }
 }
 .bp .bp-card-dark .bp-card-note { color: rgba(255, 255, 255, .72) !important; }
+
+/* Night city behind the hero (CityLights → CityMap). Scoped here so it never
+   leans on /safety's stylesheet. */
+.bp-hero .bp-city { position: absolute; z-index: 0; top: 0; bottom: 0; right: -2%; left: auto; width: 54%; height: auto; pointer-events: none; opacity: .9; }
+.bp-hero-solo .bp-city { width: 60%; right: -6%; }
+.bp-hero .bp-city canvas { width: 100%; height: 100%; display: block; -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
+.bp-hero .bp-city .sf-city-q { display: none; }
+.bp-hero .bp-city .sf-city-tag {
+  position: absolute; z-index: 2; display: inline-flex; align-items: center; padding: 7px 11px; border-radius: 999px;
+  background: var(--yellow); color: var(--ink); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+  font: 800 13px/1 Inter, sans-serif; white-space: nowrap; transform: translate(26px, -50%);
+}
+.bp-hero .bp-city .sf-city-tag i { position: absolute; right: 100%; top: 50%; width: 24px; height: 2px; background: var(--yellow); }
+.bp-hero .bp-city .sf-city-tag.is-flip { transform: translate(calc(-100% - 26px), -50%); }
+.bp-hero .bp-city .sf-city-tag.is-flip i { right: auto; left: 100%; }
+.bp-hero .bp-city.is-quiet .sf-city-tag { display: none; }
+.bp-hero .bp-city + .bp-hero-grid { z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .bp-hero .bp-city .sf-city-tag { animation: bp-tag .45s .2s cubic-bezier(.2, .8, .2, 1) both; }
+  .bp-hero .bp-city canvas { animation: bp-fade 1.2s ease both; }
+  /* Scroll reveal (PageHero's useReveal adds .bp-rv only below the fold). */
+  .bp-rv { opacity: 0; transform: translateY(26px); transition: opacity .6s ease, transform .7s cubic-bezier(.2, .8, .2, 1); }
+  .bp-rv.is-in { opacity: 1; transform: none; }
+  .bp-cards > .bp-rv:nth-child(2) { transition-delay: .08s; }
+  .bp-cards > .bp-rv:nth-child(3) { transition-delay: .16s; }
+  .bp-cards > .bp-rv:nth-child(4) { transition-delay: .24s; }
+  /* Hero copy arrives in a short cascade. */
+  .bp-hero-grid > div:first-child > * { animation: bp-rise .7s cubic-bezier(.2, .8, .2, 1) both; }
+  .bp-hero-grid > div:first-child > :nth-child(2) { animation-delay: .06s; }
+  .bp-hero-grid > div:first-child > :nth-child(3) { animation-delay: .14s; }
+  .bp-hero-grid > div:first-child > :nth-child(4) { animation-delay: .22s; }
+  .bp-hero-grid > div:first-child > :nth-child(5) { animation-delay: .3s; }
+  .bp-hero-aside { animation: bp-rise .8s .2s cubic-bezier(.2, .8, .2, 1) both; }
+}
+@keyframes bp-tag { from { opacity: 0; scale: .6; } }
+@keyframes bp-fade { from { opacity: 0; } }
+@keyframes bp-rise { from { opacity: 0; transform: translateY(18px); } }
+@media (max-width: 960px) {
+  .bp-hero .bp-city, .bp-hero-solo .bp-city { width: 100%; right: -30%; top: -40px; bottom: auto; height: 460px; opacity: .42; }
+  .bp-hero .bp-city .sf-city-tag { display: none; }
+}

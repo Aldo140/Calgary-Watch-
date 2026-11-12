@@ -10,6 +10,7 @@ import { queueDrafts } from './jobs/drafts';
 import { resolveDoubleBookings, autoApprove, publishDue, redraftAndBriefs } from './jobs/posts';
 import { sendApproved, syncReplies } from './jobs/outreach';
 import { isClaudeUnavailable } from './lib/claude';
+import { isOutlookBusy } from './lib/outlook';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota';
 import { flushUsage } from './jobs/usage';
 import { publishFromBackup, reconcileBackup, saveBackup } from './jobs/publishBackup';
@@ -28,6 +29,7 @@ async function step(name: string, run: () => Promise<unknown>) {
   if (quota) return;
   try { await run(); } catch (e) {
     if (isQuotaExhausted(e)) { quota = true; log(`${name}: Firestore quota exhausted; stopping this run.`); return; }
+    if (isOutlookBusy(e)) { log(`${name}: Outlook busy (${e instanceof Error ? e.message : e}); the next run catches up.`); return; }
     if (isClaudeUnavailable(e)) { log(`${name}: skipped, Claude unavailable (the daily health check emails the fix).`); return; }
     failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`);
   }

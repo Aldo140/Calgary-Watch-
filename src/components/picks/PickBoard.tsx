@@ -1,8 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, BadgeCheck, CheckCircle2, History, ExternalLink, MessageCircleQuestion, Phone, ShieldCheck, X } from 'lucide-react';
+import { AlarmClock, ArrowUpRight, BadgeCheck, CalendarCheck, CheckCircle2, Clock3, History, Moon, Receipt, Siren, Sparkles, ExternalLink, MessageCircleQuestion, Phone, ShieldCheck, X } from 'lucide-react';
 import { PICK_CHECKS, type PickCheck } from '../../content/cwPicks';
-import { askFor, CONSENT_TEXT, FOLLOWUP_DAYS, pickDeskPath, recentContacts, recordPickContact, rememberContact, type RecentContact, telHref, validEmail, type Contender, type ContactKind, type ContactVia, type Shelf } from '../../lib/cwPicks';
+import { afterHours, askFor, CONSENT_TEXT, orderFor, proofsFor, type Need, type Proof, FOLLOWUP_DAYS, pickDeskPath, recentContacts, recordPickContact, rememberContact, type RecentContact, telHref, validEmail, type Contender, type ContactKind, type ContactVia, type Shelf } from '../../lib/cwPicks';
 import { PickSeal } from './PickSeal';
 import '../../styles/picks.css';
 
@@ -21,7 +21,11 @@ export function PickBoard({ shelf, via, compact = false }: { shelf: Shelf; via: 
   useEffect(() => { setRecent(recentContacts(shelf.service.id)[0] ?? null); }, [shelf.service.id, sheet]);
   const recentC = recent ? shelf.contenders.find(c => c.key === recent.key) : undefined;
   const others = shelf.contenders.filter(c => c !== shelf.live?.contender);
-  const shown = compact ? others.slice(0, 3) : others;
+  // Late at night the question is "who picks up?", so 24/7 companies lead unless the reader says otherwise.
+  const [late] = useState(() => afterHours());
+  const [need, setNeed] = useState<Need | null>(() => (late ? 'urgent' : null));
+  const ordered = orderFor(others, need);
+  const shown = compact ? ordered.slice(0, 3) : ordered;
   const noun = shelf.service.label.toLowerCase();
   return (
     <div className={`pk${compact ? ' is-compact' : ''}`}>
@@ -31,10 +35,11 @@ export function PickBoard({ shelf, via, compact = false }: { shelf: Shelf; via: 
         <section className="pk-shortlist" aria-label={`${shelf.service.label} in Calgary`}>
           <header className="pk-shortlist-head">
             <h3>{shelf.live ? 'Also in Calgary' : `${others.length} local ${others.length === 1 ? trade(shelf) : noun}`}</h3>
-            <p>A–Z · in their own words · nobody pays to be here</p>
+            <p>{need === 'urgent' ? '24/7 first' : need === 'quote' ? 'Upfront pricing first' : 'A–Z'} · in their own words · nobody pays to be here</p>
           </header>
-          <ul className="pk-cards">
-            {shown.map(c => <Card key={c.key} c={c} onContact={kind => setSheet({ c, kind })} />)}
+          {others.length > 1 ? <NeedPicker need={need} late={late} onChange={setNeed} /> : null}
+          <ul className="pk-cards" key={need ?? 'all'}>
+            {shown.map((c, i) => <Card key={c.key} c={c} i={i} need={need} onContact={kind => setSheet({ c, kind })} />)}
           </ul>
         </section>
       ) : (
@@ -123,11 +128,41 @@ const hue = (key: string) => [...key].reduce((h, ch) => (h * 31 + ch.charCodeAt(
 
 const domain = (url?: string) => { try { return url ? new URL(url).hostname.replace(/^www\./, '') : ''; } catch { return ''; } };
 
-/** One company: who, where, one sourced fact, and the two ways to reach them as big thumb targets. */
-function Card({ c, onContact }: { c: Contender; onContact: (k: ContactKind) => void }) {
-  const site = domain(c.website);
+const NEEDS: Array<{ id: Need; label: string; note: string; icon: typeof Siren }> = [
+  { id: 'urgent', label: 'Something’s wrong now', note: '24/7 first', icon: Siren },
+  { id: 'quote', label: 'I want a quote', note: 'Upfront pricing first', icon: Receipt },
+  { id: 'routine', label: 'Planning ahead', note: 'A–Z, take your time', icon: CalendarCheck },
+];
+
+/** "What's going on?": one tap reorders the list for the reader's situation. Nothing hidden, only the order changes. */
+function NeedPicker({ need, late, onChange }: { need: Need | null; late: boolean; onChange: (n: Need | null) => void }) {
   return (
-    <li className="pk-c">
+    <div className="pk-need">
+      <p className="pk-need-q">{late ? <><Moon size={14} aria-hidden="true" /> It’s after hours in Calgary. Who picks up comes first.</> : <><Sparkles size={14} aria-hidden="true" /> What’s going on?</>}</p>
+      <div className="pk-need-opts" role="radiogroup" aria-label="What’s going on?">
+        {NEEDS.map(n => {
+          const on = need === n.id;
+          const I = n.icon;
+          return (
+            <button key={n.id} type="button" role="radio" aria-checked={on} className={`pk-need-opt${on ? ' is-on' : ''}`} onClick={() => onChange(on ? null : n.id)}>
+              <I size={18} aria-hidden="true" /><b>{n.label}</b><small>{n.note}</small>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const PROOF_ICON: Partial<Record<Proof['id'], typeof Siren>> = { 'always-on': AlarmClock, since: Clock3, upfront: Receipt, award: BadgeCheck, licensed: BadgeCheck, verified: BadgeCheck };
+
+/** One company: who, where, one sourced fact, and the two ways to reach them as big thumb targets. */
+function Card({ c, i, need, onContact }: { c: Contender; i: number; need: Need | null; onContact: (k: ContactKind) => void }) {
+  const site = domain(c.website);
+  const proofs = proofsFor(c);
+  const lit = (p: Proof) => (need === 'urgent' && p.id === 'always-on') || (need === 'quote' && p.id === 'upfront');
+  return (
+    <li className={`pk-c${proofs.some(lit) ? ' is-fit' : ''}`} style={{ ['--i' as string]: i }}>
       <div className="pk-c-top">
         <span className="pk-mono" style={{ ['--h' as string]: hue(c.key) }} aria-hidden="true">{initials(c.name)}</span>
         <div className="pk-c-who">
@@ -136,10 +171,15 @@ function Card({ c, onContact }: { c: Contender; onContact: (k: ContactKind) => v
         </div>
         {c.verified ? <span className="pk-verified"><BadgeCheck size={13} aria-hidden="true" /> Verified</span> : null}
       </div>
+      {proofs.length ? (
+        <ul className="pk-proofs" aria-label="In their own words">
+          {proofs.slice(0, 4).map(p => { const I = PROOF_ICON[p.id]; return <li key={p.id} className={lit(p) ? 'is-lit' : ''}>{I ? <I size={12} aria-hidden="true" /> : null}{p.label}</li>; })}
+        </ul>
+      ) : null}
       {c.fact ? <p className="pk-c-fact">{c.fact.text} <a className="pk-cite" href={c.fact.source} {...(c.fact.source.startsWith('/') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>{c.fact.label}</a></p> : null}
       <div className={`pk-c-go${c.phone && c.website ? '' : ' is-one'}`}>
         {c.phone ? <button type="button" className="pk-btn is-hi" onClick={() => onContact('call')}><Phone size={17} aria-hidden="true" /> Call</button> : null}
-        {c.website ? <button type="button" className={`pk-btn${c.phone ? '' : ' is-hi'}`} onClick={() => onContact('site')} aria-label={`${c.name} website`}>{site || 'Website'} <ExternalLink size={15} aria-hidden="true" /></button> : null}
+        {c.website ? <button type="button" className={`pk-btn${c.phone ? '' : ' is-hi'}`} onClick={() => onContact('site')} aria-label={`${c.name} website`}><span className="pk-c-site">{site || 'Website'}</span> <ExternalLink size={15} aria-hidden="true" /></button> : null}
       </div>
     </li>
   );
@@ -180,11 +220,18 @@ function ContactSheet({ shelf, c, kind, via, onClose }: { shelf: Shelf; c: Conte
             <h3 id={`${id}-t`}>{c.name}</h3>
           </div>
         </div>
+        <div className="pk-perf" aria-hidden="true" />
         {done ? (
-          <div className="pk-sheet-done" role="status">
-            <CheckCircle2 size={22} aria-hidden="true" />
-            <p>{done === 'saved' ? <><b>We’ll check in once, in 7 days.</b> Good luck with the job.</> : <><b>Good luck with the job.</b> Tell us how it went any time: reply to any CalgaryWatch email.</>}</p>
-            <button type="button" className="pk-btn" onClick={onClose}>Back to the list</button>
+          <div className="pk-stub" role="status">
+            <div className="pk-stub-stamp" aria-hidden="true">{done === 'saved' ? <>Check-in<br />booked</> : <>Good<br />luck</>}</div>
+            <p className="pk-eyebrow">Your call ticket</p>
+            <dl>
+              <div><dt>Company</dt><dd>{c.name}</dd></div>
+              <div><dt>{kind === 'call' ? 'Called' : 'Visited'}</dt><dd>{DAYFMT.format(Date.now())}</dd></div>
+              <div><dt>Check-in</dt><dd>{done === 'saved' ? DAYFMT.format(Date.now() + FOLLOWUP_DAYS * 86_400_000) : 'Not asked'}</dd></div>
+            </dl>
+            <p>{done === 'saved' ? 'One email, one question: how did it go? Your answer decides who earns the CalgaryWatch Pick.' : 'Tell us how it went any time: reply to any CalgaryWatch email.'}</p>
+            <button type="button" className="pk-btn" onClick={onClose}><CheckCircle2 size={16} aria-hidden="true" /> Back to the list</button>
           </div>
         ) : (
           <>

@@ -147,3 +147,28 @@ describe('reviews', () => {
     assert.equal(placeFromLink('nowhere', 'knight-plumbing'), null);
   });
 });
+
+describe('concierge', () => {
+  it('reads proof chips only from what the company published', async () => {
+    const { proofsFor } = await import('../src/lib/cwPicks');
+    const knight = shelfFor('plumbing', [], NOW)!.contenders.find(c => c.name === 'Knight Plumbing')!;
+    assert.deepEqual(proofsFor(knight).map(p => p.label), ['Says 24/7', 'Since 1970', 'Says licensed']);
+    const pros = shelfFor('plumbing', [], NOW)!.contenders.find(c => c.name === 'The Gentlemen Pros')!;
+    assert.ok(proofsFor(pros).some(p => p.id === 'award'), 'cited award counts');
+    assert.deepEqual(proofsFor({ fact: { text: 'We fix things.', source: '/x', label: 'x' } }), []);
+  });
+  it('orders by need without dropping anyone', async () => {
+    const { orderFor } = await import('../src/lib/cwPicks');
+    const all = shelfFor('plumbing', [], NOW)!.contenders;
+    const urgent = orderFor(all, 'urgent').map(c => c.name);
+    assert.equal(urgent.length, all.length);
+    assert.deepEqual(urgent.slice(0, 2).sort(), ['Knight Plumbing', 'Mr. Mike’s Plumbing']);
+    assert.ok(['Mr. Mike’s Plumbing', 'Mr. Rooter Plumbing of Calgary'].includes(orderFor(all, 'quote')[0].name));
+    assert.deepEqual(orderFor(all, null).map(c => c.name), all.map(c => c.name));
+  });
+  it('knows Calgary office hours', async () => {
+    const { afterHours } = await import('../src/lib/cwPicks');
+    assert.equal(afterHours(Date.parse('2026-11-12T18:00:00Z')), false, 'noon MT');
+    assert.equal(afterHours(Date.parse('2026-11-13T04:00:00Z')), true, '10 pm MT');
+  });
+});

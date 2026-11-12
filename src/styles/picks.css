@@ -360,3 +360,101 @@
   .pkh-pill.is-live { position: absolute; top: 12px; right: 10px; }
   .pkh-tile-busy { top: -9px; right: 8px; }
 }
+
+/* ─── Concierge: "What's going on?" ────────────────────────────────────── */
+.pk-need { display: grid; gap: 10px; }
+.pk-need-q { display: flex; align-items: center; gap: 7px; font: 600 12px/1.3 var(--pk-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--pk-muted); }
+.pk-need-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pk-need-opt { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; align-items: center; text-align: left; min-height: 64px; padding: 10px 12px; border: 2px solid var(--pk-ink); border-radius: 16px; background: #fff; color: var(--pk-ink); cursor: pointer; transition: transform .14s, box-shadow .14s, background .18s, color .18s; -webkit-tap-highlight-color: transparent; }
+.pk-need-opt svg { grid-row: span 2; }
+.pk-need-opt b { font: 800 14.5px/1.15 var(--pk-display); letter-spacing: -.01em; }
+.pk-need-opt small { font: 500 11.5px/1.2 var(--pk-mono); color: var(--pk-muted); }
+.pk-need-opt:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--pk-ink); }
+.pk-need-opt:active { transform: scale(.97); box-shadow: none; }
+.pk-need-opt.is-on { background: var(--pk-navy); color: #fff; box-shadow: 3px 3px 0 var(--pk-yellow); }
+.pk-need-opt.is-on small { color: var(--pk-yellow); }
+.pk-need-opt.is-on svg { color: var(--pk-yellow); animation: pk-wiggle .5s ease; }
+.bo .pk-need-q { color: rgba(255, 255, 255, .75); }
+
+/* Proof chips: what the company says, at a glance. */
+.pk-proofs { display: flex; flex-wrap: wrap; gap: 6px; }
+.pk-proofs li { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border: 1.5px solid #d9d2c1; border-radius: 999px; background: var(--pk-paper); font: 600 11px/1.2 var(--pk-mono); color: var(--pk-body); transition: background .25s, border-color .25s; }
+.pk-proofs li.is-lit { border-color: var(--pk-ink); background: var(--pk-yellow); color: var(--pk-ink); }
+.pk-c.is-fit { box-shadow: 4px 4px 0 var(--pk-cyan); }
+
+/* Cards deal in, one after another, whenever the order changes. */
+.pk-c { animation: pk-deal .5s cubic-bezier(.2, .9, .3, 1.15) both; animation-delay: calc(var(--i, 0) * 70ms); }
+@keyframes pk-deal { from { opacity: 0; transform: translateY(18px) rotate(-1.2deg) scale(.98); } }
+@keyframes pk-wiggle { 30% { transform: rotate(-14deg); } 60% { transform: rotate(10deg); } }
+
+/* ─── The call ticket ──────────────────────────────────────────────────── */
+.pk-perf { position: relative; height: 2px; margin: 2px -22px; background: repeating-linear-gradient(90deg, var(--pk-ink) 0 7px, transparent 7px 13px); }
+.pk-perf::before, .pk-perf::after { content: ''; position: absolute; top: 50%; width: 22px; height: 22px; translate: 0 -50%; border: 2px solid var(--pk-ink); border-radius: 50%; background: rgba(6, 22, 47, .9); }
+.pk-perf::before { left: -13px; } .pk-perf::after { right: -13px; }
+.pk-stub { position: relative; display: grid; gap: 12px; padding: 4px 0 2px; animation: pk-fade .3s ease-out; }
+.pk-stub dl { display: grid; gap: 0; margin: 0; border: 2px solid var(--pk-ink); border-radius: 16px; background: #fff; overflow: hidden; }
+.pk-stub dl div { display: flex; justify-content: space-between; gap: 12px; padding: 11px 14px; }
+.pk-stub dl div + div { border-top: 1.5px dashed #d9d2c1; }
+.pk-stub dt { font: 600 11px var(--pk-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--pk-muted); }
+.pk-stub dd { margin: 0; font: 800 15px var(--pk-display); text-align: right; }
+.pk-stub > p:not(.pk-eyebrow) { font: 400 14px/1.5 Inter, sans-serif; color: var(--pk-body); }
+.pk-stub-stamp { position: absolute; top: -6px; right: 0; display: grid; place-items: center; width: 92px; height: 92px; border: 3px double #c4271b; border-radius: 50%; color: #c4271b; font: 800 13px/1.05 var(--pk-display); text-align: center; text-transform: uppercase; letter-spacing: .04em; transform: rotate(-14deg); animation: pk-stamp .45s cubic-bezier(.3, 1.6, .5, 1) .15s both; mix-blend-mode: multiply; }
+@keyframes pk-stamp { from { opacity: 0; transform: rotate(-30deg) scale(2.2); } }
+
+/* Seal: the open ring draws in; the live seal lands like a stamp. */
+.pk-seal.is-open .pk-seal-track { stroke-dasharray: 195; animation: pk-draw 1.1s ease-out both; }
+.pk-seal.is-live { animation: pk-stamp-seal .6s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes pk-draw { from { stroke-dashoffset: 195; } }
+@keyframes pk-stamp-seal { from { opacity: 0; transform: scale(1.6) rotate(-20deg); } }
+
+/* Small phones (320–360): everything still one thumb wide. */
+@media (max-width: 400px) {
+  .pk-need-opts { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .pk-need-opt { min-height: 52px; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto; }
+  .pk-need-opt svg { grid-row: auto; }
+  .pk-need-opt small { text-align: right; }
+  .pk-c-go { grid-template-columns: minmax(0, 1fr); }
+  .pk-c-top { grid-template-columns: auto minmax(0, 1fr); }
+  .pk-c-top .pk-verified { grid-column: 1 / -1; justify-self: start; }
+  .pk-mono { width: 42px; height: 42px; font-size: 15px; border-radius: 13px; }
+  .pk-stub-stamp { width: 76px; height: 76px; font-size: 11px; }
+}
+.pk.is-compact .pk-need-opt small { display: none; }
+.pk.is-compact .pk-need-opt { min-height: 48px; grid-template-columns: auto minmax(0, 1fr); }
+@media (prefers-reduced-motion: reduce) {
+  .pk-c, .pk-stub, .pk-stub-stamp, .pk-seal.is-live, .pk-seal.is-open .pk-seal-track, .pk-need-opt.is-on svg { animation: none !important; }
+}
+
+/* Sliding tab highlight (phones and tablets). */
+@media (max-width: 960px) {
+  .pkd-tabs { position: sticky; }
+  .pkd-tabs-pill { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 3); border-radius: 999px; background: var(--pk-navy); transform: translateX(calc(var(--on, 0) * 100%)); transition: transform .35s cubic-bezier(.3, 1.3, .5, 1); }
+  .pkd-tabs a { position: relative; z-index: 1; transition: color .25s; }
+  .pkd-tabs a:first-child { background: none; color: var(--pk-ink); }
+  .pkd-tabs a[aria-current='true'] { color: #fff; }
+  .pkd-tabs a b { transition: background .25s; }
+}
+@media (max-width: 380px) {
+  .pkd-tabs a { font-size: 11.5px; padding: 0 4px; gap: 4px; }
+  .pkd-tabs b { display: none; }
+}
+
+/* Hub: busy-now as cards; a swipeable row on phones. */
+.pkh-busy a { gap: 10px; padding: 8px 14px 8px 8px; }
+.pkh-busy-ico { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: var(--pk-yellow); color: var(--pk-ink); }
+.pkh-busy a > span:last-child { display: grid; gap: 1px; text-align: left; }
+.pkh-busy a small { font: 500 11px var(--pk-mono); opacity: .75; }
+.pkh-busy li { animation: pk-deal .5s cubic-bezier(.2, .9, .3, 1.15) both; animation-delay: calc(var(--i, 0) * 80ms); }
+@media (max-width: 640px) {
+  .pkh-busy { display: block; padding: 14px 0 14px 14px; border-radius: 20px; }
+  .pkh-busy p { padding-right: 14px; margin-bottom: 10px !important; }
+  .pkh-busy ul { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 14px 4px 0; scrollbar-width: none; }
+  .pkh-busy ul::-webkit-scrollbar { display: none; }
+  .pkh-busy li { flex: none; scroll-snap-align: start; }
+  .pkh-busy a { min-width: 150px; border-radius: 14px; }
+  .pkh .bp-hero h1 { font-size: clamp(38px, 11vw, 50px); }
+  .pkh .bp-facts li:nth-child(n+3) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .pkh-busy li { animation: none; } }
+.pk-c-site { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-c-go .pk-btn svg { flex: none; }

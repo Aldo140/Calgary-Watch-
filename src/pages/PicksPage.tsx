@@ -78,7 +78,14 @@ export default function PicksPage() {
             {!filter && busy.length ? (
               <div className="pkh-busy">
                 <p><b>{MONTH.format(now)}</b> in Calgary, book these first</p>
-                <ul>{busy.map(s => <li key={s.service.id}><Link to={pickDeskPath(s.service.id)}><ServiceIcon id={s.service.id} size={15} />{s.service.label}</Link></li>)}</ul>
+                <ul>{busy.map((s, i) => (
+                  <li key={s.service.id} style={{ ['--i' as string]: i }}>
+                    <Link to={pickDeskPath(s.service.id)}>
+                      <span className="pkh-busy-ico"><ServiceIcon id={s.service.id} size={18} /></span>
+                      <span><b>{s.service.label}</b><small>{s.contenders.length ? `${s.contenders.length} local` : 'Desk open'}</small></span>
+                    </Link>
+                  </li>
+                ))}</ul>
               </div>
             ) : null}
             {GROUPS.map(g => {

@@ -417,3 +417,12 @@
 .cw-map .lv-quad-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 11.5px/1.2 var(--lvf-sans); color: var(--lvf-on-navy); }
 .cw-map .lv-quad[data-empty='true'] .lv-quad-top span, .cw-map .lv-quad[data-empty='true'] .lv-quad-sub { opacity: .6; }
 .cw-map .lv-quads-note { margin-top: 9px !important; font: 500 11.5px/1.35 var(--lvf-sans); color: var(--lvf-on-navy-muted); }
+
+/* The city behind the briefing: every report a cyan dot on the night map. */
+.cw-map .lv-brief { position: relative; isolation: isolate; }
+.cw-map .lv-brief > :not(.lv-brief-city) { position: relative; z-index: 1; }
+.cw-map .lv-brief-city {
+  position: absolute !important; z-index: 0; top: 10px; right: 6px; width: 42%; max-width: 170px; height: 190px; pointer-events: none;
+  -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%); mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+  opacity: .9;
+}

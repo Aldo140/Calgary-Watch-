@@ -17,6 +17,8 @@ import { buildAlertDeck, splitCityAlerts } from '@/src/lib/mapAlerts';
 import { QUADRANT_VIEW } from '@/src/lib/cityQuadrants';
 import { AlertBadge, AlertSheet, AlertStrip } from '@/src/components/map/CityAlerts';
 import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
+import { MapBoot } from '@/src/components/map/MapBoot';
+import { pulseHits } from '@/src/components/map/CityPulse';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible, isCommunityFacingIncident } from '@/src/types';
@@ -2070,6 +2072,10 @@ export default function MapPage() {
     () => feedIncidents.filter((i) => selectedCategory === 'all' || i.category === selectedCategory).length,
     [feedIncidents, selectedCategory],
   );
+  const bootHits = useMemo(
+    () => pulseHits(feedIncidents.filter((i) => selectedCategory === 'all' || i.category === selectedCategory)),
+    [feedIncidents, selectedCategory],
+  );
 
   /** Phone category chips: per-type counts inside the current time window. */
   const { phoneCategoryOptions, phoneCategoryTotal } = useMemo(() => {
@@ -3481,6 +3487,8 @@ export default function MapPage() {
             aria-hidden="true"
           />
         )}
+
+        <MapBoot hits={bootHits} count={feedCount} label={windowWord(timeWindow)} />
 
         {/* Mobile Bottom Sheet */}
         <MobileMapSheet

@@ -20,6 +20,8 @@ import { useSheetDrag, type SheetState } from '@/src/hooks/useSheetDrag';
 import { isRecentIncident, resolveDefaultSort, shouldAutoResolveNearest, sortIncidents, type SortBy } from '@/src/lib/feed';
 import { getDistance } from '@/src/lib/geo';
 import { CATEGORY, LIVE, MAP } from '@/src/lib/tokens';
+import { CityPulse, pulseHits } from '@/src/components/map/CityPulse';
+import { cellAt } from '@/src/lib/cityDots';
 
 const SORT_KEY = 'cw_sortBy';
 const FEED_FILTER_KEY = 'cw_feedFilter';
@@ -297,15 +299,28 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
   }, [hidden]);
 
   const neighborhoodPulse = useNeighborhoodPulse(incidents);
-  const latestLead = useMemo(() => {
-    let best: Incident | null = null;
+  // The newest crime and emergency headlines. The closed sheet rotates
+  // through them so it says what is happening, not only how much.
+  const leads = useMemo(() => {
+    const out: Incident[] = [];
     for (const i of incidents) {
       if (i.category !== 'crime' && i.category !== 'emergency') continue;
       if (selectedCategory !== 'all' && i.category !== selectedCategory) continue;
-      if (!best || i.timestamp > best.timestamp) best = i;
+      out.push(i);
     }
-    return best;
+    return out.sort((a, b) => b.timestamp - a.timestamp).slice(0, 5);
   }, [incidents, selectedCategory]);
+  const [leadAt, setLeadAt] = useState(0);
+  useEffect(() => { setLeadAt(0); }, [leads]);
+  useEffect(() => {
+    if (leads.length < 2 || state === 'raised' || hidden) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const t = window.setInterval(() => { if (!document.hidden) setLeadAt(k => (k + 1) % leads.length); }, 4800);
+    return () => window.clearInterval(t);
+  }, [leads, state, hidden]);
+  const latestLead = leads[leadAt % Math.max(1, leads.length)] ?? null;
+  const hits = useMemo(() => pulseHits(incidents), [incidents]);
+  const leadCell = latestLead && typeof latestLead.lat === 'number' ? cellAt(latestLead.lat, latestLead.lng) : undefined;
 
   const neighborhoods = useMemo(() => {
     const seen = new Set<string>();
@@ -455,6 +470,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             aria-expanded={isRaised}
             className="lv-sheet-peek"
           >
+            <CityPulse hits={hits} focus={leadCell} fps={30} glow={0.45} className="lv-sheet-city" />
             <span className="min-w-0 flex-1">
               <span className="lv-sheet-count block">
                 {feedCount} report{feedCount !== 1 ? 's' : ''}
@@ -463,7 +479,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
               {/* The newest crime or emergency, so the closed sheet already
                   says what is happening rather than only how much. */}
               {latestLead ? (
-                <span className="lv-sheet-lead block">
+                <span key={latestLead.id} className="lv-sheet-lead block">
                   <i style={{ background: latestLead.category === 'emergency' ? CATEGORY.emergency : CATEGORY.crime }} aria-hidden="true" />
                   {latestLead.title}
                 </span>

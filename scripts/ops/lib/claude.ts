@@ -19,6 +19,9 @@ function anthropic(): Anthropic {
   return client;
 }
 
+/** A rejected or missing-credit key: reported once in the daily health check, not a job failure every run. */
+export const isClaudeUnavailable = (e: unknown) => /invalid x-api-key|authentication_error|credit balance/i.test(e instanceof Error ? e.message : String(e));
+
 /** Whether Claude answers right now. A key can be set but out of credits, which stops new posts. */
 export async function claudeStatus(): Promise<{ ok: boolean; detail: string }> {
   if (!claudeConfigured()) return { ok: false, detail: 'No ANTHROPIC_API_KEY; drafts use fixed templates.' };

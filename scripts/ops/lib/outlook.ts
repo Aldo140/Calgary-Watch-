@@ -30,7 +30,8 @@ async function call(path: string, init: RequestInit = {}): Promise<any> {
   });
   if (res.status === 202 || res.status === 204) return null;
   const body: any = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(`Outlook: ${body.error?.message ?? res.status}`);
+  // Graph sometimes answers with an empty message (e.g. 500 UnknownError), so always name the status and code.
+  if (!res.ok) throw new Error(`Outlook: ${res.status} ${body.error?.code ?? ''} ${body.error?.message || ''}`.trim());
   return body;
 }
 
@@ -60,22 +61,44 @@ export async function replyInThread(conversationId: string, text: string): Promi
 
 export interface InboundMessage { id: string; conversationId: string; from: string; subject: string; text: string; receivedAt: number }
 
-/** Inbox messages received since `since`, newest last. */
+/**
+ * Inbox messages received since `since`, newest last.
+ * Lists ids first, then reads each body on its own: Graph can fail a whole page
+ * (500 with an empty message) when one message's body won't convert to text, and
+ * that used to stop every reply from being matched.
+ */
 export async function inboxSince(since: number): Promise<InboundMessage[]> {
   const filter = encodeURIComponent(`receivedDateTime ge ${new Date(since).toISOString()}`);
   const out: InboundMessage[] = [];
-  let next: string | null = `/users/${mailbox()}/mailFolders/inbox/messages?$filter=${filter}&$orderby=receivedDateTime asc&$top=50&$select=id,conversationId,from,subject,body,receivedDateTime`;
+  let next: string | null = `/users/${mailbox()}/mailFolders/inbox/messages?$filter=${filter}&$orderby=receivedDateTime asc&$top=50&$select=id,conversationId,from,subject,bodyPreview,receivedDateTime`;
   while (next && out.length < 500) {
-    const page = await call(next, { headers: { Prefer: 'outlook.body-content-type="text"' } });
+    const page = await call(next);
     for (const m of page.value ?? []) {
       out.push({
         id: m.id, conversationId: m.conversationId, from: String(m.from?.emailAddress?.address ?? '').toLowerCase(),
-        subject: m.subject ?? '', text: String(m.body?.content ?? '').slice(0, 20_000), receivedAt: Date.parse(m.receivedDateTime),
+        subject: m.subject ?? '', text: await messageText(m.id, String(m.bodyPreview ?? '')), receivedAt: Date.parse(m.receivedDateTime),
       });
     }
     next = page['@odata.nextLink'] ? String(page['@odata.nextLink']).replace(GRAPH, '') : null;
   }
   return out;
+}
+
+/** One message's body as text; falls back to the HTML body with tags stripped, then to the preview. */
+async function messageText(id: string, preview: string): Promise<string> {
+  const path = `/users/${mailbox()}/messages/${encodeURIComponent(id)}?$select=body`;
+  try {
+    const m = await call(path, { headers: { Prefer: 'outlook.body-content-type="text"' } });
+    return String(m.body?.content ?? '').slice(0, 20_000);
+  } catch {
+    try {
+      const m = await call(path);
+      const html = String(m.body?.content ?? '');
+      return html.replace(/<(style|script)[^>]*>[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 20_000);
+    } catch {
+      return preview;
+    }
+  }
 }
 
 /** Explicitly read-only mailbox audit for owner-requested partner conversations, including Sent Items. */

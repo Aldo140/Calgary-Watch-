@@ -12,7 +12,7 @@ import { safetyPath, safetyTopic } from '../lib/safety';
 import { communitiesFor, headlinesFor, type CrimeNewsFile, type SafetyHeadline } from '../lib/safetyNews';
 import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 import news from '../generated/crime-news.json';
-import { CityMap, onCityMap } from '../components/safety/CityMap';
+import { CityMap, cityStill, onCityMap } from '../components/safety/CityMap';
 import NotFoundPage from './NotFoundPage';
 import '../styles/safety.css';
 
@@ -324,6 +324,7 @@ function Wire({ items, now, empty, showTopic = false, filter = false, step = 12 
                 <li key={h.url} className="sf-item" style={{ '--i': Math.min(k++, 10) } as CSSProperties}>
                   <time className="sf-item-time" dateTime={h.publishedAt}>{clock(h.publishedAt)}</time>
                   <div className="sf-item-body">
+                    {h.community && onCityMap(h.community) ? <Locator community={h.community} /> : null}
                     <a href={h.url} target="_blank" rel="noopener noreferrer" className="sf-item-link">
                       <strong>{h.title}</strong>
                       <ArrowUpRight size={18} aria-hidden="true" />
@@ -547,36 +548,63 @@ function TopicPage({ topic, now }: { topic: SafetyTopic; now: number }) {
 
 /* ---------- index ---------- */
 
+const ACCENTS = ['#ffdf4f', '#00c2e0', '#7fb2ff', '#b9a4ff', '#5be3a6', '#ffab76'];
+
+/** A still of the city, drawn after first paint so it never blocks the page. */
+function useStill(opts: Parameters<typeof cityStill>[0], ready = true) {
+  const [url, setUrl] = useState('');
+  const key = JSON.stringify(opts);
+  useEffect(() => {
+    if (!ready) return;
+    const id = window.requestAnimationFrame(() => setUrl(cityStill(opts)));
+    return () => window.cancelAnimationFrame(id);
+  }, [key, ready]); // eslint-disable-line react-hooks/exhaustive-deps
+  return url;
+}
+
+function Locator({ community }: { community: string }) {
+  const [ref, seen] = useInView<HTMLSpanElement>('200px');
+  const url = useStill({ focus: community, size: 64, base: 'rgba(127,178,255,.3)', pad: 0.04 }, seen);
+  return <span ref={ref} className="sf-loc" aria-hidden="true">{url ? <img src={url} alt="" width={64} height={64} /> : null}</span>;
+}
+
+function TopicCover({ t, n, bins, places, k }: { t: SafetyTopic; n: number; bins: number[]; places: string[]; k: number }) {
+  const Icon = iconFor(t.slug);
+  const accent = ACCENTS[k % ACCENTS.length];
+  const [ref, seen] = useInView<HTMLLIElement>('300px');
+  const url = useStill({ lit: places, size: 260, accent, base: 'rgba(170,200,250,.42)' }, seen);
+  const max = Math.max(1, ...bins);
+  return (
+    <li ref={ref} style={{ '--i': k, '--acc': accent } as CSSProperties}>
+      <Link to={safetyPath(t)} className="sf-cover">
+        <span className="sf-cover-art" aria-hidden="true">{url ? <img src={url} alt="" /> : null}</span>
+        <span className="sf-cover-icon" aria-hidden="true"><Icon size={20} /></span>
+        <span className="sf-cover-n">{n ? <><b>{n}</b> {n === 1 ? 'headline' : 'headlines'} · 30 days</> : 'What to do · who to call'}</span>
+        <strong>{t.label}</strong>
+        <span className="sf-spark" aria-hidden="true">
+          {bins.map((b, d) => <i key={d} className={b ? 'on' : ''} style={{ '--h': b ? 0.25 + 0.75 * (b / max) : 0.12, '--d': d } as CSSProperties} />)}
+        </span>
+        <span className="sf-cover-go" aria-hidden="true"><ArrowUpRight size={18} /></span>
+      </Link>
+    </li>
+  );
+}
+
 function TopicGrid({ now }: { now: number }) {
   const days = 30;
   const rows = SAFETY_TOPICS.map(t => {
     const bins = Array.from({ length: days }, () => 0);
+    const places = new Set<string>();
     for (const h of NEWS.items) {
       if (!h.topics.includes(t.slug)) continue;
       const d = Math.floor((now - Date.parse(h.publishedAt)) / DAY);
-      if (d >= 0 && d < days) bins[days - 1 - d] += 1;
+      if (d >= 0 && d < days) { bins[days - 1 - d] += 1; if (h.community) places.add(h.community); }
     }
-    return { t, bins, n: bins.reduce((a, b) => a + b, 0) };
+    return { t, bins, n: bins.reduce((a, b) => a + b, 0), places: [...places] };
   });
   return (
-    <ul className="sf-grid">
-      {rows.map(({ t, bins, n }, k) => {
-        const Icon = iconFor(t.slug);
-        const max = Math.max(1, ...bins);
-        return (
-          <li key={t.slug} style={{ '--i': k } as CSSProperties}>
-            <Link to={safetyPath(t)}>
-              <span className="sf-grid-icon" aria-hidden="true"><Icon size={22} /></span>
-              <strong>{t.label}</strong>
-              <small>{n ? `${n} ${n === 1 ? 'headline' : 'headlines'} · 30 days` : 'What to do and who to call'}</small>
-              <span className="sf-spark" aria-hidden="true">
-                {bins.map((b, d) => <i key={d} className={b ? 'on' : ''} style={{ '--h': b ? 0.25 + 0.75 * (b / max) : 0.12, '--d': d } as CSSProperties} />)}
-              </span>
-              <ArrowUpRight className="sf-grid-go" size={18} aria-hidden="true" />
-            </Link>
-          </li>
-        );
-      })}
+    <ul className="sf-covers">
+      {rows.map((r, k) => <TopicCover key={r.t.slug} {...r} k={k} />)}
     </ul>
   );
 }
@@ -617,7 +645,7 @@ function IndexPage({ now }: { now: number }) {
         </Section>
 
         <Section id="sf-topics-h" className="sf-topics-sec">
-          <Head id="sf-topics-h" kicker="By topic" title={<>What are you <em>looking for?</em></>}>Each page has recent headlines, what to do and who to call. The bars are headlines per day over the last 30 days.</Head>
+          <Head id="sf-topics-h" kicker="By topic" title={<>What are you <em>looking for?</em></>}>Each cover lights the communities its last 30 days of headlines named. The bars underneath are headlines per day.</Head>
           <TopicGrid now={now} />
         </Section>
 

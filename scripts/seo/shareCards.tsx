@@ -210,7 +210,7 @@ function Card({ card, photo, logo }: { card: ShareCard; photo: string | null; lo
 async function run() {
   const started = Date.now();
   const fonts = await loadFonts();
-  const logo = dataUri(await sharp(join(ROOT, 'public/images/brand/calgarywatch-city-spark-v2.webp')).resize(120, 120).png().toBuffer(), 'png');
+  const logo = dataUri(await sharp(join(ROOT, 'brand/mark/calgarywatch-badge.svg'), { density: 300 }).resize(120, 120).png().toBuffer(), 'png');
   let cards = allShareCards(discoveryRepository);
   if (ONLY) { const want = new Set(ONLY.split(',').map(cardPath)); cards = cards.filter(c => want.has(c.path)); }
 
@@ -234,7 +234,7 @@ async function run() {
         // The page's og:image already names this file; the site picture beats a broken preview.
         try {
           await mkdir(dirname(join(OUT, card.path)), { recursive: true });
-          await writeFile(join(OUT, card.path), await readFile(join(ROOT, 'public/images/hero/calgarywatch-social-v1.jpg')));
+          await writeFile(join(OUT, card.path), await readFile(join(ROOT, 'public/images/hero/calgarywatch-site-wide.jpg')));
         } catch { /* nothing more to do */ }
       }
     }

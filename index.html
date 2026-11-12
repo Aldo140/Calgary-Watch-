@@ -29,32 +29,35 @@
 
     <title>What's happening in Calgary? | CalgaryWatch</title>
     
-    <!-- Icons — relative paths work with Vite `base` (e.g. GitHub project Pages /RepoName/).
-         Rebuild with `node scripts/brand/make-icons.mjs`. The SVG is the city-spark mark
-         simplified for 16px; the ICO covers old browsers and anything that asks for /favicon.ico. -->
-    <link rel="icon" href="./favicon.ico" sizes="48x48" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="icon" type="image/png" href="./favicon-32.png" sizes="32x32" />
-    <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180" />
-    <link rel="manifest" href="./manifest.json" />
+    <!-- Icons: the CalgaryWatch badge. Rebuild with `npm run brand:icons` (sources in brand/mark/).
+         Root-absolute paths: relative ones resolved under /local/… and /events/… and 404'd on every
+         nested page. Google's search-result icon reads these rel="icon" links from the homepage and
+         wants a square that is a multiple of 48px, hence the 96 and 192 PNGs. -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon-96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192" />
+    <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="msapplication-TileColor" content="#06162f" />
-    <meta name="msapplication-TileImage" content="./icon-tile-310.png" />
+    <meta name="msapplication-TileImage" content="/icon-tile-310.png" />
     
     <!-- PWA & Mobile Optimization -->
-    <meta name="application-name" content="Calgary Watch" />
+    <meta name="application-name" content="CalgaryWatch" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Calgary Watch" />
+    <meta name="apple-mobile-web-app-title" content="CalgaryWatch" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <meta property="og:image" content="https://calgarywatch.ca/images/hero/calgarywatch-social-v1.jpg" />
+    <meta property="og:image" content="https://calgarywatch.ca/images/hero/calgarywatch-site-wide.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="An illustrated Calgary skyline with the Bow River, the Peace Bridge and the Rockies behind, under the CalgaryWatch name." />
-    <meta name="twitter:image" content="https://calgarywatch.ca/images/hero/calgarywatch-social-v1.jpg" />
-    <meta name="twitter:image:alt" content="An illustrated Calgary skyline with the Bow River, the Peace Bridge and the Rockies behind, under the CalgaryWatch name." />
+    <meta property="og:image:alt" content="The CalgaryWatch badge and name over an illustrated Calgary skyline with the Calgary Tower, the Peace Bridge and the Rockies: What’s happening in Calgary?" />
+    <meta name="twitter:image" content="https://calgarywatch.ca/images/hero/calgarywatch-site-wide.jpg" />
+    <meta name="twitter:image:alt" content="The CalgaryWatch badge and name over an illustrated Calgary skyline with the Calgary Tower, the Peace Bridge and the Rockies: What’s happening in Calgary?" />
     
     <meta
       name="description"
@@ -71,7 +74,7 @@
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Calgary Watch" />
+    <meta property="og:site_name" content="CalgaryWatch" />
     <meta property="og:title" content="What's happening in Calgary? | CalgaryWatch" />
     <meta
       property="og:description"
@@ -92,7 +95,7 @@
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Calgary Watch",
+      "name": "CalgaryWatch",
       "slogan": "What's happening in Calgary?",
       "url": "https://calgarywatch.ca/",
       "description": "Calgary discovery and live community awareness. Find events, markets, local places and source-attributed city reports.",
@@ -107,10 +110,10 @@
         "Source-attributed city updates",
         "Live map for community reports, traffic, weather and outages"
       ],
-      "screenshot": "https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp",
+      "screenshot": "https://calgarywatch.ca/images/hero/calgarywatch-site-wide.jpg",
       "author": {
         "@type": "Organization",
-        "name": "Calgary Watch",
+        "name": "CalgaryWatch",
         "url": "https://calgarywatch.ca/"
       }
     }
@@ -121,8 +124,8 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Calgary Watch",
-      "alternateName": "Calgary Watch",
+      "name": "CalgaryWatch",
+      "alternateName": ["Calgary Watch", "calgarywatch.ca"],
       "url": "https://calgarywatch.ca/",
       "description": "Calgary discovery and live city awareness, free for residents.",
       "inLanguage": "en-CA"
@@ -134,17 +137,24 @@
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "Calgary Watch",
+      "name": "CalgaryWatch",
+      "alternateName": "Calgary Watch",
       "slogan": "What's happening in Calgary?",
       "url": "https://calgarywatch.ca/",
       "sameAs": ["https://www.instagram.com/calgarydaily/"],
       "logo": {
         "@type": "ImageObject",
-        "url": "https://calgarywatch.ca/images/brand/calgarywatch-city-spark-v2.webp",
+        "url": "https://calgarywatch.ca/images/brand/calgarywatch-logo-512.png",
+        "contentUrl": "https://calgarywatch.ca/images/brand/calgarywatch-logo-512.png",
         "width": 512,
-        "height": 512
+        "height": 512,
+        "caption": "CalgaryWatch"
       },
-      "image": "https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp",
+      "image": [
+        "https://calgarywatch.ca/images/hero/calgarywatch-site-wide.jpg",
+        "https://calgarywatch.ca/images/hero/calgarywatch-site-4x3.jpg",
+        "https://calgarywatch.ca/images/hero/calgarywatch-site-square.jpg"
+      ],
       "description": "CalgaryWatch brings local discovery and live city awareness together, free for residents.",
       "areaServed": {
         "@type": "AdministrativeArea",

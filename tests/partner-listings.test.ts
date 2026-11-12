@@ -1,3 +1,4 @@
+import './support-snapshot-clock';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';

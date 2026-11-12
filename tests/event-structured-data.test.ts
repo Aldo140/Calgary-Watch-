@@ -24,14 +24,20 @@ test('offers carry only real prices', () => {
   assert.deepEqual(ld({ ...event, pricing: 'free' }).offers, { '@type': 'Offer', url: `${origin}/events/show`, price: 0, priceCurrency: 'CAD', availability: 'https://schema.org/InStock' });
   assert.deepEqual(ld({ ...event, pricing: 'paid', priceRange: [25, 25], tickets: 'https://tix.example/1' }).offers, { '@type': 'Offer', url: 'https://tix.example/1', price: 25, priceCurrency: 'CAD', availability: 'https://schema.org/InStock' });
   assert.equal(ld({ ...event, pricing: 'paid', priceRange: [25, 90] }).offers['@type'], 'AggregateOffer');
-  assert.deepEqual(ld(event).offers, { '@type': 'Offer', url: `${origin}/events/show` });
+  // No price and no ticket link: nothing to offer, rather than an Offer Google flags as empty.
+  assert.equal(ld(event).offers, undefined);
+  assert.deepEqual(ld({ ...event, tickets: 'https://tix.example/2' }).offers, { '@type': 'Offer', url: 'https://tix.example/2', availability: 'https://schema.org/InStock' });
+  // Search Console asks every event for an image: the listing's own, else its share card.
+  assert.equal(ld(event).image, `${origin}/og/events/show.jpg`);
   assert.equal(ld({ ...event, ticketSaleStatus: 'not-on-sale' }).offers, undefined);
   assert.equal(ld({ ...event, cancelled: true }).offers, undefined);
 });
-test('market occurrences carry organizer, performer and a listing offer', () => {
+test('market occurrences carry organizer, performer, description and image, and no empty offer', () => {
   const market: Market = { ...base, id: 'mk', kind: 'market', slug: 'mk', title: 'Market', address: 'a', organizer: 'Inglewood BIA', amenities: [], vendorIds: [], images: [], sources: [{ kind: 'official', name: 'BIA', url: 'https://inglewoodyyc.ca' }] };
   const json = buildEntityJsonLd(market, origin, [{ id: 'o', marketId: 'mk', start: '2026-11-01T10:00:00-06:00', end: '2026-11-01T15:00:00-06:00', timezone: 'America/Edmonton', cancelled: false, source: market.sources[0] }]) as any;
   assert.equal(json.event[0].organizer.name, 'Inglewood BIA');
   assert.equal(json.event[0].performer.name, 'Inglewood BIA');
-  assert.deepEqual(json.event[0].offers, { '@type': 'Offer', url: `${origin}/markets/mk` });
+  assert.equal(json.event[0].offers, undefined);
+  assert.equal(json.event[0].description, market.summary);
+  assert.equal(json.event[0].image, `${origin}/og/markets/mk.jpg`);
 });

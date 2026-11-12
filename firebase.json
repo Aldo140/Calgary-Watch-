@@ -34,10 +34,6 @@
       {
         "source": "/organization/**",
         "destination": "/index.html"
-      },
-      {
-        "source": "/events/**",
-        "destination": "/index.html"
       }
     ],
     "headers": [
@@ -137,7 +133,7 @@
         ]
       },
       {
-        "source": "/@(favicon.ico|favicon.svg|favicon-32.png|apple-touch-icon.png|icon-192.png|icon-512.png|icon-maskable-512.png)",
+        "source": "/@(favicon.ico|favicon.svg|favicon-32.png|favicon-96.png|favicon-192.png|apple-touch-icon.png|icon.svg|icon-192.png|icon-512.png|icon-maskable-512.png|icon-tile-310.png)",
         "headers": [
           {
             "key": "Cache-Control",

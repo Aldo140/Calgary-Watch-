@@ -1,3 +1,4 @@
+import './support-snapshot-clock';
 /**
  * CalgaryWatch Spotlights (/spotlight/:slug): sourced, attributed, temporary
  * promotion, evergreen page, privacy-safe measurement.

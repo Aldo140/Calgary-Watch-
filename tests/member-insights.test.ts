@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { canonicalNeighborhood, looksLikeStreetAddress, readHomeArea } from '../src/lib/homeArea';
 import { plansAreaPatch } from '../src/lib/plansSetup';
-import { interestSupply, tallyAreas, tallyPlans } from '../src/lib/memberInsights';
+import { interestSupply, isResident, residentsOnly, tallyAreas, tallyPlans } from '../src/lib/memberInsights';
 import { buildDigestSummary } from '../src/lib/digest';
 import type { DiscoveryEntity } from '../src/types/discovery';
 
@@ -88,4 +88,15 @@ test('interest supply counts dated listings in the next two weeks, markets by th
   assert.equal(supply.get('outdoors'), 1);
   assert.equal(supply.get('free'), 1);
   assert.equal(supply.get('markets'), 1);
+});
+
+test('audience numbers leave organizer accounts out', () => {
+  const users = [
+    { neighborhood: 'Seton' },
+    { neighborhood: 'Inglewood', signupAs: 'organizer' as const },
+    { neighborhood: 'Varsity', signupAs: undefined },
+  ];
+  assert.deepEqual(residentsOnly(users).map((u) => u.neighborhood), ['Seton', 'Varsity']);
+  assert.equal(isResident({ signupAs: 'organizer' }), false);
+  assert.ok(!tallyAreas(residentsOnly(users)).areas.some(([a]) => /Inglewood/.test(a)));
 });

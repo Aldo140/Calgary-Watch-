@@ -69,7 +69,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/map': {
-    title: 'Calgary Crime Map: Recent Reports Near You | Calgary Watch',
+    title: 'Calgary Crime Map: Recent Reports Near You | CalgaryWatch',
     description:
       'Check recent Calgary crime, traffic, weather, infrastructure and emergency reports near you. Every map marker includes its time and source.',
     index: true,
@@ -78,7 +78,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/about': {
-    title: 'About Calgary Watch | Community Crime & Safety Map',
+    title: 'About CalgaryWatch | Community Crime & Safety Map',
     description:
       'Learn how Calgary Watch combines community reports and public data into one map for Calgary-area neighbours. See it. Share it. Calgary knows.',
     index: true,
@@ -87,7 +87,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/coverage': {
-    title: 'Calgary Safety Map Sources | Calgary Watch',
+    title: 'Calgary Safety Map Sources | CalgaryWatch',
     description:
       'Every source behind the Calgary Watch safety map: neighbour reports, Calgary Police news releases, City of Calgary 311 and traffic, weather and emergency alerts, and power outages, with how often each updates.',
     index: true,
@@ -123,25 +123,25 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/admin': {
-    title: 'Admin Portal | Calgary Watch',
+    title: 'Admin Portal | CalgaryWatch',
     description: 'Administrative dashboard for Calgary Watch operations and moderation.',
     index: false,
     pageType: 'WebPage',
   },
   '/admin/users': {
-    title: 'User Directory | Calgary Watch Admin',
+    title: 'User Directory | CalgaryWatch Admin',
     description: 'Administrative user directory for Calgary Watch.',
     index: false,
     pageType: 'WebPage',
   },
   '/admin/incidents': {
-    title: 'Report Directory | Calgary Watch Admin',
+    title: 'Report Directory | CalgaryWatch Admin',
     description: 'Administrative report directory for Calgary Watch.',
     index: false,
     pageType: 'WebPage',
   },
   '/privacy': {
-    title: 'Privacy Policy | Calgary Watch',
+    title: 'Privacy Policy | CalgaryWatch',
     description:
       'Learn what Calgary Watch collects, why it is needed, how long it is retained, and how to exercise your privacy choices.',
     index: true,
@@ -159,7 +159,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/partners': {
-    title: 'How CalgaryWatch Works With Local Businesses | Calgary Watch',
+    title: 'How CalgaryWatch Works With Local Businesses | CalgaryWatch',
     description:
       'Free, source-checked listings for Calgary businesses, picks that are never sold, how Featured partner placements will be labelled, and why we may have emailed you.',
     index: true,
@@ -174,7 +174,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     pageType: 'WebPage',
   },
   '/unsubscribe': {
-    title: 'Email Preferences | Calgary Watch',
+    title: 'Email Preferences | CalgaryWatch',
     description: 'Update Calgary Watch email preferences securely.',
     index: false,
     pageType: 'WebPage',
@@ -372,7 +372,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
     ...(config.image ? { image: config.image } : {}),
     isPartOf: {
       '@type': 'WebSite',
-      name: 'Calgary Watch',
+      name: 'CalgaryWatch',
       url: `${PRODUCTION_ORIGIN}/`,
     },
     breadcrumb: {

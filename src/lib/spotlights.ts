@@ -128,7 +128,7 @@ export function spotlightJsonLd(s: Spotlight, origin: string, image: string, ent
     image,
     inLanguage: 'en-CA',
     author: { '@type': 'Organization', name: 'CalgaryWatch', url: `${origin}/` },
-    publisher: { '@type': 'Organization', name: 'CalgaryWatch', url: `${origin}/`, logo: { '@type': 'ImageObject', url: `${origin}/icon-512.png` } },
+    publisher: { '@type': 'Organization', name: 'CalgaryWatch', url: `${origin}/`, logo: { '@type': 'ImageObject', url: `${origin}/images/brand/calgarywatch-logo-512.png`, width: 512, height: 512 } },
     ...(event ? { about: event } : {}),
     citation: s.sources.map(src => src.url),
   };

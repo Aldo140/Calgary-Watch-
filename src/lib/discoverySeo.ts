@@ -30,7 +30,13 @@ function offersJsonLd(entity: Event, url: string): object | undefined {
   if (low !== undefined && high !== undefined) return low === high
     ? { '@type': 'Offer', url: link, price: low, priceCurrency: 'CAD', availability: inStock }
     : { '@type': 'AggregateOffer', url: link, lowPrice: low, highPrice: high, priceCurrency: 'CAD', availability: inStock };
-  return { '@type': 'Offer', url: link, ...(entity.tickets ? { availability: inStock } : {}) };
+  // A ticket link without a price we hold: the link and that it is on sale, never a guessed price.
+  // With no ticket link there is nothing to offer; a bare listing link only drew empty-field warnings.
+  return entity.tickets ? { '@type': 'Offer', url: entity.tickets, availability: inStock } : undefined;
+}
+/** The listing's own photo, else the share card drawn for it at build time (scripts/seo/shareCards.tsx). */
+function imageJsonLd(entity: DiscoveryEntity, origin: string): string {
+  return entity.image ? new URL(entity.image.src, origin).href : `${origin}/og${entityPath(entity)}.jpg`;
 }
 /** Listings carry no lineup, so the organizer stands in as the performer. */
 function hostJsonLd(entity: Event | Market, origin: string, all: readonly DiscoveryEntity[]): object {
@@ -63,9 +69,9 @@ export function buildEntityJsonLd(entity: DiscoveryEntity, origin: string, occur
   const offers = entity.kind === 'event' ? offersJsonLd(entity, origin + entityPath(entity)) : undefined;
   const type = { event: 'Event', market: 'Place', business: entity.categories.includes('food') && !entity.categories.some(c => c === 'market' || c === 'markets') ? 'Restaurant' : 'LocalBusiness', guide: 'Article', neighbourhood: 'Place' }[entity.kind];
   return { '@context': 'https://schema.org', '@type': type, name: entity.title, description: entity.summary, url: origin + entityPath(entity),
-    ...(entity.image ? { image: new URL(entity.image.src, origin).href } : {}),
+    ...(entity.image || entity.kind === 'event' || entity.kind === 'market' ? { image: imageJsonLd(entity, origin) } : {}),
     ...(entity.kind === 'event' ? { startDate: entity.schedulePrecision==='date'?entity.start.slice(0,10):entity.start, endDate: entity.schedulePrecision==='date'?lastEventDate(entity.end):entity.end, eventStatus: `https://schema.org/${entity.cancelled ? 'EventCancelled' : 'EventScheduled'}`, eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode', location: placeJsonLd(entity.venue || entity.address, entity.address, entity.coordinates), ...hostJsonLd(entity, origin, all), ...(offers ? { offers } : {}), ...(entity.pricing === 'free' ? { isAccessibleForFree: true } : {}) } : {}),
-    ...(entity.kind === 'market' ? { address: addressJsonLd(entity.address) ?? entity.address, ...geoJsonLd(entity.coordinates), containedInPlace: CALGARY, event: occurrences.filter(o => o.marketId === entity.id).map(o => ({ '@type': 'Event', name: entity.title, startDate: o.start, endDate: o.end, eventStatus: `https://schema.org/${o.cancelled ? 'EventCancelled' : 'EventScheduled'}`, eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode', location: placeJsonLd(entity.venue || entity.title, entity.address, entity.coordinates), url: origin + entityPath(entity), ...hostJsonLd(entity, origin, all), offers: { '@type': 'Offer', url: origin + entityPath(entity) } })) } : {}),
+    ...(entity.kind === 'market' ? { address: addressJsonLd(entity.address) ?? entity.address, ...geoJsonLd(entity.coordinates), containedInPlace: CALGARY, event: occurrences.filter(o => o.marketId === entity.id).map(o => ({ '@type': 'Event', name: entity.title, startDate: o.start, endDate: o.end, eventStatus: `https://schema.org/${o.cancelled ? 'EventCancelled' : 'EventScheduled'}`, eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode', location: placeJsonLd(entity.venue || entity.title, entity.address, entity.coordinates), url: origin + entityPath(entity), description: entity.summary, image: imageJsonLd(entity, origin), ...hostJsonLd(entity, origin, all) })) } : {}),
     ...(entity.kind === 'business' ? businessJsonLd(entity) : {}),
     ...(entity.kind === 'neighbourhood' ? { containedInPlace: CALGARY } : {}),
     ...(entity.kind === 'guide' ? { headline: entity.title, dateModified: entity.updatedAt, publisher: { '@type': 'Organization', name: 'CalgaryWatch', url: `${origin}/` }, mainEntity: { '@type': 'ItemList', itemListElement: entity.entries.map((entry, i) => ({ '@type': 'ListItem', position: i + 1, identifier: entry.entityId })) } } : {}),

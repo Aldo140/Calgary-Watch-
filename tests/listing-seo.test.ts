@@ -1,3 +1,4 @@
+import './support-snapshot-clock';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildEntityJsonLd, buildSitemap } from '../src/lib/discoverySeo';

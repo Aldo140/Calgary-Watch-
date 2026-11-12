@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, ExternalLink } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
@@ -32,11 +32,12 @@ const BROWSE: Array<{ to: string; label: string; note: string; icon: ReactNode }
   { to: '/neighbourhoods', label: 'Neighbourhoods', note: 'Quadrant by quadrant', icon: <Compass size={20} /> },
   { to: '/guides', label: 'Guides', note: 'Self-guided days out', icon: <BookOpen size={20} /> },
   { to: '/local', label: 'Local', note: 'Places worth knowing', icon: <MapPin size={20} /> },
+  { to: '/picks', label: 'Who to call', note: 'Plumbers to snow removal, checked', icon: <BadgeCheck size={20} /> },
   { to: '/best', label: 'Best of Calgary', note: 'Pho, pizza and trades, cited', icon: <Trophy size={20} /> },
   { to: '/safety', label: 'Safety news', note: 'Calgary crime headlines by topic', icon: <ShieldCheck size={20} /> },
 ];
 
-const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'jazz', 'Kensington', 'free this weekend'];
+const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'plumber', 'Kensington', 'free this weekend'];
 
 const when = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const KIND: Record<string, string> = { event: 'Event', market: 'Market', business: 'Local', guide: 'Guide', neighbourhood: 'Neighbourhood' };
@@ -96,6 +97,9 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
   const [open, setOpen] = useState<Record<string, boolean>>({});
   // Places already ranked in the "best pho" card aren't listed twice.
   const picked = new Set(best?.picks.map(e => e.id));
+  // A Best list already shown as the service's Pick desk isn't listed (or counted) twice.
+  const shownBest = bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug }));
+  const deskCount = pickShelf?.contenders.length ?? 0;
   const kinds = Object.keys(groups).filter(k => groups[k].some(e => !picked.has(e.id)));
   const collapsed = Object.fromEntries(kinds.map(k => [k, collapseRepeats(groups[k].filter(e => !picked.has(e.id)))]));
   const distinct = kinds.reduce((n, k) => n + collapsed[k].length, 0);
@@ -121,7 +125,7 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
             <div className="sx-bar">
               <p className="sx-count" role="status">
                 {resultCount
-                  ? <>{bestLists.length ? <><b>{bestLists.length}</b> Best of Calgary {bestLists.length === 1 ? 'list' : 'lists'}{answers || distinct ? ', ' : null}</> : null}{answers ? ready : null}{answers > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
+                  ? <>{deskCount ? <><b>{deskCount}</b> local {pickShelf!.service.label.toLowerCase()}{shownBest.length || answers || distinct ? ', ' : null}</> : null}{shownBest.length ? <><b>{shownBest.length}</b> Best of Calgary {shownBest.length === 1 ? 'list' : 'lists'}{answers || distinct ? ', ' : null}</> : null}{answers ? ready : null}{answers > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
                   : best && intent.best ? <>Nothing on CalgaryWatch for <b>“{intent.best.thing}”</b> yet. Here’s where to look.</>
                   : <>Nothing matched <b>“{q}”</b> yet. Try a neighbourhood, a street, or one of these.</>}
               </p>
@@ -143,11 +147,11 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                 <PickBoard shelf={pickShelf} via="search" compact />
               </section>
             ) : null}
-            {bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug })).length && tab === 'all' ? (
+            {shownBest.length && tab === 'all' ? (
               <section className="bp-section sx-group" aria-labelledby="sx-best">
                 <div className="bp-head"><h2 id="sx-best">Best of <span>Calgary</span></h2><Link className="bp-link" to="/best">All lists <ArrowRight size={15} aria-hidden="true" /></Link></div>
                 <ul className="sx-results">
-                  {bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug })).map(b => (
+                  {shownBest.map(b => (
                     <li key={b.to}>
                       <Link to={b.to} className="sx-result">
                         <span className="sx-thumb sx-thumb-best" aria-hidden="true"><Trophy size={26} /></span>

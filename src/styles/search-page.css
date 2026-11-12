@@ -164,6 +164,7 @@
   .sx-starter small { display: none; }
   .sx-starter .sx-arrow { display: none; }
   .sx-browse { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .sx-browse > li:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .sx-has-q .bp-hero h1 { font-size: clamp(32px, 9vw, 40px); }
   .sx-bar { margin: 18px -16px 0; padding: 10px 16px; }
   .sx-bar .sx-count { font-size: 16px; }

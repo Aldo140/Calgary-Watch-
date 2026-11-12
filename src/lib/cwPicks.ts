@@ -141,6 +141,29 @@ export function telHref(phone: string): string {
   return `tel:+1${phone.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '')}`;
 }
 
+// ─── This device's memory ───────────────────────────────────────────────────
+
+/** A contact remembered on this device only, so a desk can say "you called them Tuesday". Never sent anywhere. */
+export interface RecentContact { list: string; key: string; name: string; contact: ContactKind; at: number; checkIn: boolean }
+const RECENT_KEY = 'cw-pick-recent';
+const RECENT_DAYS = 30;
+
+export function recentContacts(list?: string, now = Date.now()): RecentContact[] {
+  try {
+    const all = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]') as RecentContact[];
+    return all.filter(r => r && typeof r.at === 'number' && now - r.at < RECENT_DAYS * DAY && (!list || r.list === list)).sort((a, b) => b.at - a.at);
+  } catch {
+    return [];
+  }
+}
+
+export function rememberContact(r: RecentContact): void {
+  try {
+    const rest = recentContacts(undefined, r.at).filter(x => !(x.list === r.list && x.key === r.key));
+    localStorage.setItem(RECENT_KEY, JSON.stringify([r, ...rest].slice(0, 12)));
+  } catch { /* private mode: the desk just won't remember */ }
+}
+
 // ─── Follow-ups ─────────────────────────────────────────────────────────────
 
 /** Same pattern as isValidEmail in firestore.rules, so the rule never refuses what the form accepted. */

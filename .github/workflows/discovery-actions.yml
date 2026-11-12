@@ -14,6 +14,10 @@ on:
         description: 'Only send a sample claim approval email to this address (nothing else runs)'
         required: false
         type: string
+      pick_email_sample:
+        description: 'Only send a sample CalgaryWatch Pick check-in email to this address (nothing else runs)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -41,9 +45,16 @@ jobs:
           CLAIM_EMAIL_SAMPLE_TO: ${{ inputs.claim_email_sample }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+      - name: Send a sample Pick check-in email
+        if: ${{ inputs.pick_email_sample }}
+        run: npx tsx scripts/picks/send-followups.ts
+        env:
+          PICK_EMAIL_SAMPLE_TO: ${{ inputs.pick_email_sample }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
       - name: Apply queued moderation
         id: apply
-        if: ${{ !inputs.claim_email_sample }}
+        if: ${{ !inputs.claim_email_sample && !inputs.pick_email_sample }}
         run: npm run discovery:actions
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -51,7 +62,7 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
       # Vendor emails queued in Market HQ. Cheap when idle: one query.
       - name: Send queued vendor messages
-        if: ${{ !inputs.claim_email_sample }}
+        if: ${{ !inputs.claim_email_sample && !inputs.pick_email_sample }}
         run: npx tsx scripts/markets/send-vendor-messages.ts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -60,8 +71,22 @@ jobs:
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
           DIGEST_FROM: ${{ vars.DIGEST_FROM }}
       # One email per newly approved listing claim (src/lib/claimApprovalEmail.ts).
+      # CalgaryWatch Pick check-ins (scripts/picks/send-followups.ts): one email a week after a
+      # reader opted in. Mornings only (9 am to noon MT), so nobody gets it at 2 am.
+      - name: Send Pick check-ins
+        if: ${{ !inputs.claim_email_sample && !inputs.pick_email_sample }}
+        continue-on-error: true
+        run: |
+          h=$(TZ=America/Edmonton date +%H)
+          if [ "$GITHUB_EVENT_NAME" = schedule ] && { [ "$h" -lt 9 ] || [ "$h" -gt 11 ]; }; then echo "Outside 9-12 MT; next morning."; exit 0; fi
+          npx tsx scripts/picks/send-followups.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
       - name: Send claim approval emails
-        if: ${{ !inputs.claim_email_sample }}
+        if: ${{ !inputs.claim_email_sample && !inputs.pick_email_sample }}
         run: npx tsx scripts/claims/send-approval-emails.ts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -70,7 +95,7 @@ jobs:
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
       # Tells admins about new claims and organizer sign-ups stuck before their claim (src/lib/claimAdminAlert.ts).
       - name: Email admins about new claims
-        if: ${{ !inputs.claim_email_sample }}
+        if: ${{ !inputs.claim_email_sample && !inputs.pick_email_sample }}
         run: npx tsx scripts/claims/notify-admins.ts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

@@ -27,7 +27,9 @@ export type ProductEventName =
   | 'spotlight_link_click'
   | 'spotlight_card_click'
   | 'spotlight_card_seen'
-  | 'spotlight_read';
+  | 'spotlight_read'
+  /** Call or Website on a service list (src/lib/cwPicks.ts): `list`, `place` key, `via`, `contact`, `followup` yes/no. Never the reader. */
+  | 'pick_contact';
 
 /** Keys that could identify a place or a person, dropped unconditionally. */
 const FORBIDDEN_KEYS = new Set(['address', 'description', 'title', 'email', 'name', 'lat', 'lng']);

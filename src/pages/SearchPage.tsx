@@ -8,12 +8,13 @@ import { discoveryRepository } from '../data/discovery';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
 import { DISCOVERY_SECTIONS, entityPath, normalizeSearch } from '../lib/discovery';
 import { bestPicks, nearbyListings, searchListings, serviceFor } from '../lib/listingSearch';
-import { answerCount, bareStreetGuess, normalizeWords, parseSearchIntent } from '../lib/searchIntent';
+import { answerCount, bareStreetGuess, normalizeWords, parseSearchIntent, quadrantOnly } from '../lib/searchIntent';
 import { useStreetLookup } from '../hooks/useStreetLookup';
 import { recordSearch } from '../lib/searchDemand';
 import { POPULAR_VIA, TRENDING, popularHref, primeByDemand } from '../lib/searchTrends';
 import { BEST_CATEGORIES, type BestCategory } from '../content/bestOf';
 import { bestForQuery, bestPath, isRanked } from '../lib/bestOf';
+import { serviceForQuery, shelfFor } from '../lib/cwPicks';
 import { SAFETY_TOPICS } from '../content/safetyTopics';
 import { safetyForQuery, safetyPath } from '../lib/safety';
 import type { CrimeNewsFile } from '../lib/safetyNews';
@@ -57,18 +58,26 @@ export default function SearchPage() {
     // "best plumbers" (the Local service and where to look) instead of an empty page.
     return !p.best && !p.topics.length && !p.communities.length && (!results.total || results.partial) && serviceFor(q) ? { ...p, best: { thing: q } } : p;
   }, [q, now, results.total, results.partial]);
-  const bestLists = useMemo(() => bestForQuery(q).map(c => ({ to: bestPath(c), label: bestLabel(c), note: bestNote(c) })), [q]);
+  const bestMatches = useMemo(() => bestForQuery(q), [q]);
+  const bestLists = useMemo(() => bestMatches.map(c => ({ to: bestPath(c), label: bestLabel(c), note: bestNote(c) })), [bestMatches]);
+  // "plumber", "window cleaning": a service list answers as a decision, Pick first (src/components/picks).
+  const pickShelf = useMemo(() => { const svc = serviceForQuery(q); return svc ? shelfFor(svc.id, all, now) : null; }, [q, all, now]);
   // A cited Best of Calgary list beats the "best …" card; the card covers everything else.
-  const best = useMemo(() => parsed.best && !bestLists.length
+  // A service with a Pick desk answers on its own, so the generic "best …" card stays out of the way.
+  const best = useMemo(() => parsed.best && !bestLists.length && !pickShelf
     ? { picks: bestPicks(all, occurrences, parsed.best.thing, new Date(now)), service: serviceFor(parsed.best.thing) }
-    : undefined, [parsed.best, bestLists.length, all, occurrences, now]);
+    : undefined, [parsed.best, bestLists.length, pickShelf, all, occurrences, now]);
   // "Best pho" counts as answered only when we list one, so Search demand still shows what to add.
   const safety = useMemo(() => {
     const topics = safetyForQuery(q);
     if (!topics.length && !NEWS_WORDS.test(q)) return undefined;
     const slugs = new Set(topics.map(t => t.slug));
     const where = parsed.communities[0]?.community.name;
-    const onTopic = slugs.size ? NEWS.items.filter(h => h.topics.some(s => slugs.has(s))) : NEWS.items;
+    const allOnTopic = slugs.size ? NEWS.items.filter(h => h.topics.some(s => slugs.has(s))) : NEWS.items;
+    // "police yesterday": yesterday's headlines first, when there are any.
+    const w = parsed.time;
+    const inWindow = w ? allOnTopic.filter(h => { const t = Date.parse(h.publishedAt); return t >= w.from && t <= w.to; }) : [];
+    const onTopic = inWindow.length ? inWindow : allOnTopic;
     const local = where ? onTopic.filter(h => h.community === where) : [];
     return {
       topics: topics.map(t => ({ to: safetyPath(t), label: `${t.label} in Calgary`, note: 'Recent headlines, what to do and who to call' })),
@@ -80,14 +89,24 @@ export default function SearchPage() {
     [q, results.total, parsed, bestLists.length, safety]);
   const bareLookup = useStreetLookup(bare);
   const intent = useMemo(() => bare && bareLookup.status === 'ready' ? { ...parsed, street: bare } : parsed, [parsed, bare, bareLookup.status]);
-  const answers = q ? answerCount(intent) + (best?.picks.length ? 1 : 0) : 0;
-  const resultCount = results.total + answers + bestLists.length + (safety?.topics.length ?? 0);
   const place = intent.communities[0]?.community;
+  const quadrant = quadrantOnly(intent);
   const nearby = useMemo(() => {
-    if (results.total || !place || place.quadrant === 'Centre') return undefined;
-    const items = nearbyListings(all, occurrences, place.quadrant, new Date(now));
-    return items.length ? { title: <>Near {place.name}, <span>in the {place.quadrant}.</span></>, items } : undefined;
-  }, [results.total, place, all, occurrences, now]);
+    // "north east": what's on across the quadrant.
+    if (quadrant && results.total < 3) {
+      const items = nearbyListings(all, occurrences, quadrant, new Date(now), 8);
+      return items.length ? { title: <>On in the <span>{quadrant}.</span></>, note: 'Events, markets and places in this quadrant, soonest first.', items } : undefined;
+    }
+    // A community with one or two listings of its own ("west hillhurst") still gets what's close by.
+    if (results.total >= 3 || !place || place.quadrant === 'Centre') return undefined;
+    const own = new Set(Object.values(results.groups).flat().map(e => e?.id));
+    const items = nearbyListings(all, occurrences, place.quadrant, new Date(now), 8).filter(e => !own.has(e.id)).slice(0, 6);
+    return items.length ? { title: <>Near {place.name}, <span>in the {place.quadrant}.</span></>, note: results.total ? `Also close to ${place.name}, soonest first.` : 'Nothing listed in this community yet, so here’s what’s closest.', items } : undefined;
+  }, [results.total, results.groups, place, quadrant, all, occurrences, now]);
+
+  const answers = q ? answerCount(intent) + (best?.picks.length ? 1 : 0) : 0;
+  // Nearby listings are real answers too, so a community search isn't logged as "1 result" when there's more to show.
+  const resultCount = results.total + answers + (pickShelf ? 1 : 0) + bestLists.length + (safety?.topics.length ?? 0) + (nearby?.items.length ? 1 : 0);
 
   // Record what people look for (anonymously), once the result count settles.
   const pending = useRef<{ q: string; n: number } | null>(null);
@@ -142,7 +161,7 @@ export default function SearchPage() {
 
   return (
     <SiteLayout>
-      <SearchBoard key={q} q={q} best={best} bestLists={bestLists} safety={safety} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
+      <SearchBoard key={q} q={q} best={best} pickShelf={pickShelf} bestLists={bestLists} safety={safety} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
         listingCount={results.total} resultCount={resultCount} answers={answers}
         partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} popular={POPULAR} nearby={nearby} />
     </SiteLayout>

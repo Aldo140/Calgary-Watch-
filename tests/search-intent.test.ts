@@ -156,3 +156,36 @@ test('a lone word with no other answer is tried as a street, exact match only', 
     assert.equal(bareStreetGuess(parseSearchIntent(q, NOW), q), null, q);
   }
 });
+
+test('Nov 12 admin terms: postal codes, quadrant slips, towns, the city, quadrants', async () => {
+  const { answerCount, quadrantOnly } = await import('../src/lib/searchIntent');
+  const t2k = parseSearchIntent('t2k 2e2', NOW);
+  assert.equal(t2k.postal?.area.fsa, 'T2K');
+  assert.deepEqual(t2k.communities.map(c => c.community.name), ['Thorncliffe', 'Tuxedo Park']);
+  assert.ok(answerCount(t2k) >= 1);
+  assert.equal(parseSearchIntent('T3G', NOW).communities[0]?.community.name, 'Hawkwood');
+  assert.equal(parseSearchIntent('t4c 1a1', NOW).town?.name, 'Cochrane');
+  assert.equal(parseSearchIntent('2e2', NOW).postal, undefined, 'half a code alone is not a postal area');
+
+  const sq = parseSearchIntent('hazelwood crescent sq', NOW);
+  assert.equal(sq.street?.name, 'HAZELWOOD');
+  assert.equal(sq.street?.suffix, 'CR');
+  assert.equal(sq.quadrant, 'SW', 'q sits next to w');
+
+  assert.equal(parseSearchIntent('cochrane', NOW).town?.name, 'Cochrane');
+  assert.equal(parseSearchIntent('banff trail', NOW).town, undefined, 'a community, not the town');
+  assert.equal(parseSearchIntent('cochrane rd', NOW).town, undefined, 'a street, not the town');
+
+  const city = parseSearchIntent('calgary', NOW);
+  assert.ok(city.city && answerCount(city) === 1);
+  assert.ok(!parseSearchIntent('calgary zoo', NOW).city);
+
+  assert.equal(quadrantOnly(parseSearchIntent('north east', NOW)), 'NE');
+  assert.equal(quadrantOnly(parseSearchIntent('northwest', NOW)), 'NW');
+  assert.equal(quadrantOnly(parseSearchIntent('coral springs ne', NOW)), undefined);
+});
+
+test('two plain words aren’t a street just because one starts like a community', () => {
+  assert.equal(parseSearchIntent('apple expert', NOW).street, null);
+  assert.equal(parseSearchIntent('copperstone', NOW).street?.likely?.community.name, 'Copperfield');
+});

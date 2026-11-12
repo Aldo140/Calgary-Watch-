@@ -49,6 +49,9 @@ const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/Neighbourhood
 const AirdrieCrimeMapPage = lazy(() => import('@/src/pages/AirdrieCrimeMapPage'));
 const CheckYourCommunityPage = lazy(() => import('@/src/pages/CheckYourCommunityPage'));
 const UnsubscribePage = lazy(() => import('@/src/pages/UnsubscribePage'));
+const PicksPage = lazy(() => import('@/src/pages/PicksPage'));
+const PickDeskPage = lazy(() => import('@/src/pages/PickDeskPage'));
+const PickReviewPage = lazy(() => import('@/src/pages/PickReviewPage'));
 const PlansPage = lazy(() => import('@/src/pages/PlansPage'));
 
 /**
@@ -247,6 +250,10 @@ export default function App() {
           <Route path="/date-night" element={<DateNightPage />} />
           <Route path="/best" element={<BestOfPage />} />
           <Route path="/best/:slug" element={<BestOfPage />} />
+          {/* CalgaryWatch Picks: how vetting works, and the one-question review a follow-up email links to. */}
+          <Route path="/picks" element={<PicksPage />} />
+          <Route path="/picks/:service" element={<PickDeskPage />} />
+          <Route path="/review" element={<PickReviewPage />} />
           <Route path="/spotlight/:slug" element={<SpotlightPage />} />
           <Route path="/safety" element={<SafetyPage />} />
           <Route path="/safety/:slug" element={<SafetyPage />} />

@@ -410,6 +410,51 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // CalgaryWatch Pick follow-ups (src/lib/cwPicks.ts, docs/cw-picks.md).
+    // Written only when a reader ticks the consent box after tapping Call or
+    // Website on a service list: their email, the company, and a random key
+    // the review link carries. Nobody but admins can read them back, and the
+    // sender (scripts/picks/send-followups.ts) runs with the Admin SDK.
+    match /pick_followups/{id} {
+      allow create: if hasOnlyAllowedFields(['list', 'place', 'placeName', 'email', 'uid', 'consent', 'key', 'via', 'contact', 'createdAt', 'dueAt', 'status']) &&
+                    request.resource.data.list is string && request.resource.data.list.size() > 0 && request.resource.data.list.size() <= 40 &&
+                    request.resource.data.place is string && request.resource.data.place.size() > 0 && request.resource.data.place.size() <= 32 &&
+                    request.resource.data.placeName is string && request.resource.data.placeName.size() <= 80 &&
+                    request.resource.data.email is string && request.resource.data.email.size() <= 254 &&
+                    isValidEmail(request.resource.data.email) &&
+                    (request.resource.data.uid == null || (isAuthenticated() && request.resource.data.uid == request.auth.uid)) &&
+                    request.resource.data.consent == 'pick-v1' &&
+                    request.resource.data.key is string && request.resource.data.key.matches('^[A-Za-z0-9_-]{24}$') &&
+                    request.resource.data.via in ['search', 'best', 'desk'] &&
+                    request.resource.data.contact in ['call', 'site'] &&
+                    request.resource.data.createdAt is number &&
+                    request.resource.data.dueAt is number &&
+                    request.resource.data.dueAt > request.resource.data.createdAt &&
+                    request.resource.data.status == 'pending';
+      allow read, update, delete: if isAdmin();
+    }
+
+    // The answer to a follow-up. One per follow-up (the doc id is the
+    // follow-up's id), and only with the key from that follow-up's email.
+    // Never public: an admin reads and moderates each one.
+    match /pick_reviews/{followupId} {
+      allow create: if hasOnlyAllowedFields(['followup', 'key', 'list', 'place', 'hired', 'stars', 'again', 'onTime', 'onPrice', 'text', 'createdAt', 'status']) &&
+                    request.resource.data.followup == followupId &&
+                    exists(/databases/$(database)/documents/pick_followups/$(followupId)) &&
+                    get(/databases/$(database)/documents/pick_followups/$(followupId)).data.key == request.resource.data.key &&
+                    get(/databases/$(database)/documents/pick_followups/$(followupId)).data.place == request.resource.data.place &&
+                    get(/databases/$(database)/documents/pick_followups/$(followupId)).data.list == request.resource.data.list &&
+                    request.resource.data.hired in ['yes', 'no', 'not-yet'] &&
+                    (request.resource.data.stars == null || (request.resource.data.stars is int && request.resource.data.stars >= 1 && request.resource.data.stars <= 5)) &&
+                    (request.resource.data.again == null || request.resource.data.again is bool) &&
+                    (request.resource.data.onTime == null || request.resource.data.onTime is bool) &&
+                    (request.resource.data.onPrice == null || request.resource.data.onPrice is bool) &&
+                    request.resource.data.text is string && request.resource.data.text.size() <= 600 &&
+                    request.resource.data.createdAt is number &&
+                    request.resource.data.status == 'new';
+      allow read, update, delete: if isAdmin();
+    }
+
     // Anonymous page view analytics – write-only from any visitor, no PII stored.
     match /page_views/{viewId} {
       // Every field is bounded and type-checked. `referrer` holds a bare

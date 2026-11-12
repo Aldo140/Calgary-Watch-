@@ -36,6 +36,8 @@ export interface BestPlace {
   facts: BestFact[];
   /** Set from an approved claim, once one exists. Sorts first, never bought. */
   verified?: boolean;
+  /** Phone as the company publishes it, for the Contact button. */
+  phone?: string;
 }
 
 export type BestKind = 'food' | 'service';
@@ -49,7 +51,7 @@ export interface BestCategory {
   label: string;
   /** Big word on the cover art. */
   coverWord: string;
-  motif: 'bowl' | 'slice' | 'window' | 'truck';
+  motif: 'bowl' | 'slice' | 'window' | 'truck' | 'wrench';
   /** Cover gradient. */
   from: string;
   to: string;
@@ -75,6 +77,7 @@ export const BEST_SOURCES: BestSource[] = [
   { id: 'dh-pizza-2026', publisher: 'Daily Hive', title: '12 Calgary restaurants that serve some of the best pizza in the city', url: 'https://dailyhive.com/calgary/best-pizza-calgary-2026', published: '2026-10' },
   { id: 'avenue-best-2026', publisher: 'Avenue Calgary', title: 'Avenue’s 13 Best Restaurants 2026', url: 'https://www.avenuecalgary.com/best-restaurants-calgary/avenue-13-best-restaurants-2026/', published: '2026' },
   { id: 'avenue-una-2021', publisher: 'Avenue Calgary', title: 'Best Restaurants 2021: Una Pizza + Wine', url: 'https://www.avenuecalgary.com/best-restaurants-calgary-2021/una-pizza-and-wine/', published: '2021' },
+  { id: 'cca-plumbing-2025', publisher: 'Consumer Choice Award', title: 'The Gentlemen Pros honoured with 2025 Consumer Choice Award for Plumbing Contractors in Southern Alberta', url: 'https://www.newswire.com/news/the-gentlemen-pros-honoured-with-2025-consumer-choice-award-for-plumbing', published: '2025-12-04' },
   { id: 'top-pizza-2026', publisher: '50 Top Pizza', title: '50 Top Pizza world ranking 2026, as reported by Daily Hive', url: 'https://dailyhive.com/calgary/pizza-culture-calgary-top-100-pizzerias-2026', published: '2026' },
 ];
 
@@ -176,4 +179,29 @@ const JUNK: BestCategory = {
   ],
 };
 
-export const BEST_CATEGORIES: BestCategory[] = [PHO, PIZZA, WINDOWS, JUNK];
+const PLUMBERS: BestCategory = {
+  slug: 'plumbers', kind: 'service', noun: 'plumbers', label: 'Plumbers', coverWord: 'Pipes', motif: 'wrench',
+  from: '#0f3d5c', to: '#3fb5c9', ink: '#effcff', schemaType: 'LocalBusiness',
+  lead: 'Calgary plumbers that publish their services, hours and how long they’ve been here. No independent guide ranks Calgary plumbers, so they’re A–Z, in their own words, until one passes our Pick vetting.',
+  seoTitle: 'Plumbers in Calgary: Local Companies Compared | CalgaryWatch',
+  seoDescription: 'Calgary plumbers side by side: 24/7 emergency service, drains, water heaters, and what to ask before you book. Listed A–Z, never paid for, with a vetted CalgaryWatch Pick.',
+  keywords: ['plumber', 'plumbers', 'plumbing', 'plumbing company', 'emergency plumber', 'drain cleaning', 'clogged drain', 'water heater', 'hot water tank', 'leaky faucet', 'frozen pipes', 'burst pipe', 'sewer backup'],
+  updated: '2026-11-12',
+  places: [
+    { name: 'Knight Plumbing', website: 'https://www.knightplumbing.ca/', phone: '587-317-2535', namedBy: [], facts: [{ text: 'Says it has served Calgary homes since 1970, with licensed plumbers and HVAC technicians and a 24/7 emergency line.', source: 'https://www.knightplumbing.ca/', self: true }] },
+    { name: 'Mr. Mike’s Plumbing', website: 'https://www.mrmikesplumbing.ca/', phone: '403-520-2040', namedBy: [], facts: [{ text: 'Residential and commercial plumbing and HVAC, 24 hours a day. Says it is fully licensed and insured, with upfront prices.', source: 'https://www.mrmikesplumbing.ca/', self: true }] },
+    { name: 'Mr. Rooter Plumbing of Calgary', website: 'https://www.mrrooter.ca/calgary', namedBy: [], facts: [{ text: 'A locally owned franchise of a national brand. Says its plumbers are licensed, insured and background-checked, with flat-rate pricing.', source: 'https://www.mrrooter.ca/calgary', self: true }] },
+    { name: 'The Gentlemen Pros', website: 'https://www.thegentlemenpros.com/', phone: '587-557-9340', namedBy: [], facts: [
+      { text: 'Plumbing, heating and electrical. Says it has served Calgary, Edmonton and Red Deer since 2001.', source: 'https://www.thegentlemenpros.com/', self: true },
+      { text: 'Won a 2025 Consumer Choice Award for plumbing contractors in Southern Alberta.', source: 'cca-plumbing-2025' },
+    ] },
+  ],
+  tips: [
+    'Ask what the service-call fee covers. Often it pays for the diagnosis, not the repair, and the repair is quoted after.',
+    'Water heaters, new fixtures in new spots and most gas work need a City of Calgary permit. Ask who pulls it; a licensed plumber should.',
+    'You can check a plumber’s journeyperson certificate on Alberta’s Tradesecrets site before they start.',
+    'Frozen pipe? Shut off the main, open the tap, and warm the pipe gently. Never use an open flame.',
+  ],
+};
+
+export const BEST_CATEGORIES: BestCategory[] = [PHO, PIZZA, WINDOWS, JUNK, PLUMBERS];

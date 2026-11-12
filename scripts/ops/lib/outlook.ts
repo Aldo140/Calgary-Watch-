@@ -23,11 +23,21 @@ async function token(): Promise<string> {
   return cached.token;
 }
 
+/** Graph's busy answers (throttled or briefly unavailable), worth a retry and not a job failure. */
+const BUSY = [429, 502, 503, 504];
+export const isOutlookBusy = (e: unknown) => /^Outlook: (429|502|503|504)\b/.test(e instanceof Error ? e.message : String(e));
+
 async function call(path: string, init: RequestInit = {}): Promise<any> {
-  const res = await fetch(`${GRAPH}${path}`, {
-    ...init,
-    headers: { authorization: `Bearer ${await token()}`, 'content-type': 'application/json', ...(init.headers ?? {}) },
-  });
+  let res!: Response;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    res = await fetch(`${GRAPH}${path}`, {
+      ...init,
+      headers: { authorization: `Bearer ${await token()}`, 'content-type': 'application/json', ...(init.headers ?? {}) },
+    });
+    if (!BUSY.includes(res.status) || attempt === 2) break;
+    const wait = Math.min(20, Number(res.headers.get('retry-after')) || 5 * (attempt + 1));
+    await new Promise(r => setTimeout(r, wait * 1000));
+  }
   if (res.status === 202 || res.status === 204) return null;
   const body: any = await res.json().catch(() => ({}));
   // Graph sometimes answers with an empty message (e.g. 500 UnknownError), so always name the status and code.
@@ -70,7 +80,7 @@ export interface InboundMessage { id: string; conversationId: string; from: stri
 export async function inboxSince(since: number): Promise<InboundMessage[]> {
   const filter = encodeURIComponent(`receivedDateTime ge ${new Date(since).toISOString()}`);
   const out: InboundMessage[] = [];
-  let next: string | null = `/users/${mailbox()}/mailFolders/inbox/messages?$filter=${filter}&$orderby=receivedDateTime asc&$top=50&$select=id,conversationId,from,subject,bodyPreview,receivedDateTime`;
+  let next: string | null = `/users/${mailbox()}/mailFolders/inbox/messages?$filter=${filter}&$top=50&$select=id,conversationId,from,subject,bodyPreview,receivedDateTime`;
   while (next && out.length < 500) {
     const page = await call(next);
     for (const m of page.value ?? []) {
@@ -81,7 +91,8 @@ export async function inboxSince(since: number): Promise<InboundMessage[]> {
     }
     next = page['@odata.nextLink'] ? String(page['@odata.nextLink']).replace(GRAPH, '') : null;
   }
-  return out;
+  // Sorted here: $orderby on a filtered inbox makes Graph's query heavier.
+  return out.sort((a, b) => a.receivedAt - b.receivedAt);
 }
 
 /** One message's body as text; falls back to the HTML body with tags stripped, then to the preview. */

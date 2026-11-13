@@ -1,5 +1,5 @@
 import { hasCompletedPlans } from '../../lib/plansProfile';
-import { useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, MapPin } from 'lucide-react';
@@ -10,7 +10,6 @@ import { buildEventPicks, nextUp, pickWhenAt } from '../../lib/eventPicks';
 import { emailPlan, nearHome, partOfDay, setupPercent, setupSteps } from '../../lib/memberHome';
 import { neighbourhoodPoint } from '../../lib/eventPicks';
 import { computeBadges } from '../../lib/badges';
-import { discoveryRepository } from '../../data/discovery';
 import { GlanceLink, GlanceTiles, briefing } from '../plans/Glance';
 import type { LivePulse } from '../../hooks/useLivePulse';
 
@@ -41,13 +40,22 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
   const going = useMyGoing(demo ? undefined : user?.uid);
   const now = Date.now();
 
+  const [repository, setRepository] = useState<typeof import("../../data/discovery").discoveryRepository>();
+  useEffect(() => {
+    if (!profile || repository) return;
+    let active = true;
+    void import("../../data/discovery").then(module => {
+      if (active) setRepository(module.discoveryRepository);
+    }).catch(error => console.error("Could not load member event picks:", error));
+    return () => { active = false; };
+  }, [profile, repository]);
   const picks = useMemo(() => {
-    if (!profile) return null;
+    if (!profile || !repository) return null;
     return buildEventPicks({
-      entities: discoveryRepository.list(), occurrences: discoveryRepository.occurrences(),
+      entities: repository.list(), occurrences: repository.occurrences(),
       interests: profile.eventInterests, homeArea: homeAreaOf(profile), goingIds: going.ids, days: 10, limit: 8, rotation: user?.uid,
     });
-  }, [profile, going.ids, user?.uid]);
+  }, [profile, going.ids, user?.uid, repository]);
 
   const enter = { initial: reduce ? false : { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { type: 'spring' as const, stiffness: 150, damping: 20 } };
 

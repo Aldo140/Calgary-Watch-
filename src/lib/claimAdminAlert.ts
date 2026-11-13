@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from './calgaryTz';
 /**
  * The email that tells CalgaryWatch admins someone wants to run an
  * organization profile: a new pending claim, or an organizer account made on
@@ -57,7 +58,7 @@ export function signupNeedsAlert(createdAt: number, hasClaim: boolean, now: numb
 }
 
 const SITE = 'https://calgarywatch.ca';
-const calgary = (ms: number) => new Date(ms).toLocaleString('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'medium', timeStyle: 'short' });
+const calgary = (ms: number) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'medium', timeStyle: 'short' }).format(ms);
 const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 function lines(a: AdminAlert): string[] {

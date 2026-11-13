@@ -3,9 +3,7 @@
  * email, seven days after a reader asked us to check in, then the address is
  * wiped once they answer or after 60 days.
  *
- * NOT on a schedule yet: Aldo checks a sample first (team rule for every new
- * email). Once approved, add it to discovery-actions.yml beside the claim
- * approval emails.
+ * Runs from discovery-actions.yml, 9 am to noon Calgary time. A sample:
  *
  *   PICK_EMAIL_SAMPLE_TO=a@b.c   send one sample to that address and nothing else
  *   PICKS_DRY_RUN=1              render and log, send nothing, change nothing
@@ -42,7 +40,7 @@ async function run() {
     const p = shelf.contenders[0];
     const mail = followupEmail({ email: sampleTo, placeName: p.name, list: shelf.service.id, place: p.key }, 'SAMPLEsample0000', 'sample-key-not-valid-000', { listLabel: shelf.service.label, mailingAddress });
     mail.subject = `[Sample] ${mail.subject}`;
-    log(`sample → ${sampleTo}\n${mail.text}`);
+    log(`sample (address not logged: public repo)\n${mail.text}`);
     if (dry) return;
     if (!process.env.RESEND_API_KEY) throw new Error('No RESEND_API_KEY.');
     log(`sent sample (${await send(mail)})`);

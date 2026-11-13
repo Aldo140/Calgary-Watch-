@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { BADGES, type BadgeId } from '../../lib/badges';
 import { Tilt } from './Motion';
@@ -60,7 +61,7 @@ export function SignupPreview({ name, area, interests, weekly, events, picks, un
             {plan.kind !== 'monday' ? (
               <div className="pl-mock-sec">
                 <span className="pl-mock-h">{plan.kind === 'combined' ? '02 · Out & about' : 'Picked for you'}</span>
-                {(picks.length ? picks.slice(0, 2) : []).map((p) => <span key={p.key} className="pl-mock-row" data-tone="sun"><b>{new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short' }).format(new Date(p.start))}</b>{p.title}</span>)}
+                {(picks.length ? picks.slice(0, 2) : []).map((p) => <span key={p.key} className="pl-mock-row" data-tone="sun"><b>{calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short' }).format(new Date(p.start))}</b>{p.title}</span>)}
                 {!picks.length ? <span className="pl-mock-row" data-tone="sun"><b>Sat</b>{interests.length ? 'Your picks appear here' : 'Pick interests below'}</span> : null}
               </div>
             ) : null}

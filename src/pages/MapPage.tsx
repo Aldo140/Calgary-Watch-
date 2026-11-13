@@ -29,7 +29,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
-import { collection, onSnapshot, query, where, orderBy, limit, getDoc, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, orderBy, limit, getDoc, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { buildWatchFeed } from '@/src/lib/watch';
 import { DIGEST_CATEGORY_ORDER, DIGEST_CATEGORY_LABEL } from '@/src/lib/digest';
@@ -71,7 +71,8 @@ import { foldRepeats } from '@/src/lib/repeatReports';
 import { DEFAULT_MAP_WINDOW, inMapTimeWindow, parseWhenParam, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
 
 /** Older pages a 7-day view may fetch on its own (60 records each). */
-const WEEK_AUTO_PAGES = 4;
+// Public Firestore queries are limited to 200 rows, including the lookahead.
+const MAX_VISIBLE_REPORTS = 199;
 
 const PHONE_CATEGORIES = [
   { id: 'emergency', label: 'Emergency', Icon: Siren },
@@ -701,7 +702,12 @@ export default function MapPage() {
   const { stats: statcanStats, yearlyStats: statcanYearlyStats } = useAlbertaMunicipalityCrimeStats();
   const cityAverages = useMemo(() => computeCityAverages(crimeStats), [crimeStats]);
 
-  const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
+  const [liveIncidents, setLiveIncidents] = useState<Incident[]>([]);
+  const [linkedIncident, setLinkedIncident] = useState<Incident | null>(null);
+  const firebaseIncidents = useMemo(() => {
+    if (!linkedIncident || liveIncidents.some(item => item.id === linkedIncident.id)) return liveIncidents;
+    return [...liveIncidents, linkedIncident].sort((a, b) => b.timestamp - a.timestamp);
+  }, [liveIncidents, linkedIncident]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<IncidentCategory | 'all'>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -886,7 +892,8 @@ export default function MapPage() {
   const [hasMoreIncidents, setHasMoreIncidents] = useState(false);
   const hasInitializedIncidents = useRef(false);
   const knownIncidentIds = useRef<Set<string>>(new Set());
-  const lastVisibleIncidentDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [incidentLimit, setIncidentLimit] = useState(INCIDENT_PAGE_SIZE);
+  const newestIncidentTimestamp = useRef<number | null>(null);
   const buttonClickDebounceRef = useRef(0); // Prevent rapid button clicks
   const deepLinkHandledRef = useRef(false); // Ensure ?i= deep-link opens only once
   const lastNeighborhoodReportUidRef = useRef<string | null>(null);
@@ -1094,7 +1101,7 @@ export default function MapPage() {
     if (import.meta.env.DEV) {
       const fixture = (window as { __CW_MAP_FIXTURE__?: Incident[] }).__CW_MAP_FIXTURE__;
       if (Array.isArray(fixture)) {
-        setFirebaseIncidents(fixture);
+        setLiveIncidents(fixture);
         setHasMoreIncidents(false);
         setIsLoading(false);
         return;
@@ -1103,9 +1110,9 @@ export default function MapPage() {
 
     if (!db) {
       // Firebase not configured — start with an empty map.
-      setFirebaseIncidents([]);
+      setLiveIncidents([]);
       setHasMoreIncidents(false);
-      lastVisibleIncidentDoc.current = null;
+      setIsLoadingMoreIncidents(false);
       setIsLoading(false);
       return;
     }
@@ -1118,18 +1125,20 @@ export default function MapPage() {
       collection(db, 'incidents'),
       where('visibility', '==', 'public'),
       orderBy('timestamp', 'desc'),
-      limit(INCIDENT_PAGE_SIZE),
+      limit(incidentLimit + 1),
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const incidentData = snapshot.docs
+      const incidentData = snapshot.docs.slice(0, incidentLimit)
         .map(doc => {
           const d = doc.data();
-          return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
+          return { ...d, id: doc.id, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
         })
         .filter((incident) => isPubliclyVisible(incident) && isFinite(incident.lat) && isFinite(incident.lng));
 
-      if (hasInitializedIncidents.current) {
-        const newIncidents = incidentData.filter((i) => !knownIncidentIds.current.has(i.id));
+      const head = incidentData.slice(0, INCIDENT_PAGE_SIZE);
+      const previousNewest = newestIncidentTimestamp.current;
+      if (hasInitializedIncidents.current && previousNewest !== null) {
+        const newIncidents = head.filter(i => i.timestamp >= previousNewest && !knownIncidentIds.current.has(i.id));
 
         if (newIncidents.length > 0) {
           const incoming = newIncidents
@@ -1141,81 +1150,34 @@ export default function MapPage() {
         }
       }
       
-      lastVisibleIncidentDoc.current = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
-      setHasMoreIncidents(snapshot.docs.length === INCIDENT_PAGE_SIZE);
-
-      setFirebaseIncidents((prev) => {
-        const merged = new globalThis.Map<string, Incident>();
-        incidentData.forEach((incident) => merged.set(incident.id, incident));
-
-        const oldestTimestamp = incidentData.length > 0
-          ? Math.min(...incidentData.map(i => i.timestamp))
-          : Date.now();
-
-        prev.forEach((incident) => {
-          if (!merged.has(incident.id) && incident.timestamp < oldestTimestamp && isPubliclyVisible(incident)) {
-            merged.set(incident.id, incident);
-          }
-        });
-
-        const now = Date.now();
-        return [...merged.values()]
-          .filter((i) => !i.expires_at || i.expires_at > now)
-          .sort((a, b) => b.timestamp - a.timestamp);
-      });
+      // Each snapshot owns visibility for the full displayed window, including older pages.
+      // A lookahead row detects a next page even when the archive ends at a page boundary.
+      setHasMoreIncidents(incidentLimit < MAX_VISIBLE_REPORTS && snapshot.size > incidentLimit);
+      setIsLoadingMoreIncidents(false);
+      setLiveIncidents(incidentData.filter(i => !i.expires_at || i.expires_at > Date.now()));
+      if (head.length) {
+        newestIncidentTimestamp.current = Math.max(previousNewest ?? -Infinity, head[0].timestamp);
+        head.forEach(i => knownIncidentIds.current.add(i.id));
+      }
       hasInitializedIncidents.current = true;
-      knownIncidentIds.current = new Set(incidentData.map((i) => i.id));
       // Data is on screen — drop the skeleton now rather than waiting out the
       // 1.5s fallback timer.
       setIsLoading(false);
     }, (error) => {
       console.error('Failed to subscribe to incidents:', error);
-      // Show an empty map rather than stale/fake data on error.
-      setFirebaseIncidents([]);
+      setLiveIncidents([]);
+      setHasMoreIncidents(false);
+      setIsLoadingMoreIncidents(false);
       setIsLoading(false);
     });
 
     return () => unsubscribe();
-  }, [isAuthReady]);
+  }, [isAuthReady, incidentLimit]);
 
-  const handleLoadMoreIncidents = useCallback(async () => {
-    if (!db || isLoadingMoreIncidents || !hasMoreIncidents || !lastVisibleIncidentDoc.current) return;
-
+  const handleLoadMoreIncidents = useCallback(() => {
+    if (!db || isLoadingMoreIncidents || !hasMoreIncidents) return;
     setIsLoadingMoreIncidents(true);
-    const path = 'incidents';
-    try {
-      const nextQuery = query(
-        collection(db, path),
-        where('visibility', '==', 'public'),
-        orderBy('timestamp', 'desc'),
-        startAfter(lastVisibleIncidentDoc.current),
-        limit(INCIDENT_PAGE_SIZE)
-      );
-      const nextPage = await getDocs(nextQuery);
-      const olderIncidents = nextPage.docs
-        .map((doc) => {
-          const d = doc.data();
-          return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
-        })
-        .filter((incident) => isPubliclyVisible(incident) && isFinite(incident.lat) && isFinite(incident.lng));
-
-      setFirebaseIncidents((prev) => {
-        const merged = new globalThis.Map(prev.map((incident) => [incident.id, incident]));
-        olderIncidents.forEach((incident) => {
-          if (!merged.has(incident.id)) {
-            merged.set(incident.id, incident);
-          }
-        });
-        return [...merged.values()].sort((a, b) => b.timestamp - a.timestamp);
-      });
-
-      lastVisibleIncidentDoc.current = nextPage.docs.length > 0 ? nextPage.docs[nextPage.docs.length - 1] : lastVisibleIncidentDoc.current;
-      setHasMoreIncidents(nextPage.docs.length === INCIDENT_PAGE_SIZE);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.LIST, path);
-    } finally {
-      setIsLoadingMoreIncidents(false);
-    }
+    setIncidentLimit(current => Math.min(current + INCIDENT_PAGE_SIZE, MAX_VISIBLE_REPORTS));
   }, [hasMoreIncidents, isLoadingMoreIncidents]);
 
   /**
@@ -1224,15 +1186,12 @@ export default function MapPage() {
    * day 4 to 7 aren't silently missing. Capped, so a busy week can't turn one
    * visit into hundreds of reads.
    */
-  const autoPages = useRef(0);
   useEffect(() => {
-    if (timeWindow !== '7d' || !hasMoreIncidents || isLoadingMoreIncidents || firebaseIncidents.length === 0) return;
-    if (autoPages.current >= WEEK_AUTO_PAGES) return;
-    const oldest = firebaseIncidents[firebaseIncidents.length - 1].timestamp;
+    if (timeWindow !== '7d' || !hasMoreIncidents || isLoadingMoreIncidents || liveIncidents.length === 0) return;
+    const oldest = liveIncidents[liveIncidents.length - 1].timestamp;
     if (oldest <= Date.now() - 7 * 86_400_000) return;
-    autoPages.current += 1;
     void handleLoadMoreIncidents();
-  }, [timeWindow, hasMoreIncidents, isLoadingMoreIncidents, firebaseIncidents, handleLoadMoreIncidents]);
+  }, [timeWindow, hasMoreIncidents, isLoadingMoreIncidents, liveIncidents, handleLoadMoreIncidents]);
 
   const handleMarkerClick = useCallback((incident: Incident, stack?: Incident[]) => {
     setSelectedArea(null);
@@ -1703,14 +1662,37 @@ export default function MapPage() {
       if (!isPubliclyVisible(fetched) || !Number.isFinite(fetched.lat) || !Number.isFinite(fetched.lng)) return;
       if (typeof fetched.expires_at === 'number' && fetched.expires_at <= Date.now()) return;
       deepLinkHandledRef.current = true;
-      setFirebaseIncidents((previous) => previous.some((item) => item.id === fetched.id)
-        ? previous
-        : [fetched, ...previous]);
+      setLinkedIncident(fetched);
       handleMarkerClick(fetched);
       startTransition(() => setSelectedIncident(fetched));
     }).catch((error) => console.error('Failed to load linked incident:', error));
     return () => { cancelled = true; };
   }, [searchParams, incidents, handleMarkerClick, isAuthReady]);
+
+  const linkedIncidentId = linkedIncident?.id;
+  useEffect(() => {
+    if (!db || !linkedIncidentId) return;
+    return onSnapshot(doc(db, 'incidents', linkedIncidentId), snapshot => {
+      const data = snapshot.data();
+      const lat = Number(data?.lat), lng = Number(data?.lng);
+      const item = { ...data, id: snapshot.id, lat, lng } as Incident;
+      setLinkedIncident(data && isPubliclyVisible(item) && Number.isFinite(lat) && Number.isFinite(lng)
+        && (!item.expires_at || item.expires_at > Date.now()) ? item : null);
+    }, () => setLinkedIncident(null));
+  }, [linkedIncidentId]);
+
+  const visibleIncidentsById = useMemo(() => new globalThis.Map(incidents.map(item => [item.id, item])), [incidents]);
+  const visibleSelectedIncident = selectedIncident ? visibleIncidentsById.get(selectedIncident.id) : undefined;
+  useEffect(() => {
+    if (selectedIncident && !visibleSelectedIncident) setSelectedIncident(null);
+  }, [selectedIncident, visibleSelectedIncident]);
+  useEffect(() => {
+    if (activeIncidentId && !visibleIncidentsById.has(activeIncidentId)) {
+      mapRef.current?.closeIncidentPopup();
+      setActiveIncidentId(null);
+    }
+  }, [activeIncidentId, visibleIncidentsById]);
+
 
   useEffect(() => {
     const nextParams = new URLSearchParams(searchParams);
@@ -2108,7 +2090,11 @@ export default function MapPage() {
   const peekList = useMemo(() => {
     if (!peekId) return [] as Incident[];
     // A stacked pin steps through the reports on that spot only.
-    if (peekStack?.some((i) => i.id === peekId)) return peekStack;
+    const visibleStack = peekStack?.flatMap(item => {
+      const visible = visibleIncidentsById.get(item.id);
+      return visible ? [visible] : [];
+    });
+    if (visibleStack?.some(item => item.id === peekId)) return visibleStack;
     const list = feedIncidents
       .filter((i) => selectedCategory === 'all' || i.category === selectedCategory)
       .slice()
@@ -2118,7 +2104,7 @@ export default function MapPage() {
       if (tapped) list.unshift(tapped);
     }
     return list;
-  }, [peekId, peekStack, feedIncidents, selectedCategory, incidents]);
+  }, [peekId, peekStack, feedIncidents, selectedCategory, incidents, visibleIncidentsById]);
   const peekIndex = peekId ? peekList.findIndex((i) => i.id === peekId) : -1;
   const peekIncident = peekIndex >= 0 ? peekList[peekIndex] : null;
 
@@ -4000,7 +3986,7 @@ export default function MapPage() {
 
         {/* Desktop & Mobile Panels */}
         <IncidentDetailPanel
-          incident={selectedIncident}
+          incident={visibleSelectedIncident ?? null}
           incidents={feedIncidents}
           userLocation={userLocation}
           homeNeighbourhood={userProfile?.neighborhood}

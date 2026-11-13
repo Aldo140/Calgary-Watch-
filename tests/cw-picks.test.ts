@@ -74,9 +74,9 @@ describe('shelves', () => {
 
   it('Local profiles that offer the service join the shelf, merged by name', () => {
     const biz = (title: string, tags: string[], extra: Partial<DiscoveryEntity> = {}) => ({ id: title, kind: 'business', slug: placeKey({ name: title }), title, tags, website: 'https://x.example', ...extra }) as unknown as DiscoveryEntity;
-    const shelf = shelfFor('electrical', [biz('Bright Spark Electric', ['electrician']), biz('Some Bakery', ['bakery']), biz('Hidden Co', ['electrician'], { developmentOnly: true } as Partial<DiscoveryEntity>)], NOW)!;
-    assert.deepEqual(shelf.contenders.map(c => c.name), ['Bright Spark Electric']);
-    assert.equal(shelf.contenders[0].path, '/local/bright-spark-electric');
+    const shelf = shelfFor('locksmith', [biz('Bright Spark Locks', ['locksmith']), biz('Some Bakery', ['bakery']), biz('Hidden Co', ['locksmith'], { developmentOnly: true } as Partial<DiscoveryEntity>)], NOW)!;
+    assert.deepEqual(shelf.contenders.map(c => c.name), ['Bright Spark Locks']);
+    assert.equal(shelf.contenders[0].path, '/local/bright-spark-locks');
     const merged = shelfFor('plumbing', [biz('Knight Plumbing', ['plumber'])], NOW)!;
     assert.equal(merged.contenders.length, plumbers.places.length, 'a profile for a listed plumber adds a link, not a row');
     assert.equal(merged.contenders.find(c => c.name === 'Knight Plumbing')?.path, '/local/knight-plumbing');
@@ -145,5 +145,30 @@ describe('reviews', () => {
     assert.equal(placeFromLink(url.searchParams.get('l')!, url.searchParams.get('p')!)?.contender.name, 'Knight Plumbing');
     assert.equal(placeFromLink('plumbing', 'nobody'), null);
     assert.equal(placeFromLink('nowhere', 'knight-plumbing'), null);
+  });
+});
+
+describe('concierge', () => {
+  it('reads proof chips only from what the company published', async () => {
+    const { proofsFor } = await import('../src/lib/cwPicks');
+    const knight = shelfFor('plumbing', [], NOW)!.contenders.find(c => c.name === 'Knight Plumbing')!;
+    assert.deepEqual(proofsFor(knight).map(p => p.label), ['Says 24/7', 'Since 1970', 'Says licensed']);
+    const pros = shelfFor('plumbing', [], NOW)!.contenders.find(c => c.name === 'The Gentlemen Pros')!;
+    assert.ok(proofsFor(pros).some(p => p.id === 'award'), 'cited award counts');
+    assert.deepEqual(proofsFor({ fact: { text: 'We fix things.', source: '/x', label: 'x' } }), []);
+  });
+  it('orders by need without dropping anyone', async () => {
+    const { orderFor } = await import('../src/lib/cwPicks');
+    const all = shelfFor('plumbing', [], NOW)!.contenders;
+    const urgent = orderFor(all, 'urgent').map(c => c.name);
+    assert.equal(urgent.length, all.length);
+    assert.deepEqual(urgent.slice(0, 2).sort(), ['Knight Plumbing', 'Mr. Mike’s Plumbing']);
+    assert.ok(['Mr. Mike’s Plumbing', 'Mr. Rooter Plumbing of Calgary'].includes(orderFor(all, 'quote')[0].name));
+    assert.deepEqual(orderFor(all, null).map(c => c.name), all.map(c => c.name));
+  });
+  it('knows Calgary office hours', async () => {
+    const { afterHours } = await import('../src/lib/cwPicks');
+    assert.equal(afterHours(Date.parse('2026-11-12T18:00:00Z')), false, 'noon MT');
+    assert.equal(afterHours(Date.parse('2026-11-13T04:00:00Z')), true, '10 pm MT');
   });
 });

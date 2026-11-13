@@ -10,7 +10,7 @@ import { adminIncidents, adminUsers } from '@/src/lib/adminStore';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { collection, getDocs, deleteDoc, doc, limit, onSnapshot, query, updateDoc } from 'firebase/firestore';
+import { collection, getDoc, getDocs, deleteDoc, doc, limit, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import {
   ArrowLeft, FileText, Loader2, Lock, Mail, MailCheck, MailX, Save, Search, Trash2, Users, X,
 } from 'lucide-react';
@@ -170,12 +170,22 @@ export default function AdminUserListPage() {
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
   const [draftProfiles, setDraftProfiles] = useState<Record<string, ProfileDraft>>({});
   const [savingUid, setSavingUid] = useState<string | null>(null);
+  const [moreUsers, setMoreUsers] = useState(false);
+  const [moreReports, setMoreReports] = useState(false);
+  const [linkedUser, setLinkedUser] = useState<UserProfile | null>(null);
+  useEffect(() => {
+    if (!db || !uidParam) return;
+    let active = true;
+    void getDoc(doc(db, "users", uidParam)).then(snapshot => {
+      if (active && snapshot.exists()) setLinkedUser({ ...snapshot.data(), uid: snapshot.id } as UserProfile);
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [uidParam]);
 
   useEffect(() => {
     if (!db) { setLoading(false); return; }
-    // Every account (the directory has to find anyone), read once per tab and
-    // shared across admin pages; reports come from the shared archive.
-    const unsubUsers = adminUsers.subscribe(db, ({ rows, loading }) => {
+    const unsubUsers = adminUsers.subscribe(db, ({ rows, loading, hasMore }) => {
+      setMoreUsers(hasMore);
       setUsers(rows as unknown as UserProfile[]);
       if (!loading) setLoading(false);
     });
@@ -184,7 +194,7 @@ export default function AdminUserListPage() {
       if (live) setUnsubscribes(snapshot.docs.map((row) => ({ uid: row.id, ...row.data() } as DigestUnsubscribeRequest)));
     }).catch(() => {});
     const unsubDigest = () => { live = false; };
-    const unsubIncidents = adminIncidents.subscribe(db, ({ rows }) => setIncidents([...rows].sort((a, b) => b.timestamp - a.timestamp)));
+    const unsubIncidents = adminIncidents.subscribe(db, ({ rows, hasMore }) => { setMoreReports(hasMore); setIncidents([...rows].sort((a, b) => b.timestamp - a.timestamp)); });
     return () => { unsubUsers(); unsubDigest(); unsubIncidents(); };
   }, []);
 
@@ -209,19 +219,23 @@ export default function AdminUserListPage() {
     return map;
   }, [incidents]);
 
-  const enrichedUsers = useMemo(() => users.map((profile) => {
-    const reports = reportsByUserKey.get(profile.uid) ?? reportsByUserKey.get(profile.email) ?? [];
-    const joinedAt = coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || 0;
-    const anonymousCount = reports.filter((r) => r.anonymous).length;
-    const unsubscribeRequest = unsubscribeByUid.get(profile.uid);
-    const digestStatus = digestAudienceStatus(profile, unsubscribeRequest);
-    const searchBlob = [
-      profile.displayName, profile.email, profile.notes,
-      digestStatusCopy[digestStatus], unsubscribeRequest?.source, profile.digestUnsubscribeSource,
-      ...reports.map((i) => `${i.title} ${i.description} ${i.neighborhood}`),
-    ].join(' ').toLowerCase();
-    return { ...profile, joinedAt, reports, anonymousCount, searchBlob, digestStatus, unsubscribeRequest };
-  }), [users, reportsByUserKey, unsubscribeByUid]);
+  const enrichedUsers = useMemo(() => {
+    const profiles = linkedUser && linkedUser.uid === uidParam && !users.some(user => user.uid === uidParam)
+      ? [linkedUser, ...users] : users;
+    return profiles.map(profile => {
+      const reports = reportsByUserKey.get(profile.uid) ?? reportsByUserKey.get(profile.email) ?? [];
+      const joinedAt = coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || 0;
+      const anonymousCount = reports.filter((r) => r.anonymous).length;
+      const unsubscribeRequest = unsubscribeByUid.get(profile.uid);
+      const digestStatus = digestAudienceStatus(profile, unsubscribeRequest);
+      const searchBlob = [
+        profile.displayName, profile.email, profile.notes,
+        digestStatusCopy[digestStatus], unsubscribeRequest?.source, profile.digestUnsubscribeSource,
+        ...reports.map((i) => `${i.title} ${i.description} ${i.neighborhood}`),
+      ].join(' ').toLowerCase();
+      return { ...profile, joinedAt, reports, anonymousCount, searchBlob, digestStatus, unsubscribeRequest };
+    });
+  }, [users, linkedUser, uidParam, reportsByUserKey, unsubscribeByUid]);
 
   const filteredUsers = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -243,7 +257,8 @@ export default function AdminUserListPage() {
       });
   }, [enrichedUsers, search, sort, roleFilter, digestFilter]);
 
-  const selectedUser = filteredUsers.find((p) => p.uid === selectedUid) || filteredUsers[0] || null;
+  const selectedUser = filteredUsers.find(p => p.uid === selectedUid)
+    || filteredUsers[0] || null;
 
   const userStats = useMemo(() => ({
     total: users.length,
@@ -324,12 +339,14 @@ export default function AdminUserListPage() {
                   <span className="tabular-nums" style={{ fontFamily: mono }}>{filteredUsers.length}</span>
                   {' of '}
                   <span className="tabular-nums" style={{ fontFamily: mono }}>{users.length}</span>
-                  {' accounts'}
+                  {' loaded accounts'}
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-2 mt-3">
+            <div className="flex flex-wrap gap-2 mt-3">
+              {moreUsers && <AdminButton variant="outline" onClick={() => { if (db) void adminUsers.loadMore(db); }}>Load more accounts</AdminButton>}
+              {moreReports && <AdminButton variant="outline" onClick={() => { if (db) void adminIncidents.loadMore(db); }}>Load more reports</AdminButton>}
               <SearchField
                 value={search}
                 onChange={setSearch}

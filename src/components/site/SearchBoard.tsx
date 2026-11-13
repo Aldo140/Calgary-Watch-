@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, ExternalLink } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Search, TrendingUp, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink, ChevronLeft, ChevronRight, CornerDownLeft } from 'lucide-react';
+import { useRef, useState, type ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
-import { PageHero } from './PageHero';
 import type { SearchIntent } from '../../lib/searchIntent';
 import type { DiscoveryEntity } from '../../types/discovery';
 import type { SafetyHeadline } from '../../lib/safetyNews';
@@ -13,6 +12,7 @@ import { tryChips } from '../../lib/searchTrends';
 import { PickBoard } from '../picks/PickBoard';
 import type { Shelf } from '../../lib/cwPicks';
 import { bestPath } from '../../lib/bestOf';
+import '../../styles/brand-page.css';
 import '../../styles/search-page.css';
 
 /** One-tap searches for what people most often come looking for. */
@@ -32,11 +32,12 @@ const BROWSE: Array<{ to: string; label: string; note: string; icon: ReactNode }
   { to: '/neighbourhoods', label: 'Neighbourhoods', note: 'Quadrant by quadrant', icon: <Compass size={20} /> },
   { to: '/guides', label: 'Guides', note: 'Self-guided days out', icon: <BookOpen size={20} /> },
   { to: '/local', label: 'Local', note: 'Places worth knowing', icon: <MapPin size={20} /> },
+  { to: '/picks', label: 'Who to call', note: 'Plumbers to snow removal, checked', icon: <BadgeCheck size={20} /> },
   { to: '/best', label: 'Best of Calgary', note: 'Pho, pizza and trades, cited', icon: <Trophy size={20} /> },
   { to: '/safety', label: 'Safety news', note: 'Calgary crime headlines by topic', icon: <ShieldCheck size={20} /> },
 ];
 
-const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'jazz', 'Kensington', 'free this weekend'];
+const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'plumber', 'Kensington', 'free this weekend'];
 
 const when = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const KIND: Record<string, string> = { event: 'Event', market: 'Market', business: 'Local', guide: 'Guide', neighbourhood: 'Neighbourhood' };
@@ -74,9 +75,9 @@ export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: Discove
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, pickShelf }: {
+export function SearchBoard({ q, intent, now, groups, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, pickShelf }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
-  listingCount: number; resultCount: number; answers: number;
+  resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
   /** What Calgary searched for most lately (searchTrends.ts), most first. */
   popular?: Suggestion[];
@@ -96,6 +97,9 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
   const [open, setOpen] = useState<Record<string, boolean>>({});
   // Places already ranked in the "best pho" card aren't listed twice.
   const picked = new Set(best?.picks.map(e => e.id));
+  // A Best list already shown as the service's Pick desk isn't listed (or counted) twice.
+  const shownBest = bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug }));
+  const deskCount = pickShelf?.contenders.length ?? 0;
   const kinds = Object.keys(groups).filter(k => groups[k].some(e => !picked.has(e.id)));
   const collapsed = Object.fromEntries(kinds.map(k => [k, collapseRepeats(groups[k].filter(e => !picked.has(e.id)))]));
   const distinct = kinds.reduce((n, k) => n + collapsed[k].length, 0);
@@ -103,25 +107,52 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
   const top = !partial && !intent.best && kinds.length ? collapsed[kinds[0]][0] : undefined;
   const shown = tab === 'all' ? kinds : kinds.filter(k => k === tab);
   const listings = <><b>{distinct}</b> {partial ? 'close ' : ''}{distinct === 1 ? 'listing' : 'listings'}</>;
-  const ready = <><b>{answers}</b> ready-made {answers === 1 ? 'answer' : 'answers'}</>;
+  const answerTotal = answers + (safety?.topics.length ?? 0) + (nearby?.items.length ? 1 : 0);
+  const ready = <><b>{answerTotal}</b> {answerTotal === 1 ? 'answer' : 'answers'}</>;
   return (
     <div className={`bp sx${q ? ' sx-has-q' : ''}`}>
-      <PageHero
-        id="sx-title"
-        kicker={q ? 'Search results' : 'Search CalgaryWatch'}
-        title={q ? <>Results for <span>“{q}”</span></> : <>Ask about <span>Calgary.</span></>}
-        lead={q ? undefined : 'A neighbourhood, a street, what happened last night, or something to do this weekend. Answers come from the live map and every listing on the site.'}
-        ctas={<div className="sx-box"><GlobalSearch initial={q} suggest={suggest} popular={popular} /></div>}
-        facts={<>{tryChips(popular, TRY).map(t => <li key={t.to}><Link to={t.to}>{t.label}</Link></li>)}</>}
-      />
+      <section className="sx-hero" aria-labelledby="sx-title">
+        {!q && <div className="sx-city" aria-hidden="true">
+          <picture>
+            <source media="(max-width: 640px)" srcSet="/images/hero/search-calgary-pocket.webp" />
+            <img
+            src="/images/hero/search-calgary-1320.webp"
+            srcSet="/images/hero/search-calgary-860.webp 860w, /images/hero/search-calgary-1320.webp 1320w"
+            sizes="(max-width: 760px) 100vw, 62vw"
+            width={1320}
+            height={742}
+            alt=""
+            fetchPriority="high"
+            />
+          </picture>
+          <div className="sx-pocket-route"><i /><i /><i /></div>
+          <div className="sx-city-lens"><span /><span /><span /><span /></div>
+          <span className="sx-city-point sx-city-point-tower" />
+          <span className="sx-city-point sx-city-point-river" />
+        </div>}
+        <div className="cw-wrap sx-hero-inner">
+          <div className="sx-hero-copy">
+            <p className="sx-kicker"><Search size={16} aria-hidden="true" /> Search CalgaryWatch</p>
+            <h1 id="sx-title">{q ? <>Results for <em>“{q}”</em></> : <>Find it <em>in Calgary.</em></>}</h1>
+            {!q && <p className="sx-lead">Look up a street, check what happened nearby, or find something to do this weekend.</p>}
+            <div className="sx-search-panel">
+            <div className="sx-box"><GlobalSearch initial={q} suggest={suggest} popular={popular} showSubmitText placeholder="Street, place, or event" /></div>
+            {!q && <div className="sx-try">
+              <span>Try</span>
+              <ul aria-label="Example searches">{tryChips(popular, TRY).slice(0, 4).map(t => <li key={t.to}><Link to={t.to}>{t.label}<CornerDownLeft size={12} aria-hidden="true" /></Link></li>)}</ul>
+            </div>}
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div className="cw-wrap">
+      <div className="cw-wrap sx-body">
         {q ? (
           <>
             <div className="sx-bar">
               <p className="sx-count" role="status">
                 {resultCount
-                  ? <>{bestLists.length ? <><b>{bestLists.length}</b> Best of Calgary {bestLists.length === 1 ? 'list' : 'lists'}{answers || distinct ? ', ' : null}</> : null}{answers ? ready : null}{answers > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
+                  ? <>{deskCount ? <><b>{deskCount}</b> local {pickShelf!.service.label.toLowerCase()}{shownBest.length || answerTotal || distinct ? ', ' : null}</> : null}{shownBest.length ? <><b>{shownBest.length}</b> Best of Calgary {shownBest.length === 1 ? 'list' : 'lists'}{answerTotal || distinct ? ', ' : null}</> : null}{answerTotal ? ready : null}{answerTotal > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
                   : best && intent.best ? <>Nothing on CalgaryWatch for <b>“{intent.best.thing}”</b> yet. Here’s where to look.</>
                   : <>Nothing matched <b>“{q}”</b> yet. Try a neighbourhood, a street, or one of these.</>}
               </p>
@@ -136,6 +167,7 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
               ) : null}
             </div>
             {didYouMean ? <p className="sx-dym">Did you mean <Link to={`/search?q=${encodeURIComponent(didYouMean)}`}>{didYouMean}</Link>?</p> : null}
+            <div key={tab} className="sx-results-enter">
             {tab === 'all' ? <SearchAnswers intent={intent} now={now} best={best} /> : null}
             {pickShelf && tab === 'all' ? (
               <section className="bp-section sx-group" aria-labelledby="sx-pick">
@@ -143,11 +175,11 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                 <PickBoard shelf={pickShelf} via="search" compact />
               </section>
             ) : null}
-            {bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug })).length && tab === 'all' ? (
+            {shownBest.length && tab === 'all' ? (
               <section className="bp-section sx-group" aria-labelledby="sx-best">
                 <div className="bp-head"><h2 id="sx-best">Best of <span>Calgary</span></h2><Link className="bp-link" to="/best">All lists <ArrowRight size={15} aria-hidden="true" /></Link></div>
                 <ul className="sx-results">
-                  {bestLists.filter(b => !pickShelf?.bestSlug || b.to !== bestPath({ slug: pickShelf.bestSlug })).map(b => (
+                  {shownBest.map(b => (
                     <li key={b.to}>
                       <Link to={b.to} className="sx-result">
                         <span className="sx-thumb sx-thumb-best" aria-hidden="true"><Trophy size={26} /></span>
@@ -217,14 +249,15 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                 <Rows rows={collapseRepeats(nearby.items)} />
               </section>
             ) : null}
-            {!resultCount && !best ? <>{popular.length ? <Popular items={popular} title={<>Others found <span>these.</span></>} /> : null}<Starters title="Try one of these" /></> : null}
+            {!resultCount && !best ? <Starters title="Try one of these" /> : null}
+            </div>
           </>
         ) : (
           <>
-            {popular.length ? <Popular items={popular} title={<>What Calgary <span>searches for.</span></>} /> : null}
-            <Starters title={popular.length ? <>Quick <span>answers.</span></> : <>What people <span>ask most.</span></>} />
+            <Starters title="Quick answers" />
+            {popular.length ? <Popular items={popular} title="Popular searches" /> : null}
             <section className="bp-section" aria-labelledby="sx-browse">
-              <div className="bp-head"><h2 id="sx-browse">Or just <span>browse.</span></h2><p>Every section, checked against its source.</p></div>
+              <div className="bp-head"><h2 id="sx-browse">Browse Calgary</h2></div>
               <ul className="sx-browse">
                 {BROWSE.map(b => (
                   <li key={b.to}><Link to={b.to}><span className="sx-browse-icon" aria-hidden="true">{b.icon}</span><strong>{b.label}</strong><small>{b.note}</small><ArrowUpRight size={18} aria-hidden="true" className="sx-arrow" /></Link></li>
@@ -234,12 +267,12 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
           </>
         )}
 
-        <section className="bp-banner sx-live">
+        <section className="sx-live">
           <div>
-            <h2>Happening right now?</h2>
+            <h2>See what’s happening now</h2>
             <p>Weather, traffic, outages and what neighbours are reporting live on one map, each pin with its source.</p>
           </div>
-          <div className="bp-ctas"><Link className="bp-btn bp-btn-navy" to="/map"><MapIcon size={18} aria-hidden="true" /> Open the live map</Link></div>
+          <div className="bp-ctas"><Link className="sx-live-link" to="/map"><MapIcon size={18} aria-hidden="true" /> Open the live map</Link></div>
         </section>
       </div>
     </div>
@@ -304,10 +337,10 @@ function Rows({ rows }: { rows: Array<{ e: DiscoveryEntity; more: number }> }) {
 function Popular({ items, title }: { items: Suggestion[]; title: ReactNode }) {
   return (
     <section className="bp-section" aria-labelledby="sx-popular">
-      <div className="bp-head"><h2 id="sx-popular">{title}</h2><p>Where searches on CalgaryWatch landed most this month.</p></div>
+      <div className="bp-head"><h2 id="sx-popular">{title}</h2></div>
       <ul className="sx-browse sx-popular">
-        {items.map((p, i) => (
-          <li key={p.to}><Link to={p.to}><span className="sx-browse-icon sx-popular-n" aria-hidden="true">{i + 1}</span><strong>{p.label}</strong><small>{p.note}</small><ArrowUpRight size={18} aria-hidden="true" className="sx-arrow" /></Link></li>
+        {items.map(p => (
+          <li key={p.to}><Link to={p.to}><span className="sx-browse-icon" aria-hidden="true"><TrendingUp size={19} /></span><strong>{p.label}</strong><small>{p.note}</small><ArrowUpRight size={18} aria-hidden="true" className="sx-arrow" /></Link></li>
         ))}
       </ul>
     </section>
@@ -315,10 +348,29 @@ function Popular({ items, title }: { items: Suggestion[]; title: ReactNode }) {
 }
 
 function Starters({ title }: { title: ReactNode }) {
+  const rail = useRef<HTMLUListElement>(null);
+  const [position, setPosition] = useState({ start: true, end: false });
+  const move = (direction: number) => {
+    const list = rail.current;
+    if (!list) return;
+    const behaviour = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+    const card = list.firstElementChild?.getBoundingClientRect().width ?? list.clientWidth;
+    list.scrollBy({ left: direction * (card + parseFloat(getComputedStyle(list).columnGap)), behavior: behaviour });
+  };
   return (
-    <section className="bp-section" aria-labelledby="sx-starters">
-      <div className="bp-head"><h2 id="sx-starters">{title}</h2><p>One tap, real answers. When there’s nothing reported, it says so.</p></div>
-      <ul className="sx-starters">
+    <section className="bp-section sx-quick" aria-labelledby="sx-starters">
+      <div className="bp-head">
+        <h2 id="sx-starters">{title}</h2>
+        <div className="sx-rail-controls">
+          <button type="button" onClick={() => move(-1)} disabled={position.start} aria-label="Previous quick answer"><ChevronLeft size={19} /></button>
+          <button type="button" onClick={() => move(1)} disabled={position.end} aria-label="Next quick answer"><ChevronRight size={19} /></button>
+        </div>
+      </div>
+      <ul className="sx-starters" ref={rail} onScroll={event => {
+        const { scrollLeft, clientWidth, scrollWidth } = event.currentTarget;
+        const start = scrollLeft <= 1, end = scrollLeft + clientWidth >= scrollWidth - 1;
+        setPosition(previous => previous.start === start && previous.end === end ? previous : { start, end });
+      }}>
         {STARTERS.map(s => (
           <li key={s.to}>
             <Link to={s.to} className={`sx-starter bp-tone-${s.tone}`}>

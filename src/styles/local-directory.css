@@ -137,6 +137,15 @@
 
 .ld-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 268px), 1fr)); gap: 20px; }
 .ld-card { display: flex; }
+/* "Show all": the shelf's last tile until it is opened (cards past the first few aren't drawn up front). */
+.cw-loc .ld-card-more button {
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 8px; width: 100%; min-height: 160px; padding: 18px;
+  border: 2px dashed var(--ink); border-radius: 22px; background: color-mix(in srgb, var(--tone) 22%, var(--card)); color: var(--ink);
+  font: inherit; text-align: left; cursor: pointer; transition: transform .25s cubic-bezier(.2, .9, .3, 1), background .2s;
+}
+.cw-loc .ld-card-more button:hover, .cw-loc .ld-card-more button:focus-visible { transform: translate(-3px, -3px); background: var(--tone); color: var(--tink, var(--ink)); }
+.ld-card-more b { font: 800 40px/1 var(--display); letter-spacing: -.04em; }
+.ld-card-more span { font-weight: 700; font-size: 16px; line-height: 1.25; }
 .cw-loc .ld-card-main {
   position: relative; display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 18px 18px 16px; overflow: hidden;
   border: 2px solid var(--ink); border-radius: 22px; background: var(--card); box-shadow: 5px 5px 0 var(--ink);
@@ -258,6 +267,7 @@
   .ld-cards::-webkit-scrollbar { display: none; }
   .ld-card { flex: 0 0 80vw; max-width: 330px; scroll-snap-align: start; }
   .ld-cards:has(> .ld-card:only-child) .ld-card { flex-basis: 100%; max-width: none; }
+  .ld-card.ld-card-more { flex-basis: 46vw; max-width: 200px; }
   .cw-loc .ld-card-main { padding: 16px 16px 14px; border-radius: 20px; box-shadow: 4px 4px 0 var(--ink); }
   .ld-card-name { font-size: 20px; }
   .ld-steps li:nth-child(n) { margin-left: 0; }

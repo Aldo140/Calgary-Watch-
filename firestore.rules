@@ -224,7 +224,8 @@ service cloud.firestore {
       // enforced as a *query constraint*: rules filter queries, not rows, so
       // the client must ask for visibility == 'public' and the rule below
       // requires it. Anything hidden is unreachable, not merely unrendered.
-      allow get: if true;
+      allow get: if resource.data.visibility == 'public' || isAdmin() ||
+                    (isAuthenticated() && resource.data.get('authorUid', '') == request.auth.uid);
       allow list: if (request.query.limit <= 200 &&
                    resource.data.visibility == 'public') ||
                   isAdmin();
@@ -453,6 +454,23 @@ service cloud.firestore {
                     request.resource.data.createdAt is number &&
                     request.resource.data.status == 'new';
       allow read, update, delete: if isAdmin();
+    }
+
+    // The CalgaryWatch Pick vetting desk (src/lib/pickVetting.ts). Admin only:
+    // check dates and private notes. The deploy publishes only dates, the
+    // company and the why (scripts/picks/export-picks.ts).
+    match /pick_vetting/{serviceId} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() &&
+                    hasOnlyAllowedFields(['service', 'place', 'placeName', 'checks', 'why', 'status', 'updatedAt', 'publish', 'publishedAt', 'updatedBy']) &&
+                    request.resource.data['service'] == serviceId &&
+                    request.resource.data.place is string && request.resource.data.place.size() <= 32 &&
+                    request.resource.data.placeName is string && request.resource.data.placeName.size() <= 120 &&
+                    request.resource.data.checks is map &&
+                    request.resource.data.why is string && request.resource.data.why.size() <= 400 &&
+                    request.resource.data.status in ['vetting', 'live', 'paused'] &&
+                    request.resource.data.updatedAt is number;
+      allow delete: if isAdmin();
     }
 
     // Anonymous page view analytics – write-only from any visitor, no PII stored.

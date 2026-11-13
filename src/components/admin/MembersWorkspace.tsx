@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import {MemberActivity} from './MemberActivity';
 import {useAdminView} from '../../hooks/useAdminView';
 import {WorkspaceTabs} from './WorkspaceTabs';
@@ -19,7 +20,7 @@ import type { AdminData } from '../../hooks/useAdminData';
 import { MembersDirectory } from './MembersDirectory';
 
 type Counts = { accounts?: number; monday?: number; thursday?: number; withArea?: number; suggestions?: number; organizers?: number };
-const dayFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
+const dayFmt = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
 
 /** Every listing the export knows, including ones that have ended or aged out, so old plans keep their names. */
 const exported = new Map((inventory.entities as Array<{ id: string; title: string }>).map((e) => [e.id, e]));

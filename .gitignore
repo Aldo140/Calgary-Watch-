@@ -34,3 +34,8 @@ public/email-previews/
 /functions/admin-member.cjs
 
 functions/approve-organization.cjs
+
+# Generated from the current discovery export before starting Vite
+/src/generated/home-inventory.json
+/playwright-report/
+/test-results/

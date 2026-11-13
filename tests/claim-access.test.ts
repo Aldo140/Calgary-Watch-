@@ -93,6 +93,7 @@ const firestoreMock=moduleUrl(`
  export const limit=()=>{};export const onSnapshot=()=>{};export const query=()=>{};export const where=()=>{};
 `);
 const claimApi=await import(compile('../src/lib/claimsApi.ts',{
+ './myClaims':moduleUrl('export const useMyClaims=()=>null;export const useClaimLoadError=()=>false;'),
  './auth':moduleUrl('export const syncVerifiedToken=async()=>{};'),
  './readEfficiency':compile('../src/lib/readEfficiency.ts'),
  './listingUpdates':moduleUrl('export const listingUpdateRequest=()=>{};'),

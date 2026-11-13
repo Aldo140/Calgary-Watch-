@@ -46,10 +46,16 @@ export default function SearchPage() {
   useOrganizationLive();
   const [params] = useSearchParams();
   const q = normalizeSearch(params.get('q') ?? '');
+  const lastQuery = useRef(q);
+  useEffect(() => {
+    if (lastQuery.current === q) return;
+    lastQuery.current = q;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [q]);
   // A tap on a popular pick isn't new demand: counting it would let the list feed itself.
   const fromPopular = params.get('via') === POPULAR_VIA;
   const all = discoveryRepository.list();
-  const occurrences = useMemo(() => discoveryRepository.occurrences(), []);
+  const occurrences = useMemo(() => discoveryRepository.occurrences(), [all]);
   const now = useMemo(() => Date.now(), [q]);
   const results = useMemo(() => searchListings(all, occurrences, q, new Date(now)), [all, occurrences, q, now]);
   const parsed = useMemo(() => {
@@ -162,7 +168,7 @@ export default function SearchPage() {
   return (
     <SiteLayout>
       <SearchBoard key={q} q={q} best={best} pickShelf={pickShelf} bestLists={bestLists} safety={safety} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
-        listingCount={results.total} resultCount={resultCount} answers={answers}
+        resultCount={resultCount} answers={answers}
         partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} popular={POPULAR} nearby={nearby} />
     </SiteLayout>
   );

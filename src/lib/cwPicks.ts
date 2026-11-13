@@ -1,6 +1,8 @@
+import { calgaryDateTimeFormat } from './calgaryTz';
 import { BEST_CATEGORIES, type BestPlace } from '../content/bestOf';
 import { sourceOf } from './bestOf';
 import { PICK_CHECKS, PICKS, type CwPick, type PickCheck } from '../content/cwPicks';
+import { DESK_COMPANIES } from '../content/pickDesks';
 import { LOCAL_SERVICES, offersService, serviceById, type LocalService } from '../data/localServices';
 import type { DiscoveryEntity } from '../types/discovery';
 
@@ -58,6 +60,8 @@ export interface Contender {
   path?: string;
   area?: string;
   verified?: boolean;
+  /** Every other published fact, for proof chips. */
+  facts?: string[];
 }
 
 /** Everything the Pick desk for one service shows. */
@@ -75,7 +79,7 @@ const sortName = (n: string) => n.replace(/^the\s+/i, '');
 function fromBest(p: BestPlace, sourceLabel: (id: string) => { url: string; label: string } | undefined): Contender {
   const f = p.facts[0];
   const src = f ? (f.self ? { url: f.source, label: 'their site' } : sourceLabel(f.source)) : undefined;
-  return { key: placeKey(p), name: p.name, website: p.website, phone: p.phone, area: p.area, verified: p.verified,
+  return { key: placeKey(p), name: p.name, website: p.website, phone: p.phone, area: p.area, verified: p.verified, facts: p.facts.slice(1).map(x => x.text),
     ...(f && src ? { fact: { text: f.text, source: src.url, label: src.label } } : {}) };
 }
 
@@ -91,6 +95,7 @@ export function shelfFor(serviceId: string, entities: readonly DiscoveryEntity[]
   const best = service.best ? BEST_CATEGORIES.find(c => c.slug === service.best) : undefined;
   const out = new Map<string, Contender>();
   for (const p of best?.places ?? []) out.set(placeKey(p), fromBest(p, sourceLabel));
+  for (const p of DESK_COMPANIES[service.id]?.places ?? []) if (!out.has(placeKey(p))) out.set(placeKey(p), fromBest(p, sourceLabel));
   for (const e of entities) {
     if (e.kind !== 'business' || e.developmentOnly || !offersService(e, service)) continue;
     const key = placeKey({ name: e.title });
@@ -139,6 +144,29 @@ export const askFor = (service: LocalService): string[] => service.ask?.length ?
 
 export function telHref(phone: string): string {
   return `tel:+1${phone.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '')}`;
+}
+
+// ─── This device's memory ───────────────────────────────────────────────────
+
+/** A contact remembered on this device only, so a desk can say "you called them Tuesday". Never sent anywhere. */
+export interface RecentContact { list: string; key: string; name: string; contact: ContactKind; at: number; checkIn: boolean }
+const RECENT_KEY = 'cw-pick-recent';
+const RECENT_DAYS = 30;
+
+export function recentContacts(list?: string, now = Date.now()): RecentContact[] {
+  try {
+    const all = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]') as RecentContact[];
+    return all.filter(r => r && typeof r.at === 'number' && now - r.at < RECENT_DAYS * DAY && (!list || r.list === list)).sort((a, b) => b.at - a.at);
+  } catch {
+    return [];
+  }
+}
+
+export function rememberContact(r: RecentContact): void {
+  try {
+    const rest = recentContacts(undefined, r.at).filter(x => !(x.list === r.list && x.key === r.key));
+    localStorage.setItem(RECENT_KEY, JSON.stringify([r, ...rest].slice(0, 12)));
+  } catch { /* private mode: the desk just won't remember */ }
 }
 
 // ─── Follow-ups ─────────────────────────────────────────────────────────────
@@ -291,4 +319,48 @@ export function followupEmail(f: Pick<PickFollowup, 'email' | 'placeName' | 'lis
 ${opts.mailingAddress ? `<p style="color:#8090a5;font-size:12px">${esc(opts.mailingAddress)}</p>` : ''}
 </div>`;
   return { to: f.email, subject, text: lines.join('\n'), html };
+}
+
+// ─── Concierge ──────────────────────────────────────────────────────────────
+
+/** What the reader is dealing with, from the desk's "What's going on?" choice. */
+export type Need = 'urgent' | 'quote' | 'routine';
+
+export interface Proof { id: 'always-on' | 'since' | 'licensed' | 'upfront' | 'award' | 'verified'; label: string }
+
+/**
+ * Short proof chips for a card, read from the company's own published facts
+ * (and awards we cite). Words like "Says" stay in the fact; a chip only names
+ * what the text claims, so it never says more than the source.
+ */
+export function proofsFor(c: Pick<Contender, 'fact' | 'verified'> & { facts?: string[] }): Proof[] {
+  const text = [c.fact?.text ?? '', ...(c.facts ?? [])].join(' ');
+  const out: Proof[] = [];
+  if (/24\/7|24 hours|around the clock|emergency line/i.test(text)) out.push({ id: 'always-on', label: 'Says 24/7' });
+  const since = text.match(/since (\d{4})/i);
+  if (since) out.push({ id: 'since', label: `Since ${since[1]}` });
+  if (/licensed/i.test(text)) out.push({ id: 'licensed', label: 'Says licensed' });
+  if (/upfront|flat-rate|flat rate/i.test(text)) out.push({ id: 'upfront', label: 'Upfront pricing' });
+  if (/award/i.test(text)) out.push({ id: 'award', label: 'Award named' });
+  if (c.verified) out.push({ id: 'verified', label: 'Verified on CalgaryWatch' });
+  return out;
+}
+
+/** Calgary's hour (0–23) right now. */
+export const calgaryHour = (now = Date.now()) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', hourCycle: 'h23' }).format(now));
+/** Most offices are closed: before 8 am, after 6 pm. */
+export const afterHours = (now = Date.now()) => { const h = calgaryHour(now); return h < 8 || h >= 18; };
+
+/**
+ * The shelf in the order that fits the need. Urgent: companies that say they
+ * answer around the clock, with a phone, first. Quote: those publishing
+ * upfront pricing first. Routine: A–Z as listed. Stable otherwise.
+ */
+export function orderFor(contenders: readonly Contender[], need: Need | null): Contender[] {
+  if (!need || need === 'routine') return [...contenders];
+  const score = (c: Contender) => {
+    const p = new Set(proofsFor(c).map(x => x.id));
+    return need === 'urgent' ? (p.has('always-on') ? 2 : 0) + (c.phone ? 1 : 0) : (p.has('upfront') ? 2 : 0) + (c.website ? 1 : 0);
+  };
+  return contenders.map((c, i) => ({ c, i, s: score(c) })).sort((a, b) => b.s - a.s || a.i - b.i).map(x => x.c);
 }

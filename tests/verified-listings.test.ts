@@ -93,7 +93,7 @@ describe('verified state follows approved claims only', () => {
 });
 
 describe('the verified badge', () => {
-  const cta = readFileSync(new URL('../src/components/entity/ClaimCta.tsx', import.meta.url), 'utf8');
+  const cta = readFileSync(new URL('../src/components/entity/ClaimCta.tsx', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 
   it('4. shows on a verified listing, with what it means', () => {
     const html = renderToStaticMarkup(createElement(VerifiedBadge));

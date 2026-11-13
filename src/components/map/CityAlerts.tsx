@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { useEffect, useId, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
@@ -104,7 +105,7 @@ const PLAN_LINE: Record<AlertHazard, string> = {
 
 /** Calgary-clock date key for `daily`, matching useCalgaryWeather. */
 function dayKey(t: number): string {
-  return new Date(t).toLocaleDateString('en-CA', { timeZone: 'America/Edmonton' });
+  return calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: 'numeric', day: 'numeric' }).format(new Date(t));
 }
 
 /**
@@ -164,7 +165,7 @@ function RightNow({ now }: { now: number }) {
             const DayIcon = SKY_ICON[describeSky(d!.code).icon];
             return (
               <li key={t}>
-                <small>{new Date(t).toLocaleDateString('en-CA', { timeZone: 'America/Edmonton', weekday: 'short' })}</small>
+                <small>{calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short' }).format(new Date(t))}</small>
                 <DayIcon size={18} strokeWidth={2.2} aria-hidden="true" />
                 <b>{Math.round(d!.max)}°<span> / {Math.round(d!.min)}°</span></b>
                 {d!.precipChance !== null && d!.precipChance >= 20 && <em>{d!.precipChance}%</em>}

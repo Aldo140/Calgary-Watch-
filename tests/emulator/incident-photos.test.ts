@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { after, test } from 'node:test';
 import { initializeApp, deleteApp, type FirebaseApp } from 'firebase/app';
-import { connectFirestoreEmulator, doc, getFirestore, setDoc, terminate } from 'firebase/firestore';
+import { collection, connectFirestoreEmulator, doc, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, terminate, updateDoc, where } from 'firebase/firestore';
 import { connectStorageEmulator, getStorage, ref, uploadBytes } from 'firebase/storage';
 
 const fsHost = process.env.FIRESTORE_EMULATOR_HOST;
@@ -71,4 +71,20 @@ test('a report cannot point its photo anywhere else', async () => {
   ]) {
     await assert.rejects(setDoc(doc(db, 'incidents', crypto.randomUUID()), incident('u1', { image_url })), /permission/i, String(image_url));
   }
+});
+
+test('two flags remove a report from both the live query and the public detail URL', async () => {
+  const report = 'moderation-smoke';
+  const reporter = client('reporter').db;
+  const guest = client(null).db;
+  const reportAt = (db: typeof reporter) => doc(db, 'incidents', report);
+  const visible = query(collection(guest, 'incidents'), where('visibility', '==', 'public'), orderBy('timestamp', 'desc'), limit(200));
+  await setDoc(reportAt(reporter), incident('reporter'));
+  assert.ok((await getDocs(visible)).docs.some(row => row.id === report));
+  await updateDoc(reportAt(client('flagger1').db), { flagged_by: ['flagger1'], flag_count: 1, visibility: 'public' });
+  assert.ok((await getDoc(reportAt(guest))).exists());
+  await updateDoc(reportAt(client('flagger2').db), { flagged_by: ['flagger1', 'flagger2'], flag_count: 2, visibility: 'flagged', flagged_at: Date.now() });
+  assert.ok(!(await getDocs(visible)).docs.some(row => row.id === report));
+  await assert.rejects(getDoc(reportAt(guest)), /permission/i);
+  assert.ok((await getDoc(reportAt(reporter))).exists());
 });

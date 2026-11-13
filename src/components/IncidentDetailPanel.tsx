@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 import { Incident, STATUS_ICONS, CATEGORY_ICONS, FLAG_THRESHOLD, isPubliclyVisible } from '@/src/types';
 import { findNearestCamera, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import {
@@ -101,14 +102,14 @@ function planDay(iso: string): { dow: string; day: string } {
   const d = new Date(iso);
   const tz = 'America/Edmonton';
   return {
-    dow: d.toLocaleDateString('en-CA', { timeZone: tz, weekday: 'short' }),
-    day: d.toLocaleDateString('en-CA', { timeZone: tz, day: 'numeric' }),
+    dow: calgaryDateTimeFormat('en-CA', { timeZone: tz, weekday: 'short' }).format(d),
+    day: calgaryDateTimeFormat('en-CA', { timeZone: tz, day: 'numeric' }).format(d),
   };
 }
 
 function planTime(iso: string): string {
   const d = new Date(iso);
-  const hm = d.toLocaleTimeString('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+  const hm = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' }).format(d);
   return /^12:00\sa\.?m\.?$/i.test(hm) ? 'All day' : hm;
 }
 

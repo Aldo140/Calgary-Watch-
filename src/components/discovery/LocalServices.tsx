@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowUpRight, BadgeCheck, CalendarClock, Lightbulb } from 'lucide-react';
@@ -8,8 +9,8 @@ import { entityPath } from '../../lib/discovery';
 import { inPeak, LOCAL_SERVICES, offersService, SERVICE_GROUPS, type LocalService, type ServiceGroup } from '../../data/localServices';
 
 const GROUPS = Object.keys(SERVICE_GROUPS) as ServiceGroup[];
-const MONTH = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long' });
-const calgaryMonth = (d: Date) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
+const MONTH = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long' });
+const calgaryMonth = (d: Date) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
 
 const recommendHref = (s: LocalService) => `mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Recommending a Calgary ${s.trades[0]}`)}&body=${encodeURIComponent('Name and website:\n\nWhy I’d recommend them:\n')}`;
 

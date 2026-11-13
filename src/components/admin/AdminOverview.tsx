@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 /**
  * The admin home: how CalgaryWatch is doing, then what needs a human.
  *
@@ -40,7 +41,7 @@ export interface OverviewProps {
 }
 
 function greeting(now: number) {
-  const hour = Number(new Intl.DateTimeFormat('en-CA', { hour: 'numeric', hourCycle: 'h23', timeZone: 'America/Edmonton' }).format(now));
+  const hour = Number(calgaryDateTimeFormat('en-CA', { hour: 'numeric', hourCycle: 'h23', timeZone: 'America/Edmonton' }).format(now));
   return hour < 5 ? 'Up late' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 }
 
@@ -84,7 +85,7 @@ export function AdminOverview({
   name, members, pulse, pageViewsTotal, residentReports, reportsToday, apiHealths, catalogue, now = Date.now(), onOpen, children,
 }: OverviewProps) {
   const first = name?.trim().split(/\s+/)[0];
-  const date = new Intl.DateTimeFormat('en-CA', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'America/Edmonton' }).format(now);
+  const date = calgaryDateTimeFormat('en-CA', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'America/Edmonton' }).format(now);
   const feeds = summarizeFeeds(apiHealths, now);
   const problems = apiHealths.map((api) => ({ api, reading: readFeed(api, now) })).filter((f) => f.reading.actionable);
   const late = apiHealths.filter((api) => readFeed(api, now).verdict === 'late');
@@ -151,7 +152,7 @@ export function AdminOverview({
         <button type="button" className="ao-kpi" onClick={() => onOpen('reports')}>
           <span className="ao-kpi-head"><ShieldCheck size={15} aria-hidden /> Resident reports</span>
           <span className="ao-kpi-number">{fmt(residentReports)}</span>
-          <span className="ao-kpi-foot">{reportsToday ? `${fmt(reportsToday)} in the last 24h` : 'Kept permanently'}</span>
+          <span className="ao-kpi-foot">{reportsToday ? `${fmt(reportsToday)} in the last 24h` : 'From loaded reports'}</span>
         </button>
       </section>
 

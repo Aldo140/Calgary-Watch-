@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { useEffect, useState } from 'react';
 import { animate, AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { CountUp, EASE_OUT } from './Motion';
@@ -8,7 +9,7 @@ import { pickWhen, type PickItem } from '../../lib/eventPicks';
 import { setupPercent, type EmailPlan, type NearReport, type SetupStep, type SetupStepId } from '../../lib/memberHome';
 import { BadgeMark } from './BadgeMark';
 
-const dayLabel = (t: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(t);
+const dayLabel = (t: number) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(t);
 const ago = (t: number, now: number) => {
   const m = Math.max(1, Math.round((now - t) / 60_000));
   return m < 60 ? `${m} min ago` : `${Math.round(m / 60)} h ago`;
@@ -207,7 +208,7 @@ export function GoingTimeline({ going }: { going: PickItem[] }) {
       <ol className="pl-timeline">
         {going.map((g, i) => {
           const d = new Date(g.start);
-          const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...o }).format(d);
+          const fmt = (o: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...o }).format(d);
           return (
             <li key={g.key} style={{ ['--i' as string]: i }}>
               <Link to={g.path}>

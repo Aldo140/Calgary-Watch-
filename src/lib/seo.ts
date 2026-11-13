@@ -17,6 +17,8 @@ import { safetyJsonLd, safetyPath } from './safety';
 import { SPOTLIGHTS } from '@/src/content/spotlights';
 import { spotlightBySlug, spotlightJsonLd, spotlightPath, SPOTLIGHT_PATH } from './spotlights';
 import { LOCAL_SERVICES } from '../data/localServices';
+import { allShelves, shelfFor } from './cwPicks';
+import { deskDescription, deskIndexable, deskJsonLd, deskTitle, deskUpdated } from './pickSeo';
 
 /**
  * Single source of truth for per-route SEO.
@@ -175,9 +177,9 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     pageType: 'WebPage',
   },
   '/picks': {
-    title: 'How CalgaryWatch Picks Work: Vetted Local Services | CalgaryWatch',
-    description: 'One vetted company per service, chosen after seven checks we do ourselves and kept honest by neighbours who hired them. Never bought.',
-    index: false,
+    title: 'Who to Call in Calgary: Plumbers, Electricians, Furnace Repair & More | CalgaryWatch',
+    description: 'Local Calgary plumbers, electricians, furnace repair, window cleaners and junk haulers, each checked against its own site, with what to ask and when to book. One vetted CalgaryWatch Pick per service. Never bought.',
+    index: true,
     pageType: 'WebPage',
     image: DEFAULT_IMAGE,
   },
@@ -244,9 +246,15 @@ for (const s of SPOTLIGHTS) {
     image: DEFAULT_IMAGE,
   };
 }
-// Pick desks: noindex until each service has a vetted Pick worth ranking.
-for (const s of LOCAL_SERVICES) {
-  ROUTE_SEO[`/picks/${s.id}`] = { title: `${s.label} in Calgary, checked | CalgaryWatch Picks`, description: `Local Calgary ${s.label.toLowerCase()}, A–Z, with what to ask on the phone and when to book. One CalgaryWatch Pick per service, vetted and never bought.`, index: false, pageType: 'CollectionPage', image: DEFAULT_IMAGE };
+// Pick desks (2026-11-12): a desk with 3+ checked companies is the page for "best <trade> Calgary",
+// unless a Best of Calgary list already covers that service (one page per intent). Thinner desks stay noindex.
+const SEO_YEAR = new Date().getFullYear();
+for (const shelf of allShelves(discoveryRepository.list())) {
+  const s = shelf.service;
+  const index = deskIndexable(shelf);
+  ROUTE_SEO[`/picks/${s.id}`] = index
+    ? { title: deskTitle(shelf, SEO_YEAR), description: deskDescription(shelf), index: true, pageType: 'CollectionPage', image: DEFAULT_IMAGE, ...(deskUpdated(shelf) ? { dateModified: deskUpdated(shelf) } : {}) }
+    : { title: `${s.label} in Calgary, checked | CalgaryWatch Picks`, description: `Local Calgary ${s.label.toLowerCase()}, A–Z, with what to ask on the phone and when to book. One CalgaryWatch Pick per service, vetted and never bought.`, index: false, pageType: 'CollectionPage', image: DEFAULT_IMAGE };
 }
 ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Search a Calgary neighbourhood or street for recent reports, or find events, markets and local places.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
@@ -300,6 +308,8 @@ for (const s of SPOTLIGHTS) {
   ROUTE_BREADCRUMBS[spotlightPath(s)] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Events', item: `${PRODUCTION_ORIGIN}/events` }, { name: s.name, item: `${PRODUCTION_ORIGIN}${spotlightPath(s)}` }];
 }
 
+ROUTE_BREADCRUMBS['/picks'] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Who to call', item: `${PRODUCTION_ORIGIN}/picks` }];
+for (const s of LOCAL_SERVICES) ROUTE_BREADCRUMBS[`/picks/${s.id}`] = [...ROUTE_BREADCRUMBS['/picks'], { name: `${s.label} in Calgary`, item: `${PRODUCTION_ORIGIN}/picks/${s.id}` }];
 ROUTE_BREADCRUMBS[BEST_PATH] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Best of Calgary', item: `${PRODUCTION_ORIGIN}${BEST_PATH}` }];
 for (const c of BEST_CATEGORIES) {
   ROUTE_BREADCRUMBS[bestPath(c)] = [...ROUTE_BREADCRUMBS[BEST_PATH], { name: c.label, item: `${PRODUCTION_ORIGIN}${bestPath(c)}` }];
@@ -373,6 +383,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
   const best = section === BEST_PATH.slice(1) ? (slug ? bestCategory(slug) : undefined) : undefined;
   const bestList = best ? bestItemListJsonLd(best, origin) : pathname === BEST_PATH ? bestIndexJsonLd(origin) : undefined;
   const safety = safetyJsonLd(pathname);
+  const desk = section === 'picks' && slug && config.index ? shelfFor(slug, repository.list()) : null;
   const spotlight = section === SPOTLIGHT_PATH.slice(1) ? spotlightBySlug(slug) : undefined;
   const crumbs = ROUTE_BREADCRUMBS[pathname]
     ?? (entity ? listingBreadcrumbs(entity).map(c => ({ name: c.name, item: `${PRODUCTION_ORIGIN}${c.path}` }))
@@ -406,6 +417,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
     ...(bestList ? { mainEntity: bestList } : {}),
     ...(spotlight ? { mainEntity: spotlightJsonLd(spotlight, origin, config.image ?? DEFAULT_IMAGE, repository.list()) } : {}),
     ...(safety ?? {}),
+    ...(desk ? deskJsonLd(desk, origin) : {}),
     ...(pathname === COMMUNITY_PATH
       ? {
           about: ['Calgary crime map', 'Calgary crime watch', 'Community watch', 'Calgary public safety map'],

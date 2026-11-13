@@ -102,6 +102,16 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
         run: npm run search:trends
 
+      # CalgaryWatch Picks made live on the admin vetting desk (pick_vetting).
+      # Writes company, check dates and the why only; notes stay in Firestore.
+      - name: Export live CalgaryWatch Picks
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+        run: npx tsx scripts/picks/export-picks.ts
+
       - name: Build Site
         env:
           VITE_BASE_PATH: /
@@ -161,6 +171,10 @@ jobs:
       - name: Publish the popular searches
         run: cp src/generated/search-trends.json dist/search-trends.json
 
+      # The next deploy falls back to this copy when Firestore can't be read.
+      - name: Publish the live Picks
+        run: cp src/generated/cw-picks.json dist/cw-picks.json
+
       # Publish the UI before backend provisioning. This keeps ordinary site
       # releases available even when a Google Cloud IAM or Secret Manager
       # change needs attention.
@@ -171,6 +185,22 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           channelId: live
           projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+
+      - name: Record catalogue publication
+        run: npx tsx scripts/discovery/mark-published.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+
+      # The vetting desk shows "Live on the site" once this runs.
+      - name: Mark Pick changes as published
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+        run: npx tsx scripts/picks/export-picks.ts --mark-published
 
       - name: Synchronize organization management catalogue
         run: npx tsx scripts/claims/sync-organization-catalog.ts

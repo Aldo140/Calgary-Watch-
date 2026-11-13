@@ -40,6 +40,9 @@ import { weekAgenda } from '../../src/lib/discoveryCalendar.js';
 import type { DiscoveryEntity } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 import { BEST_CATEGORIES } from '../../src/content/bestOf.js';
+import { allShelves, askFor, pickDeskPath, shelfFor } from '../../src/lib/cwPicks.js';
+import { deskFaq, deskIndexable, seoNounInline } from '../../src/lib/pickSeo.js';
+import { SERVICE_GROUPS, type ServiceGroup } from '../../src/data/localServices.js';
 import { SPOTLIGHT_PATH, spotlightBySlug } from '../../src/lib/spotlights.js';
 import { BEST_PATH, bestCategory, bestPath, publishersOf, rankPlaces, sourceOf, sourcesFor } from '../../src/lib/bestOf.js';
 import { SAFETY_CONTACTS, SAFETY_FAQS, SAFETY_PATH, SAFETY_TOPICS } from '../../src/content/safetyTopics.js';
@@ -221,6 +224,7 @@ function routeSections(pathname: string, now: Date): string {
  */
 export function buildStaticRouteBody(pathname: string, now = new Date()): string {
   if (pathname === BEST_PATH || pathname.startsWith(`${BEST_PATH}/`)) return bestStaticBody(pathname);
+  if (pathname === '/picks' || pathname.startsWith('/picks/')) return picksStaticBody(pathname);
   if (pathname === SAFETY_PATH || pathname.startsWith(`${SAFETY_PATH}/`)) return safetyStaticBody(pathname);
   if (pathname.startsWith(`${SPOTLIGHT_PATH}/`)) return spotlightStaticBody(pathname);
   if (pathname === AIRDRIE_GUIDE_PATH) {
@@ -327,7 +331,7 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
     '/': {
       heading: 'What’s happening in Calgary.',
       copy: 'CalgaryWatch is Calgary’s crime watch: a live Calgary crime map and public safety map, plus events, markets and local places. Community Watch puts crime and safety reports from neighbours next to Calgary Police news releases, City data, weather and outages. The week planner lists real events and markets by day.',
-      links: [['/community', 'Calgary crime watch'], ['/map', 'Live safety map'], ['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/best', 'Best of Calgary'], ['/neighbourhoods', 'Neighbourhoods']],
+      links: [['/community', 'Calgary crime watch'], ['/map', 'Live safety map'], ['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/picks', 'Who to call'], ['/best', 'Best of Calgary'], ['/neighbourhoods', 'Neighbourhoods']],
     },
     '/events': {
       heading: 'Events in Calgary this week.',
@@ -347,7 +351,7 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
     '/local': {
       heading: 'Local Calgary places and the people behind what’s on.',
       copy: 'Calgary venues, markets, cafés, community associations and event organizers, each with its address and official links. Organizer profiles list their upcoming events and markets on CalgaryWatch. Listings are free, and a place that confirms it runs a profile is marked Verified.',
-      links: [['/events', 'Events'], ['/markets', 'Markets'], ['/neighbourhoods', 'Neighbourhoods'], ['/best', 'Best of Calgary lists'], ['/partners', 'How listings work']],
+      links: [['/events', 'Events'], ['/markets', 'Markets'], ['/neighbourhoods', 'Neighbourhoods'], ['/picks', 'Who to call: plumbers, electricians, furnace repair'], ['/best', 'Best of Calgary lists'], ['/partners', 'How listings work']],
     },
     '/neighbourhoods': {
       heading: 'Calgary neighbourhood guides.',
@@ -407,6 +411,26 @@ function spotlightStaticBody(pathname: string): string {
     <section><h2>What’s next</h2><p>${escapeText(s.future)}</p></section>
     <section><h2>Official links</h2><ul>${links}</ul></section><section><h2>Sources</h2><ul>${sources}</ul></section>
     <p>${staticLink('/events', 'Events in Calgary this week')} · ${staticLink('/date-night', 'Date night ideas')}</p></article></main>`;
+}
+
+/** /picks and /picks/:service, mirroring PicksPage and PickDeskPage: who to call, what to ask, when to book. */
+export function picksStaticBody(pathname: string): string {
+  const entities = discoveryRepository.list();
+  const id = pathname.split('/')[2];
+  if (!id) {
+    const groups = (Object.keys(SERVICE_GROUPS) as ServiceGroup[]).map(g => {
+      const items = allShelves(entities).filter(x => x.service.group === g).map(x => `<li>${staticLink(pickDeskPath(x.service.id), `${x.service.label} in Calgary`)}${x.contenders.length ? ` (${x.contenders.length} local ${x.contenders.length === 1 ? 'company' : 'companies'})` : ''}</li>`).join('');
+      return `<section><h2>${escapeText(SERVICE_GROUPS[g].label)}</h2><ul>${items}</ul></section>`;
+    }).join('');
+    return `<main data-prerendered-route="/picks"><article><p>CalgaryWatch Picks</p><h1>Who do you call? We checked.</h1><p>For every everyday service in Calgary, a short list of local companies, and one CalgaryWatch Pick that passed seven checks we do ourselves. Neighbours who hire through us keep it honest. It can’t be bought.</p>${groups}<p>${staticLink(BEST_PATH, 'Best of Calgary lists')} · ${staticLink('/local', 'Browse Local')}</p></article></main>`;
+  }
+  const shelf = shelfFor(id, entities);
+  if (!shelf) return '';
+  const s = shelf.service;
+  const rows = shelf.contenders.map(c => `<li><h3>${escapeText(c.name)}</h3>${c.area ? `<p>${escapeText(c.area)}</p>` : ''}${c.fact ? `<p>${escapeText(c.fact.text)} (${staticLink(c.fact.source, c.fact.label)})</p>` : ''}<p>${c.phone ? `Phone: ${escapeText(c.phone)}` : ''}${c.phone && c.website ? ' · ' : ''}${c.website ? staticLink(c.website, `${c.name} website`) : ''}</p></li>`).join('');
+  const faq = deskFaq(shelf).map(x => `<h3>${escapeText(x.q)}</h3><p>${escapeText(x.a)}</p>`).join('');
+  const h1 = deskIndexable(shelf) ? `Best ${seoNounInline(s)} in Calgary.` : `${s.label} in Calgary.`;
+  return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><p>${staticLink('/picks', 'Who to call')} / ${escapeText(s.label)}</p><h1>${escapeText(h1)}</h1><p>${shelf.contenders.length ? `${shelf.contenders.length} local ${shelf.contenders.length === 1 ? 'company' : 'companies'}, each checked against its own site. One tap to call. Nobody pays to be here.` : 'The list is being built.'}</p><h2>Who to call</h2><ol>${rows}</ol><h2>Ask these three</h2><ol>${askFor(s).map(q => `<li>${escapeText(q)}</li>`).join('')}</ol><h2>When Calgary books it</h2><p>${escapeText(s.tip)}</p><h2>Questions Calgarians ask</h2>${faq}<p>${staticLink('/picks', 'Every service')}${s.best ? ` · ${staticLink(`${BEST_PATH}/${s.best}`, 'Sources for this list')}` : ''}</p></article></main>`;
 }
 
 /** /best and /best/:slug, mirroring BestOfPage: the ordered list with its sources. */

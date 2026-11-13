@@ -1,3 +1,4 @@
+import { outreachDeliveryId, claimOutreachDelivery } from '../lib/outreachDelivery';
 // Partner outreach jobs. With autoSend on (brand/outreach.json) first emails and
 // the one follow-up are approved automatically once every CASL check passes;
 // otherwise a reviewer approves each message in the admin Partners workspace.
@@ -403,7 +404,7 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
     const checked = (await db.collection(COLLECTIONS.health).doc('outreach_inbox').get()).get('lastCheckedAt') as number | undefined;
     if (!checked || now - checked > INBOX_STALE_AFTER) { log('Outlook inbox has not synced in 6 hours; nothing sent until replies and opt-outs are being read.'); return; }
   }
-  const send = (to: string, subject: string, text: string) => viaResend ? sendViaResend(cfg.sender, to, subject, text) : sendNew(to, subject, text);
+  const send = (to: string, subject: string, text: string, key: string) => viaResend ? sendViaResend(cfg.sender, to, subject, text, key) : sendNew(to, subject, text);
   const sup = await loadSuppression(db);
   // Resolve factual authority again immediately before every send, including edited drafts and replies.
   const current = JSON.parse(await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8')) as DiscoveryIndex;
@@ -421,13 +422,20 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
     if (sup.emails.has(normalizeEmail(lead.lastReply.from))) continue;
     const factualErrors = languageProblems(lead, lead.lastReply.suggestedSubject, lead.lastReply.suggestedBody);
     if (factualErrors.length) { log(`Reply blocked for ${lead.businessName}: ${factualErrors.join(' ')}`); continue; }
+    const deliveryId = outreachDeliveryId('reply', lead.lastReply.at);
+    const delivery = await claimOutreachDelivery(doc.ref, deliveryId, now, current =>
+      !current.doNotContact && current.lastReply?.approved && !current.lastReply.sent
+      && current.lastReply.at === lead.lastReply?.at && current.lastReply.from === lead.lastReply?.from
+      && current.lastReply.suggestedBody === lead.lastReply?.suggestedBody
+      && current.lastReply.suggestedSubject === lead.lastReply?.suggestedSubject);
+    if (!delivery) { log("Reply claim skipped for " + lead.businessName + "; reconcile in the sender mailbox before retrying."); continue; }
     try {
-      if (viaResend) await send(lead.lastReply.from, lead.lastReply.suggestedSubject || `Re: ${lead.lastReply.subject}`, lead.lastReply.suggestedBody);
+      if (viaResend) await send(lead.lastReply.from, lead.lastReply.suggestedSubject || `Re: ${lead.lastReply.subject}`, lead.lastReply.suggestedBody, doc.id + "-" + deliveryId);
       else await replyInThread(lead.conversationId!, lead.lastReply.suggestedBody);
-      await doc.ref.update({ 'lastReply.sent': true, lastContactAt: now, updatedAt: now, history: push(event('reply-sent', `Approved reply sent to ${lead.lastReply.from}.`)) });
+      await delivery.complete({ 'lastReply.sent': true, lastContactAt: now, updatedAt: now, history: push(event('reply-sent', `Approved reply sent to ${lead.lastReply.from}.`)) });
       log(`reply sent: ${lead.businessName}`);
     } catch (e) {
-      await doc.ref.update({ notes: `Reply failed: ${e instanceof Error ? e.message : e}`, updatedAt: now });
+      await doc.ref.update({ notes: `Reply delivery needs reconciliation before retry: ${e instanceof Error ? e.message : e}`, updatedAt: now });
       log(`reply failed for ${lead.businessName}: ${e instanceof Error ? e.message : e}`);
     }
   }
@@ -458,21 +466,27 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   for (const doc of sendable) {
     if (budget <= 0) { log('Send limit for this run or today reached.'); break; }
     const lead = doc.data() as PartnerLead;
+    const deliveryId = outreachDeliveryId('outreach', lead.followUps + (lead.conversationId ? 1 : 0));
+    const delivery = await claimOutreachDelivery(doc.ref, deliveryId, now, current =>
+      current.status === 'approved' && !current.doNotContact && current.contactEmail === lead.contactEmail
+      && current.draftSubject === lead.draftSubject && current.draftBody === lead.draftBody
+      && current.followUps === lead.followUps && current.conversationId === lead.conversationId);
+    if (!delivery) { log("Delivery claim skipped for " + lead.businessName + "; reconcile in the sender mailbox before retrying."); continue; }
+    budget--;
     try {
       // A follow-up goes out as its own "Re:" message; the first conversation id is kept for matching replies.
       const isFollowUp = Boolean(lead.conversationId);
-      const sent = await send(lead.contactEmail!, lead.draftSubject, lead.draftBody);
+      const sent = await send(lead.contactEmail!, lead.draftSubject, lead.draftBody, doc.id + "-" + deliveryId);
       if (isFollowUp) sent.conversationId = lead.conversationId!;
-      await doc.ref.update({
+      await delivery.complete({
         status: 'contacted', conversationId: sent.conversationId, lastContactAt: now,
         nextFollowUpAt: now + cfg.limits.followUpAfterDays * DAY, followUps: isFollowUp ? lead.followUps + 1 : lead.followUps,
         updatedAt: now, history: push(event('sent', `${isFollowUp ? 'Follow-up' : 'First email'} sent to ${lead.contactEmail}: "${lead.draftSubject}"`)),
       });
-      budget--;
       sentNames.push(lead.businessName);
       log(`sent: ${lead.businessName} (${lead.contactEmail})`);
     } catch (e) {
-      await doc.ref.update({ notes: `Send failed: ${e instanceof Error ? e.message : e}`, updatedAt: now });
+      await doc.ref.update({ notes: `Delivery needs reconciliation before retry: ${e instanceof Error ? e.message : e}`, updatedAt: now });
       failed ??= { business: lead.businessName, error: String(e instanceof Error ? e.message : e).slice(0, 300) };
       log(`send failed for ${lead.businessName}: ${e instanceof Error ? e.message : e}`);
     }

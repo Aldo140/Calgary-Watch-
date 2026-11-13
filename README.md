@@ -114,6 +114,24 @@ is shown, but files are never downloaded automatically.
 
 ## Infrastructure
 
+### Release checks
+
+The Verify CalgaryWatch workflow runs type-checking, the unit suite, a clean build,
+and mobile browser smoke tests on pull requests. In GitHub branch protection,
+require **Verify CalgaryWatch / verify** and the applicable Firebase rules checks
+to enforce those checks before merging. Deploy changed Firebase rules with the
+separate **Deploy Firebase Backend** workflow.
+
+The **Check feed freshness** workflow fails when a monitored feed misses its
+publication deadline, including when no successful run has been recorded. The
+operations summary reports the same failures for feeds in its configured database.
+
+Partner outreach records a delivery claim under each lead before contacting the
+provider. If a send becomes uncertain, compare that message with the provider’s
+delivery activity or Sent Items. If delivery is confirmed, record it on the lead
+and mark the claim sent. Only clear the claim after confirming the provider never
+accepted the message. Record the decision in the lead history.
+
 ### Firebase Hosting
 
 The site is deployed to Firebase Hosting at **calgarywatch.ca** via the `.github/workflows/deploy-firebase.yml` GitHub Actions workflow on every push to `main`.

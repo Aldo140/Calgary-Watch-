@@ -1,4 +1,4 @@
-import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Component, memo, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { Business } from '../../types/discovery';
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
@@ -319,6 +319,29 @@ export function Traffic() {
   return <Scenery><TrafficLanes /></Scenery>;
 }
 
+/** One storefront. Memoised so a swipe (which updates the counter) doesn't redraw every shop. */
+const Shop = memo(function Shop({ p, i, night, lamp }: { p: Business; i: number; night: boolean; lamp: boolean }) {
+  const up = UPPER[i % UPPER.length];
+  return (
+    <li style={{ ['--i' as string]: Math.min(i, 12) }}>
+      <Link to={entityPath(p)} className="lx-shop">
+        <Upper floors={up.floors} wall={up.wall} seed={i + 1} night={night} />
+        <span className="lx-shop-front">
+          <ShopArt id={p.id} title={p.title} tags={p.tags} categories={p.categories} />
+          {p.partner ? <span className="lx-shop-flag lx-shop-flag-partner">Featured partner</span> : p.editorialSelection ? <span className="lx-shop-flag">Our pick</span> : null}
+        </span>
+        <span className="lx-shop-sign"><b>{shortName(p.title)}</b><small>{p.neighbourhood}</small></span>
+      </Link>
+      {lamp ? <Lamp /> : null}
+    </li>
+  );
+});
+
+/** Shops drawn up front, and how many more join each time the street nears its end.
+ *  Each shop is ~75 SVG nodes, so drawing all 600+ at once froze phones for seconds. */
+const STREET_FIRST = 16;
+const STREET_MORE = 24;
+
 /** A block of storefronts on one road: the /local hero, and "next door" on a place page. */
 export function Street({ places, night, label }: { places: Business[]; night: boolean; label: string }) {
   const block = useRef<HTMLUListElement>(null);
@@ -326,6 +349,8 @@ export function Street({ places, night, label }: { places: Business[]; night: bo
   const [shown, setShown] = useState(places.length);
   const [ends, setEnds] = useState<{ start: boolean; end: boolean }>({ start: true, end: true });
   const [swiped, setSwiped] = useState(false);
+  const [built, setBuilt] = useState(STREET_FIRST);
+  const drawn = Math.min(places.length, built);
 
   // The street scrolls sideways once it holds more shops than fit: a phone swipes it,
   // a laptop gets arrows. The counter says which shops are in front of you.
@@ -337,15 +362,17 @@ export function Street({ places, night, label }: { places: Business[]; night: bo
     const max = el.scrollWidth - el.clientWidth;
     setAt(Math.min(places.length - 1, Math.round(el.scrollLeft / step)));
     setShown(Math.max(1, Math.min(places.length, Math.floor(el.clientWidth / step))));
-    setEnds({ start: el.scrollLeft <= 2, end: el.scrollLeft >= max - 2 });
+    setEnds({ start: el.scrollLeft <= 2, end: el.scrollLeft >= max - 2 && built >= places.length });
     if (el.scrollLeft > step / 2) setSwiped(true);
+    // Build the next stretch of street before the swipe reaches the last drawn shop.
+    if (el.scrollLeft + el.clientWidth * 3 >= el.scrollWidth) setBuilt(n => (n < places.length ? n + STREET_MORE : n));
   };
 
   useEffect(() => {
     measure();
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, [places.length]);
+  }, [places.length, drawn]);
 
   const slide = (dir: 1 | -1) => {
     const el = block.current;
@@ -366,22 +393,7 @@ export function Street({ places, night, label }: { places: Business[]; night: bo
         </div>
       ) : null}
       <ul className="lx-block" aria-label={label} ref={block} onScroll={measure}>
-        {places.map((p, i) => {
-          const up = UPPER[i % UPPER.length];
-          return (
-            <li key={p.id} style={{ ['--i' as string]: Math.min(i, 12) }}>
-              <Link to={entityPath(p)} className="lx-shop">
-                <Upper floors={up.floors} wall={up.wall} seed={i + 1} night={night} />
-                <span className="lx-shop-front">
-                  <ShopArt id={p.id} title={p.title} tags={p.tags} categories={p.categories} />
-                  {p.partner ? <span className="lx-shop-flag lx-shop-flag-partner">Featured partner</span> : p.editorialSelection ? <span className="lx-shop-flag">Our pick</span> : null}
-                </span>
-                <span className="lx-shop-sign"><b>{shortName(p.title)}</b><small>{p.neighbourhood}</small></span>
-              </Link>
-              {i % 2 === 1 && i < places.length - 1 ? <Lamp /> : null}
-            </li>
-          );
-        })}
+        {places.slice(0, drawn).map((p, i) => <Shop key={p.id} p={p} i={i} night={night} lamp={i % 2 === 1 && i < places.length - 1} />)}
       </ul>
       <div className="lx-road" aria-hidden="true">
         <Traffic />

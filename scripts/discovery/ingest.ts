@@ -36,6 +36,7 @@ function providerFor(batch: { source: SourceConfig; records?: SourceRecord[] }):
 
 const DUPLICATE_RECHECK_MS = 20 * 3_600_000;
 let failed = 0; let completed = 0;
+const scheduled = write && process.argv.includes("--scheduled");
 for (const batch of batches) {
   const name = batch.source.name;
   try {
@@ -103,3 +104,10 @@ for (const batch of batches) {
 }
 // Fail the job only when nothing worked, so one broken feed can't block the rebuild.
 if (failed && !completed) process.exitCode = 1;
+if (scheduled && completed && !process.exitCode) {
+  const checkedAt = Date.now();
+  await inventoryDatabase().collection("ingestion_health").doc("discovery_ingest").set({
+    sourceId: "discovery_ingest", name: "Discovery inventory", checkedAt, lastSuccessAt: checkedAt,
+    status: failed ? "error" : "ok", error: failed ? failed + " discovery providers failed" : null,
+  }, { merge: true });
+}

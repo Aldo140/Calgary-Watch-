@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { entityPath } from '../../lib/discovery';
 import { discoveryRepository } from '../../data/discovery';
 import {approvedManagementOrganization as approvedOrganization} from '../../lib/claimOrganization';
@@ -6,7 +7,7 @@ import { ArrowUpRight, BadgeCheck, Store } from 'lucide-react';
 import type { BusinessAccount } from '../../lib/businessAccount';
 import type { Claim } from './Dashboard';
 import { listingManagementPath } from '../../lib/listingPreview';
-const formatSince = (at: number, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...options }).format(at);
+const formatSince = (at: number, options: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...options }).format(at);
 
 /**
  * The organizer desk: a band right under the member's day board, because an

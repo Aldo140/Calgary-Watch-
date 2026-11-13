@@ -21,6 +21,7 @@ import type { LeadStatus, PartnerLead } from '@/src/types/ops';
 import { LOCAL_SERVICES, SERVICE_GROUPS, serviceById } from '@/src/data/localServices';
 import { ClaimsPanel } from './ClaimsPanel';
 import { MarketHQPanel } from './MarketHQPanel';
+import { PicksPanel } from './PicksPanel';
 import { AdminButton, Chip, EmptyState, Field, FilterChip, FilterRow, Panel, SkeletonRows, T, TimeAgo, inputClass, inputStyle, mono, type Tone } from './ui';
 
 type View = 'approve' | 'replies' | 'pipeline' | 'research' | 'closed';
@@ -208,7 +209,7 @@ function AddLead() {
 }
 
 export function PartnersWorkspace() {
-  const [workspace,setWorkspace]=useAdminView(['directory','claims','updates','outreach','markets'] as const,'claims');
+  const [workspace,setWorkspace]=useAdminView(['directory','claims','updates','picks','outreach','markets'] as const,'claims');
   const [leads, setLeads] = useState<PartnerLead[] | null>(null);
   const [error, setError] = useState('');
   const[attempt,setAttempt]=useState(0);
@@ -224,11 +225,12 @@ export function PartnersWorkspace() {
 
   return (
     <div className="space-y-4">
-      <WorkspaceTabs label="Organization tools" value={workspace} onChange={setWorkspace} items={[{id:'directory',label:'Local partners',description:'Organizations & event counts'},{id:'claims',label:'Claims & verification',description:'Confirm organization access'},{id:'updates',label:'Business updates',description:'Changes already published'},{id:'outreach',label:'Partner outreach',description:'Contacts, drafts and replies'},{id:'markets',label:'Market HQ',description:'Managed market requests'}]} />
+      <WorkspaceTabs label="Organization tools" value={workspace} onChange={setWorkspace} items={[{id:'directory',label:'Local partners',description:'Organizations & event counts'},{id:'claims',label:'Claims & verification',description:'Confirm organization access'},{id:'updates',label:'Business updates',description:'Changes already published'},{id:'picks',label:'CalgaryWatch Picks',description:'Contacts, check-ins, answers'},{id:'outreach',label:'Partner outreach',description:'Contacts, drafts and replies'},{id:'markets',label:'Market HQ',description:'Managed market requests'}]} />
       {workspace==='directory'&&<OrganizationDirectory />}
       {workspace==='updates'&&<OwnerEditsPanel />}
       {workspace==='claims'&&<ClaimsPanel leads={leads} />}
       {workspace==='markets'&&<MarketHQPanel />}
+      {workspace==='picks'&&<PicksPanel />}
       {workspace==='outreach'&&<>
       <Panel title="Partner outreach" subtitle="Emails that pass every rule are sent automatically (cancel any under In progress). Businesses come from real listings; replies wait for you; paid placement stays off until the offer is final (brand/outreach.json)." padded={false}>
         <div className="px-4 pt-3">

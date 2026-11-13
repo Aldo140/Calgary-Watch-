@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { BadgeCheck, ChevronDown, Store, LayoutDashboard, LogOut, Mail, Map as MapIcon, Shield, Ticket } from 'lucide-react';
 import { useAuth } from '../FirebaseProvider';
-import { useMyClaims } from '../../lib/claimsApi';
+import { useMyClaims } from '../../lib/myClaims';
 
 /**
  * The header's account control. Signed out it is the "Sign up" button it

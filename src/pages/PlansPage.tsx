@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 import { plansSetupProblem } from '../lib/plansSetup';
 import { hasCompletedPlans } from '../lib/plansProfile';
 import {useAdminEditMode} from '../hooks/useAdminEditMode';
@@ -440,6 +441,6 @@ export default function PlansPage() {
 function savedSummary(profile: PlansProfile | null): string {
   const plan = emailPlan(profile?.weeklyDigestOptIn === true, profile?.eventsDigestOptIn === true, Date.now());
   if (plan.kind === 'none' || !plan.next) return 'No emails for now; your picks and plans stay here.';
-  const when = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(plan.next);
+  const when = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(plan.next);
   return `Your first “${plan.name.replace(/^The /, '')}” email arrives ${when}, ${plan.cadence.split(', ')[1].replace(/\.$/, '')}.`;
 }

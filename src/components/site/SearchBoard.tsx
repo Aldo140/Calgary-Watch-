@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Search, TrendingUp, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink, ChevronLeft, ChevronRight, CornerDownLeft } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
+import { SearchNeighbourhoods } from './SearchNeighbourhoods';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
 import type { SearchIntent } from '../../lib/searchIntent';
@@ -257,6 +258,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
           <>
             <ExploreSearch />
             <Starters title="Quick answers" />
+            <SearchNeighbourhoods />
             {popular.length ? <Popular items={popular} title="Popular searches" /> : null}
             <section className="bp-section" aria-labelledby="sx-browse">
               <div className="bp-head"><h2 id="sx-browse">Browse Calgary</h2></div>

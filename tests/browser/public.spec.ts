@@ -74,3 +74,17 @@ test('illustrated search shortcuts link to the content they describe', async ({ 
   await explore.getByRole('link', { name: /Make weekend plans/ }).click();
   await expect(page).toHaveURL(/\/events\/this-weekend$/);
 });
+
+test('the Bow explorer switches neighbourhood stories and starts a real search', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/search');
+  const atlas = page.getByRole('region', { name: 'Follow the Bow' });
+  const pin = atlas.getByRole('button', { name: 'Inglewood' });
+  await pin.focus();
+  await pin.press('Enter');
+  await expect(pin).toHaveAttribute('aria-pressed', 'true');
+  await expect(atlas.getByRole('heading', { name: 'Inglewood' })).toBeVisible();
+  await expect(atlas.locator('img')).toHaveAttribute('src', /search-atlas-inglewood/);
+  await atlas.getByRole('link', { name: 'Search Inglewood' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: /Results for.*inglewood/i })).toBeVisible();
+});

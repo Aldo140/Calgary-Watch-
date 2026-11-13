@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Search, TrendingUp, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink, ChevronLeft, ChevronRight, CornerDownLeft } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
@@ -254,6 +255,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
           </>
         ) : (
           <>
+            <ExploreSearch />
             <Starters title="Quick answers" />
             {popular.length ? <Popular items={popular} title="Popular searches" /> : null}
             <section className="bp-section" aria-labelledby="sx-browse">
@@ -347,9 +349,44 @@ function Popular({ items, title }: { items: Suggestion[]; title: ReactNode }) {
   );
 }
 
+const EXPLORE = [
+  { to: '/check-your-community', label: 'Check your area', note: 'Find reports by neighbourhood', image: 'area', icon: MapPin },
+  { to: '/events/this-weekend', label: 'Make weekend plans', note: 'See what’s on', image: 'weekend', icon: CalendarDays },
+  { to: '/map', label: 'Open the live map', note: 'Traffic, outages and alerts', image: 'live', icon: MapIcon },
+] as const;
+
+function ExploreSearch() {
+  const reduceMotion = useReducedMotion();
+  return (
+    <section className="sx-explore bp-section" aria-labelledby="sx-explore-title">
+      <div className="bp-head"><h2 id="sx-explore-title">Where to?</h2></div>
+      <ul className="sx-explore-grid">
+        {EXPLORE.map(({ to, label, note, image, icon: Icon }, index) => (
+          <motion.li
+            key={to}
+            initial={false}
+            whileInView={reduceMotion ? undefined : { y: [9, 0] }}
+            viewport={{ once: true, amount: .25 }}
+            transition={{ duration: .4, delay: index * .065, ease: [.22, 1, .36, 1] }}
+          >
+            <Link to={to} className="sx-explore-link" data-art={image}>
+              <span className="sx-explore-art" aria-hidden="true">
+                <img src={"/images/hero/search-explore-" + image + ".webp"} alt="" loading="lazy" decoding="async" width={640} height={360} />
+              </span>
+              <span className="sx-explore-icon" aria-hidden="true"><Icon size={19} /></span>
+              <span className="sx-explore-copy"><strong>{label}</strong><small>{note}</small></span>
+              <span className="sx-explore-arrow" aria-hidden="true"><ArrowUpRight size={20} /></span>
+            </Link>
+          </motion.li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function Starters({ title }: { title: ReactNode }) {
   const rail = useRef<HTMLUListElement>(null);
-  const [position, setPosition] = useState({ start: true, end: false });
+  const [position, setPosition] = useState({ start: true, end: false, progress: 0 });
   const move = (direction: number) => {
     const list = rail.current;
     if (!list) return;
@@ -369,7 +406,7 @@ function Starters({ title }: { title: ReactNode }) {
       <ul className="sx-starters" ref={rail} onScroll={event => {
         const { scrollLeft, clientWidth, scrollWidth } = event.currentTarget;
         const start = scrollLeft <= 1, end = scrollLeft + clientWidth >= scrollWidth - 1;
-        setPosition(previous => previous.start === start && previous.end === end ? previous : { start, end });
+        setPosition({ start, end, progress: scrollLeft / Math.max(1, scrollWidth - clientWidth) });
       }}>
         {STARTERS.map(s => (
           <li key={s.to}>
@@ -382,6 +419,7 @@ function Starters({ title }: { title: ReactNode }) {
           </li>
         ))}
       </ul>
+      <div className="sx-rail-track" aria-hidden="true"><span style={{ transform: "translateX(" + position.progress * 300 + "%)" }} /></div>
     </section>
   );
 }

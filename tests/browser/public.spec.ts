@@ -60,3 +60,17 @@ test('mobile search uses its own artwork and quick answers advance one card', as
   await previous.click();
   await expect(previous).toBeDisabled();
 });
+
+test('illustrated search shortcuts link to the content they describe', async ({ page }) => {
+  await page.goto('/search');
+  const explore = page.getByRole('region', { name: 'Where to?' });
+  for (const [label, href] of [
+    ['Check your area', '/check-your-community'],
+    ['Make weekend plans', '/events/this-weekend'],
+    ['Open the live map', '/map'],
+  ]) {
+    await expect(explore.getByRole('link', { name: new RegExp(label) })).toHaveAttribute('href', href);
+  }
+  await explore.getByRole('link', { name: /Make weekend plans/ }).click();
+  await expect(page).toHaveURL(/\/events\/this-weekend$/);
+});

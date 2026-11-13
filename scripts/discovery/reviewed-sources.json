@@ -6893,5 +6893,48 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "mid-sun-community",
+      "name": "Mid-Sun Community Association",
+      "approved": true,
+      "hosts": [
+        "midsun.org",
+        "www.midsun.org"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "merry-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Mid-Sun Merry Market",
+          "summary": "Mid-Sun's third annual holiday market with free entry and free photos with Santa.",
+          "description": "Mid-Sun Community Centre hosts its third annual Merry Market on Saturday, November 21, 2026, from 10 a.m. to 3 p.m., with free entry. Free Santa photos run from 9 a.m. to 2 p.m. and need registration through Mid-Sun; there are no walk-ins for photos, but Santa walks the gym during the market's last hour. Check Mid-Sun's events page before you go.",
+          "address": "50 Midpark Rise SE, Calgary, AB T2X 1L7",
+          "venue": "Mid-Sun Community Centre",
+          "neighbourhood": "Midnapore",
+          "organizer": "Mid-Sun Community Association",
+          "sourceUrl": "https://midsun.org/communityevents/",
+          "categories": [
+            "holiday",
+            "markets",
+            "family"
+          ],
+          "tags": [
+            "christmas market",
+            "santa photos",
+            "local makers",
+            "family"
+          ],
+          "pricing": "free",
+          "familyFriendly": true,
+          "start": "2026-11-21T10:00:00-06:00",
+          "end": "2026-11-21T15:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

@@ -58,13 +58,14 @@ export default defineConfig(() => {
       chunkSizeWarningLimit: 700,
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-            'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-            'vendor-leaflet': ['leaflet'],
-            'vendor-recharts': ['recharts'],
-            'vendor-animation': ['motion/react', 'vaul'],
-            'vendor-date': ['date-fns'],
+          manualChunks(id) {
+            if (id.endsWith('/src/generated/discovery-index.json') || id.endsWith('/src/data/discovery.ts')) return 'discovery-inventory';
+            if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'vendor-react';
+            if (/\/node_modules\/(firebase|@firebase)\//.test(id)) return 'vendor-firebase';
+            if (id.includes('/node_modules/leaflet/')) return 'vendor-leaflet';
+            if (id.includes('/node_modules/recharts/')) return 'vendor-recharts';
+            if (/\/node_modules\/(motion|framer-motion|motion-dom|motion-utils|vaul)\//.test(id)) return 'vendor-animation';
+            if (id.includes('/node_modules/date-fns/')) return 'vendor-date';
           },
         },
       },

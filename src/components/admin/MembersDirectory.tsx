@@ -74,6 +74,7 @@ const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof s
 
 export function MembersDirectory() {
   const [directoryError,setDirectoryError]=useState('');
+  const [moreUsers, setMoreUsers] = useState(false);
   const [authRows,setAuthRows]=useState<MemberAuthRecord[]>([]),[authAt,setAuthAt]=useState<number|null>(null),[authError,setAuthError]=useState(''),[authAttempt,setAuthAttempt]=useState(0);
   const [sort,setSort]=useState('joined');
   const date=(value:number|null)=>value?calgaryDateTimeFormat('en-CA',{dateStyle:'medium',timeStyle:'short'}).format(value):'Not recorded';
@@ -99,7 +100,7 @@ export function MembersDirectory() {
 
   useEffect(() => {
     if (!db) { setRows([]); return; }
-    return adminUsers.subscribe(db, ({ rows: r, loading, error }) => { setDirectoryError(error??'');if (!loading || r.length) setRows(r as Row[]); });
+    return adminUsers.subscribe(db, ({ rows: r, loading, error, hasMore }) => { setMoreUsers(hasMore); setDirectoryError(error??'');if (!loading || r.length) setRows(r as Row[]); });
   }, []);
 
   const members = useMemo(() => {const merged=new Map<string,Row>((rows??[]).map(row=>[row.uid||row.id,row]));for(const account of authRows)if(!merged.has(account.uid))merged.set(account.uid,{id:account.uid,uid:account.uid,email:account.email??'',displayName:account.displayName??'',createdAt:account.createdAt??0,profileSaved:false});return [...merged.values()].map(row=>{const member=shape(row,authByUid.get(row.uid||row.id));return {...member,business:member.business||(accessByUid.get(member.uid)?.length??0)>0};}).sort((a,b)=>sort==='signin'?(b.account.lastSignInAt??0)-(a.account.lastSignInAt??0):sort==='name'?a.name.localeCompare(b.name):b.createdAt-a.createdAt);}, [rows,authRows,authByUid,accessByUid,sort]);
@@ -113,7 +114,7 @@ export function MembersDirectory() {
     <Panel title="All members" subtitle="Tap someone to see what they get, then open their dashboard exactly as they see it." padded={false}>
       <div className="px-4 pt-3 space-y-3">
         <div className="flex flex-wrap gap-2"><Chip>{members.length} accounts</Chip><Chip>{members.filter(m=>m.account.recent).length} signed in this week</Chip><Chip>{members.filter(m=>m.account.emailVerified===false).length} email unverified</Chip><Chip>{members.filter(m=>m.account.disabled).length} disabled</Chip></div>
-        <div className="flex flex-wrap items-end justify-between gap-3"><p className="text-xs" style={{color:T.muted}}>Auth snapshot: {date(authAt)} · Refreshed every four hours. Sign-ins and session renewals are different from page visits.</p><label className="text-xs font-semibold">Sort accounts<select className="ml-2 rounded border p-2" value={sort} onChange={e=>setSort(e.target.value)}><option value="joined">Newest accounts</option><option value="signin">Latest sign-in</option><option value="name">Name</option></select></label><AdminButton variant="outline" onClick={()=>{setAuthAttempt(n=>n+1);if(db)void adminUsers.refresh(db);}}>Refresh saved data</AdminButton></div>
+        <div className="flex flex-wrap items-end justify-between gap-3"><p className="text-xs" style={{color:T.muted}}>Auth snapshot: {date(authAt)} · Refreshed every four hours. Sign-ins and session renewals are different from page visits.</p><label className="text-xs font-semibold">Sort accounts<select className="ml-2 rounded border p-2" value={sort} onChange={e=>setSort(e.target.value)}><option value="joined">Newest accounts</option><option value="signin">Latest sign-in</option><option value="name">Name</option></select></label><AdminButton variant="outline" onClick={()=>{setAuthAttempt(n=>n+1);if(db)void adminUsers.refresh(db);}}>Refresh saved data</AdminButton>{moreUsers && <AdminButton variant="outline" onClick={() => { if (db) void adminUsers.loadMore(db); }}>Load more accounts</AdminButton>}</div>
         {authError?<p role="status" className="text-xs" style={{color:T.muted}}>{authError}</p>:null}
         <SearchField value={q} onChange={(v) => { setQ(v); setShown(30); }} placeholder="Name, email, organization or sign-in method" />
         <FilterRow>

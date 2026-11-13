@@ -87,7 +87,7 @@ test('real organization transactions serialize two representatives against one w
     await admin.collection('organization_catalog').doc(org.id).set({entity:org});
     await Promise.all(['u1','u2'].map(uid=>admin.collection('listing_claims').doc(`${uid}_${org.id}`).set({uid,entityId:org.id,status:'approved'})));
     const attempts=await Promise.allSettled(['u1','u2'].map((uid,i)=>submitOrganizationBatch(admin,uid,{organizationId:org.id,requestId:`${i+1}2345678-1234-1234-1234-123456789abc`,operations:[{entityId:org.id,action:'edit',changes:{phone:`403-555-010${i}`}}]})));
-    assert.equal(attempts.filter(result=>result.status==='fulfilled').length,1);
+    assert.equal(attempts.filter(result=>result.status==='fulfilled').length,1, attempts.flatMap(result=>result.status==='rejected'?[String(result.reason)]:[]).join(' | '));
     const [rate,live,receipts]=await Promise.all([admin.collection('owner_business_edit_limits').doc(org.id).get(),admin.collection('organization_live_content').doc(org.id).get(),admin.collection('owner_listing_edits').get()]);
     assert.equal(rate.exists,true);assert.equal(live.exists,true);assert.equal(receipts.size,1);assert.equal(receipts.docs[0].get('notificationPending'),true);
     assert.equal(live.get('batchId'),rate.get('editId'));

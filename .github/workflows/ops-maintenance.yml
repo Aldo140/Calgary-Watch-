@@ -37,8 +37,8 @@ jobs:
         run: |
           set -o pipefail
           { echo "## npm run lint"; npm run lint 2>&1 | tail -60; } > report.txt || echo "LINT_FAILED" >> report.txt
-          { echo "## npm test"; npm test 2>&1 | grep -E "not ok|# (pass|fail)|Error|expected|actual" | head -80; } >> report.txt || true
-          npm test > /dev/null 2>&1 || echo "TESTS_FAILED" >> report.txt
+          { echo "## npm test"; npm test > tests.txt 2>&1; } >> report.txt || echo "TESTS_FAILED" >> report.txt
+          tail -80 tests.txt >> report.txt
           { echo "## npm audit (production, high+)"; npm audit --omit=dev --audit-level=high 2>&1 | tail -40; } >> report.txt || echo "AUDIT_FAILED" >> report.txt
           if grep -q "_FAILED" report.txt; then exit 1; fi
       - name: Keep the report

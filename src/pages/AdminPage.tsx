@@ -191,10 +191,11 @@ export default function AdminPage() {
             {d.loadingData ? 'Loading reports' : 'Admin access'}
           </Chip></span>
           {/* The archive is read once per tab; this re-reads it on demand. */}
-          {['desk','reports','people'].includes(section) ? <AdminButton size="sm" variant="ghost" title="Re-read the full report archive" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton> : null}
+          {['desk','reports','people'].includes(section) ? <AdminButton size="sm" variant="ghost" title="Refresh loaded reports" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton> : null}
         </>
       }
     >
+      {d.moreIncidents && ["desk", "reports", "people"].includes(section) && <div className="flex flex-wrap items-center gap-2"><span>Report breakdowns cover loaded records. {d.storedIncidentCount === null ? "" : d.storedIncidentCount.toLocaleString() + " total stored reports."}</span><AdminButton variant="outline" onClick={() => { if (db) void adminIncidents.loadMore(db); }}>Load more reports</AdminButton></div>}
       {Object.keys(d.dataErrors).length?<details className="admin-read-warning"><summary>Some reports could not be loaded</summary>{Object.entries(d.dataErrors).map(([name,error])=><p key={name} role="alert"><strong>{name}:</strong> {error}</p>)}</details>:null}
       {work.error ? <details className="admin-read-warning"><summary>Some task counts are unavailable</summary><p role="alert">{work.error}</p></details> : null}
       <AdminSectionBoundary key={section}><Suspense fallback={<Panel title="Opening workspace"><SkeletonRows /></Panel>}>
@@ -274,7 +275,7 @@ function DeskSection({ d, work, tasks, preview, onOpen }: { d: D; work:AdminWork
       <details className="admin-overview-details"><summary>Reports, traffic & city overview</summary><div className="space-y-4 mt-3">
       <StatGrid>
         <StatTile label="Resident reports today" value={d.todayIncidents} tone="signal" hint="Community submissions · last 24 hours" />
-        <StatTile label="Resident report history" value={d.totalIncidents} hint="Retained permanently" />
+        <StatTile label="Resident reports loaded" value={d.totalIncidents} hint="Archive sample" />
         <StatTile label="Registered users" value={d.totalUsers} hint={`${d.adminUsers} admin`} />
         <StatTile label="Page views" value={d.totalPageViews} hint={`${d.uniqueSessions} sessions`} />
       </StatGrid>

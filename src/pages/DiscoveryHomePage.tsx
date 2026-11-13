@@ -1,4 +1,3 @@
-import { useOrganizationLive } from '../lib/organizationLive';
 import { useMemo, useState } from 'react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { HomeHero } from '../components/home/HomeHero';
@@ -13,7 +12,11 @@ import { SlowerPlans, MondayDigest } from '../components/home/SlowerPlans';
 import { CalgaryDailyStrip } from '../components/home/CalgaryDailyStrip';
 import { useCalgaryWeather } from '../hooks/useCalgaryWeather';
 import { weekAgenda } from '../lib/discoveryCalendar';
-import { discoveryRepository } from '../data/discovery';
+import inventory from '../generated/home-inventory.json';
+import { useOrganizationLiveState } from '../lib/organizationLiveState';
+import { createDiscoveryRepository } from '../lib/discovery';
+import { mergeOrganizationContent, mergeOrganizationOccurrences } from '../lib/organizationWorkspace';
+import type { DiscoveryEntity, MarketOccurrence } from '../types/discovery';
 import { SpotlightCard } from '../components/spotlight/SpotlightCard';
 import { activeSpotlight } from '../lib/spotlights';
 import '../styles/home.css';
@@ -45,9 +48,13 @@ function withDemoPulse(pulse: LivePulse): LivePulse {
  * three type-based sections.
  */
 export default function DiscoveryHomePage() {
-  useOrganizationLive();
-  const entities = discoveryRepository.list();
-  const days = useMemo(() => weekAgenda(entities, discoveryRepository.occurrences()), [entities]);
+  const { rows } = useOrganizationLiveState(inventory.generatedAt);
+  const repository = useMemo(() => createDiscoveryRepository(
+    mergeOrganizationContent(inventory.entities as DiscoveryEntity[], rows),
+    mergeOrganizationOccurrences(inventory.occurrences as MarketOccurrence[], rows),
+  ), [rows]);
+  const entities = repository.list();
+  const days = useMemo(() => weekAgenda(repository.list(), repository.occurrences()), [repository]);
   const weather = useCalgaryWeather();
   const pulse = withDemoPulse(useLivePulse(true));
   const spotlight = activeSpotlight();

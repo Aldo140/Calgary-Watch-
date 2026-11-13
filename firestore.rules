@@ -224,7 +224,8 @@ service cloud.firestore {
       // enforced as a *query constraint*: rules filter queries, not rows, so
       // the client must ask for visibility == 'public' and the rule below
       // requires it. Anything hidden is unreachable, not merely unrendered.
-      allow get: if true;
+      allow get: if resource.data.visibility == 'public' || isAdmin() ||
+                    (isAuthenticated() && resource.data.get('authorUid', '') == request.auth.uid);
       allow list: if (request.query.limit <= 200 &&
                    resource.data.visibility == 'public') ||
                   isAdmin();

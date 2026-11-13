@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from './calgaryTz';
 /**
  * The vetting desk behind CalgaryWatch Picks (docs/cw-picks.md). One Firestore
  * doc per service in pick_vetting, admin-only: the company being vetted, the
@@ -58,7 +59,7 @@ const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const SHORT: Record<PickCheck, string> = { licence: 'licence', insurance: 'insurance', wcb: 'WCB', local: 'local', reviews: 'reviews', 'mystery-call': 'mystery call', pledge: 'pledge' };
 
 export function calgaryDay(now = Date.now()): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  return calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
 }
 
 /** The oldest check plus six months: the date the Pick lapses unless re-vetted. */

@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz';
 // Exposure report for a CalgaryWatch Spotlight, in Markdown, ready to share with
 // the organizer:
 //
@@ -21,7 +22,7 @@ const spotlight = found;
 const path = spotlightPath(spotlight);
 const since = Date.parse(sinceArg ?? `${spotlight.published}T00:00:00-06:00`);
 
-const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
+const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
 const count = <T,>(rows: T[], key: (r: T) => string) => {
   const m = new Map<string, number>();
   for (const r of rows) m.set(key(r), (m.get(key(r)) ?? 0) + 1);

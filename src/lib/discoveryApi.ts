@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from './calgaryTz';
 import { syncVerifiedToken } from './auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -32,7 +33,7 @@ async function callable(name: 'submitDiscovery' | 'manageDiscovery', data: unkno
 
 /** Calgary calendar day, the window the five-a-day limit counts in. */
 function calgaryDay(now = new Date()): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  return calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
 }
 
 export async function submitDiscovery(input: unknown): Promise<DiscoveryResult> {

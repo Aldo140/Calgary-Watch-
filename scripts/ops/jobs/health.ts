@@ -1,5 +1,6 @@
 // Daily health check and the morning summary email to the founder.
 
+import { feedProblems, type FeedHealth } from '../../ingest/freshness';
 import type { Firestore } from 'firebase-admin/firestore';
 import type { OpsHealth, OpsPerformance, OpsPost, PartnerLead } from '../../../src/types/ops';
 import { BRANDS, brandKit } from '../lib/brand';
@@ -83,8 +84,8 @@ export async function checkHealth(db: Firestore | null, index: DiscoveryIndex, n
 
   if (db) {
     const feeds = await db.collection('ingestion_health').get();
-    const bad = feeds.docs.filter(d => d.get('status') === 'error').map(d => d.id);
-    items.push({ id: 'feeds', label: 'Data feeds', ok: !bad.length, detail: bad.length ? `Erroring: ${bad.join(', ')}` : `${feeds.size} feeds healthy.` });
+    const problems = feedProblems(new Map(feeds.docs.map(doc => [doc.id, doc.data() as FeedHealth])), now);
+    items.push({ id: 'feeds', label: 'Data feeds', ok: !problems.length, detail: problems.length ? problems.join('; ') : 'Expected feeds are current.' });
   }
   items.push(await sitemapCheck());
   items.push(await workflowCheck());

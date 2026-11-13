@@ -186,6 +186,13 @@ jobs:
           channelId: live
           projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
 
+      - name: Record catalogue publication
+        run: npx tsx scripts/discovery/mark-published.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+
       # The vetting desk shows "Live on the site" once this runs.
       - name: Mark Pick changes as published
         continue-on-error: true

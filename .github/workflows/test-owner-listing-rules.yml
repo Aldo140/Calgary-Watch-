@@ -5,11 +5,17 @@ on:
     paths:
       - firestore.rules
       - tests/emulator/**
+      - src/pages/ClaimListingPage.tsx
+      - src/lib/claimsApi.ts
+      - functions/**
       - .github/workflows/test-owner-listing-rules.yml
   pull_request:
     paths:
       - firestore.rules
       - tests/emulator/**
+      - src/pages/ClaimListingPage.tsx
+      - src/lib/claimsApi.ts
+      - functions/**
       - .github/workflows/test-owner-listing-rules.yml
   workflow_dispatch:
 permissions:

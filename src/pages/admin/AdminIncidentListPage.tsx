@@ -105,14 +105,13 @@ export default function AdminIncidentListPage() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [rawView, setRawView] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const [moreReports, setMoreReports] = useState(false);
+  const [moreFeedback, setMoreFeedback] = useState(false);
 
   useEffect(() => {
     if (!db) { setLoading(false); return; }
-    // Read the collection itself: orderBy(timestamp) silently excludes legacy
-    // documents that do not contain that field, which made old submissions
-    // disappear from the purported all-time archive.
-    // Shared with /admin: read once per tab, plus a live window on the newest.
-    const unsubIncidents = adminIncidents.subscribe(db, ({ rows, loading, error }) => {
+    const unsubIncidents = adminIncidents.subscribe(db, ({ rows, loading, error, hasMore }) => {
+      setMoreReports(hasMore);
       setIncidents(rows);
       setLoadError(error ? 'The all-time report archive could not be loaded. Check the deployed admin read rules.' : '');
       if (!loading) setLoading(false);
@@ -120,7 +119,7 @@ export default function AdminIncidentListPage() {
     const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
       setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
     });
-    const unsubFeedback = adminFeedback.subscribe(db, ({ rows }) => setFeedback(rows as unknown as IncidentFeedback[]));
+    const unsubFeedback = adminFeedback.subscribe(db, ({ rows, hasMore }) => { setFeedback(rows as unknown as IncidentFeedback[]); setMoreFeedback(hasMore); });
     return () => { unsubIncidents(); unsubUsers(); unsubFeedback(); };
   }, []);
 
@@ -309,9 +308,9 @@ export default function AdminIncidentListPage() {
                   <span className="tabular-nums" style={{ fontFamily: mono }}>{filteredIncidents.length}</span>
                   {' shown · '}
                   <span className="tabular-nums" style={{ fontFamily: mono }}>{incidentStats.total}</span>
-                  {' resident retained · '}
+                  {' resident loaded · '}
                   <span className="tabular-nums" style={{ fontFamily: mono }}>{incidentStats.official}</span>
-                  {' API current'}
+                  {' API loaded'}
                   {uidFilter && ' · filtered to one reporter'}
                 </p>
               </div>
@@ -320,7 +319,9 @@ export default function AdminIncidentListPage() {
               </AdminButton>
             </div>
 
-            <div className="flex gap-2 mt-3">
+            <div className="flex flex-wrap gap-2 mt-3">
+              {moreReports && <AdminButton variant="outline" onClick={() => { if (db) void adminIncidents.loadMore(db); }}>Load more reports</AdminButton>}
+              {moreFeedback && <AdminButton variant="outline" onClick={() => { if (db) void adminFeedback.loadMore(db); }}>Load more feedback</AdminButton>}
               <SearchField
                 value={search}
                 onChange={setSearch}

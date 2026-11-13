@@ -158,6 +158,8 @@ export function useAdminData(section = 'all') {
   const { user, isAuthReady, isAdmin } = useAuth();
 
   const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [archiveCount, setArchiveCount] = useState<number | null>(null);
+  const [moreIncidents, setMoreIncidents] = useState(false);
   const [accountCount, setAccountCount] = useState<number | null>(null);
   const [communityStats, setCommunityStats] = useState<(CommunityStats & { id: string })[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -324,11 +326,17 @@ export function useAdminData(section = 'all') {
   useEffect(() => {
     if (!needs.incidents) { setLoadingData(false); return; }
     if (!isAuthReady || !user || !isAdmin || !db) return;
-    return adminIncidents.subscribe(db, ({ rows, loading, error }) => {
+    let active = true;
+    const database = db;
+    void adminReadCache.read(user.uid + ":incident_count", () => getCountFromServer(collection(database, "incidents")), 5 * 60_000)
+      .then(snapshot => { if (active) setArchiveCount(snapshot.data().count); }).catch(() => {});
+    const unsubscribe = adminIncidents.subscribe(database, ({ rows, loading, error, hasMore }) => {
+      setMoreIncidents(hasMore);
       reportRead('Report archive',error);
       setIncidents([...rows].sort((a, b) => b.timestamp - a.timestamp));
       setLoadingData(loading);
     });
+    return () => { active = false; unsubscribe(); };
   }, [isAuthReady, isAdmin, user?.uid, needs.incidents]);
 
   useEffect(() => {
@@ -482,7 +490,7 @@ export function useAdminData(section = 'all') {
   // reproducible operational feed and must not inflate community KPIs.
   const realIncidents      = useMemo(() => incidents.filter(isResidentSubmission), [incidents]);
   const operationalIncidents = useMemo(() => incidents.filter(isOperationalIncident), [incidents]);
-  const storedIncidentCount = incidents.length;
+  const storedIncidentCount = archiveCount;
   const totalIncidents     = realIncidents.length;
   const officialReportCount = operationalIncidents.length;
   const anonymousCommunityCount = realIncidents.filter((i) => i.anonymous).length;
@@ -932,7 +940,7 @@ export function useAdminData(section = 'all') {
     // ── raw collections ──
     incidents, communityStats, users, usersLoaded, digestSubscribers, digestSubscribersLoaded, digestSubscribersError,
     pageViewDocs, flaggedIncidents,
-    crimeStats, crimeLoading, loadingData,
+    crimeStats, crimeLoading, loadingData, moreIncidents,
     // ── counters ──
     totalIncidents, officialReportCount, storedIncidentCount,
     anonymousCommunityCount, hiddenCommunityCount,

@@ -24,6 +24,7 @@ export const discoveryFixtures: DiscoveryEntity[] = [
 // statically false for `vite build`, so this can never ship in a production bundle; the
 // optional chain also covers plain-Node execution (tests, the prerender/SEO scripts),
 // where import.meta.env doesn't exist at all outside Vite.
+export const discoveryGeneratedAt = inventory.generatedAt;
 const isDevServer = Boolean(import.meta.env?.DEV);
 const entities = isDevServer
   ? [...(inventory.entities as DiscoveryEntity[]), ...discoveryFixtures]

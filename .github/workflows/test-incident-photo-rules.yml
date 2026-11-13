@@ -6,12 +6,16 @@ on:
       - firestore.rules
       - storage.rules
       - tests/emulator/**
+      - src/pages/MapPage.tsx
+      - src/components/IncidentForm.tsx
       - .github/workflows/test-incident-photo-rules.yml
   pull_request:
     paths:
       - firestore.rules
       - storage.rules
       - tests/emulator/**
+      - src/pages/MapPage.tsx
+      - src/components/IncidentForm.tsx
       - .github/workflows/test-incident-photo-rules.yml
   workflow_dispatch:
 permissions:

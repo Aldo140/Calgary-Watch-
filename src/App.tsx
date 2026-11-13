@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AccountCompanion } from './components/auth/AccountCompanion';
+import { useAuth } from './components/FirebaseProvider';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Suspense, useEffect, useRef, type ReactNode } from 'react';
-import SeoManager from '@/src/components/SeoManager';
 import { db } from '@/src/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import './styles/page-loader.css';
@@ -21,6 +20,8 @@ startVersionWatch();
 // Lazy-load every page so the initial bundle stays minimal and module-eval
 // failures (e.g. GSAP/Leaflet on Safari) are isolated to their own chunk.
 // `lazy` here is lazyWithRecovery, which rides out deploys and dropped connections.
+const SeoManager = lazy(() => import('./components/SeoManager'));
+const AccountCompanion = lazy(() => import('./components/auth/AccountCompanion').then(module => ({ default: module.AccountCompanion })));
 const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
 const CommunityPage = lazy(() => import('@/src/pages/CommunityPage'));
 const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
@@ -207,13 +208,25 @@ function RouteBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={pathname}>{children}</ErrorBoundary>;
 }
 
+function DeferredSiteTools() {
+  const { user } = useAuth();
+  const { pathname } = useLocation();
+  const needsSeo = useRef(false);
+  if (pathname !== "/") needsSeo.current = true;
+  return (
+    <>
+      <Suspense fallback={null}>{needsSeo.current && <SeoManager />}</Suspense>
+      <Suspense fallback={null}>{user && <AccountCompanion />}</Suspense>
+    </>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <RedirectHandler />
       <PageTracker />
-      <SeoManager />
-      <AccountCompanion />
+      <DeferredSiteTools />
       <BuildSwap />
       <RouteBoundary>
       <Suspense fallback={<PageLoader />}>

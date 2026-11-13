@@ -58,5 +58,5 @@ export async function submitOrganizationBatch(db:Firestore,uid:string,input:{org
     if(new TextEncoder().encode(JSON.stringify({before,after})).length>850000)throw Error('This submission is too large to save safely. Shorten long descriptions or contact CalgaryWatch for a programme import. Your allowance has not been used.');
     tx.create(receipt,{requestHash,uid,...(adminEdit?{actorRole:'admin',subjectUid:input.subjectUid??null}:{}),rootId:orgId,entityId:orgId,entityTitle:org.title,changes:{listings:input.operations.map(o=>({entityId:o.entityId,action:o.action}))},before,after,status:'applied',createdAt:new Date(now),appliedAt:now,publishedAt:now,notificationPending:true,publicationPending:false,live:true});
     return {publishedAt:now,nextAt:adminEdit?organizationNextAt(rate.data()?.lastSubmittedAt??0):organizationNextAt(now)};
-  },{maxAttempts:1});
+  });
 }

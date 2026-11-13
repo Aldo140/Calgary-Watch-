@@ -67,6 +67,7 @@ export interface MapRef {
     options?: { zoom?: number; offsetX?: number; offsetY?: number; onComplete?: () => void }
   ) => void;
   showPopup: (incident: Incident) => void;
+  closeIncidentPopup: () => void;
   /** Returns the current map center - used by pin-mode to capture coordinates */
   getCenter: () => { lat: number; lng: number } | null;
   /** Show a pulsing blue dot at the user's location */
@@ -95,6 +96,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const trafficFlowLayer = useRef<L.LayerGroup | null>(null);
   const baseMapLayer = useRef<L.Layer | null>(null);
   const popup = useRef<L.Popup | null>(null);
+  const popupFrame = useRef<number | undefined>(undefined);
   const serviceAreaLayer = useRef<L.LayerGroup | null>(null);
   const serviceAreaBounds = useRef<L.LatLngBounds | null>(null);
   const incidentsRef = useRef<Incident[]>(incidents);
@@ -260,6 +262,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       nearFocusLayer.current = L.layerGroup(layers).addTo(m);
     },
 
+    closeIncidentPopup: () => {
+      if (popupFrame.current !== undefined) window.cancelAnimationFrame(popupFrame.current);
+      popup.current?.remove();
+    },
     showPopup: (incident: Incident) => {
       if (!map.current) return;
       
@@ -272,6 +278,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       const wrapper = buildPopupContent(incident, { reporterFirstName: getReporterDisplay(incident).firstName });
 
       const openPopup = () => {
+        popupFrame.current = undefined;
+        if (!map.current) return;
         popup.current = L.popup({
           closeButton: false,
           className: 'custom-leaflet-popup lv-popup-shell',
@@ -285,7 +293,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       };
 
       // Yield one frame before opening to avoid visible hitch right after pan.
-      window.requestAnimationFrame(openPopup);
+      if (popupFrame.current !== undefined) window.cancelAnimationFrame(popupFrame.current);
+      popupFrame.current = window.requestAnimationFrame(openPopup);
     }
   }));
 

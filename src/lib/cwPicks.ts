@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from './calgaryTz';
 import { BEST_CATEGORIES, type BestPlace } from '../content/bestOf';
 import { sourceOf } from './bestOf';
 import { PICK_CHECKS, PICKS, type CwPick, type PickCheck } from '../content/cwPicks';
@@ -346,7 +347,7 @@ export function proofsFor(c: Pick<Contender, 'fact' | 'verified'> & { facts?: st
 }
 
 /** Calgary's hour (0–23) right now. */
-export const calgaryHour = (now = Date.now()) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', hourCycle: 'h23' }).format(now));
+export const calgaryHour = (now = Date.now()) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', hourCycle: 'h23' }).format(now));
 /** Most offices are closed: before 8 am, after 6 pm. */
 export const afterHours = (now = Date.now()) => { const h = calgaryHour(now); return h < 8 || h >= 18; };
 

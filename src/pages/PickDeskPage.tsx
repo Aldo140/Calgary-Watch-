@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowDown, ArrowUpRight, BookOpenCheck, Share2, Lightbulb, MessageCircleQuestion, ShieldCheck, UserPlus } from 'lucide-react';
@@ -18,7 +19,7 @@ import '../styles/picks.css';
 const CONTACT = 'aldo@calgarywatch.ca';
 const MONTHS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const calgaryMonth = (d: Date) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
+const calgaryMonth = (d: Date) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
 
 /**
  * /picks/:service: one service as a decision. The Pick (or its open slot),
@@ -130,7 +131,7 @@ export default function PickDeskPage() {
   );
 }
 
-const CLOCK = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+const CLOCK = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 
 /**
  * The answer a search came for, before the list: how many, who picks up at

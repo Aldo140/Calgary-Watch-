@@ -8,11 +8,11 @@ export const resendConfigured = () => Boolean(process.env.RESEND_API_KEY);
 
 /** Send a plain-text message. The returned id stands in for an Outlook conversation id. */
 export async function sendViaResend(
-  from: { name: string; mailbox: string }, to: string, subject: string, text: string,
+  from: { name: string; mailbox: string }, to: string, subject: string, text: string, deliveryId?: string,
 ): Promise<{ conversationId: string }> {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+    headers: { authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'content-type': 'application/json', ...(deliveryId ? { 'Idempotency-Key': deliveryId } : {}) },
     body: JSON.stringify({ from: `${from.name} <${from.mailbox}>`, to: [to], reply_to: from.mailbox, subject, text }),
   });
   const body: any = await res.json().catch(() => ({}));

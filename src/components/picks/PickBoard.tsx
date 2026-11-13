@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { oneOf, seoNounInline } from '../../lib/pickSeo';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -60,7 +61,7 @@ export function PickBoard({ shelf, via, compact = false }: { shelf: Shelf; via: 
   );
 }
 
-const DAYFMT = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' });
+const DAYFMT = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' });
 const when = (at: number) => {
   const days = Math.floor((Date.now() - at) / 86_400_000);
   return days < 1 ? 'today' : days < 2 ? 'yesterday' : `on ${DAYFMT.format(at)}`;

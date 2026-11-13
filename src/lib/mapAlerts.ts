@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from './calgaryTz';
 /**
  * City alerts: weather warnings, emergency alerts, smoke and river readings.
  *
@@ -164,13 +165,13 @@ export function alertAreaLabel(areas: string[]): string {
 /** "until 6 am" / "until Sun 6 am" on the Calgary clock. */
 export function alertUntilLabel(expiresAt: number | undefined, now = Date.now()): string | null {
   if (!expiresAt || expiresAt <= now) return null;
-  const sameDay = new Date(expiresAt).toLocaleDateString('en-CA', { timeZone: 'America/Edmonton' })
-    === new Date(now).toLocaleDateString('en-CA', { timeZone: 'America/Edmonton' });
+  const sameDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: 'numeric', day: 'numeric' }).format(expiresAt)
+    === calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: 'numeric', day: 'numeric' }).format(now);
   const time = new Date(expiresAt).toLocaleTimeString('en-CA', {
     timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit',
   }).replace(':00', '').replace(/\./g, '').toLowerCase();
   if (sameDay) return `until ${time}`;
-  const day = new Date(expiresAt).toLocaleDateString('en-CA', { timeZone: 'America/Edmonton', weekday: 'short' });
+  const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short' }).format(expiresAt);
   return `until ${day} ${time}`;
 }
 

@@ -242,7 +242,6 @@ async function run(): Promise<void> {
     },
   ];
   const sourceResults = await Promise.all(jobs.map(runSource));
-  await publishSourceHealth(db, sourceResults);
 
   for (const result of sourceResults) {
     const name = DATA_SOURCE_BY_ID.get(result.id)?.shortName ?? result.id;
@@ -270,6 +269,7 @@ async function run(): Promise<void> {
     console.log('[ingest] No incidents to process. Done.');
     await writePulseSnapshot(db);
     await writeCrimeBoard(db, []);
+    await publishSourceHealth(db, sourceResults);
     return;
   }
 
@@ -291,6 +291,7 @@ async function run(): Promise<void> {
   );
   await writePulseSnapshot(db);
   await writeCrimeBoard(db, allIncidents);
+  await publishSourceHealth(db, sourceResults);
 }
 
 /**

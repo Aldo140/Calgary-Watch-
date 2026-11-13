@@ -1,46 +1,46 @@
 import { trackSubscription } from './readEfficiency';
-/**
- * Shared, read-once data for the admin console.
- *
- * Admin used to open a live listener on the whole `incidents` collection on
- * /admin and again on /admin/incidents, and a second one on the whole
- * `incident_feedback` collection. Every visit, and every hop between those
- * pages, re-read every document: on Firestore's free plan that alone could
- * spend a large part of the daily read quota.
- *
- * Now the full archive is read once per browser tab (kept in memory across
- * admin pages), and a small live window of the newest 150 reports keeps the
- * desk current. "Refresh" re-reads on demand. All-time history still includes
- * legacy rows without a timestamp, because the archive read is unfiltered.
- */
-
-import { collection, getDocs, limit, onSnapshot, orderBy, query, type Firestore } from 'firebase/firestore';
+import { collection, documentId, getDocs, limit, onSnapshot, orderBy, query, startAfter, type Firestore } from 'firebase/firestore';
 import { adminIncidentTimestamp } from './adminIncidentPolicy';
 import type { Incident } from '../types';
 
-type Listener<T> = (state: { rows: T[]; loading: boolean; error: string; loadedAt: number | null }) => void;
+type Listener<T> = (state: { rows: T[]; loading: boolean; error: string; loadedAt: number | null; hasMore: boolean }) => void;
 
 const LIVE_WINDOW = 150;
+const ARCHIVE_PAGE_SIZE = 150;
 
-function createStore<T extends { id: string }>(load: (db: Firestore) => Promise<T[]>, live?: (db: Firestore, merge: (rows: T[]) => void) => () => void) {
+function createStore<T extends { id: string }>(load: (db: Firestore, after: string | undefined) => Promise<{ rows: T[]; hasMore: boolean }>, live?: (db: Firestore, merge: (rows: T[]) => void) => () => void) {
   let rows: T[] = [];
+  let cursor: string | undefined;
+  let hasMore = false;
+  let liveRows: T[] = [];
   let loading = false;
   let error = '';
   let loadedAt: number | null = null;
   let pending: Promise<void> | undefined;
   let unlive: (() => void) | null = null;
   const listeners = new Set<Listener<T>>();
-  const emit = () => listeners.forEach((l) => l({ rows, loading, error, loadedAt }));
+  const current = () => {
+    const merged = new Map(rows.map(row => [row.id, row]));
+    liveRows.forEach(row => merged.set(row.id, row));
+    return { rows: [...merged.values()], loading, error, loadedAt, hasMore };
+  };
+  const emit = () => {
+    const state = current();
+    listeners.forEach(listener => listener(state));
+  };
 
-  function refresh(db: Firestore): Promise<void> {
+  function refresh(db: Firestore, append = false): Promise<void> {
     if (pending) return pending;
-    pending = loadOnce(db).finally(() => { pending = undefined; });
+    pending = loadOnce(db, append).finally(() => { pending = undefined; });
     return pending;
   }
-  async function loadOnce(db: Firestore) {
+  async function loadOnce(db: Firestore, append: boolean) {
     loading = true; emit();
     try {
-      rows = await load(db);
+      const page = await load(db, append ? cursor : undefined);
+      rows = append ? [...rows, ...page.rows] : page.rows;
+      cursor = page.rows.at(-1)?.id;
+      hasMore = page.hasMore;
       error = ''; loadedAt = Date.now();
     } catch (e) {
       error = e instanceof Error ? e.message : 'Could not load';
@@ -52,13 +52,11 @@ function createStore<T extends { id: string }>(load: (db: Firestore) => Promise<
   return {
     subscribe(db: Firestore, listener: Listener<T>) {
       listeners.add(listener);
-      listener({ rows, loading, error, loadedAt });
+      listener(current());
       if (loadedAt === null && !loading) void refresh(db);
       if (live && !unlive) {
         unlive = trackSubscription('admin:archive_live', () => live(db, (fresh) => {
-          const byId = new Map(rows.map((r) => [r.id, r]));
-          for (const r of fresh) byId.set(r.id, r);
-          rows = [...byId.values()];
+          liveRows = fresh;
           emit();
         }));
       }
@@ -69,9 +67,12 @@ function createStore<T extends { id: string }>(load: (db: Firestore) => Promise<
       };
     },
     refresh,
+    loadMore(db: Firestore) { return hasMore ? refresh(db, true) : Promise.resolve(); },
     /** Apply a local edit without a re-read (moderation actions). */
     patch(id: string, change: Partial<T> | null) {
-      rows = change === null ? rows.filter((r) => r.id !== id) : rows.map((r) => (r.id === id ? { ...r, ...change } : r));
+      const patchRows = (items: T[]) => change === null ? items.filter(r => r.id !== id) : items.map(r => r.id === id ? { ...r, ...change } : r);
+      rows = patchRows(rows);
+      liveRows = patchRows(liveRows);
       emit();
     },
   };
@@ -79,24 +80,33 @@ function createStore<T extends { id: string }>(load: (db: Firestore) => Promise<
 
 const toIncident = (row: { id: string; data: () => Record<string, unknown> }) => {
   const data = row.data();
-  return { id: row.id, ...data, timestamp: adminIncidentTimestamp(data) } as Incident;
+  return { ...data, id: row.id, timestamp: adminIncidentTimestamp(data) } as Incident;
 };
 
+// Document ID ordering includes older rows with no timestamp or account metadata.
+async function archivePage<T>(db: Firestore, name: string, after: string | undefined, mapRow: (doc: import("firebase/firestore").QueryDocumentSnapshot) => T) {
+  const source = collection(db, name);
+  const page = await getDocs(after
+    ? query(source, orderBy(documentId()), startAfter(after), limit(ARCHIVE_PAGE_SIZE + 1))
+    : query(source, orderBy(documentId()), limit(ARCHIVE_PAGE_SIZE + 1)));
+  return { rows: page.docs.slice(0, ARCHIVE_PAGE_SIZE).map(mapRow), hasMore: page.size > ARCHIVE_PAGE_SIZE };
+}
+
 export const adminIncidents = createStore<Incident>(
-  async (db) => (await getDocs(collection(db, 'incidents'))).docs.map(toIncident),
+  (db, after) => archivePage(db, 'incidents', after, toIncident),
   (db, merge) => onSnapshot(
     query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(LIVE_WINDOW)),
-    (snap) => merge(snap.docChanges().filter((c) => c.type !== 'removed').map((c) => toIncident(c.doc))),
+    (snap) => merge(snap.docs.map(toIncident)),
     () => {},
   ),
 );
 
 export type FeedbackRow = { id: string; incidentId?: string; uid?: string; kind?: string; createdAt?: number; updatedAt?: number };
 export const adminFeedback = createStore<FeedbackRow>(
-  async (db) => (await getDocs(collection(db, 'incident_feedback'))).docs.map((d) => ({ id: d.id, ...d.data() })),
+  (db, after) => archivePage(db, 'incident_feedback', after, d => ({ ...d.data(), id: d.id })),
 );
 
-/** Every account, for the People directory's search. Read once per tab. */
+/** Account history, paged by document ID to include legacy profiles. */
 export const adminUsers = createStore<{ id: string; uid: string } & Record<string, unknown>>(
-  async (db) => (await getDocs(collection(db, 'users'))).docs.map((d) => ({ ...d.data(), id: d.id, uid: d.id })),
+  (db, after) => archivePage(db, 'users', after, d => ({ ...d.data(), id: d.id, uid: d.id })),
 );

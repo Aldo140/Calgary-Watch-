@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, TimeAgo, m
 const WINDOWS = [7, 30, 90] as const;
 /** Rows in the live "Latest searches" list: one read each when the page opens, then one per new search. */
 const LATEST = 20;
-const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+const clock = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 
 /**
  * Search demand: what people typed into CalgaryWatch search, grouped.

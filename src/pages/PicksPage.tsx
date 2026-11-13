@@ -1,3 +1,4 @@
+import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, BadgeCheck, MailCheck, MessageSquareText, PhoneCall, Search, ShieldCheck } from 'lucide-react';
@@ -14,8 +15,8 @@ import '../styles/picks.css';
 const CONTACT = 'aldo@calgarywatch.ca';
 const CHECK_KEYS = Object.keys(PICK_CHECKS) as PickCheck[];
 const GROUPS = Object.keys(SERVICE_GROUPS) as ServiceGroup[];
-const calgaryMonth = (d: Date) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
-const MONTH = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long' });
+const calgaryMonth = (d: Date) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
+const MONTH = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long' });
 
 /**
  * /picks: "who do you call?" for every everyday service, each with its Pick

@@ -11,7 +11,7 @@ export interface Suggestion { label: string; note?: string; to: string }
  * communities, sections and listings as you type (arrow keys, Enter, Escape).
  * With `popular` too, an empty box offers what Calgary searches for most.
  */
-export function GlobalSearch({ initial = '', suggest, popular = [] }: { initial?: string; suggest?: (q: string) => Suggestion[]; popular?: Suggestion[] }) {
+export function GlobalSearch({ initial = '', suggest, popular = [], showSubmitText = false }: { initial?: string; suggest?: (q: string) => Suggestion[]; popular?: Suggestion[]; showSubmitText?: boolean }) {
   const navigate = useNavigate();
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -103,7 +103,8 @@ export function GlobalSearch({ initial = '', suggest, popular = [] }: { initial?
         } : {})}
       />
       <button type="submit" aria-label="Search">
-        <ArrowRight size={22} />
+        {showSubmitText && <span>Search</span>}
+        <ArrowRight size={21} aria-hidden="true" />
       </button>
       {suggest ? (
         <ul className="cw-suggest" id={`${id}-list`} role="listbox" aria-label={showingPopular ? 'Popular right now' : 'Suggestions'} data-popular={showingPopular || undefined} hidden={!open}>

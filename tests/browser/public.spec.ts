@@ -30,3 +30,17 @@ test('the guest homepage loads without downloading the full discovery catalogue'
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   expect([...scripts].filter(path => /\/(discovery-inventory|SeoManager|AccountCompanion)-/.test(path))).toEqual([]);
 });
+
+test('search supports keyboard suggestions and a compact results view on mobile', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/search');
+  await expect(page.getByRole('heading', { name: 'Find it in Calgary.' })).toBeVisible();
+  const search = page.getByRole('combobox', { name: 'Search CalgaryWatch' });
+  await search.fill('Beltl');
+  await expect(page.getByRole('option', { name: /Beltline/ }).first()).toBeVisible();
+  await search.press('ArrowDown');
+  await search.press('Enter');
+  await expect(page.getByRole('heading', { level: 1, name: /Results for.*beltline/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: /See Beltline on the live map/i })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(await page.evaluate(() => innerWidth));
+});

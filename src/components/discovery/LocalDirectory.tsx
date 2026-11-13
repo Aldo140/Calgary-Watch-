@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, BadgeCheck, Beer, Coffee, Drama, FerrisWheel, Ghost, MapPin, Palette, Search, ShoppingBag, Store, Tractor, Users, UtensilsCrossed, X, type LucideIcon } from 'lucide-react';
 import type { Business } from '../../types/discovery';
@@ -175,7 +175,7 @@ export function ShelfRibbon({ counts }: { counts: Map<ShelfId, number> }) {
   );
 }
 
-export function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shelf: Shelf; programme?: Programme; now: number; i: number }) {
+export const ProfileCard = memo(function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shelf: Shelf; programme?: Programme; now: number; i: number }) {
   const note = LOCAL_NOTES[p.id];
   const verified = isOwnerVerified(p);
   const next = programme?.next;
@@ -210,7 +210,11 @@ export function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shel
       </Link>
     </li>
   );
-}
+});
+
+/** Cards a shelf shows before "Show all". Every card carries an SVG cover (~80 nodes),
+ *  and drawing 600+ of them at once froze phones for seconds. */
+const SHELF_FIRST = 9;
 
 /**
  * The directory: every profile on its shelf. A sticky rail (sideways chips on phones)
@@ -221,6 +225,7 @@ export function ShelfDirectory({ profiles, shelfOfId, programmes, now, category 
 }) {
   const [q, setQ] = useState('');
   const [active, setActive] = useState<ShelfId | null>(null);
+  const [open, setOpen] = useState<ReadonlySet<ShelfId>>(() => new Set());
   const needle = q.trim().toLocaleLowerCase('en-CA');
   const match = (p: Business) => !needle || `${p.title} ${p.summary} ${p.neighbourhood ?? ''} ${p.tags.join(' ')}`.toLocaleLowerCase('en-CA').includes(needle);
   const shelves = useMemo(() => SHELVES.map(s => ({ shelf: s, all: profiles.filter(p => shelfOfId.get(p.id) === s.id) })).filter(x => x.all.length), [profiles, shelfOfId]);
@@ -330,7 +335,15 @@ export function ShelfDirectory({ profiles, shelfOfId, programmes, now, category 
                   </span>
                 </header>
                 <ul className="ld-cards">
-                  {list.map((p, i) => <ProfileCard key={p.id} p={p} shelf={shelf} programme={programmes.get(p.id)} now={now} i={i} />)}
+                  {(open.has(shelf.id) ? list : list.slice(0, SHELF_FIRST)).map((p, i) => <ProfileCard key={p.id} p={p} shelf={shelf} programme={programmes.get(p.id)} now={now} i={i} />)}
+                  {!open.has(shelf.id) && list.length > SHELF_FIRST ? (
+                    <li className="ld-card ld-card-more">
+                      <button type="button" onClick={() => setOpen(prev => new Set(prev).add(shelf.id))}>
+                        <b>+{list.length - SHELF_FIRST}</b>
+                        <span>Show all {list.length} on {shelf.label}</span>
+                      </button>
+                    </li>
+                  ) : null}
                 </ul>
               </section>
             );

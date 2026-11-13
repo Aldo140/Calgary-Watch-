@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Search, TrendingUp, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Search, TrendingUp, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink, ChevronLeft, ChevronRight, CornerDownLeft } from 'lucide-react';
+import { useRef, useState, type ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
 import type { SearchIntent } from '../../lib/searchIntent';
@@ -113,7 +113,9 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
     <div className={`bp sx${q ? ' sx-has-q' : ''}`}>
       <section className="sx-hero" aria-labelledby="sx-title">
         {!q && <div className="sx-city" aria-hidden="true">
-          <img
+          <picture>
+            <source media="(max-width: 640px)" srcSet="/images/hero/search-calgary-pocket.webp" />
+            <img
             src="/images/hero/search-calgary-1320.webp"
             srcSet="/images/hero/search-calgary-860.webp 860w, /images/hero/search-calgary-1320.webp 1320w"
             sizes="(max-width: 760px) 100vw, 62vw"
@@ -121,7 +123,9 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
             height={742}
             alt=""
             fetchPriority="high"
-          />
+            />
+          </picture>
+          <div className="sx-pocket-route"><i /><i /><i /></div>
           <div className="sx-city-lens"><span /><span /><span /><span /></div>
           <span className="sx-city-point sx-city-point-tower" />
           <span className="sx-city-point sx-city-point-river" />
@@ -131,11 +135,13 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
             <p className="sx-kicker"><Search size={16} aria-hidden="true" /> Search CalgaryWatch</p>
             <h1 id="sx-title">{q ? <>Results for <em>“{q}”</em></> : <>Find it <em>in Calgary.</em></>}</h1>
             {!q && <p className="sx-lead">Look up a street, check what happened nearby, or find something to do this weekend.</p>}
-            <div className="sx-box"><GlobalSearch initial={q} suggest={suggest} popular={popular} showSubmitText /></div>
+            <div className="sx-search-panel">
+            <div className="sx-box"><GlobalSearch initial={q} suggest={suggest} popular={popular} showSubmitText placeholder="Street, place, or event" /></div>
             {!q && <div className="sx-try">
               <span>Try</span>
-              <ul aria-label="Example searches">{tryChips(popular, TRY).slice(0, 4).map(t => <li key={t.to}><Link to={t.to}>{t.label}</Link></li>)}</ul>
+              <ul aria-label="Example searches">{tryChips(popular, TRY).slice(0, 4).map(t => <li key={t.to}><Link to={t.to}>{t.label}<CornerDownLeft size={12} aria-hidden="true" /></Link></li>)}</ul>
             </div>}
+            </div>
           </div>
         </div>
       </section>
@@ -342,10 +348,29 @@ function Popular({ items, title }: { items: Suggestion[]; title: ReactNode }) {
 }
 
 function Starters({ title }: { title: ReactNode }) {
+  const rail = useRef<HTMLUListElement>(null);
+  const [position, setPosition] = useState({ start: true, end: false });
+  const move = (direction: number) => {
+    const list = rail.current;
+    if (!list) return;
+    const behaviour = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+    const card = list.firstElementChild?.getBoundingClientRect().width ?? list.clientWidth;
+    list.scrollBy({ left: direction * (card + parseFloat(getComputedStyle(list).columnGap)), behavior: behaviour });
+  };
   return (
-    <section className="bp-section" aria-labelledby="sx-starters">
-      <div className="bp-head"><h2 id="sx-starters">{title}</h2></div>
-      <ul className="sx-starters">
+    <section className="bp-section sx-quick" aria-labelledby="sx-starters">
+      <div className="bp-head">
+        <h2 id="sx-starters">{title}</h2>
+        <div className="sx-rail-controls">
+          <button type="button" onClick={() => move(-1)} disabled={position.start} aria-label="Previous quick answer"><ChevronLeft size={19} /></button>
+          <button type="button" onClick={() => move(1)} disabled={position.end} aria-label="Next quick answer"><ChevronRight size={19} /></button>
+        </div>
+      </div>
+      <ul className="sx-starters" ref={rail} onScroll={event => {
+        const { scrollLeft, clientWidth, scrollWidth } = event.currentTarget;
+        const start = scrollLeft <= 1, end = scrollLeft + clientWidth >= scrollWidth - 1;
+        setPosition(previous => previous.start === start && previous.end === end ? previous : { start, end });
+      }}>
         {STARTERS.map(s => (
           <li key={s.to}>
             <Link to={s.to} className={`sx-starter bp-tone-${s.tone}`}>

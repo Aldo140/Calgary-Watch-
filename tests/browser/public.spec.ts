@@ -44,3 +44,19 @@ test('search supports keyboard suggestions and a compact results view on mobile'
   await expect(page.getByRole('link', { name: /See Beltline on the live map/i })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(await page.evaluate(() => innerWidth));
 });
+
+test('mobile search uses its own artwork and quick answers advance one card', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/search');
+  const artwork = page.locator('.sx-city img');
+  await expect(artwork).toBeVisible();
+  await expect.poll(() => artwork.evaluate(img => (img as HTMLImageElement).currentSrc)).toContain('search-calgary-pocket.webp');
+  const rail = page.locator('.sx-starters');
+  const previous = page.getByRole('button', { name: 'Previous quick answer' });
+  await expect(previous).toBeDisabled();
+  await page.getByRole('button', { name: 'Next quick answer' }).click();
+  await expect(previous).toBeEnabled();
+  expect(await rail.evaluate(el => el.scrollLeft)).toBeGreaterThan(100);
+  await previous.click();
+  await expect(previous).toBeDisabled();
+});

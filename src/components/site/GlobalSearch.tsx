@@ -11,7 +11,7 @@ export interface Suggestion { label: string; note?: string; to: string }
  * communities, sections and listings as you type (arrow keys, Enter, Escape).
  * With `popular` too, an empty box offers what Calgary searches for most.
  */
-export function GlobalSearch({ initial = '', suggest, popular = [], showSubmitText = false }: { initial?: string; suggest?: (q: string) => Suggestion[]; popular?: Suggestion[]; showSubmitText?: boolean }) {
+export function GlobalSearch({ initial = '', suggest, popular = [], showSubmitText = false, placeholder = "Neighbourhood, street, event…" }: { initial?: string; suggest?: (q: string) => Suggestion[]; popular?: Suggestion[]; showSubmitText?: boolean; placeholder?: string }) {
   const navigate = useNavigate();
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,7 +87,7 @@ export function GlobalSearch({ initial = '', suggest, popular = [], showSubmitTe
         defaultValue={initial}
         key={initial}
         maxLength={120}
-        placeholder="Neighbourhood, street, event…"
+        placeholder={placeholder}
         type="search"
         autoComplete="off"
         {...(suggest ? {

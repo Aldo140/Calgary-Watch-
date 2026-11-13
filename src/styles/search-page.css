@@ -593,3 +593,49 @@ html.cw-splashing .sx-search-panel { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
   .sx-explore-link:focus-visible img, .sx-explore-link:hover img, .sx-explore-link:hover .sx-explore-arrow, .sx .sx-explore-link:active { transform: none; }
 }
+
+/* Query cards pair real destinations with editorial artwork and a short cue. */
+.sx .sx-starter[data-scene] {
+  isolation: isolate; overflow: hidden; align-content: end; min-height: 204px;
+  padding: 66px 44px 18px 18px; color: #fff; background: #0b2039; border-color: #263d57;
+}
+.sx .sx-starter[data-scene] .sx-arrow { color: #fff; }
+.sx .sx-starter[data-scene] .sx-starter-icon { position: absolute; top: 14px; left: 17px; color: #102943; background: #ffdf4f; }
+.sx-quick-scene { position: absolute; z-index: -1; inset: 0; overflow: hidden; }
+.sx-quick-scene::after { position: absolute; inset: 0; content: ""; background: linear-gradient(0deg,#06152bf7 3%,#06152bd6 35%,#06152b13 93%); }
+.sx-quick-scene img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .55s cubic-bezier(.22,1,.36,1); }
+.sx-starter:hover .sx-quick-scene img, .sx-starter:focus-visible .sx-quick-scene img { transform: scale(1.045); }
+.sx .sx-starter[data-scene="outage"] { background: #132a46; }
+.sx [data-scene="outage"] .sx-quick-scene {
+  background: radial-gradient(circle at 75% 28%,#425d7c,transparent 40%), repeating-linear-gradient(90deg,#d7eaff20 0 1px,transparent 1px 25px), repeating-linear-gradient(0deg,#d7eaff20 0 1px,transparent 1px 25px);
+}
+.sx-grid-bolt { position: absolute; top: 12%; right: 15%; width: 32%; height: 52%; color: #ffdf4f; filter: drop-shadow(0 0 12px #ffdf4f8c); }
+.sx-scene-motion { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.sx-scene-motion i { position: absolute; opacity: 0; }
+.sx [data-scene="safety"] i, .sx [data-scene="weekly"] i { top: 34%; left: 72%; width: 10px; height: 10px; background: #ffdf4f; border: 2px solid #fff; border-radius: 50%; }
+.sx [data-scene="safety"] i:nth-child(2), .sx [data-scene="weekly"] i:nth-child(2) { top: 25%; left: 53%; }
+.sx [data-scene="safety"] i:nth-child(3), .sx [data-scene="weekly"] i:nth-child(3) { top: 44%; left: 83%; }
+.sx [data-scene="traffic"] i { top: 32%; left: 25%; width: 28%; height: 2px; border-radius: 4px; background: linear-gradient(90deg,transparent,#ffdf4f); }
+.sx [data-scene="traffic"] i:nth-child(2) { top: 37%; }
+.sx [data-scene="traffic"] i:nth-child(3) { top: 42%; }
+.sx [data-scene="outage"] i, .sx [data-scene="weekend"] i { top: 26%; right: 34%; width: 10px; height: 10px; transform: rotate(45deg); background: #ffdf4f; }
+.sx [data-scene="outage"] i:nth-child(2), .sx [data-scene="weekend"] i:nth-child(2) { top: 36%; right: 14%; }
+.sx [data-scene="outage"] i:nth-child(3), .sx [data-scene="weekend"] i:nth-child(3) { top: 48%; right: 25%; }
+.sx [data-scene="yesterday"] i { top: 33%; right: 14%; height: 1px; width: 40%; background: linear-gradient(90deg,transparent,#a8dcec); }
+.sx [data-scene="yesterday"] i:nth-child(2) { top: 38%; right: 22%; }
+.sx [data-scene="yesterday"] i:nth-child(3) { top: 43%; right: 16%; }
+.sx .sx-starter:is(:hover,:focus-visible) i { animation: sx-scene-ping .7s both; }
+.sx [data-scene="traffic"]:is(:hover,:focus-visible) i, .sx [data-scene="yesterday"]:is(:hover,:focus-visible) i { animation-name: sx-scene-travel; }
+@keyframes sx-scene-ping { 0% { opacity: 0; scale: .4; } 52% { opacity: 1; scale: 1.25; } 100% { opacity: .88; scale: 1; } }
+@keyframes sx-scene-travel { from { opacity: 0; translate: -20px; } to { opacity: .85; translate: 24px; } }
+@media (max-width: 640px) {
+  .sx .sx-starter[data-scene] { min-height: 186px; padding: 65px 34px 15px 15px; }
+  .sx .sx-starter[data-scene] .sx-starter-icon { left: 14px; }
+  .sx .sx-starter[data-active] i { animation: sx-scene-ping .7s both; }
+  .sx [data-scene="traffic"][data-active] i, .sx [data-scene="yesterday"][data-active] i { animation-name: sx-scene-travel; }
+}
+.sx .sx-starter i:nth-child(2) { animation-delay: .09s; }
+.sx .sx-starter i:nth-child(3) { animation-delay: .18s; }
+@media (prefers-reduced-motion: reduce) {
+  .sx-starter:hover .sx-quick-scene img, .sx-starter:focus-visible .sx-quick-scene img { transform: none; }
+}

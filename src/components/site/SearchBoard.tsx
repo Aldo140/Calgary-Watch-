@@ -17,13 +17,13 @@ import '../../styles/brand-page.css';
 import '../../styles/search-page.css';
 
 /** One-tap searches for what people most often come looking for. */
-const STARTERS: Array<{ label: string; note: string; to: string; icon: ReactNode; tone: string }> = [
-  { label: 'Police and safety tonight', note: 'What neighbours and police posted', to: '/search?q=police+tonight', icon: <ShieldAlert size={22} />, tone: 'navy' },
-  { label: 'What happened yesterday', note: 'Every report from yesterday', to: '/search?q=yesterday', icon: <Clock3 size={22} />, tone: 'red' },
-  { label: 'Crime reports this week', note: 'The last seven days, citywide', to: '/search?q=crime+this+week', icon: <MapPin size={22} />, tone: 'purple' },
-  { label: 'Traffic and road closures', note: 'Collisions and closures today', to: '/search?q=traffic+today', icon: <Car size={22} />, tone: 'blue' },
-  { label: 'Power outages', note: 'Where ENMAX says the power’s out', to: '/search?q=power+outage', icon: <Zap size={22} />, tone: 'yellow' },
-  { label: 'Things to do this weekend', note: 'Events, day by day', to: '/events/this-weekend', icon: <Sparkles size={22} />, tone: 'green' },
+const STARTERS: Array<{ label: string; note: string; to: string; icon: ReactNode; tone: string; scene: string; art?: string }> = [
+  { label: 'Police and safety tonight', note: 'What neighbours and police posted', to: '/search?q=police+tonight', icon: <ShieldAlert size={22} />, tone: 'navy', scene: 'safety', art: 'search-explore-live.webp' },
+  { label: 'What happened yesterday', note: 'See reports from the previous day', to: '/search?q=yesterday', icon: <Clock3 size={22} />, tone: 'red', scene: 'yesterday', art: 'search-quick-yesterday.webp' },
+  { label: 'Crime reports this week', note: 'The last seven days, citywide', to: '/search?q=crime+this+week', icon: <MapPin size={22} />, tone: 'purple', scene: 'weekly', art: 'search-quick-weekly.webp' },
+  { label: 'Traffic and road closures', note: 'Collisions and closures today', to: '/search?q=traffic+today', icon: <Car size={22} />, tone: 'blue', scene: 'traffic', art: 'search-quick-traffic.webp' },
+  { label: 'Power outages', note: 'Where ENMAX says the power’s out', to: '/search?q=power+outage', icon: <Zap size={22} />, tone: 'yellow', scene: 'outage' },
+  { label: 'Things to do this weekend', note: 'Events, day by day', to: '/events/this-weekend', icon: <Sparkles size={22} />, tone: 'green', scene: 'weekend', art: 'search-explore-weekend.webp' },
 ];
 
 const BROWSE: Array<{ to: string; label: string; note: string; icon: ReactNode }> = [
@@ -386,7 +386,7 @@ function ExploreSearch() {
 
 function Starters({ title }: { title: ReactNode }) {
   const rail = useRef<HTMLUListElement>(null);
-  const [position, setPosition] = useState({ start: true, end: false, progress: 0 });
+  const [position, setPosition] = useState({ start: true, end: false, progress: 0, active: 0 });
   const move = (direction: number) => {
     const list = rail.current;
     if (!list) return;
@@ -406,11 +406,18 @@ function Starters({ title }: { title: ReactNode }) {
       <ul className="sx-starters" ref={rail} onScroll={event => {
         const { scrollLeft, clientWidth, scrollWidth } = event.currentTarget;
         const start = scrollLeft <= 1, end = scrollLeft + clientWidth >= scrollWidth - 1;
-        setPosition({ start, end, progress: scrollLeft / Math.max(1, scrollWidth - clientWidth) });
+        const list = event.currentTarget;
+        const stride = (list.firstElementChild?.getBoundingClientRect().width ?? clientWidth) + parseFloat(getComputedStyle(list).columnGap);
+        const active = end ? STARTERS.length - 1 : Math.max(0, Math.min(STARTERS.length - 1, Math.round(scrollLeft / stride)));
+        setPosition({ start, end, active, progress: Math.max(0, Math.min(1, scrollLeft / Math.max(1, scrollWidth - clientWidth))) });
       }}>
-        {STARTERS.map(s => (
+        {STARTERS.map((s, index) => (
           <li key={s.to}>
-            <Link to={s.to} className={`sx-starter bp-tone-${s.tone}`}>
+            <Link to={s.to} className={"sx-starter bp-tone-" + s.tone} data-scene={s.scene} data-active={position.active === index || undefined}>
+              <span className="sx-quick-scene" aria-hidden="true">
+                {s.art ? <img src={"/images/hero/" + s.art} alt="" loading="lazy" decoding="async" width={560} height={300} /> : <Zap className="sx-grid-bolt" strokeWidth={1.25} />}
+                <span className="sx-scene-motion"><i /><i /><i /></span>
+              </span>
               <span className="sx-starter-icon" aria-hidden="true">{s.icon}</span>
               <strong>{s.label}</strong>
               <small>{s.note}</small>

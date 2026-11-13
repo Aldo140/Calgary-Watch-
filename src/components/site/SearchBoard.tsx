@@ -1,8 +1,6 @@
-import { motion, useReducedMotion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Search, TrendingUp, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink, ChevronLeft, ChevronRight, CornerDownLeft } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, TrendingUp, Zap, Clock3, Heart, BookOpen, Trophy, ShieldCheck, BadgeCheck, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
-import { SearchNeighbourhoods } from './SearchNeighbourhoods';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
 import type { SearchIntent } from '../../lib/searchIntent';
@@ -18,13 +16,13 @@ import '../../styles/brand-page.css';
 import '../../styles/search-page.css';
 
 /** One-tap searches for what people most often come looking for. */
-const STARTERS: Array<{ label: string; note: string; to: string; icon: ReactNode; tone: string; scene: string; art?: string }> = [
-  { label: 'Police and safety tonight', note: 'What neighbours and police posted', to: '/search?q=police+tonight', icon: <ShieldAlert size={22} />, tone: 'navy', scene: 'safety', art: 'search-explore-live.webp' },
-  { label: 'What happened yesterday', note: 'See reports from the previous day', to: '/search?q=yesterday', icon: <Clock3 size={22} />, tone: 'red', scene: 'yesterday', art: 'search-quick-yesterday.webp' },
-  { label: 'Crime reports this week', note: 'The last seven days, citywide', to: '/search?q=crime+this+week', icon: <MapPin size={22} />, tone: 'purple', scene: 'weekly', art: 'search-quick-weekly.webp' },
-  { label: 'Traffic and road closures', note: 'Collisions and closures today', to: '/search?q=traffic+today', icon: <Car size={22} />, tone: 'blue', scene: 'traffic', art: 'search-quick-traffic.webp' },
-  { label: 'Power outages', note: 'Where ENMAX says the power’s out', to: '/search?q=power+outage', icon: <Zap size={22} />, tone: 'yellow', scene: 'outage' },
-  { label: 'Things to do this weekend', note: 'Events, day by day', to: '/events/this-weekend', icon: <Sparkles size={22} />, tone: 'green', scene: 'weekend', art: 'search-explore-weekend.webp' },
+const STARTERS: Array<{ label: string; note: string; to: string; icon: ReactNode; tone: string }> = [
+  { label: 'Police and safety tonight', note: 'Community reports and police updates', to: '/search?q=police+tonight', icon: <ShieldAlert size={22} />, tone: 'navy' },
+  { label: 'What happened yesterday', note: 'See reports from the previous day', to: '/search?q=yesterday', icon: <Clock3 size={22} />, tone: 'red' },
+  { label: 'Crime reports this week', note: 'The last seven days, citywide', to: '/search?q=crime+this+week', icon: <MapPin size={22} />, tone: 'purple' },
+  { label: 'Traffic and road closures', note: 'Collisions and closures today', to: '/search?q=traffic+today', icon: <Car size={22} />, tone: 'blue' },
+  { label: 'Power outages', note: 'Where ENMAX says the power’s out', to: '/search?q=power+outage', icon: <Zap size={22} />, tone: 'yellow' },
+  { label: 'Things to do this weekend', note: 'Events, day by day', to: '/events/this-weekend', icon: <Sparkles size={22} />, tone: 'green' },
 ];
 
 const BROWSE: Array<{ to: string; label: string; note: string; icon: ReactNode }> = [
@@ -116,32 +114,26 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
       <section className="sx-hero" aria-labelledby="sx-title">
         {!q && <div className="sx-city" aria-hidden="true">
           <picture>
-            <source media="(max-width: 640px)" srcSet="/images/hero/search-calgary-pocket.webp" />
+
             <img
-            src="/images/hero/search-calgary-1320.webp"
-            srcSet="/images/hero/search-calgary-860.webp 860w, /images/hero/search-calgary-1320.webp 1320w"
-            sizes="(max-width: 760px) 100vw, 62vw"
-            width={1320}
-            height={742}
+            src="/images/photo/calgary1.webp"
+            width={910}
+            height={607}
             alt=""
             fetchPriority="high"
             />
           </picture>
-          <div className="sx-pocket-route"><i /><i /><i /></div>
-          <div className="sx-city-lens"><span /><span /><span /><span /></div>
-          <span className="sx-city-point sx-city-point-tower" />
-          <span className="sx-city-point sx-city-point-river" />
         </div>}
         <div className="cw-wrap sx-hero-inner">
           <div className="sx-hero-copy">
-            <p className="sx-kicker"><Search size={16} aria-hidden="true" /> Search CalgaryWatch</p>
+
             <h1 id="sx-title">{q ? <>Results for <em>“{q}”</em></> : <>Find it <em>in Calgary.</em></>}</h1>
-            {!q && <p className="sx-lead">Look up a street, check what happened nearby, or find something to do this weekend.</p>}
+            {!q && <p className="sx-lead">Find a place, check what happened nearby, or make weekend plans.</p>}
             <div className="sx-search-panel">
             <div className="sx-box"><GlobalSearch initial={q} suggest={suggest} popular={popular} showSubmitText placeholder="Street, place, or event" /></div>
             {!q && <div className="sx-try">
               <span>Try</span>
-              <ul aria-label="Example searches">{tryChips(popular, TRY).slice(0, 4).map(t => <li key={t.to}><Link to={t.to}>{t.label}<CornerDownLeft size={12} aria-hidden="true" /></Link></li>)}</ul>
+              <ul aria-label="Example searches">{tryChips(popular, TRY).slice(0, 4).map(t => <li key={t.to}><Link to={t.to}>{t.label}</Link></li>)}</ul>
             </div>}
             </div>
           </div>
@@ -256,9 +248,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
           </>
         ) : (
           <>
-            <ExploreSearch />
             <Starters title="Quick answers" />
-            <SearchNeighbourhoods />
             {popular.length ? <Popular items={popular} title="Popular searches" /> : null}
             <section className="bp-section" aria-labelledby="sx-browse">
               <div className="bp-head"><h2 id="sx-browse">Browse Calgary</h2></div>
@@ -351,44 +341,9 @@ function Popular({ items, title }: { items: Suggestion[]; title: ReactNode }) {
   );
 }
 
-const EXPLORE = [
-  { to: '/check-your-community', label: 'Check your area', note: 'Find reports by neighbourhood', image: 'area', icon: MapPin },
-  { to: '/events/this-weekend', label: 'Make weekend plans', note: 'See what’s on', image: 'weekend', icon: CalendarDays },
-  { to: '/map', label: 'Open the live map', note: 'Traffic, outages and alerts', image: 'live', icon: MapIcon },
-] as const;
-
-function ExploreSearch() {
-  const reduceMotion = useReducedMotion();
-  return (
-    <section className="sx-explore bp-section" aria-labelledby="sx-explore-title">
-      <div className="bp-head"><h2 id="sx-explore-title">Where to?</h2></div>
-      <ul className="sx-explore-grid">
-        {EXPLORE.map(({ to, label, note, image, icon: Icon }, index) => (
-          <motion.li
-            key={to}
-            initial={false}
-            whileInView={reduceMotion ? undefined : { y: [9, 0] }}
-            viewport={{ once: true, amount: .25 }}
-            transition={{ duration: .4, delay: index * .065, ease: [.22, 1, .36, 1] }}
-          >
-            <Link to={to} className="sx-explore-link" data-art={image}>
-              <span className="sx-explore-art" aria-hidden="true">
-                <img src={"/images/hero/search-explore-" + image + ".webp"} alt="" loading="lazy" decoding="async" width={640} height={360} />
-              </span>
-              <span className="sx-explore-icon" aria-hidden="true"><Icon size={19} /></span>
-              <span className="sx-explore-copy"><strong>{label}</strong><small>{note}</small></span>
-              <span className="sx-explore-arrow" aria-hidden="true"><ArrowUpRight size={20} /></span>
-            </Link>
-          </motion.li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 function Starters({ title }: { title: ReactNode }) {
   const rail = useRef<HTMLUListElement>(null);
-  const [position, setPosition] = useState({ start: true, end: false, progress: 0, active: 0 });
+  const [position, setPosition] = useState({ start: true, end: false });
   const move = (direction: number) => {
     const list = rail.current;
     if (!list) return;
@@ -408,18 +363,11 @@ function Starters({ title }: { title: ReactNode }) {
       <ul className="sx-starters" ref={rail} onScroll={event => {
         const { scrollLeft, clientWidth, scrollWidth } = event.currentTarget;
         const start = scrollLeft <= 1, end = scrollLeft + clientWidth >= scrollWidth - 1;
-        const list = event.currentTarget;
-        const stride = (list.firstElementChild?.getBoundingClientRect().width ?? clientWidth) + parseFloat(getComputedStyle(list).columnGap);
-        const active = end ? STARTERS.length - 1 : Math.max(0, Math.min(STARTERS.length - 1, Math.round(scrollLeft / stride)));
-        setPosition({ start, end, active, progress: Math.max(0, Math.min(1, scrollLeft / Math.max(1, scrollWidth - clientWidth))) });
+        setPosition(previous => previous.start === start && previous.end === end ? previous : { start, end });
       }}>
-        {STARTERS.map((s, index) => (
+        {STARTERS.map(s => (
           <li key={s.to}>
-            <Link to={s.to} className={"sx-starter bp-tone-" + s.tone} data-scene={s.scene} data-active={position.active === index || undefined}>
-              <span className="sx-quick-scene" aria-hidden="true">
-                {s.art ? <img src={"/images/hero/" + s.art} alt="" loading="lazy" decoding="async" width={560} height={300} /> : <Zap className="sx-grid-bolt" strokeWidth={1.25} />}
-                <span className="sx-scene-motion"><i /><i /><i /></span>
-              </span>
+            <Link to={s.to} className={`sx-starter bp-tone-${s.tone}`}>
               <span className="sx-starter-icon" aria-hidden="true">{s.icon}</span>
               <strong>{s.label}</strong>
               <small>{s.note}</small>
@@ -428,7 +376,6 @@ function Starters({ title }: { title: ReactNode }) {
           </li>
         ))}
       </ul>
-      <div className="sx-rail-track" aria-hidden="true"><span style={{ transform: "translateX(" + position.progress * 300 + "%)" }} /></div>
     </section>
   );
 }

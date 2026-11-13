@@ -45,12 +45,12 @@ test('search supports keyboard suggestions and a compact results view on mobile'
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(await page.evaluate(() => innerWidth));
 });
 
-test('mobile search uses its own artwork and quick answers advance one card', async ({ page }) => {
+test('mobile search shows Calgary photography and quick answers advance one card', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/search');
   const artwork = page.locator('.sx-city img');
   await expect(artwork).toBeVisible();
-  await expect.poll(() => artwork.evaluate(img => (img as HTMLImageElement).currentSrc)).toContain('search-calgary-pocket.webp');
+  await expect.poll(() => artwork.evaluate(img => (img as HTMLImageElement).currentSrc)).toContain('calgary1.webp');
   const rail = page.locator('.sx-starters');
   const previous = page.getByRole('button', { name: 'Previous quick answer' });
   await expect(previous).toBeDisabled();
@@ -59,32 +59,4 @@ test('mobile search uses its own artwork and quick answers advance one card', as
   expect(await rail.evaluate(el => el.scrollLeft)).toBeGreaterThan(100);
   await previous.click();
   await expect(previous).toBeDisabled();
-});
-
-test('illustrated search shortcuts link to the content they describe', async ({ page }) => {
-  await page.goto('/search');
-  const explore = page.getByRole('region', { name: 'Where to?' });
-  for (const [label, href] of [
-    ['Check your area', '/check-your-community'],
-    ['Make weekend plans', '/events/this-weekend'],
-    ['Open the live map', '/map'],
-  ]) {
-    await expect(explore.getByRole('link', { name: new RegExp(label) })).toHaveAttribute('href', href);
-  }
-  await explore.getByRole('link', { name: /Make weekend plans/ }).click();
-  await expect(page).toHaveURL(/\/events\/this-weekend$/);
-});
-
-test('the Bow explorer switches neighbourhood stories and starts a real search', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/search');
-  const atlas = page.getByRole('region', { name: 'Follow the Bow' });
-  const pin = atlas.getByRole('button', { name: 'Inglewood' });
-  await pin.focus();
-  await pin.press('Enter');
-  await expect(pin).toHaveAttribute('aria-pressed', 'true');
-  await expect(atlas.getByRole('heading', { name: 'Inglewood' })).toBeVisible();
-  await expect(atlas.locator('img')).toHaveAttribute('src', /search-atlas-inglewood/);
-  await atlas.getByRole('link', { name: 'Search Inglewood' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: /Results for.*inglewood/i })).toBeVisible();
 });

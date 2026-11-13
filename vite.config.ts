@@ -58,8 +58,9 @@ export default defineConfig(() => {
       chunkSizeWarningLimit: 700,
       rollupOptions: {
         output: {
+          // Keep the catalogue module separate from pure discovery helpers.
           manualChunks(id) {
-            if (id.endsWith('/src/generated/discovery-index.json') || id.endsWith('/src/data/discovery.ts')) return 'discovery-inventory';
+            if (id.endsWith('/src/generated/discovery-index.json')) return 'discovery-inventory';
             if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'vendor-react';
             if (/\/node_modules\/(firebase|@firebase)\//.test(id)) return 'vendor-firebase';
             if (id.includes('/node_modules/leaflet/')) return 'vendor-leaflet';

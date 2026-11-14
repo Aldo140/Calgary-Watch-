@@ -31,7 +31,8 @@ test('an accepted email is never resent when the lead update fails', async () =>
 test('the feed check catches missing, stale, and erroring jobs without flagging disabled providers', () => {
   const now = Date.UTC(2026, 10, 12);
   const feeds = new Map<string, FeedHealth>([
-    ['calgary_311', { status: 'ok', lastSuccessAt: now - 91 * 60_000 }],
+    ['calgary_311', { status: 'ok', lastSuccessAt: now - 9 * 60 * 60_000 }],
+    ['environment_canada', { status: 'ok', lastSuccessAt: now - 5 * 60 * 60_000 }],
     ['enmax_outages', { status: 'ok', lastSuccessAt: now - 10 * 60_000 }],
     ['aggregate_traffic_flow', { status: 'disabled' }],
     ['discovery_ingest', { status: 'error', lastSuccessAt: now }],
@@ -40,7 +41,7 @@ test('the feed check catches missing, stale, and erroring jobs without flagging 
   assert.ok(problems.some(problem => problem.startsWith('calgary_311')));
   assert.ok(problems.some(problem => problem.startsWith('discovery_publication')));
   assert.ok(problems.some(problem => problem.startsWith('discovery_ingest')));
-  assert.ok(!problems.some(problem => /aggregate_traffic_flow|enmax_outages/.test(problem)));
+  assert.ok(!problems.some(problem => /aggregate_traffic_flow|enmax_outages|environment_canada/.test(problem)));
 });
 
 test('Calgary winter formatting preserves historical offsets and crosses midnight correctly', () => {

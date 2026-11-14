@@ -27360,8 +27360,8 @@
       "title": "MarshaSophia",
       "name": "MarshaSophia",
       "website": "https://www.marshasophia.ca/",
-      "summary": "Gluten-free bakery and café in Sunnyside from certified gluten-free practitioner Marsha Hebert.",
-      "description": "MarshaSophia is a gluten-free bakery and café at 1081 2 Ave NW in Sunnyside, open since June 2025. It grew out of Eat For Life by Marsha, founded by Marsha Hebert, a certified gluten-free practitioner, so everything on the counter is made for people who can't take chances with gluten.",
+      "summary": "Dedicated celiac-safe, gluten-free and dairy-free bakery in Kensington, with vegan, vegetarian and keto-friendly options.",
+      "description": "MarshaSophia Gluten-Free Bakery & More is a dedicated, celiac-safe bakery in Calgary's Kensington neighbourhood. We offer gluten-free and dairy-free baked goods, along with vegan, vegetarian, and keto-friendly options. From freshly baked breads and pastries to cakes, desserts, and savoury favourites, we're passionate about bringing nourishment, joy, and community together.",
       "categories": [
         "food"
       ],
@@ -27392,7 +27392,7 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-11-11T00:30:00Z",
+      "updatedAt": "2026-11-14T19:00:00Z",
       "email": "yes@marshasophia.ca",
       "address": "1081 2 Ave NW, Calgary, AB",
       "neighbourhood": "Sunnyside"
@@ -27485,7 +27485,7 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-11T00:30:00Z",
       "email": "sales@choklat.com",
-      "address": "Calgary, AB"
+      "address": "3601B 21 St NE, Calgary, AB"
     },
     {
       "id": "biz-aroma-cafe-bar",
@@ -29065,6 +29065,316 @@
       "email": "info@valleyboutiqueandhome.com",
       "address": "8435 Bowfort Rd NW, Calgary, AB",
       "neighbourhood": "Bowness"
+    },
+    {
+      "id": "biz-pho-houz",
+      "kind": "business",
+      "slug": "pho-houz",
+      "title": "Pho HouZ",
+      "name": "Pho HouZ",
+      "website": "https://phohouz.com/",
+      "summary": "Vietnamese pho in Kensington, from recipes owner Catherine Logullo learned in her mother's Saigon kitchen.",
+      "description": "Pho HouZ is a Vietnamese restaurant at 411 10th St NW in Kensington, open since 2018. Owner Catherine Logullo cooks from recipes she learned in her mother's kitchen, Lien Tran from Saigon. Open 7 days a week, holidays included, with catering for team lunches.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pho",
+        "vietnamese",
+        "catering",
+        "kensington"
+      ],
+      "sources": [
+        {
+          "name": "Pho HouZ",
+          "url": "https://phohouz.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://phohouz.com/"
+      },
+      "services": [
+        "Dine-in",
+        "Takeout",
+        "Catering"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-14T19:00:00Z",
+      "address": "411 10th St NW, Calgary, AB",
+      "neighbourhood": "Kensington",
+      "phone": "403-619-2248"
+    },
+    {
+      "id": "biz-knifewear",
+      "kind": "business",
+      "slug": "knifewear",
+      "title": "Knifewear",
+      "name": "Knifewear",
+      "website": "https://knifewear.com/",
+      "summary": "Canadian-owned shop for handcrafted Japanese kitchen knives, with sharpening and repairs, in Inglewood.",
+      "description": "Knifewear is a Canadian-owned shop for handcrafted Japanese kitchen knives, with its Calgary store at 1406 9th Ave SE in Inglewood. Shop gyuto, santoku and nakiri knives from blacksmiths like Masashi Yamamoto and Moritaka Hamono, or bring your own knives in for sharpening and repairs.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "japanese knives",
+        "kitchen",
+        "sharpening",
+        "inglewood"
+      ],
+      "sources": [
+        {
+          "name": "Knifewear",
+          "url": "https://knifewear.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://knifewear.com/"
+      },
+      "services": [
+        "Japanese kitchen knives",
+        "Sharpening",
+        "Repairs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-14T19:00:00Z",
+      "address": "1406 9th Ave SE, Calgary, AB",
+      "neighbourhood": "Inglewood"
+    },
+    {
+      "id": "guide-december-picks-2026",
+      "kind": "guide",
+      "slug": "one-december-pick-calgary",
+      "title": "One December pick",
+      "summary": "One thing to try, give or book from Calgary local businesses this December, in their own words.",
+      "description": "CalgaryWatch's December 2026 series: one pick from each local business, from a bowl of pho in Kensington to a Japanese knife in Inglewood. Each owner approved their entry.",
+      "categories": [
+        "guides",
+        "shopping",
+        "food",
+        "gifts"
+      ],
+      "tags": [
+        "december",
+        "holiday gift guide",
+        "shop local",
+        "christmas 2026"
+      ],
+      "sources": [
+        {
+          "name": "Pho HouZ",
+          "url": "https://phohouz.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Aroma Café Bar",
+          "url": "https://aromacafebar.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Choklat",
+          "url": "https://choklat.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Glam Wigs",
+          "url": "https://glamwigsinc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Only Nutrition & Fitness",
+          "url": "https://onlynutrition.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Butts & Co.",
+          "url": "https://www.calvinbuttsbespoke.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Joyce's Closet",
+          "url": "https://www.joycescloset.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "My Body Couture",
+          "url": "https://www.mybodycouture.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Knifewear",
+          "url": "https://knifewear.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T19:00:00Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-14T19:00:00Z",
+      "updatedAt": "2026-11-14T19:00:00Z",
+      "image": {
+        "src": "/images/photo/calgary4.webp",
+        "alt": "Calgary in winter"
+      },
+      "introduction": "Every Calgary business has one thing it would point a friend to in December. We asked local owners for theirs. Here are the picks, from lunch and office catering to gifts for the people who are hard to shop for.",
+      "methodology": "Each pick came from the business itself: we wrote it from their own website and they approved or edited it before it went up. Nobody paid to be on this list, and prices and offers are as the business gave them in November 2026.",
+      "entries": [
+        {
+          "entityId": "biz-pho-houz",
+          "note": "Pho HouZ"
+        },
+        {
+          "entityId": "biz-aroma-cafe-bar",
+          "note": "Aroma Café Bar"
+        },
+        {
+          "entityId": "biz-choklat",
+          "note": "Choklat"
+        },
+        {
+          "entityId": "biz-glam-wigs",
+          "note": "Glam Wigs"
+        },
+        {
+          "entityId": "biz-only-nutrition",
+          "note": "Only Nutrition & Fitness"
+        },
+        {
+          "entityId": "biz-butts-and-co",
+          "note": "Butts & Co."
+        },
+        {
+          "entityId": "biz-joyces-closet",
+          "note": "Joyce's Closet"
+        },
+        {
+          "entityId": "biz-my-body-couture",
+          "note": "My Body Couture"
+        },
+        {
+          "entityId": "biz-knifewear",
+          "note": "Knifewear"
+        }
+      ],
+      "relatedGuideIds": [
+        "guide-farmers-markets",
+        "guide-calgary-for-free"
+      ],
+      "route": false,
+      "facts": {
+        "time": "All of December",
+        "distance": "Across the city",
+        "cost": "Varies by pick",
+        "season": "December 2026"
+      },
+      "tips": [
+        "Offers and prices are the business's own. Check with them before you go, especially around holiday hours.",
+        "Shopping for someone hard to buy for? Start with Choklat, My Body Couture or Knifewear.",
+        "Planning an office party? Pho HouZ and Aroma Café Bar both cater."
+      ],
+      "cover": {
+        "from": "#7a1020",
+        "to": "#e0a040",
+        "ink": "#ffffff",
+        "motif": "market",
+        "label": "December"
+      },
+      "stops": [
+        {
+          "name": "Pho HouZ",
+          "area": "Kensington",
+          "entityId": "biz-pho-houz",
+          "mapQuery": "Pho HouZ, 411 10th St NW, Calgary, AB",
+          "note": "A hot bowl of pho after a walk past Kensington's lit-up shops. Open since 2018, with recipes owner Catherine Logullo learned in her mother's kitchen, Lien Tran from Saigon. Open 7 days a week, holidays included.",
+          "tip": "Planning a team lunch? They cater too."
+        },
+        {
+          "name": "Aroma Café Bar",
+          "area": "Marda Loop",
+          "entityId": "biz-aroma-cafe-bar",
+          "mapQuery": "Aroma Cafe Bar, 1721 29 Ave SW, Calgary, AB",
+          "note": "A taco bar for your December office party. Aroma Café Bar brings Mexican comfort food and specialty coffee to two Calgary spots: cSpace in Marda Loop (1721 29 Ave SW) and 1845 33 Ave SW. This December, skip the sandwich trays. Their catering team does taco bar service, corporate breakfasts and lunches, and social gatherings. Just stopping in? Try the Horchata Chai Cold Foam: spiced chai and horchata under vanilla cold foam, with a sprinkle of pumpkin spice.",
+          "tip": "Catering quotes: catering@aromacafebar.ca or 403-355-1869."
+        },
+        {
+          "name": "Choklat",
+          "area": "Northeast Calgary",
+          "entityId": "biz-choklat",
+          "mapQuery": "Choklat, 3601B 21 St NE, Calgary, AB",
+          "note": "Sugar-free truffles. Choklat is a Calgary chocolate maker run by Brad Churchill, and this Christmas it has a new line of sugar-free, diabetic-friendly truffles. So the person on your list who usually skips dessert gets a box made just for them, and Brad says they're absolutely decadent.",
+          "tip": "Find them at choklat.com."
+        },
+        {
+          "name": "Glam Wigs",
+          "area": "17 Ave SW",
+          "entityId": "biz-glam-wigs",
+          "mapQuery": "Glam Wigs, 718 17 Ave SW, Calgary, AB",
+          "note": "A private wig fitting with Renée. For anyone dealing with hair loss, or who just wants a new look for the holidays. Renée runs private fittings in Calgary and helps you match colour, texture, length and fit on premium 100% human-hair wigs. They also offer medical hair replacement support, customization and virtual consultations.",
+          "tip": "Book a private consultation at glamwigsinc.com."
+        },
+        {
+          "name": "Only Nutrition & Fitness",
+          "area": "Calgary",
+          "entityId": "biz-only-nutrition",
+          "mapQuery": "Only Nutrition & Fitness, Calgary, AB",
+          "note": "Real strength training. Want to start the new year stronger? Only Nutrition & Fitness is a women-only fitness club in Calgary, run by Siera and Shane, that focuses on real strength training. December is a good time to start, before the January rush.",
+          "tip": "Intro offer: 3 workouts for $79. For the holidays: 10% off workout packs."
+        },
+        {
+          "name": "Butts & Co.",
+          "area": "Marda Loop",
+          "entityId": "biz-butts-and-co",
+          "mapQuery": "Butts & Co, 3470 18 St SW, Calgary, AB",
+          "note": "For the man who has everything, give him something unforgettable. Floris London's No. 89 — famously known as James Bond's signature scent — is a timeless expression of British sophistication, understated sensuality, and effortless refinement. A perennial favourite at Butts & Co., Calvin Butts's men's lifestyle boutique in Marda Loop. And while you're there, indulge in a little more. Discover bespoke suiting, impeccable alterations, considered ready-to-wear, and exceptional gifts — all beneath one roof.",
+          "tip": "Butts & Co. — For the art of being well dressed."
+        },
+        {
+          "name": "Joyce's Closet",
+          "area": "Calgary",
+          "entityId": "biz-joyces-closet",
+          "mapQuery": "Joyce's Closet, Calgary, AB",
+          "note": "A vintage rhinestone brooch. For the person whose coat needs one bit of sparkle for holiday parties. Joyce's Closet has been an authenticated luxury consignment boutique in Calgary since 2013, with designer clothing, handbags, jewelry and vintage pieces, plus dress rental and styling.",
+          "tip": "The brooch: $45."
+        },
+        {
+          "name": "My Body Couture",
+          "area": "Calgary",
+          "entityId": "biz-my-body-couture",
+          "mapQuery": "My Body Couture, Calgary, AB",
+          "note": "A pearl Yamuna Body Rolling ball. For the person who carries their stress in their back and shoulders. Janis Isaman teaches one-on-one STOTT Pilates, yin yoga and Yamuna Body Rolling in Calgary, with a focus on people living with chronic pain or movement limits. The pearl Yamuna ball is the tool she uses in sessions: a gift they can use at home, every day.",
+          "tip": "The ball: $48."
+        },
+        {
+          "name": "Knifewear",
+          "area": "Inglewood",
+          "entityId": "biz-knifewear",
+          "mapQuery": "Knifewear, 1406 9th Ave SE, Calgary, AB",
+          "note": "A Japanese kitchen knife for the cook on your list. Knifewear is a Canadian-owned shop for handcrafted Japanese kitchen knives, with its Calgary store at 1406 9th Ave SE in Inglewood. Come in for a gyuto, santoku or nakiri from blacksmiths like Masashi Yamamoto and Moritaka Hamono, or bring your own knives in for sharpening and repairs. Not sure what to get? Try the Japanese Knife Gift Quiz on their site.",
+          "tip": "Stocking Stuffer Sale, Dec 5–24: 10–30% off Knifewear-brand cookware, accessories and sharpening gear."
+        }
+      ]
     }
   ]
 }

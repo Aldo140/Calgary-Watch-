@@ -46,7 +46,7 @@ describe('guide helpers', () => {
   });
   it('has no route for a single stop', () => assert.equal(routeUrl(bow.stops!.slice(0, 1)), undefined));
   it('features the newest guide, the last added on a tie', () => {
-    assert.equal(featuredGuide(guides)?.id, 'guide-cuff-docs-first-night');
+    assert.equal(featuredGuide(guides)?.id, 'guide-december-picks-2026');
     assert.equal(featuredGuide([]), undefined);
   });
   it('prerenders every stop into the guide HTML', () => {

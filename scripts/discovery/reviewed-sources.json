@@ -3551,6 +3551,81 @@
           "start": "2026-11-08T15:00:00-06:00",
           "end": "2026-11-08T17:00:00-06:00"
         }
+      },
+      {
+        "id": "radiant-joy-2026-12-13",
+        "input": {
+          "kind": "event",
+          "title": "Spiritus Chamber Choir: Radiant Joy",
+          "summary": "A festive Christmas concert with the Spirit Vocal Ensemble.",
+          "description": "Spiritus Chamber Choir's Christmas concert: uplifting choral music for the season, joined by the acclaimed Spirit Vocal Ensemble. At Christ Church Elbow Park. Tickets online through the choir's ticket page, or at the door.",
+          "address": "3602 8 Street SW, Calgary, AB",
+          "venue": "Christ Church Elbow Park",
+          "organizer": "Spiritus Chamber Choir",
+          "sourceUrl": "https://www.spirituschamberchoir.ca/tickets",
+          "categories": [
+            "music",
+            "indoor"
+          ],
+          "tags": [
+            "choir",
+            "christmas concert"
+          ],
+          "pricing": "paid",
+          "start": "2026-12-13T15:00:00-06:00",
+          "end": "2026-12-13T17:00:00-06:00",
+          "neighbourhood": "Elbow Park"
+        }
+      },
+      {
+        "id": "from-this-land-2027-03-14",
+        "input": {
+          "kind": "event",
+          "title": "Spiritus Chamber Choir: From This Land",
+          "summary": "Contemporary Canadian choral music, with a world premiere by Katerina Gimon.",
+          "description": "Spiritus Chamber Choir celebrates Canadian choral music, including the world premiere of a new work commissioned from Canadian composer Katerina Gimon, alongside contemporary Canadian works inspired by the people, landscapes and stories of this land. At Christ Church Elbow Park.",
+          "address": "3602 8 Street SW, Calgary, AB",
+          "venue": "Christ Church Elbow Park",
+          "organizer": "Spiritus Chamber Choir",
+          "sourceUrl": "https://www.spirituschamberchoir.ca/tickets",
+          "categories": [
+            "music",
+            "indoor"
+          ],
+          "tags": [
+            "choir",
+            "canadian composers"
+          ],
+          "pricing": "paid",
+          "start": "2027-03-14T15:00:00-06:00",
+          "end": "2027-03-14T17:00:00-06:00",
+          "neighbourhood": "Elbow Park"
+        }
+      },
+      {
+        "id": "the-sacred-veil-2027-05-16",
+        "input": {
+          "kind": "event",
+          "title": "Spiritus Chamber Choir: The Sacred Veil",
+          "summary": "Eric Whitacre's The Sacred Veil, performed as a complete work.",
+          "description": "Spiritus Chamber Choir performs Eric Whitacre's The Sacred Veil in full, his collaboration with poet Charles Anthony Silvestri: a meditation on love, loss and memory. At Christ Church Elbow Park.",
+          "address": "3602 8 Street SW, Calgary, AB",
+          "venue": "Christ Church Elbow Park",
+          "organizer": "Spiritus Chamber Choir",
+          "sourceUrl": "https://www.spirituschamberchoir.ca/tickets",
+          "categories": [
+            "music",
+            "indoor"
+          ],
+          "tags": [
+            "choir",
+            "classical"
+          ],
+          "pricing": "paid",
+          "start": "2027-05-16T15:00:00-06:00",
+          "end": "2027-05-16T17:00:00-06:00",
+          "neighbourhood": "Elbow Park"
+        }
       }
     ]
   },
@@ -6929,10 +7004,221 @@
             "local makers",
             "family"
           ],
-          "pricing": "free",
           "familyFriendly": true,
-          "start": "2026-11-21T10:00:00-06:00",
-          "end": "2026-11-21T15:00:00-06:00"
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-21",
+              "start": "2026-11-21T10:00:00-06:00",
+              "end": "2026-11-21T15:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "amenities": [
+            "Free entry",
+            "Free Santa photos (register ahead)",
+            "Indoor"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "salvation-army-glenmore-temple",
+      "name": "The Salvation Army Glenmore Temple",
+      "approved": true,
+      "hosts": [
+        "glenmoretemple.com",
+        "www.glenmoretemple.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-band-choir-concert-2026",
+        "input": {
+          "kind": "event",
+          "title": "Glenmore Temple Christmas Band & Choir Concert and Carol Sing",
+          "summary": "The Salvation Army Glenmore Temple's annual Christmas band and choir concert, with a carol sing.",
+          "description": "Glenmore Temple's annual Christmas Band & Choir Concert and Carol Sing, on Friday, December 4, 2026 at 7 p.m. Open to the public. Times are from Glenmore Temple's office; call (403) 253-1700 with questions.",
+          "address": "921 68 Ave SW, Calgary, AB T2V 0N7",
+          "venue": "The Salvation Army Glenmore Temple",
+          "organizer": "The Salvation Army Glenmore Temple",
+          "sourceUrl": "https://glenmoretemple.com/",
+          "categories": [
+            "music",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas concert",
+            "carol sing",
+            "brass band",
+            "choir"
+          ],
+          "pricing": "free",
+          "start": "2026-12-04T19:00:00-06:00",
+          "end": "2026-12-04T21:00:00-06:00"
+        }
+      },
+      {
+        "id": "family-christmas-sunday-2026",
+        "input": {
+          "kind": "event",
+          "title": "Glenmore Temple Family Christmas Sunday Service",
+          "summary": "Glenmore Temple's annual Family Christmas Sunday service. This year's theme: Joy.",
+          "description": "The Salvation Army Glenmore Temple's annual Family Christmas Sunday Service, Sunday, December 13, 2026 at 10:30 a.m. This year's theme is Joy. Everyone is welcome.",
+          "address": "921 68 Ave SW, Calgary, AB T2V 0N7",
+          "venue": "The Salvation Army Glenmore Temple",
+          "organizer": "The Salvation Army Glenmore Temple",
+          "sourceUrl": "https://glenmoretemple.com/",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas service",
+            "church",
+            "family"
+          ],
+          "pricing": "free",
+          "start": "2026-12-13T10:30:00-06:00",
+          "end": "2026-12-13T12:00:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-eve-candlelight-2026",
+        "input": {
+          "kind": "event",
+          "title": "Glenmore Temple Christmas Eve Candlelight Service",
+          "summary": "A Christmas Eve candlelight service at Glenmore Temple. Theme: Journey from Worry to Wonder.",
+          "description": "The Salvation Army Glenmore Temple's annual Christmas Eve Candlelight Service, Thursday, December 24, 2026 at 6:30 p.m. This year's theme is Journey from Worry to Wonder. Everyone is welcome.",
+          "address": "921 68 Ave SW, Calgary, AB T2V 0N7",
+          "venue": "The Salvation Army Glenmore Temple",
+          "organizer": "The Salvation Army Glenmore Temple",
+          "sourceUrl": "https://glenmoretemple.com/",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "candlelight service",
+            "church"
+          ],
+          "pricing": "free",
+          "start": "2026-12-24T18:30:00-06:00",
+          "end": "2026-12-24T19:45:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "st-lukes-anglican-calgary",
+      "name": "St Luke's Anglican Church",
+      "approved": true,
+      "hosts": [
+        "calgary.anglican.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-eve-2026",
+        "input": {
+          "kind": "event",
+          "title": "St Luke's Christmas Eve Service and Potluck Dinner",
+          "summary": "St Luke's Anglican and Emmanuel Community Church share a 4 p.m. Christmas Eve service, then a potluck dinner.",
+          "description": "St Luke's Anglican Church holds its Christmas Eve service jointly with Emmanuel Community Church, at 3003 28 St SE, on Thursday, December 24, 2026 at 4 p.m., followed by a potluck dinner. Everyone is welcome. Questions: (403) 273-2686.",
+          "address": "3003 28 St SE, Calgary, AB",
+          "venue": "Emmanuel Community Church",
+          "organizer": "St Luke's Anglican Church",
+          "sourceUrl": "https://calgary.anglican.ca/glenmore-deanery/st-luke",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "church",
+            "potluck"
+          ],
+          "pricing": "free",
+          "start": "2026-12-24T16:00:00-06:00",
+          "end": "2026-12-24T18:30:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-day-2026",
+        "input": {
+          "kind": "event",
+          "title": "St Luke's Christmas Day Service and Potluck Lunch",
+          "summary": "A Christmas Day service at 11 a.m., shared with Emmanuel Community Church, then a potluck lunch.",
+          "description": "St Luke's Anglican Church holds its Christmas Day service jointly with Emmanuel Community Church, at 3003 28 St SE, on Friday, December 25, 2026 at 11 a.m., followed by a potluck lunch. Everyone is welcome. Questions: (403) 273-2686.",
+          "address": "3003 28 St SE, Calgary, AB",
+          "venue": "Emmanuel Community Church",
+          "organizer": "St Luke's Anglican Church",
+          "sourceUrl": "https://calgary.anglican.ca/glenmore-deanery/st-luke",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas day",
+            "church",
+            "potluck"
+          ],
+          "pricing": "free",
+          "start": "2026-12-25T11:00:00-06:00",
+          "end": "2026-12-25T13:30:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-civic-symphony",
+      "name": "Calgary Civic Symphony",
+      "approved": true,
+      "hosts": [
+        "www.calgarycivicsymphony.ca",
+        "calgarycivicsymphony.ca",
+        "werklundcentre.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-at-the-movies-2026",
+        "input": {
+          "kind": "event",
+          "title": "Calgary Civic Symphony: Christmas at the Movies",
+          "summary": "Holiday film scores from It's a Wonderful Life to the Grinch, with 13-year-old violinist Sacha Jorba-Wu.",
+          "description": "The Calgary Civic Symphony's 50th-season holiday concert plays film music from It's a Wonderful Life, The Holiday, Love Actually, How the Grinch Stole Christmas, A Charlie Brown Christmas, The Red Violin and more. Rising Star Sacha Jorba-Wu, 13, joins as guest violinist, and Music Director Rolf Bertsch conducts from the piano. Tickets through Werklund Centre.",
+          "address": "205 8 Ave SE, Calgary, AB",
+          "venue": "Jack Singer Concert Hall, Werklund Centre",
+          "organizer": "Calgary Civic Symphony",
+          "sourceUrl": "https://www.calgarycivicsymphony.ca/christmasmovies",
+          "categories": [
+            "music",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "orchestra",
+            "film music",
+            "christmas concert"
+          ],
+          "pricing": "paid",
+          "start": "2026-12-06T14:30:00-06:00",
+          "end": "2026-12-06T16:30:00-06:00",
+          "neighbourhood": "Downtown East Village",
+          "tickets": "https://werklundcentre.ca/whats-on/christmas-at-the-movies"
         }
       }
     ]

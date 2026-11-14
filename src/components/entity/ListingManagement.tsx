@@ -55,7 +55,7 @@ export function ListingManagement({claim,previewUid,initialTargetId,adminEdit=fa
       operation.current??=crypto.randomUUID();
       if(adminEdit){if(!db)throw Error('Sign-in is unavailable.');await httpsCallable(getFunctions(db.app,'northamerica-northeast1'),'submitOrganizationBatch')({organizationId:claim.entityId,requestId:operation.current,adminEdit:true,subjectUid,operations:[{entityId:target.id,action:'edit',changes}]});}
       else await saveOwnerEdit(user.uid,claim.entityId,target,changes,operation.current);
-      setNotice(adminEdit?'Admin changes published immediately without using the business’s weekly allowance.':'Update saved for automatic publishing. No admin approval is needed. The public page updates after publishing succeeds; normally after the next scheduled run. CalgaryWatch will be notified.');
+      setNotice(adminEdit?'Admin changes published immediately without using the business’s weekly allowance.':'Saved! Your update goes on your page automatically at our next publishing run. Nobody needs to approve it. Spot something off? Email aldo@calgarywatch.ca and we’ll fix it for you.');
       setDraft({});operation.current=undefined;
       await load();
     }catch(e){setError(firestoreActionError(e));}finally{setBusy(false);}

@@ -61,6 +61,15 @@ import {
   parseOwnerField,
 } from "../lib/ownerListingEdits";
 import { OwnerFieldEditor } from "../components/entity/OwnerFieldEditor";
+import { OwnerProfilePreview } from "../components/entity/OwnerProfilePreview";
+import {
+  EXTRA_FIELDS,
+  PROFILE_STEPS,
+  fieldLabel,
+  fieldProblem,
+  friendlyValue,
+  stepDone,
+} from "../lib/ownerProfileGuide";
 import { entityPath } from "../lib/discovery";
 import { calgaryDateTimeFormat } from "../lib/calgaryTz";
 import { firestoreActionError } from "../lib/firestoreErrors";
@@ -89,10 +98,34 @@ const dateFormatter = calgaryDateTimeFormat("en-CA", {
   timeStyle: "short",
 });
 const fmt = (at: number) => dateFormatter.format(new Date(at));
+/**
+ * Development only: `/organization/<business id>?demo=owner` renders the owner
+ * workspace without Firebase. `&locked=1` shows the weekly wait, `&updated=1`
+ * a recent publish. The draft lives in this browser like a real one.
+ */
+function useOwnerDemo(id: string, params: URLSearchParams) {
+  const mode = import.meta.env.DEV ? params.get("demo") : null;
+  return useMemo(() => {
+    if (!mode) return null;
+    const org = managementOrganizationById(id, discoveryRepository.list());
+    if (!org) return null;
+    const now = Date.now();
+    return {
+      key: `${id}:${params.toString()}`,
+      org,
+      state: {
+        nextAt: params.get("locked") ? now + 4 * 86400000 : 0,
+        lastUpdated: params.get("updated") ? now - 2 * 86400000 : undefined,
+      },
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, id]);
+}
 export default function OrganizationPage() {
   const { id = "" } = useParams(),
     [params] = useSearchParams(),
     { user, isAdmin, signIn } = useAuth();
+  const demo = useOwnerDemo(id, params);
   const previewUid = isAdmin ? params.get("as") || undefined : undefined,
     uid = previewUid ?? user?.uid;
   const adminMode = useAdminEditMode(isAdmin, `${user?.uid}:${uid}:${id}`);
@@ -158,6 +191,22 @@ export default function OrganizationPage() {
         !c.approvedOrganizationId,
     );
 
+  if (demo)
+    return (
+      <SiteLayout>
+        <main className="cw-wrap cl-page">
+          <OrganizationWorkspace
+            key={demo.key}
+            org={demo.org}
+            uid="demo"
+            readOnly={false}
+            liveVersion={0}
+            ownerName="Paul Demo"
+            demo={demo.state}
+          />
+        </main>
+      </SiteLayout>
+    );
   return (
     <SiteLayout>
       <main className="cw-wrap cl-page">
@@ -214,6 +263,7 @@ export default function OrganizationPage() {
             adminEdit={adminMode.enabled}
             adminUserId={isAdmin ? user?.uid : undefined}
             onAdminEditChange={adminMode.setEnabled}
+            ownerName={previewUid ? undefined : (user?.displayName ?? undefined)}
           />
         )}
       </main>
@@ -228,6 +278,8 @@ export function OrganizationWorkspace({
   adminEdit = false,
   adminUserId,
   onAdminEditChange,
+  ownerName,
+  demo,
 }: {
   org: ManagementOrganization;
   uid: string;
@@ -236,6 +288,10 @@ export function OrganizationWorkspace({
   adminEdit?: boolean;
   adminUserId?: string;
   onAdminEditChange?: (enabled: boolean) => void;
+  /** The signed-in owner's name, for a friendly greeting. */
+  ownerName?: string;
+  /** Development only: render without Firebase (see the page's `?demo=`). */
+  demo?: { nextAt?: number; lastUpdated?: number };
 }) {
   const key = `organization-draft:${adminUserId ? `admin:${adminUserId}:${uid}` : uid}:${org.id}`;
   const [ops, setOps] = useState<OrganizationChange[]>(() => {
@@ -285,9 +341,12 @@ export function OrganizationWorkspace({
     [loaded, setLoaded] = useState(false),
     [busy, setBusy] = useState(false),
     [review, setReview] = useState(false),
-    [confirmed, setConfirmed] = useState(false),
     [error, setError] = useState(""),
-    [notice, setNotice] = useState("");
+    [notice, setNotice] = useState(""),
+    [step, setStep] = useState(0),
+    [pane, setPane] = useState<"edit" | "preview">("edit"),
+    [published, setPublished] = useState<{ at: number; next: number }>(),
+    [copied, setCopied] = useState(false);
   const [initialRequest] = useState<string | undefined>(() => {
     if (readOnly) return undefined;
     try {
@@ -305,6 +364,11 @@ export function OrganizationWorkspace({
   useOrganizationDraftPersistence(key, readOnly, ops, request, setError);
   useEffect(() => {
     let active = true;
+    if (demo) {
+      setNextAt(demo.nextAt ?? 0);
+      setLoaded(true);
+      return;
+    }
     if (!db) return;
     setLoaded(false);
     setLoadingError("");
@@ -483,20 +547,52 @@ export function OrganizationWorkspace({
       setError((e as Error).message);
     }
   }
+  /** The first change that would be refused, so we can take the owner straight to it. */
+  function firstProblem() {
+    for (const o of ops) {
+      if (o.action === "delete") continue;
+      const entity = targets.find((t) => t.id === o.entityId);
+      if (!entity) continue;
+      for (const [field, value] of Object.entries(o.changes)) {
+        if (["image", "images"].includes(field)) continue;
+        const problem = fieldProblem(entity, field, value);
+        if (problem) return { entityId: o.entityId, field, problem };
+      }
+    }
+    return undefined;
+  }
   function beginReview() {
     try {
       prepareOrganizationBatch(org, entities, ops, Date.now(), adminEdit);
       setError("");
-      setConfirmed(false);
+      setPublished(undefined);
       setReview(true);
     } catch (e) {
-      setError((e as Error).message);
+      const found = firstProblem();
+      if (found) {
+        setTargetId(found.entityId);
+        if (found.entityId === org.id) {
+          setView("profile");
+          const at = PROFILE_STEPS.findIndex((s) => s.fields.includes(found.field));
+          if (at >= 0) setStep(at);
+          setPane("edit");
+        } else setView("editor");
+        setError(`One thing needs a quick look before you publish: ${fieldLabel(found.field)}. ${found.problem}`);
+      } else setError((e as Error).message);
     }
   }
   async function submit() {
-    if (readOnly || !confirmed || busy || !db) return;
+    if (readOnly || busy || (!db && !demo)) return;
     setBusy(true);
     setError("");
+    if (demo) {
+      setNextAt(Date.now() + 7 * 86400000);
+      setOps([]);
+      setReview(false);
+      setPublished({ at: Date.now(), next: Date.now() + 7 * 86400000 });
+      setBusy(false);
+      return;
+    }
     try {
       request.current ??= crypto.randomUUID();
       try {
@@ -516,7 +612,7 @@ export function OrganizationWorkspace({
         },
         { nextAt: number }
       >(
-        getFunctions(db.app, "northamerica-northeast1"),
+        getFunctions(db!.app, "northamerica-northeast1"),
         "submitOrganizationBatch",
       );
       const result = await call({
@@ -529,10 +625,11 @@ export function OrganizationWorkspace({
       setNextAt(result.data.nextAt);
       setOps([]);
       setReview(false);
+      setPublished({ at: Date.now(), next: result.data.nextAt });
       setNotice(
         adminEdit
           ? "Admin changes are live and recorded under your account. The business’s weekly allowance was not used."
-          : "Your complete submission is live. CalgaryWatch has been notified; no approval is needed.",
+          : "",
       );
       request.current = undefined;
     } catch (e) {
@@ -540,7 +637,7 @@ export function OrganizationWorkspace({
       setError(
         code === "functions/not-found" || code === "functions/unavailable"
           ? "Organization publishing is temporarily unavailable. Your draft is saved on this device. Please try again later or email aldo@calgarywatch.ca."
-          : firestoreActionError(e, true),
+          : `${firestoreActionError(e, true)} Your changes are still saved here, so nothing is lost. If it keeps happening, email aldo@calgarywatch.ca and we'll publish them for you.`,
       );
     } finally {
       setBusy(false);
@@ -550,18 +647,11 @@ export function OrganizationWorkspace({
     () => new Set(rows.filter((r) => r.deleted).map((r) => r.entityId)),
     [rows],
   );
-  const upcoming = events.filter(
-    (e) => organizationListingState(e, deleted, clock) === "upcoming",
-  );
-  const activeMarkets = events.filter(
-    (e) => e.kind === "market" && !deleted.has(e.id),
-  );
   const publicProfile =
     (entities.find((e) => e.id === org.id && e.kind === "business") as
       | Business
       | undefined) ?? org;
   const presentation = claimPresentation(publicProfile);
-  const profileDraft = ops.some((op) => op.entityId === org.id);
   const filteredEvents = useMemo(
     () =>
       filterOrganizationProgramme(
@@ -573,27 +663,120 @@ export function OrganizationWorkspace({
       ),
     [events, deleted, eventFilter, deferredQuery, clock],
   );
+  const profileOp = ops.find((o) => o.entityId === org.id);
+  const draftProfile = {
+    ...publicProfile,
+    ...(profileOp?.changes ?? {}),
+  } as Business;
+  const changedProfile = new Set(Object.keys(profileOp?.changes ?? {}));
+  const lastUpdated =
+    demo?.lastUpdated ??
+    rows
+      .filter((r) => r.entityId === org.id || r.organizationId === org.id)
+      .reduce((max, r) => Math.max(max, r.updatedAt ?? 0), 0);
+  const dayFormat = calgaryDateTimeFormat("en-CA", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+  const day = (at: number) => dayFormat.format(new Date(at));
+  const firstName = ownerName?.trim().split(/\s+/)[0];
+  const studio =
+    view === "profile" &&
+    !org.managementOnly &&
+    !adminEdit &&
+    target?.id === org.id &&
+    target.kind === "business";
+  const current = PROFILE_STEPS[step];
+  const problemFor = (field: string) => {
+    if (!target || !op || op.action === "delete") return undefined;
+    const value = op.changes[field];
+    if (value === undefined || (op.action === "add" && value === "")) return undefined;
+    return fieldProblem(target, field, value);
+  };
+  const valueFor = (field: string) =>
+    text(
+      field,
+      op?.changes[field] ??
+        (field === "occurrences"
+          ? (
+              rows.find((r) => r.entityId === target!.id)?.occurrences ??
+              discoveryRepository
+                .occurrences()
+                .filter((o) => o.marketId === target!.id)
+            ).map(({ id, start, end, cancelled }) => ({
+              id,
+              start,
+              end,
+              cancelled,
+            }))
+          : (target as unknown as Record<string, unknown>)[field]),
+    );
+  const editorFor = (field: string) => (
+    <OwnerFieldEditor
+      key={`${target!.id}:${field}`}
+      field={field}
+      value={valueFor(field)}
+      disabled={disabled}
+      changed={op?.action === "edit" && op.changes[field] !== undefined}
+      problem={problemFor(field)}
+      onChange={(v) => update(field, v)}
+    />
+  );
+  const publicLink = `https://calgarywatch.ca${entityPath(org)}`;
+  const changeCount = ops.reduce(
+    (n, o) => n + (o.action === "edit" ? Object.keys(o.changes).length : 1),
+    0,
+  );
+  const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
   return (
     <section
-      className="pl-form cl-form organization-workspace"
+      className="pl-form cl-form organization-workspace ow"
       data-profile-category={presentation.key}
     >
-      <header className="organization-hero">
-        <p className="pl-eyebrow">Your organization · CalgaryWatch</p>
-        <span className="organization-category">
-          {presentation.label.replace(/^For /, "")}
-        </span>
+      <header className="organization-hero ow-hero">
+        <p className="pl-eyebrow">
+          {firstName ? `Hi ${firstName}, welcome back` : "Your page on CalgaryWatch"}
+        </p>
         <h1 className="cl-title">
           {(entities.find((e) => e.id === org.id) ?? org).title}
         </h1>
-        <p>
-          {org.managementOnly
-            ? "Your management home. Start with one listing and add events when you need them. This does not create another public business page."
-            : "One place for your profile, programme and weekly updates."}
-        </p>
+        <div
+          className="ow-status"
+          role="status"
+          data-state={
+            published ? "live" : ops.length ? "draft" : "live"
+          }
+        >
+          <span className="ow-dot" aria-hidden="true" />
+          <span>
+            <strong>
+              {published
+                ? "Your changes are live"
+                : ops.length
+                  ? `${plural(changeCount, "change")} not published yet`
+                  : org.managementOnly
+                    ? "Your listing is live"
+                    : "Your page is live"}
+            </strong>
+            <small>
+              {published
+                ? `Published ${fmt(published.at)}`.replace(/\.?$/, ".")
+                : ops.length
+                  ? "Saved on this device as you type. Visitors see them once you publish."
+                  : lastUpdated
+                    ? `Last updated ${fmt(lastUpdated)}`.replace(/\.?$/, ".")
+                    : "Showing the details we have on file. Anything missing? Add it below."}
+              {loaded && locked && !adminEdit
+                ? ` You can publish again on ${day(nextAt)}.`
+                : ""}
+            </small>
+          </span>
+        </div>
         {!org.managementOnly ||
         discoveryRepository.list().some((e) => e.id === org.sourceListingId) ? (
           <Link
+            className="ow-hero-link"
             to={entityPath(
               org.sourceListingId
                 ? discoveryRepository
@@ -602,10 +785,7 @@ export function OrganizationWorkspace({
                 : org,
             )}
           >
-            {org.managementOnly
-              ? "View public listing"
-              : "View public organization profile"}{" "}
-            ↗
+            {org.managementOnly ? "View your public listing" : "View your page"} ↗
           </Link>
         ) : (
           <p>
@@ -628,73 +808,64 @@ export function OrganizationWorkspace({
           workspace.
         </p>
       ) : null}
-      <div className="organization-stats">
-        <div>
-          <strong>
-            {org.managementOnly
-              ? events.filter((e) => !deleted.has(e.id)).length
-              : upcoming.length + activeMarkets.length}
-          </strong>
-          <span>
-            {org.managementOnly
-              ? "Listings you manage"
-              : "Upcoming events & markets"}
-          </span>
-        </div>
-        <div>
-          <strong>
-            {ops.length} / {MAX_ORGANIZATION_CHANGES}
-          </strong>
-          <span>Listings in your draft</span>
-        </div>
-        <div>
-          <strong>
-            {loaded
-              ? locked
-                ? "Preparing next week"
-                : "Ready to publish"
-              : "Checking allowance…"}
-          </strong>
-          <span>
-            {adminEdit
-              ? "Admin edits do not use the weekly allowance"
-              : "One submission every seven days"}
-          </span>
-        </div>
-      </div>
-      <div className="organization-help">
-        <strong>Have event graphics?</strong>
-        <p>
-          Owners cannot upload or replace images in this workspace. Send the
-          original files or an approved download link, the listing dates,
-          image-use permission and artist credit. CalgaryWatch will install the
-          artwork.
-        </p>
-        <a
-          className="pl-textbtn"
-          href={artworkRequestUrl(
-            org.title,
-            org.managementOnly
-              ? `/claim/${encodeURIComponent(org.id)}`
-              : entityPath(org),
-          )}
-        >
-          Send approved artwork
-        </a>
-      </div>
-      <details className="organization-help">
-        <summary>How publishing, images and urgent corrections work</summary>
-        <p>
-          Bundle all your profile and event changes into one weekly submission.
-          Changes publish together without approval. CalgaryWatch is notified.{" "}
-          {adminEdit
-            ? "Admins can update primary and gallery image links, alternative text and credits."
-            : "Business owners cannot add, change or delete images."}{" "}
-          Removing an event retains its original images and history. Email{" "}
-          <a href="mailto:aldo@calgarywatch.ca">aldo@calgarywatch.ca</a> for
-          image requests or urgent corrections during your weekly wait.
-        </p>
-      </details>
+      {published && !adminEdit ? (
+        <section className="ow-success" aria-labelledby="ow-success">
+          <h2 id="ow-success">You’re live! 🎉</h2>
+          <p>
+            Your changes are on your page now. Nobody needs to approve them.
+            Thanks for keeping your page fresh.
+          </p>
+          <div className="ow-success-acts">
+            <Link className="pl-btn" to={entityPath(org)}>
+              See your page
+            </Link>
+            <button
+              type="button"
+              className="pl-btn ow-btn-ghost"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(publicLink);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2500);
+                } catch {
+                  /* clipboard blocked */
+                }
+              }}
+            >
+              {copied ? "Link copied" : "Copy your page link"}
+            </button>
+          </div>
+          <p className="ow-small">
+            Your next update opens {day(published.next)}. Need a change before
+            then? Just email{" "}
+            <a href="mailto:aldo@calgarywatch.ca">aldo@calgarywatch.ca</a> and
+            we’ll make it for you.
+          </p>
+          <button
+            type="button"
+            className="pl-textbtn"
+            onClick={() => setPublished(undefined)}
+          >
+            Close
+          </button>
+        </section>
+      ) : null}
+      {!ops.length && !published && !readOnly && !org.managementOnly ? (
+        <ol className="ow-how" aria-label="How updating your page works">
+          <li>
+            <strong>Edit</strong>
+            <span>Change anything below. It saves on this device as you type.</span>
+          </li>
+          <li>
+            <strong>Preview</strong>
+            <span>See exactly how your page will look before anyone else does.</span>
+          </li>
+          <li>
+            <strong>Publish</strong>
+            <span>It goes live right away. No approval needed. Once a week, so bundle your changes.</span>
+          </li>
+        </ol>
+      ) : null}
 
       {error ? (
         <p role="alert" className="pl-error">
@@ -712,26 +883,15 @@ export function OrganizationWorkspace({
               setReload((n) => n + 1);
             }}
           >
-            Retry loading saved information
+            Try loading again
           </button>
         </div>
       ) : null}
       {notice ? <p role="status">{notice}</p> : null}
       {!loaded ? (
-        <p role="status">Loading your organization and allowance…</p>
-      ) : locked ? (
-        <p role="status">
-          Next submission: {fmt(nextAt)} (Calgary time). You can prepare your
-          next draft now.
-        </p>
-      ) : (
-        <p>
-          {adminEdit
-            ? "Admin publishing is available; the business’s weekly allowance is unchanged."
-            : "Your weekly submission is available."}
-        </p>
-      )}
-      <nav className="organization-actions" aria-label="Workspace sections">
+        <p role="status">Loading your page…</p>
+      ) : null}
+      <nav className="organization-actions ow-tabs" aria-label="Workspace sections">
         <button
           className="pl-btn"
           aria-pressed={view === "profile"}
@@ -741,9 +901,7 @@ export function OrganizationWorkspace({
             setView("profile");
           }}
         >
-          {org.managementOnly
-            ? "Organizer details"
-            : "Edit organization profile"}
+          {org.managementOnly ? "Organizer details" : "Your page"}
         </button>
         <button
           className="pl-btn"
@@ -751,7 +909,7 @@ export function OrganizationWorkspace({
           disabled={busy || review}
           onClick={() => setView("events")}
         >
-          Events &amp; markets ({events.length})
+          {org.managementOnly ? "Your listings" : "Events"} ({events.length})
         </button>
         <button
           className="pl-btn"
@@ -759,54 +917,135 @@ export function OrganizationWorkspace({
           disabled={busy || review}
           onClick={() => setView("draft")}
         >
-          Weekly draft ({ops.length})
+          Changes{ops.length ? ` (${changeCount})` : ""}
         </button>
       </nav>
-      {view === "profile" && !org.managementOnly ? (
-        <section
-          className="organization-profile-preview"
-          aria-label="Published organization profile"
-        >
-          <div>
-            <p className="pl-kicker">What visitors currently see</p>
-            <h2>{publicProfile.title}</h2>
-            <p>
-              {publicProfile.summary ||
-                "Add a short introduction so visitors know what your organization does."}
-            </p>
-            <div className="organization-profile-facts">
-              {publicProfile.website ? (
-                <a
-                  href={publicProfile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Official website ↗
-                </a>
-              ) : (
-                <span>No official website listed</span>
-              )}
-              {publicProfile.address ? (
-                <span>{publicProfile.address}</span>
-              ) : (
-                <span>Event locations are listed separately</span>
-              )}
-            </div>
+      {studio ? (
+        <div className="ow-studio">
+          <ol className="ow-steps" aria-label="Sections of your page">
+            {PROFILE_STEPS.map((s, i) => {
+              const done = stepDone(s, draftProfile as unknown as Record<string, unknown>);
+              const edited = s.fields.some((f) => changedProfile.has(f));
+              return (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    aria-current={i === step ? "step" : undefined}
+                    data-done={done || undefined}
+                    data-edited={edited || undefined}
+                    onClick={() => {
+                      setStep(i);
+                      setPane("edit");
+                    }}
+                  >
+                    <span className="ow-step-n" aria-hidden="true">
+                      {done ? "✓" : i + 1}
+                    </span>
+                    {s.short}
+                    {edited ? <span className="ow-visually-hidden"> (edited)</span> : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="ow-seg" role="group" aria-label="Show">
+            <button
+              type="button"
+              aria-pressed={pane === "edit"}
+              onClick={() => setPane("edit")}
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              aria-pressed={pane === "preview"}
+              onClick={() => setPane("preview")}
+            >
+              Preview{changedProfile.size ? " · new" : ""}
+            </button>
           </div>
-          <aside>
-            <strong>
-              {profileDraft
-                ? "Profile changes in your draft"
-                : "Your published profile"}
-            </strong>
-            <p>
-              {profileDraft
-                ? "The public page updates after you review and publish your complete submission."
-                : "Use the fields below to prepare changes. You can bundle profile edits and events into one submission."}
-            </p>
-            <Link to={entityPath(org)}>Open visitor view ↗</Link>
-          </aside>
-        </section>
+          <div className="ow-panes" data-pane={pane}>
+            <section className="ow-step-card" aria-labelledby="ow-step-title">
+              <p className="ow-step-count">
+                Step {step + 1} of {PROFILE_STEPS.length}
+              </p>
+              <h2 id="ow-step-title">{current.title}</h2>
+              <p className="ow-why">{current.why}</p>
+              <div className="ow-fields">
+                {current.fields
+                  .filter(
+                    (f) =>
+                      !EXTRA_FIELDS.has(f) &&
+                      ownerEditableFields("business").includes(f),
+                  )
+                  .map(editorFor)}
+              </div>
+              {current.fields.some((f) => EXTRA_FIELDS.has(f)) ? (
+                <details className="ow-more">
+                  <summary>More details (optional)</summary>
+                  <div className="ow-fields">
+                    {current.fields
+                      .filter(
+                        (f) =>
+                          EXTRA_FIELDS.has(f) &&
+                          ownerEditableFields("business").includes(f),
+                      )
+                      .map(editorFor)}
+                  </div>
+                </details>
+              ) : null}
+              <div className="ow-step-nav">
+                {step > 0 ? (
+                  <button
+                    type="button"
+                    className="pl-btn ow-btn-ghost"
+                    onClick={() => setStep(step - 1)}
+                  >
+                    Back
+                  </button>
+                ) : null}
+                {step < PROFILE_STEPS.length - 1 ? (
+                  <button
+                    type="button"
+                    className="pl-btn"
+                    onClick={() => {
+                      setStep(step + 1);
+                      document
+                        .querySelector(".ow-steps")
+                        ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                    }}
+                  >
+                    Next: {PROFILE_STEPS[step + 1].short}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="pl-btn"
+                    onClick={() => setPane("preview")}
+                  >
+                    See your preview
+                  </button>
+                )}
+              </div>
+            </section>
+            <aside className="ow-preview-wrap">
+              <OwnerProfilePreview
+                profile={draftProfile}
+                changed={changedProfile}
+                state={changedProfile.size ? "draft" : "live"}
+              />
+              {pane === "preview" ? (
+                <button
+                  type="button"
+                  className="pl-btn ow-btn-ghost ow-back-edit"
+                  onClick={() => setPane("edit")}
+                >
+                  Back to editing
+                </button>
+              ) : null}
+            </aside>
+          </div>
+        </div>
       ) : null}
       {view === "events" ? (
         <section
@@ -814,15 +1053,35 @@ export function OrganizationWorkspace({
           aria-labelledby="organization-programme"
         >
           <h2 id="organization-programme">
-            {org.managementOnly ? "Your listings" : "Your event programme"}
+            {org.managementOnly ? "Your listings" : "Your events"}
           </h2>
           <p>
-            Keep all dates together. Past, cancelled and removed listings stay
-            available here.
+            Add your next event, or fix a date or ticket link. Past, cancelled
+            and removed events stay here too.
           </p>
+          <button
+            className="pl-btn organization-add"
+            disabled={disabled || ops.length >= MAX_ORGANIZATION_CHANGES}
+            onClick={() => {
+              const entityId = `${org.id}-event-${crypto.randomUUID()}`;
+              setOps((v) => [
+                ...v,
+                {
+                  entityId,
+                  action: "add",
+                  changes: { title: "", address: org.address },
+                },
+              ]);
+              setTargetId(entityId);
+              setView("editor");
+              request.current = undefined;
+            }}
+          >
+            + Add an event
+          </button>
           <div className="organization-filters">
             <label className="pl-field">
-              <span>Search your programme</span>
+              <span>Search your events</span>
               <input
                 type="search"
                 placeholder="Event name or address"
@@ -874,7 +1133,7 @@ export function OrganizationWorkspace({
                     setView("editor");
                   }}
                 >
-                  Manage {e.kind}
+                  Edit {e.kind}
                 </button>
                 {e.kind === "market" ? (
                   <Link
@@ -889,43 +1148,98 @@ export function OrganizationWorkspace({
               </li>
             ))}
           </ul>
-          <p className="organization-results" role="status">
-            Showing {Math.min(shown, filteredEvents.length)} of{" "}
-            {filteredEvents.length} listings
-            {eventQuery !== deferredQuery ? " · Updating search…" : ""}
-          </p>
+          {filteredEvents.length ? (
+            <p className="organization-results" role="status">
+              Showing {Math.min(shown, filteredEvents.length)} of{" "}
+              {filteredEvents.length}
+              {eventQuery !== deferredQuery ? " · Updating search…" : ""}
+            </p>
+          ) : null}
           {filteredEvents.length > shown ? (
             <button
               className="pl-btn"
               onClick={() => setShown((count) => count + 24)}
             >
-              Show more listings
+              Show more
             </button>
           ) : null}
           {!filteredEvents.length ? (
             <div className="organization-empty">
               <strong>
                 {eventQuery
-                  ? "No matching listings"
-                  : "Nothing in this view yet"}
+                  ? "No matching events"
+                  : eventFilter === "upcoming"
+                    ? "Nothing coming up yet"
+                    : "Nothing here yet"}
               </strong>
               <p>
                 {eventQuery
-                  ? "Try another name or switch to All."
-                  : "Add a confirmed event, or switch the filter to see the rest of your programme."}
+                  ? "Try another name, or switch Show to All."
+                  : "Got a sale, tasting, workshop or class coming up? Add it and it shows on your page and in what’s on near you."}
               </p>
             </div>
           ) : null}
+          <details className="organization-help">
+            <summary>Lots of dates? Add them from a spreadsheet</summary>
+            <p>
+              Import up to {MAX_ORGANIZATION_CHANGES} confirmed shows or
+              workshops as a CSV file. Nothing publishes until you review
+              everything. Required columns: title, start, end, address. Dates
+              use Calgary time (2026-11-20T19:00).
+            </p>
+            <a
+              className="pl-textbtn"
+              download="calgarywatch-event-template.csv"
+              href={`data:text/csv;charset=utf-8,${encodeURIComponent(ORGANIZATION_CSV_TEMPLATE)}`}
+            >
+              Download CSV template
+            </a>
+            <label className="pl-field">
+              <span>Import event CSV</span>
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                disabled={disabled}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  setBusy(true);
+                  try {
+                    if (file.size > 500000)
+                      throw Error("Keep the CSV below 500 KB.");
+                    const incoming = importOrganizationProgramme(
+                      await file.text(),
+                      org,
+                      entities,
+                      ops,
+                    );
+                    request.current = undefined;
+                    setOps((current) => [...current, ...incoming]);
+                    setView("draft");
+                    setError("");
+                    setNotice(
+                      `${incoming.length} events added. Check dates, venues and tickets before publishing.`,
+                    );
+                  } catch (error) {
+                    setError((error as Error).message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              />
+            </label>
+          </details>
         </section>
       ) : null}
       {view === "editor" ? (
         <button className="pl-textbtn" onClick={() => setView("events")}>
-          ← Back to event programme
+          ← Back to your events
         </button>
       ) : null}
-      {view === "editor" ? (
+      {view === "editor" && targets.length > 2 ? (
         <label className="pl-field">
-          <span>Switch listing without losing your draft</span>
+          <span>Switch to another listing (your changes are kept)</span>
           <select
             value={targetId}
             disabled={busy || review}
@@ -934,7 +1248,7 @@ export function OrganizationWorkspace({
             {targets.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.kind === "business"
-                  ? "Organization profile"
+                  ? "Your page"
                   : e.kind === "market"
                     ? "Market"
                     : deleted.has(e.id)
@@ -942,96 +1256,25 @@ export function OrganizationWorkspace({
                       : e.kind === "event" && Date.parse(e.end) < Date.now()
                         ? "Past event"
                         : "Event"}
-                : {e.title}
+                : {e.title || "New event"}
               </option>
             ))}
           </select>
         </label>
       ) : null}
-      <details className="organization-help">
-        <summary>Add a programme from a spreadsheet</summary>
-        <p>
-          Import up to {MAX_ORGANIZATION_CHANGES} confirmed shows or workshops
-          as a CSV file. Nothing publishes until you review and confirm your
-          complete draft. This uses the same weekly submission. Images stay with
-          CalgaryWatch.
-        </p>
-        <p>
-          Required columns: title, start, end, address. Dates use Calgary local
-          time (2026-11-20T19:00) or an ISO timestamp with an explicit offset.
-        </p>
-        <a
-          className="pl-textbtn"
-          download="calgarywatch-event-template.csv"
-          href={`data:text/csv;charset=utf-8,${encodeURIComponent(ORGANIZATION_CSV_TEMPLATE)}`}
-        >
-          Download CSV template
-        </a>
-        <label className="pl-field">
-          <span>Import event CSV into your draft</span>
-          <input
-            type="file"
-            accept=".csv,text/csv"
-            disabled={disabled}
-            onChange={async (e) => {
-              const file = e.target.files?.[0];
-              e.target.value = "";
-              if (!file) return;
-              setBusy(true);
-              try {
-                if (file.size > 500000)
-                  throw Error("Keep the CSV below 500 KB.");
-                const incoming = importOrganizationProgramme(
-                  await file.text(),
-                  org,
-                  entities,
-                  ops,
-                );
-                request.current = undefined;
-                setOps((current) => [...current, ...incoming]);
-                setView("draft");
-                setError("");
-                setNotice(
-                  `${incoming.length} events added to your draft. Review dates, venues and tickets before publishing.`,
-                );
-              } catch (error) {
-                setError((error as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          />
-        </label>
-      </details>
-      <button
-        className="pl-btn organization-add"
-        disabled={disabled || ops.length >= MAX_ORGANIZATION_CHANGES}
-        onClick={() => {
-          const entityId = `${org.id}-event-${crypto.randomUUID()}`;
-          setOps((v) => [
-            ...v,
-            {
-              entityId,
-              action: "add",
-              changes: { title: "", address: org.address },
-            },
-          ]);
-          setTargetId(entityId);
-          setView("editor");
-          request.current = undefined;
-        }}
-      >
-        Add another event to this draft
-      </button>
-      {(view === "profile" || view === "editor") &&
+      {!studio &&
+      (view === "profile" || view === "editor") &&
       target &&
       op?.action !== "delete" ? (
-        <>
+        <section className="ow-step-card ow-plain-editor">
           <h2>
-            Editing{" "}
             {target.kind === "business"
-              ? "organization profile"
-              : target.title || "new event"}
+              ? org.managementOnly
+                ? "Organizer details"
+                : "Your page"
+              : op?.action === "add"
+                ? target.title || "New event"
+                : target.title}
           </h2>
           {org.managementOnly && target.id === org.id ? (
             <p>
@@ -1066,48 +1309,19 @@ export function OrganizationWorkspace({
               .filter(
                 (f) => f !== "organizer" && essential.includes(f) !== advanced,
               )
-              .map((field) => (
-                <OwnerFieldEditor
-                  key={`${target.id}:${field}`}
-                  field={field}
-                  value={text(
-                    field,
-                    op?.changes[field] ??
-                      (field === "occurrences"
-                        ? (
-                            rows.find((r) => r.entityId === target.id)
-                              ?.occurrences ??
-                            discoveryRepository
-                              .occurrences()
-                              .filter((o) => o.marketId === target.id)
-                          ).map(({ id, start, end, cancelled }) => ({
-                            id,
-                            start,
-                            end,
-                            cancelled,
-                          }))
-                        : (target as unknown as Record<string, unknown>)[
-                            field
-                          ]),
-                  )}
-                  disabled={disabled}
-                  onChange={(v) => update(field, v)}
-                />
-              ));
+              .map(editorFor);
             return advanced ? (
-              <details key="advanced" className="organization-events">
-                <summary>
-                  More details · hours, social links, categories and location
-                </summary>
-                <div className="organization-extra">{fields}</div>
+              <details key="advanced" className="ow-more">
+                <summary>More details (optional)</summary>
+                <div className="ow-fields">{fields}</div>
               </details>
             ) : (
-              <div key="essential" className="organization-extra">
+              <div key="essential" className="ow-fields">
                 {fields}
               </div>
             );
           })}
-        </>
+        </section>
       ) : null}
       {adminEdit && target && (view === "profile" || view === "editor") ? (
         <AdminImageEditor
@@ -1165,6 +1379,7 @@ export function OrganizationWorkspace({
             if (op?.action === "add") {
               setOps((v) => v.filter((o) => o.entityId !== targetId));
               setTargetId(org.id);
+              setView("events");
             } else
               setOps((v) => [
                 ...v.filter((o) => o.entityId !== targetId),
@@ -1176,75 +1391,91 @@ export function OrganizationWorkspace({
               ]);
           }}
         >
-          {op?.action === "delete"
-            ? "Undo removal"
-            : deleted.has(targetId)
-              ? "Restore event in this submission"
-              : "Remove event in this submission"}
+          {op?.action === "add"
+            ? "Discard this new event"
+            : op?.action === "delete"
+              ? "Undo removal"
+              : deleted.has(targetId)
+                ? "Put this event back on your page"
+                : "Remove this event from your page"}
         </button>
       ) : null}
-      <section className="organization-draft" hidden={view !== "draft"}>
-        <h2 id="organization-draft">
-          Your draft · {ops.length} listing{ops.length === 1 ? "" : "s"}
-        </h2>
-        <p>
-          Drafts save on this device while you work. They do not use your
-          allowance. Switching events keeps your changes.
-        </p>
-        <ul>
-          {ops.map((o) => (
-            <li key={o.entityId}>
-              <strong>
-                {o.action === "add"
-                  ? "Add"
-                  : o.action === "delete"
-                    ? "Remove"
-                    : "Update"}
-                :{" "}
-                {String(
-                  o.changes.title ??
-                    targets.find((t) => t.id === o.entityId)?.title ??
-                    o.entityId,
-                ) || "Untitled event"}
-              </strong>{" "}
-              · {Object.keys(o.changes).join(", ")}{" "}
-              <button
-                className="pl-textbtn"
-                disabled={disabled}
-                onClick={() => {
+      <section className="organization-draft ow-changes" hidden={view !== "draft"}>
+        <h2 id="organization-draft">Your changes</h2>
+        {ops.length ? (
+          <p>
+            Saved on this device and not live yet. Check them over, then
+            publish when you’re ready.
+          </p>
+        ) : (
+          <div className="organization-empty">
+            <strong>No changes yet</strong>
+            <p>
+              Edit anything on Your page or Events and it shows up here, ready
+              to publish.
+            </p>
+          </div>
+        )}
+        <ChangeList
+          ops={ops}
+          targets={targets}
+          orgId={org.id}
+          onDiscard={
+            disabled
+              ? undefined
+              : (o) => {
                   setOps((v) => v.filter((x) => x.entityId !== o.entityId));
                   request.current = undefined;
                   if (o.action === "add" && targetId === o.entityId)
                     setTargetId(org.id);
-                }}
-              >
-                Discard this change
-              </button>
-            </li>
-          ))}
-        </ul>
+                }
+          }
+        />
       </section>
-      <div className="organization-publishbar">
-        <span>
-          <strong>
-            {ops.length} listing{ops.length === 1 ? "" : "s"} in your draft
-          </strong>
-          <small>
-            {readOnly
-              ? "Read-only admin preview"
-              : locked
-                ? `Next submission: ${fmt(nextAt)}`
-                : "Include all changes before using this week’s submission."}
-          </small>
-        </span>
-        <button
-          className="pl-btn"
-          disabled={disabled || locked || !loaded || !ops.length}
-          onClick={beginReview}
-        >
-          Review complete submission
-        </button>
-      </div>
+      <aside className="ow-help" aria-label="Help">
+        <strong>Need a hand?</strong>
+        <p>
+          Photos and logos: we add them for you.{" "}
+          {"Owners cannot upload or replace images here, so just send them over."}{" "}
+          <a
+            href={artworkRequestUrl(
+              org.title,
+              org.managementOnly
+                ? `/claim/${encodeURIComponent(org.id)}`
+                : entityPath(org),
+            )}
+          >
+            Send photos
+          </a>
+        </p>
+        <p>
+          Anything else, or not sure something looks right? Email{" "}
+          <a href="mailto:aldo@calgarywatch.ca">aldo@calgarywatch.ca</a>. A
+          real person reads every message, and we’re happy to make changes for
+          you.
+        </p>
+      </aside>
+      {ops.length && !readOnly ? (
+        <div className="organization-publishbar" data-locked={locked || undefined}>
+          <span>
+            <strong>{plural(changeCount, "change")} ready</strong>
+            <small>
+              {locked
+                ? `You can publish again on ${day(nextAt)}. Your changes stay saved here until then.`
+                : adminEdit
+                  ? "Admin publishing does not use the business’s weekly update."
+                  : "Goes live right away. No approval needed."}
+            </small>
+          </span>
+          <button
+            className="pl-btn"
+            disabled={disabled || locked || !loaded || !ops.length}
+            onClick={beginReview}
+          >
+            Review & publish
+          </button>
+        </div>
+      ) : null}
       {review ? (
         <dialog
           ref={dialog}
@@ -1255,78 +1486,126 @@ export function OrganizationWorkspace({
             else setReview(false);
           }}
         >
-          <h2 id="organization-confirm">Are you sure you want to submit?</h2>
+          <h2 id="organization-confirm">Ready to go live?</h2>
           {adminEdit ? (
             <p>
-              Publish {ops.length} listing changes as an administrator? Changes
+              Publish {plural(changeCount, "change")} as an administrator? They
               go live immediately and are recorded under your admin account.
-              This does not consume or reset the business’s weekly allowance.
+              This does not use the business’s weekly update.
             </p>
           ) : (
             <p>
-              This publishes all {ops.length} listing changes for {org.title}{" "}
-              immediately and uses your one submission for seven complete days.
-              It is wise to include every event and all profile changes
-              together. Your next submission will be available approximately{" "}
-              {fmt(Date.now() + 7 * 86400000)}.
+              Here’s everything that will change on your page. It goes live as
+              soon as you publish, with no approval step. You can publish once
+              a week, so your next update opens{" "}
+              {day(Date.now() + 7 * 86400000)}. Spot something after that?
+              Email us and we’ll fix it for you.
             </p>
           )}
-          <ul>
-            {ops.map((o) => (
-              <li key={o.entityId}>
-                <strong>
-                  {o.action}:{" "}
-                  {String(
-                    o.changes.title ??
-                      targets.find((t) => t.id === o.entityId)?.title ??
-                      o.entityId,
-                  )}
-                </strong>
-                <dl>
-                  {Object.entries(o.changes).map(([field, value]) => (
-                    <div key={field}>
-                      <dt>{field}</dt>
-                      <dd>
-                        {typeof value === "string"
-                          ? value
-                          : JSON.stringify(value)}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-                {o.action === "delete" ? (
-                  <p>This event will be removed from public listings.</p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-          <label>
-            <input
-              type="checkbox"
-              checked={confirmed}
+          <ChangeList ops={ops} targets={targets} orgId={org.id} />
+          <div className="ow-confirm-acts">
+            <button
+              className="pl-btn"
               disabled={busy}
-              onChange={(e) => setConfirmed(e.target.checked)}
-            />{" "}
-            {adminEdit
-              ? "I have reviewed these changes and want to publish them as an administrator."
-              : "I have reviewed every change and included all the events I want to publish this week."}
-          </label>
-          <button
-            className="pl-btn"
-            disabled={!confirmed || busy}
-            onClick={() => void submit()}
-          >
-            {busy ? "Publishing…" : "Confirm and publish all changes"}
-          </button>
-          <button
-            className="pl-textbtn"
-            disabled={busy}
-            onClick={() => setReview(false)}
-          >
-            Keep editing this draft
-          </button>
+              onClick={() => void submit()}
+            >
+              {busy ? "Publishing…" : "Publish now"}
+            </button>
+            <button
+              className="pl-btn ow-btn-ghost"
+              disabled={busy}
+              onClick={() => setReview(false)}
+            >
+              Keep editing
+            </button>
+          </div>
         </dialog>
       ) : null}
     </section>
+  );
+}
+
+/** Every change as "before → after" in plain words. Never field keys or JSON. */
+function ChangeList({
+  ops,
+  targets,
+  orgId,
+  onDiscard,
+}: {
+  ops: OrganizationChange[];
+  targets: readonly import("../types/discovery").DiscoveryEntity[];
+  orgId: string;
+  onDiscard?: (op: OrganizationChange) => void;
+}) {
+  if (!ops.length) return null;
+  return (
+    <ul className="ow-diff">
+      {ops.map((o) => {
+        const before = targets.find((t) => t.id === o.entityId) as
+          | Record<string, unknown>
+          | undefined;
+        const name =
+          o.entityId === orgId
+            ? "Your page"
+            : String(o.changes.title ?? before?.title ?? "") || "New event";
+        return (
+          <li key={o.entityId}>
+            <p className="ow-diff-head">
+              <span data-action={o.action}>
+                {o.action === "add"
+                  ? "New event"
+                  : o.action === "delete"
+                    ? "Removing"
+                    : "Updating"}
+              </span>
+              <strong>{name}</strong>
+            </p>
+            {o.action === "delete" ? (
+              <p className="ow-small">
+                This event comes off your page. Its history stays here.
+              </p>
+            ) : (
+              <dl>
+                {Object.entries(o.changes)
+                  .filter(([field]) => !["image", "images"].includes(field))
+                  .map(([field, value]) => {
+                    const was =
+                      o.action === "edit" ? before?.[field] : undefined;
+                    const hadValue =
+                      was !== undefined && was !== null && was !== "";
+                    return (
+                      <div key={field}>
+                        <dt>{fieldLabel(field)}</dt>
+                        <dd>
+                          {hadValue ? (
+                            <del>
+                              {friendlyValue(field, was).map((line) => (
+                                <span key={line}>{line}</span>
+                              ))}
+                            </del>
+                          ) : null}
+                          <ins>
+                            {friendlyValue(field, value).map((line) => (
+                              <span key={line}>{line}</span>
+                            ))}
+                          </ins>
+                        </dd>
+                      </div>
+                    );
+                  })}
+              </dl>
+            )}
+            {onDiscard ? (
+              <button
+                className="pl-textbtn"
+                onClick={() => onDiscard(o)}
+              >
+                Undo this change
+              </button>
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
   );
 }

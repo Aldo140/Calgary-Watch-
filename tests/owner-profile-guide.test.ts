@@ -61,3 +61,32 @@ test('the publish confirmation speaks plainly and lists changes without raw fiel
   assert.doesNotMatch(page, /Are you sure you want to submit/);
   assert.match(page, /friendlyValue\(field, value\)/);
 });
+
+import { profileProgress, fieldLabel as label } from '../src/lib/ownerProfileGuide';
+import { eventWhen } from '../src/components/entity/OwnerEventPreview';
+import { approvalEmail } from '../src/lib/claimApprovalEmail';
+
+test('page progress counts filled sections and names the one next thing to do', () => {
+  const p = profileProgress({ title: 'Shop', summary: 'Hi', description: 'About', phone: '1', email: 'a@b.ca', website: 'https://a.ca', address: 'x' });
+  assert.equal(p.done, 2);
+  assert.equal(p.next?.id, 'hours');
+  assert.match(p.next!.ask, /opening hours/);
+});
+
+test('events get event wording, not business wording', () => {
+  assert.equal(label('title', 'event'), 'Event name');
+  assert.equal(label('title', 'business'), 'Business name');
+  assert.equal(label('tickets', 'event'), 'Ticket or sign-up link');
+});
+
+test('event times read like a poster', () => {
+  assert.equal(eventWhen('2026-11-22T19:00:00-06:00', '2026-11-22T22:00:00-06:00'), 'Sun, Nov 22 · 7 pm – 10 pm');
+  assert.equal(eventWhen(''), undefined);
+});
+
+test('the approval email points owners at finishing their page, in plain words', () => {
+  const m = approvalEmail({ entityId: 'biz-x', entityTitle: 'X', entityPath: '/local/x', name: 'Pat', accountEmail: 'p@x.ca', workEmail: 'p@x.ca' }, { mailingAddress: '' });
+  assert.match(m.text, /Finish your page\./);
+  assert.match(m.text, /preview first/);
+  assert.doesNotMatch(m.text, /explicitly linked|per business|admin approval/);
+});

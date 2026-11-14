@@ -198,3 +198,18 @@ a.cl-verified-by { color: inherit; text-decoration: underline; text-underline-of
 .cl-finder-hit strong { font-size: 16px; overflow-wrap: anywhere; }
 .cl-finder-hit[data-suggested='true'] { border-color: #a9d9c8; background: #f1faf6; }
 .pl-field > .cl-password, .pl-field > .cl-finder-search { font: inherit; text-transform: none; letter-spacing: 0; color: inherit; }
+/* Newly verified owner: welcome + finish-your-page checklist */
+.ow-welcome { display:grid; gap:12px; padding:clamp(18px,3vw,28px); border-radius:20px; background:#06162f; color:#fff; }
+.ow-welcome h2 { margin:0; font:800 clamp(22px,3vw,30px)/1.1 var(--pl-display); color:#fff; }
+.ow-welcome p { margin:0; line-height:1.55; color:#dfe7f0; }
+.ow-welcome-badge { display:inline-flex; align-items:center; gap:6px; width:fit-content; padding:4px 10px; border-radius:999px; background:#3ddc97; color:#06302a !important; font-weight:800; font-size:13px; }
+.ow-welcome-steps { list-style:none; margin:4px 0 0; padding:0; display:grid; gap:6px; }
+.ow-welcome-steps a { display:flex; align-items:center; gap:10px; min-height:44px; padding:8px 12px; border-radius:12px; background:#ffffff12; color:#fff; text-decoration:none; font-weight:600; }
+.ow-welcome-steps a:hover { background:#ffffff22; }
+.ow-welcome-steps span { flex:none; width:22px; height:22px; border-radius:50%; border:2px solid #8fa3b8; display:grid; place-items:center; }
+.ow-welcome-steps li[data-done] a { color:#b9c6d3; }
+.ow-welcome-steps li[data-done] span { background:#3ddc97; border-color:#3ddc97; color:#06302a; }
+.ow-welcome-acts { display:flex; flex-wrap:wrap; align-items:center; gap:14px; }
+.ow-welcome .pl-btn { background:#ffdf4f; color:#06162f; display:inline-flex; align-items:center; gap:6px; }
+.ow-welcome .pl-textbtn { color:#ffdf4f; font-weight:700; }
+.ow-welcome .ow-small { font-size:13.5px; color:#b9c6d3; }

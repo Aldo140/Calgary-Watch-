@@ -26,7 +26,7 @@ test('admin and owner render the same Business account and claim states',()=>{
   assert.match(render('clare-uid'),/href="\/claim\/biz-downstage\?as=clare-uid"/);
   assert.match(render(),/href="\/claim\/biz-downstage"/);
   assert.doesNotMatch(render(),/\?as=/);
-  assert.equal(render('clare-uid').replaceAll('?as=clare-uid',''),render());
+  assert.equal(render('clare-uid').replaceAll('?as=clare-uid','').replaceAll('&amp;as=clare-uid',''),render());
 });
 test('management links encode IDs and preserve subject only in admin preview',()=>{
   assert.equal(listingManagementPath('biz downstage','uid&other'),'/claim/biz%20downstage?as=uid%26other');

@@ -4,6 +4,7 @@ import {AdminAccessBar} from '../components/admin/AdminAccessBar';
 import {useAdminEditMode} from '../hooks/useAdminEditMode';
 import { approvedOrganization } from '../lib/organizationWorkspace';
 import { ListingManagement } from '../components/entity/ListingManagement';
+import { OwnerWelcome } from '../components/entity/OwnerWelcome';
 import { clearClaimDraft, isClaimQueued, loadClaimDraft, saveClaimDraft, setClaimQueued } from '../lib/claimDraft';
 import { INVITE_PARAM, decodeInvite, inviteGreetingName, normalizeInvite, type ClaimInvite, type SignupIntent } from '../lib/claimInvite';
 import { useVerifiedListing } from '../lib/claimsApi';
@@ -270,7 +271,7 @@ function ClaimForm({ id }: { id: string }) {
                   </Link>
                 ) : null}
                 <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>{adminView?'Administrator listing access.':'Your account is a business account.'}</strong> {adminView?'This preview does not change ownership or approval. Open the selected account’s':'It manages this listing; you’ll see it on your'} <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
-                {management?<Link className="pl-btn" to={`/organization/${management.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>{management.managementOnly?'Manage organizer workspace & events':'Manage organization profile & all events'}</Link>:<ListingManagement key={`${id}:${adminMode.enabled}`} claim={claim??{entityId:entity.id,entityTitle:entity.title}} previewUid={previewUid} initialTargetId={entity.id} adminEdit={adminMode.enabled} />}
+                {management&&!management.managementOnly&&!adminView?<OwnerWelcome orgId={management.id} title={management.title} query={previewUid?`?as=${encodeURIComponent(previewUid)}`:''} />:management?<Link className="pl-btn" to={`/organization/${management.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>{management.managementOnly?'Edit your listing & events':'Edit your page & events'}</Link>:<ListingManagement key={`${id}:${adminMode.enabled}`} claim={claim??{entityId:entity.id,entityTitle:entity.title}} previewUid={previewUid} initialTargetId={entity.id} adminEdit={adminMode.enabled} />}
               </>
             ) : claim?.status === 'pending' ? (
               <motion.section className="cl-status" data-state="pending" {...rise(4)}>

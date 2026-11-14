@@ -62,9 +62,12 @@ import {
 } from "../lib/ownerListingEdits";
 import { OwnerFieldEditor } from "../components/entity/OwnerFieldEditor";
 import { OwnerProfilePreview } from "../components/entity/OwnerProfilePreview";
+import { OwnerEventPreview } from "../components/entity/OwnerEventPreview";
 import {
+  EVENT_SECTIONS,
   EXTRA_FIELDS,
   PROFILE_STEPS,
+  profileProgress,
   fieldLabel,
   fieldProblem,
   friendlyValue,
@@ -309,8 +312,14 @@ export function OrganizationWorkspace({
   const [catalog, setCatalog] = useState<
     import("../types/discovery").DiscoveryEntity[]
   >([]);
+  const [linkParams] = useSearchParams();
   const [view, setView] = useState<"profile" | "events" | "editor" | "draft">(
-    org.managementOnly ? "events" : "profile",
+    () =>
+      linkParams.get("view") === "events" || linkParams.get("add") === "event"
+        ? "events"
+        : org.managementOnly
+          ? "events"
+          : "profile",
   );
   const [eventQuery, setEventQuery] = useState(""),
     [eventFilter, setEventFilter] = useState(
@@ -343,7 +352,9 @@ export function OrganizationWorkspace({
     [review, setReview] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
-    [step, setStep] = useState(0),
+    [step, setStep] = useState(() =>
+      Math.max(0, PROFILE_STEPS.findIndex((s) => s.id === linkParams.get("step"))),
+    ),
     [pane, setPane] = useState<"edit" | "preview">("edit"),
     [published, setPublished] = useState<{ at: number; next: number }>(),
     [copied, setCopied] = useState(false);
@@ -553,6 +564,14 @@ export function OrganizationWorkspace({
       if (o.action === "delete") continue;
       const entity = targets.find((t) => t.id === o.entityId);
       if (!entity) continue;
+      if (o.action === "add")
+        for (const field of ["title", "start", "end", "address"])
+          if (!String(o.changes[field] ?? "").trim())
+            return {
+              entityId: o.entityId,
+              field,
+              problem: "Fill this in before publishing.",
+            };
       for (const [field, value] of Object.entries(o.changes)) {
         if (["image", "images"].includes(field)) continue;
         const problem = fieldProblem(entity, field, value);
@@ -577,7 +596,10 @@ export function OrganizationWorkspace({
           if (at >= 0) setStep(at);
           setPane("edit");
         } else setView("editor");
-        setError(`One thing needs a quick look before you publish: ${fieldLabel(found.field)}. ${found.problem}`);
+        const kind = targets.find((t) => t.id === found.entityId)?.kind;
+        setError(
+          `One thing needs a quick look before you publish: ${fieldLabel(found.field, kind)}${found.entityId === org.id ? "" : ` on “${String(targets.find((t) => t.id === found.entityId)?.title || "your new event")}”`}. ${found.problem}`,
+        );
       } else setError((e as Error).message);
     }
   }
@@ -712,6 +734,22 @@ export function OrganizationWorkspace({
             }))
           : (target as unknown as Record<string, unknown>)[field]),
     );
+  /** Required fields still empty on a new event, flagged once the owner tries to publish. */
+  const missing = new Set(
+    op?.action === "add" && error
+      ? ["title", "start", "end", "address"].filter(
+          (f) => !String(op.changes[f] ?? "").trim(),
+        )
+      : [],
+  );
+  const progress = profileProgress(
+    draftProfile as unknown as Record<string, unknown>,
+  );
+  const eventEditor =
+    view === "editor" &&
+    !adminEdit &&
+    target?.kind === "event" &&
+    op?.action !== "delete";
   const editorFor = (field: string) => (
     <OwnerFieldEditor
       key={`${target!.id}:${field}`}
@@ -719,10 +757,64 @@ export function OrganizationWorkspace({
       value={valueFor(field)}
       disabled={disabled}
       changed={op?.action === "edit" && op.changes[field] !== undefined}
-      problem={problemFor(field)}
-      onChange={(v) => update(field, v)}
+      problem={
+        problemFor(field) ??
+        (missing.has(field) ? "Fill this in before publishing." : undefined)
+      }
+      kind={target!.kind}
+      onChange={(v) => {
+        update(field, v);
+        // A start with no sensible end gets a two-hour end the owner can change.
+        if (field === "start" && target!.kind === "event") {
+          const end = Date.parse(String(op?.changes.end ?? (target as { end?: string }).end ?? ""));
+          const start = Date.parse(v);
+          if (Number.isFinite(start) && (!Number.isFinite(end) || end <= start))
+            update("end", new Date(start + 2 * 3600000).toISOString());
+        }
+      }}
     />
   );
+  function addEvent() {
+    const entityId = `${org.id}-event-${crypto.randomUUID()}`;
+    setOps((v) => [
+      ...v,
+      {
+        entityId,
+        action: "add",
+        changes: { title: "", address: org.address, pricing: "unknown" },
+      },
+    ]);
+    setTargetId(entityId);
+    setView("editor");
+    setPane("edit");
+    request.current = undefined;
+  }
+  // `?step=hours` (from the dashboard or claim page) lands on that step, not the top of the page.
+  useEffect(() => {
+    if (!linkParams.get("step") || !loaded) return;
+    document.querySelector(".ow-progress, .ow-steps")?.scrollIntoView({ block: "start" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
+  // `?add=event` (from the dashboard) opens a fresh event once the workspace is ready.
+  const addedFromLink = useRef(false);
+  useEffect(() => {
+    if (
+      addedFromLink.current ||
+      linkParams.get("add") !== "event" ||
+      readOnly ||
+      !loaded ||
+      org.kind !== "business"
+    )
+      return;
+    addedFromLink.current = true;
+    if (!ops.some((o) => o.action === "add" && !o.changes.start)) addEvent();
+    else {
+      const open = ops.find((o) => o.action === "add" && !o.changes.start)!;
+      setTargetId(open.entityId);
+      setView("editor");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
   const publicLink = `https://calgarywatch.ca${entityPath(org)}`;
   const changeCount = ops.reduce(
     (n, o) => n + (o.action === "edit" ? Object.keys(o.changes).length : 1),
@@ -922,6 +1014,26 @@ export function OrganizationWorkspace({
       </nav>
       {studio ? (
         <div className="ow-studio">
+          {progress.next ? (
+            <div className="ow-progress">
+              <span
+                className="ow-progress-bar"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={progress.total}
+                aria-valuenow={progress.done}
+                aria-label="Page sections filled in"
+              >
+                <i style={{ width: `${(progress.done / progress.total) * 100}%` }} />
+              </span>
+              <span>
+                <strong>
+                  {progress.done} of {progress.total} sections done.
+                </strong>{" "}
+                Next: {progress.next.ask.toLowerCase()}.
+              </span>
+            </div>
+          ) : null}
           <ol className="ow-steps" aria-label="Sections of your page">
             {PROFILE_STEPS.map((s, i) => {
               const done = stepDone(s, draftProfile as unknown as Record<string, unknown>);
@@ -1062,20 +1174,7 @@ export function OrganizationWorkspace({
           <button
             className="pl-btn organization-add"
             disabled={disabled || ops.length >= MAX_ORGANIZATION_CHANGES}
-            onClick={() => {
-              const entityId = `${org.id}-event-${crypto.randomUUID()}`;
-              setOps((v) => [
-                ...v,
-                {
-                  entityId,
-                  action: "add",
-                  changes: { title: "", address: org.address },
-                },
-              ]);
-              setTargetId(entityId);
-              setView("editor");
-              request.current = undefined;
-            }}
+            onClick={addEvent}
           >
             + Add an event
           </button>
@@ -1262,7 +1361,76 @@ export function OrganizationWorkspace({
           </select>
         </label>
       ) : null}
+      {eventEditor ? (
+        <div className="ow-studio">
+          <div className="ow-seg" role="group" aria-label="Show">
+            <button type="button" aria-pressed={pane === "edit"} onClick={() => setPane("edit")}>
+              Edit
+            </button>
+            <button type="button" aria-pressed={pane === "preview"} onClick={() => setPane("preview")}>
+              Preview
+            </button>
+          </div>
+          <div className="ow-panes" data-pane={pane}>
+            <section className="ow-step-card" aria-labelledby="ow-event-title">
+              <p className="ow-step-count">
+                {op?.action === "add" ? "New event" : "Editing event"}
+              </p>
+              <h2 id="ow-event-title">
+                {String(op?.changes.title ?? target.title ?? "") || "Tell people what’s on"}
+              </h2>
+              <p className="ow-why">
+                {op?.action === "add"
+                  ? "Four quick parts: what, when, where and price. It shows on your page and in what’s on around Calgary."
+                  : "Fix a date, time or link. Everything else stays as it is."}
+              </p>
+              {EVENT_SECTIONS.map((section) => {
+                const pricing = String(op?.changes.pricing ?? (target as { pricing?: string }).pricing ?? "unknown");
+                const fields = section.fields.filter(
+                  (f) =>
+                    ownerEditableFields("event").includes(f) &&
+                    // Ticket prices only matter for paid events.
+                    (f !== "priceRange" || pricing === "paid"),
+                );
+                return section.extra ? (
+                  <details key={section.id} className="ow-more">
+                    <summary>{section.title}</summary>
+                    <div className="ow-fields">{fields.map(editorFor)}</div>
+                  </details>
+                ) : (
+                  <fieldset key={section.id} className="ow-section">
+                    <legend>{section.title}</legend>
+                    <div className="ow-fields">{fields.map(editorFor)}</div>
+                  </fieldset>
+                );
+              })}
+              <div className="ow-step-nav">
+                <button type="button" className="pl-btn ow-btn-ghost" onClick={() => setView("events")}>
+                  Back to events
+                </button>
+                <button type="button" className="pl-btn" onClick={() => setPane("preview")}>
+                  See preview
+                </button>
+              </div>
+            </section>
+            <aside className="ow-preview-wrap">
+              <OwnerEventPreview
+                event={{ ...(target as object), ...(op?.changes ?? {}) } as never}
+                changed={new Set(op?.action === "edit" ? Object.keys(op.changes) : [])}
+                state={op?.action === "add" ? "new" : op ? "draft" : "live"}
+                host={(entities.find((e) => e.id === org.id) ?? org).title}
+              />
+              {pane === "preview" ? (
+                <button type="button" className="pl-btn ow-btn-ghost ow-back-edit" onClick={() => setPane("edit")}>
+                  Back to editing
+                </button>
+              ) : null}
+            </aside>
+          </div>
+        </div>
+      ) : null}
       {!studio &&
+      !eventEditor &&
       (view === "profile" || view === "editor") &&
       target &&
       op?.action !== "delete" ? (
@@ -1575,7 +1743,7 @@ function ChangeList({
                       was !== undefined && was !== null && was !== "";
                     return (
                       <div key={field}>
-                        <dt>{fieldLabel(field)}</dt>
+                        <dt>{fieldLabel(field, (before?.kind as string | undefined) ?? (o.action === "add" ? "event" : undefined))}</dt>
                         <dd>
                           {hadValue ? (
                             <del>

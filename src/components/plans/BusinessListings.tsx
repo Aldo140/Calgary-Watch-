@@ -7,6 +7,7 @@ import { ArrowUpRight, BadgeCheck, Store } from 'lucide-react';
 import type { BusinessAccount } from '../../lib/businessAccount';
 import type { Claim } from './Dashboard';
 import { listingManagementPath } from '../../lib/listingPreview';
+import { profileProgress } from '../../lib/ownerProfileGuide';
 const formatSince = (at: number, options: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...options }).format(at);
 
 /**
@@ -52,9 +53,20 @@ export function BusinessListings({ claims, business, previewUid }: { claims: Cla
               {org.managementOnly ? <p className="pd-biz-sub">Manage your listing and add events when needed.</p> : (
                 <dl className="pd-biz-stats">
                   <div><dt>Upcoming</dt><dd>{list.length}</dd></div>
-                  <div><dt>Next event</dt><dd>{next ? <Link to={entityPath(next)}><strong>{next.title}</strong><small>{when(next.start)}</small></Link> : <small>Nothing scheduled. Add one.</small>}</dd></div>
+                  <div><dt>Next event</dt><dd>{next ? <Link to={entityPath(next)}><strong>{next.title}</strong><small>{when(next.start)}</small></Link> : <Link to={`/organization/${org.id}?add=event${previewUid ? `&as=${encodeURIComponent(previewUid)}` : ''}`}><small>Nothing scheduled. <strong>Add an event</strong></small></Link>}</dd></div>
                 </dl>
               )}
+              {(() => {
+                const page = org.managementOnly ? undefined : inventory.find((e) => e.id === org.id && e.kind === 'business');
+                const progress = page ? profileProgress(page as unknown as Record<string, unknown>) : undefined;
+                return progress?.next ? (
+                  <Link className="pd-biz-next" to={`/organization/${org.id}?step=${progress.next.id}${previewUid ? `&as=${encodeURIComponent(previewUid)}` : ''}`}>
+                    <span className="pd-biz-meter" aria-hidden="true"><i style={{ width: `${(progress.done / progress.total) * 100}%` }} /></span>
+                    <span><small>Your page · {progress.done} of {progress.total} done</small><strong>Next: {progress.next.ask}</strong></span>
+                    <ArrowUpRight size={15} aria-hidden="true" />
+                  </Link>
+                ) : null;
+              })()}
               <div className="pd-biz-acts">
                 <Link className="pd-biz-btn" to={`/organization/${org.id}${as}`}>{org.managementOnly ? 'Edit your listing' : 'Edit your page & events'} <ArrowUpRight size={15} aria-hidden="true" /></Link>
                 <Link className="pd-biz-btn" data-k="ghost" to={publicPath}>{org.managementOnly ? 'Public listing' : 'Public profile'}</Link>

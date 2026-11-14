@@ -221,3 +221,15 @@
   .ow .organization-publishbar .pl-btn { width:auto; flex:none; min-height:46px; padding:0 16px; font-size:14px; }
 }
 .organization-confirm[open] { margin:auto; inset:0; }
+
+/* Page progress, guided event editor */
+.ow-progress { display:grid; gap:8px; font-size:14px; color:#475866; }
+.ow-progress strong { color:#06162f; }
+.ow-progress-bar { display:block; height:8px; border-radius:999px; background:#e9edf0; overflow:hidden; }
+.ow-progress-bar i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#3ddc97,#00c2e0); }
+.ow-section { border:0; margin:0; padding:14px 0 0; border-top:1px solid #ebe7dc; min-width:0; }
+.ow-section:first-of-type { border-top:0; padding-top:0; }
+.ow-section legend { padding:0; margin-bottom:10px; font:800 17px/1.2 var(--pl-display); color:#06162f; }
+.ow-pv-when { margin:0; display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-weight:800; color:#123c78; font-size:14px; }
+.ow-pv-cancel { padding:2px 8px; border-radius:999px; background:#fde8e6; color:#8a1f17; font-size:12px; }
+.ow-pv-host { margin:-6px 0 0; font-size:13px; color:#5b6b78; }

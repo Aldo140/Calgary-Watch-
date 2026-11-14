@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ownerInstant, ownerLocalDate } from "../../lib/ownerListingEdits";
 import {
-  FIELD_COPY,
+  fieldCopy,
   SOCIAL_NAMES,
   WEEK,
   fieldLabel,
@@ -32,8 +32,8 @@ function useTyping(value: string, same: (typed: string, saved: string) => boolea
   return [typed, setTyped] as const;
 }
 
-function Hint({ field, id }: { field: string; id: string }) {
-  const hint = FIELD_COPY[field]?.hint;
+function Hint({ field, id, kind }: { field: string; id: string; kind?: string }) {
+  const hint = fieldCopy(field, kind)?.hint;
   return hint ? (
     <small className="ow-hint" id={id}>
       {hint}
@@ -49,10 +49,10 @@ function Problem({ text, id }: { text?: string; id: string }) {
   ) : null;
 }
 
-function Label({ field, changed, children }: { field: string; changed?: boolean; children?: ReactNode }) {
+function Label({ field, changed, children, kind }: { field: string; changed?: boolean; children?: ReactNode; kind?: string }) {
   return (
     <span className="ow-label">
-      {children ?? fieldLabel(field)}
+      {children ?? fieldLabel(field, kind)}
       {changed ? <em className="ow-edited">Edited</em> : null}
     </span>
   );
@@ -199,7 +199,10 @@ export function OwnerFieldEditor({
   onChange,
   problem,
   changed,
+  kind,
 }: {
+  /** The listing kind, so events get event wording ("Event name", not "Business name"). */
+  kind?: string;
   field: string;
   value: string;
   disabled: boolean;
@@ -311,9 +314,9 @@ export function OwnerFieldEditor({
     return (
       <fieldset className="pl-step">
         <legend>
-          <Label field={field} changed={changed} />
+          <Label field={field} changed={changed} kind={kind} />
         </legend>
-        <Hint field={field} id={hintId} />
+        <Hint field={field} id={hintId} kind={kind} />
         {keys.map((key, i) => (
           <label key={key} className="pl-field">
             <span>{field === "coordinates" ? (i ? "Longitude" : "Latitude") : i ? "Maximum ($)" : "Minimum ($)"}</span>
@@ -333,7 +336,7 @@ export function OwnerFieldEditor({
       </fieldset>
     );
   }
-  const copy = FIELD_COPY[field];
+  const copy = fieldCopy(field, kind);
   const described = [copy?.hint ? hintId : "", problem ? problemId : ""].filter(Boolean).join(" ") || undefined;
   const change = (text: string) => {
     setTyped(text);
@@ -341,7 +344,7 @@ export function OwnerFieldEditor({
   };
   return (
     <label className="pl-field" data-problem={problem ? true : undefined}>
-      <Label field={field} changed={changed} />
+      <Label field={field} changed={changed} kind={kind} />
       {["cancelled", "petFriendly", "familyFriendly"].includes(field) ? (
         <select value={value || "false"} disabled={disabled} onChange={(e) => change(e.target.value)}>
           <option value="false">No</option>
@@ -349,7 +352,7 @@ export function OwnerFieldEditor({
         </select>
       ) : field === "pricing" ? (
         <select value={value || "unknown"} disabled={disabled} onChange={(e) => change(e.target.value)}>
-          <option value="unknown">See official source</option>
+          <option value="unknown">Not sure, or it varies</option>
           <option value="free">Free</option>
           <option value="paid">Paid</option>
         </select>

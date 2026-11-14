@@ -24,8 +24,8 @@ async function token(): Promise<string> {
 }
 
 /** Graph's busy answers (throttled or briefly unavailable), worth a retry and not a job failure. */
-const BUSY = [429, 502, 503, 504];
-export const isOutlookBusy = (e: unknown) => /^Outlook: (429|502|503|504)\b/.test(e instanceof Error ? e.message : String(e));
+const BUSY = [429, 500, 502, 503, 504];
+export const isOutlookBusy = (e: unknown) => /^Outlook: (429|500|502|503|504)\b/.test(e instanceof Error ? e.message : String(e));
 
 async function call(path: string, init: RequestInit = {}): Promise<any> {
   let res!: Response;

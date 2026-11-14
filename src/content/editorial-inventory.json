@@ -29375,6 +29375,53 @@
           "tip": "Stocking Stuffer Sale, Dec 5–24: 10–30% off Knifewear-brand cookware, accessories and sharpening gear."
         }
       ]
+    },
+    {
+      "id": "biz-apple-expert",
+      "kind": "business",
+      "slug": "apple-expert",
+      "title": "Apple Expert",
+      "name": "Apple Expert",
+      "website": "https://www.appleexpert.ca/",
+      "summary": "Independent Mac, iPhone and iPad repair and data recovery shop on 14 St SW, with free diagnostics.",
+      "description": "Apple Expert is an independent repair shop at 1504 14 St SW that fixes MacBooks, iMacs, iPhones and iPads: liquid damage, logic boards, screens, batteries and keyboards. It also recovers data from Macs, PCs, external and USB drives, iPhones and iPads. Diagnostics and estimates are free, and you can bring your device in or mail it. Seniors 60+ get 5% off iPhone and MacBook repairs. Apple Expert is not affiliated with Apple.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "mac repair",
+        "iphone repair",
+        "ipad repair",
+        "data recovery",
+        "computer repair"
+      ],
+      "sources": [
+        {
+          "name": "Apple Expert",
+          "url": "https://www.appleexpert.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-14T20:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.appleexpert.ca/"
+      },
+      "services": [
+        "Mac and MacBook repair",
+        "iPhone and iPad repair",
+        "Data recovery",
+        "Free diagnostics"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-14T20:00:00Z",
+      "email": "info@appleexpert.ca",
+      "phone": "403-831-3352",
+      "address": "1504 14 St SW, Calgary, AB T3C 1C9"
     }
   ]
 }

@@ -30,7 +30,7 @@ async function render({admin=false,user=true,emailVerified=true,claim=null,path=
   '../components/admin/AdminAccessBar':compile('../src/components/admin/AdminAccessBar.tsx'),
   '../hooks/useAdminEditMode':compile('../src/hooks/useAdminEditMode.ts'),
   '../lib/organizationWorkspace':moduleUrl('export const approvedOrganization=()=>undefined;'),
-  '../components/entity/ListingManagement':moduleUrl('export const ListingManagement=()=>null;'),
+  '../components/entity/ListingManagement':moduleUrl('export const ListingManagement=()=>null;'),'../components/entity/OwnerWelcome':moduleUrl('export const OwnerWelcome=({title})=>title;'),
   '../lib/claimDraft':compile('../src/lib/claimDraft.ts'),
   '../lib/claimInvite':compile('../src/lib/claimInvite.ts'),
   '../lib/claimsApi':moduleUrl(`export const useVerifiedListing=()=>${verified};export const useClaimLoadError=()=>${failed};export const useMyClaims=()=>${loading?'null':JSON.stringify(claim?[claim]:[])};export const submitClaim=()=>{throw Error('Rendering must not submit a claim')};`),

@@ -5,6 +5,7 @@
  */
 import { ownerEditPatch, ownerEditableFields } from './ownerListingEdits';
 import type { DiscoveryEntity } from '../types/discovery';
+import { calgaryDateTimeFormat } from './calgaryTz';
 
 export type FieldCopy = { label: string; hint?: string; placeholder?: string };
 
@@ -56,17 +57,41 @@ export const FIELD_COPY: Record<string, FieldCopy> = {
   occurrences: { label: 'Market dates' },
 };
 
-export const fieldLabel = (field: string) => FIELD_COPY[field]?.label ?? field;
+/** Event and market listings word a few fields differently from a business page. */
+const LISTING_COPY: Record<string, FieldCopy> = {
+  title: { label: 'Event name', hint: 'Short and clear, the way you’d put it on a poster.', placeholder: 'Holiday treat tasting' },
+  summary: { label: 'One-line description', hint: 'Shows on cards and in search.', placeholder: 'Free samples of our new winter treats, and 15% off all day.' },
+  description: { label: 'Details', hint: 'Anything people should know: who it’s for, what to bring, whether to book.' },
+  venue: { label: 'Venue name', hint: 'Where it happens, if it isn’t your usual spot.', placeholder: 'Our store' },
+  address: { label: 'Address', placeholder: '123 4 St SW, Calgary, AB' },
+  tickets: { label: 'Ticket or sign-up link', hint: 'Leave blank if people can just show up.', placeholder: 'eventbrite.ca/…' },
+  pricing: { label: 'Price' },
+  priceRange: { label: 'Ticket prices', hint: 'Lowest and highest, in dollars.' },
+  cancelled: { label: 'Cancelled?', hint: 'Keeps the listing up with a clear “Cancelled” label.' },
+};
+export const fieldCopy = (field: string, kind?: string): FieldCopy | undefined =>
+  (kind === 'event' || kind === 'market' ? LISTING_COPY[field] : undefined) ?? FIELD_COPY[field];
+export const fieldLabel = (field: string, kind?: string) => fieldCopy(field, kind)?.label ?? field;
 
-export type ProfileStep = { id: string; title: string; short: string; why: string; fields: string[] };
+export type EventSection = { id: string; title: string; fields: string[]; extra?: boolean };
+/** How an event's fields are grouped for owners. Anything not listed falls into “More details”. */
+export const EVENT_SECTIONS: EventSection[] = [
+  { id: 'what', title: 'What’s happening', fields: ['title', 'summary', 'description'] },
+  { id: 'when', title: 'When', fields: ['start', 'end'] },
+  { id: 'where', title: 'Where', fields: ['venue', 'address'] },
+  { id: 'tickets', title: 'Price & tickets', fields: ['pricing', 'priceRange', 'tickets'] },
+  { id: 'more', title: 'More details (optional)', fields: ['cancelled', 'neighbourhood', 'categories', 'tags', 'coordinates'], extra: true },
+];
+
+export type ProfileStep = { id: string; title: string; short: string; why: string; ask: string; fields: string[] };
 
 /** The guided order for a business profile. Every owner-editable business field appears exactly once. */
 export const PROFILE_STEPS: ProfileStep[] = [
-  { id: 'about', title: 'About you', short: 'About', why: 'This is the first thing people read. Say it the way you’d say it at the counter.', fields: ['title', 'summary', 'description', 'services'] },
-  { id: 'contact', title: 'How to reach you', short: 'Contact', why: 'Make it easy to call, write or drop by.', fields: ['phone', 'email', 'website', 'address'] },
-  { id: 'hours', title: 'Opening hours', short: 'Hours', why: 'Your page shows “Open now” or “Closed” from these, so visitors don’t make a wasted trip.', fields: ['hours'] },
-  { id: 'links', title: 'Social links', short: 'Links', why: 'Let people follow you and see what’s new.', fields: ['socials'] },
-  { id: 'offer', title: 'Offers & extras', short: 'Offers', why: 'A deal or a regular event gives people a reason to visit this week.', fields: ['offer', 'neighbourhood', 'tags', 'categories', 'priceLevel', 'coordinates', 'venue'] },
+  { id: 'about', title: 'About you', short: 'About', ask: 'Add a short intro about your business', why: 'This is the first thing people read. Say it the way you’d say it at the counter.', fields: ['title', 'summary', 'description', 'services'] },
+  { id: 'contact', title: 'How to reach you', short: 'Contact', ask: 'Add your phone, email and website', why: 'Make it easy to call, write or drop by.', fields: ['phone', 'email', 'website', 'address'] },
+  { id: 'hours', title: 'Opening hours', short: 'Hours', ask: 'Add your opening hours', why: 'Your page shows “Open now” or “Closed” from these, so visitors don’t make a wasted trip.', fields: ['hours'] },
+  { id: 'links', title: 'Social links', short: 'Links', ask: 'Link your Instagram or Facebook', why: 'Let people follow you and see what’s new.', fields: ['socials'] },
+  { id: 'offer', title: 'Offers & extras', short: 'Offers', ask: 'Share an offer or a regular deal', why: 'A deal or a regular event gives people a reason to visit this week.', fields: ['offer', 'neighbourhood', 'tags', 'categories', 'priceLevel', 'coordinates', 'venue'] },
 ];
 /** The business fields the guided steps cover (the owner-editable set). */
 export const ownerProfileFields = () => ownerEditableFields('business');
@@ -84,6 +109,12 @@ const filled = (v: unknown) =>
 export function stepDone(step: ProfileStep, entity: Record<string, unknown>): boolean {
   const main = step.fields.filter((f) => !EXTRA_FIELDS.has(f) && f !== 'offer' && f !== 'services');
   return (main.length ? main : step.fields.filter((f) => !EXTRA_FIELDS.has(f))).every((f) => filled(entity[f]));
+}
+
+/** How complete a business page is, and the one thing to do next. */
+export function profileProgress(entity: Record<string, unknown>): { done: number; total: number; next?: ProfileStep } {
+  const states = PROFILE_STEPS.map((s) => stepDone(s, entity));
+  return { done: states.filter(Boolean).length, total: PROFILE_STEPS.length, next: PROFILE_STEPS[states.indexOf(false)] };
 }
 
 export const WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -111,7 +142,7 @@ export function hoursLines(hours: Record<string, string> | undefined): string[] 
 
 /** What today's row says, in Calgary time. */
 export function todaysHours(hours: Record<string, string> | undefined, now = Date.now()): { day: string; value?: string } {
-  const day = new Intl.DateTimeFormat('en-CA', { weekday: 'long', timeZone: 'America/Edmonton' }).format(now);
+  const day = calgaryDateTimeFormat('en-CA', { weekday: 'long', timeZone: 'America/Edmonton' }).format(now);
   return { day, value: hours?.[day]?.trim() || undefined };
 }
 
@@ -168,7 +199,7 @@ export function friendlyValue(field: string, value: unknown): string[] {
   if (Array.isArray(value)) return [value.join(', ') || '(empty)'];
   if (field === 'website' || field === 'tickets') return [shortLink(String(value))];
   if (field === 'start' || field === 'end')
-    return [new Intl.DateTimeFormat('en-CA', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Edmonton' }).format(new Date(String(value)))];
+    return [calgaryDateTimeFormat('en-CA', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Edmonton' }).format(new Date(String(value)))];
   return [String(value)];
 }
 

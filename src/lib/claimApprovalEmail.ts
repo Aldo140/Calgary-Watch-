@@ -73,14 +73,14 @@ export function approvalEmail(
 
   const changes: Array<{ lead: string; body: string; url?: string }> = [
     { lead: 'Verified mark.', body: `${title} now shows “Verified · Confirmed by the organization” on CalgaryWatch.`, url: listingUrl },
-    { lead: 'Business account.', body: 'Your CalgaryWatch account is now a business account. Your dashboard shows the listing, and you can send changes from there.', url: `${SITE}/plans` },
+    { lead: 'Business account.', body: 'Your CalgaryWatch account is now a business account. Your dashboard keeps your page and events in one place.', url: `${SITE}/plans` },
     ...(priority ? [{ lead: 'More weight in recommendations.', body: 'Verified listings are given more weight when we surface relevant listings and recommendations across CalgaryWatch. It’s a modest nudge that starts with the next site update, usually within a day, not a fixed spot.' }] : []),
-    { lead: 'Direct updates.', body: 'Edit your profile and explicitly linked events from your dashboard or the listing’s management page. Save one update every seven days per business, with several fields in one save. Changes publish automatically without admin approval, and CalgaryWatch is notified. Images cannot be added, changed or deleted there; email us about images.', url: claimUrl },
+    { lead: 'Finish your page.', body: 'Add your hours, phone, links and any offers or events. It takes about five minutes, you see a preview first, and your changes go live as soon as you publish, with no waiting for approval. You can publish once a week; if you need something changed in between, just reply and we’ll do it. We add photos for you, so send any you’d like on your page.', url: claimUrl },
   ];
 
   const subject = `${title} is now verified on CalgaryWatch`;
-  const intro = `Your claim for ${title} is approved, so the listing is now verified on CalgaryWatch. Here’s what that gives you:`;
-  const outro = 'If anything on the listing looks wrong, just reply to this email.';
+  const intro = `Great news: your claim for ${title} is approved, and the listing is now verified on CalgaryWatch. Here’s what that means for you:`;
+  const outro = 'Thanks for being part of CalgaryWatch. If anything looks off or you’d like a hand, just reply to this email. A real person reads every one.';
   const sig = ['Aldo Ortiz', 'Founder, CalgaryWatch', SITE.replace('https://', '')];
   const footer = `You’re getting this because you claimed ${title} on CalgaryWatch. CalgaryWatch${opts.mailingAddress ? `, ${opts.mailingAddress}` : ''}.`;
 

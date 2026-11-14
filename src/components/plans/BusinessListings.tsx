@@ -38,7 +38,7 @@ export function BusinessListings({ claims, business, previewUid }: { claims: Cla
       <div className="pd-biz-head">
         <p className="pd-kicker">{isBusiness ? <><BadgeCheck size={14} aria-hidden="true" /> Business account{business?.since ? ` · since ${formatSince(business.since, { month: 'short', year: 'numeric' })}` : ''}</> : <><Store size={14} aria-hidden="true" /> For organizers</>}</p>
         <h2 id="pd-biz">{isBusiness ? 'Organizer desk' : 'Your claim'}</h2>
-        <p className="pd-biz-lede">{isBusiness ? 'Draft changes any time; profile, market and event updates publish together once every seven days.' : 'Once we confirm it, you can update the listing and add events from here.'}</p>
+        <p className="pd-biz-lede">{isBusiness ? 'Edit your page any time and see a preview first. Changes go live as soon as you publish, once a week.' : 'Once we confirm it, you can update the listing and add events from here.'}</p>
       </div>
       <div className="pd-biz-cards">
         {organizations.map((org) => {
@@ -56,7 +56,7 @@ export function BusinessListings({ claims, business, previewUid }: { claims: Cla
                 </dl>
               )}
               <div className="pd-biz-acts">
-                <Link className="pd-biz-btn" to={`/organization/${org.id}${as}`}>Manage {org.managementOnly ? 'listing' : 'organization & events'} <ArrowUpRight size={15} aria-hidden="true" /></Link>
+                <Link className="pd-biz-btn" to={`/organization/${org.id}${as}`}>{org.managementOnly ? 'Edit your listing' : 'Edit your page & events'} <ArrowUpRight size={15} aria-hidden="true" /></Link>
                 <Link className="pd-biz-btn" data-k="ghost" to={publicPath}>{org.managementOnly ? 'Public listing' : 'Public profile'}</Link>
               </div>
             </article>

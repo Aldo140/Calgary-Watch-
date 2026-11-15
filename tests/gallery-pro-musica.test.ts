@@ -16,7 +16,7 @@ for(const [slug,count] of [['herringer-kiss-gallery',2],['calgary-pro-musica',13
   const batch=batches.find((b:any)=>b.source.id===slug);assert.equal(batch.records.length,count);
   const normalized=batch.records.map((r:any)=>({...domain.normalizeRecord(r.input,batch.source,r.id).entity,status:'published'}));
   const linked=associateOrganizers([...authored,...normalized]).filter(e=>e.kind==='event'&&e.organizerEntityId===id) as Event[];assert.equal(linked.length,count);
-  for(const e of linked){assert.ok(validateEntity(e));assert.ok(Date.parse(e.end)>Date.parse('2026-10-23T00:00:00Z'));assert.equal(e.image,undefined);assert.ok(entities.some(s=>s.id===e.id&&s.kind==='event'&&s.organizerEntityId===id));}
+  for(const e of linked){assert.ok(validateEntity(e));assert.ok(Date.parse(e.end)>Date.parse('2026-10-23T00:00:00Z'));if(e.image!==undefined)assert.match(String((e.image as {src?:string}).src??e.image),/visualizing-pyrocene-2026\.webp$/);assert.ok(entities.some(s=>s.id===e.id&&s.kind==='event'&&s.organizerEntityId===id));}
   assert.equal(claimOrganization(profile,entities)?.claimEntity.id,id);
   assert.equal(new Set(linked.map(e=>[e.title,e.start].join('|'))).size,count);
  });

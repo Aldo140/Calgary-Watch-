@@ -7157,8 +7157,8 @@
         "input": {
           "kind": "event",
           "title": "St Luke's Christmas Day Service and Potluck Lunch",
-          "summary": "A Christmas Day service at 11 a.m., shared with Emmanuel Community Church, then a potluck lunch.",
-          "description": "St Luke's Anglican Church holds its Christmas Day service jointly with Emmanuel Community Church, at 3003 28 St SE, on Friday, December 25, 2026 at 11 a.m., followed by a potluck lunch. Everyone is welcome. Questions: (403) 273-2686.",
+          "summary": "A Christmas Day service at 10 a.m., shared with Emmanuel Community Church, then a potluck lunch.",
+          "description": "St Luke's Anglican Church holds its Christmas Day service jointly with Emmanuel Community Church, at 3003 28 St SE, on Friday, December 25, 2026 at 10 a.m., followed by a potluck lunch. Everyone is welcome. Questions: (403) 273-2686.",
           "address": "3003 28 St SE, Calgary, AB",
           "venue": "Emmanuel Community Church",
           "organizer": "St Luke's Anglican Church",
@@ -7174,8 +7174,8 @@
             "potluck"
           ],
           "pricing": "free",
-          "start": "2026-12-25T11:00:00-06:00",
-          "end": "2026-12-25T13:30:00-06:00"
+          "start": "2026-12-25T10:00:00-06:00",
+          "end": "2026-12-25T12:30:00-06:00"
         }
       }
     ]

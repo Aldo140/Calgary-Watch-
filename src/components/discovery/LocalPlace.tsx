@@ -6,7 +6,7 @@ import { claimPresentation } from '../../lib/claimPresentation';
 import { ListingArtwork } from '../entity/ListingArtwork';
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, CalendarDays, PhoneCall, Check, Clock, ExternalLink, Globe, Layers, MapPin, Navigation, Phone, Mail, Quote, Search, Share2, Store, Ticket } from 'lucide-react';
+import { ArrowUpRight, BadgePercent, CalendarDays, Instagram, PhoneCall, Check, Clock, ExternalLink, Globe, Layers, MapPin, Navigation, Phone, Mail, Quote, Search, Share2, Store, Ticket } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { organizerEvents, organizerMarkets, organizationVisitAddress, profilePhoto, publicOrganizationEvents } from '../../lib/organizations';
@@ -102,6 +102,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const spotlight = spotlightForProfile(place.id);
   const site = place.website || place.sources.find(s => s.kind === 'official')?.url;
   const season = place.socials.season;
+  const instagram = place.socials.instagram && /^https:\/\//.test(place.socials.instagram) ? place.socials.instagram : undefined;
   // Companies without a fixed season (Ghost River Theatre) point to their current projects instead.
   const experiences = place.socials.experiences;
   const q = quadrant(place.address);
@@ -222,14 +223,16 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           </a> : markets.length ? <a className="lp-fact" href="#lp-market-locations"><small><MapPin size={14} aria-hidden="true" />Locations</small><strong>{markets.length} {markets.length === 1 ? 'market' : 'markets'}</strong><span>{[...new Set(markets.map(m => m.neighbourhood || cleanAddress(m.address)).filter(Boolean))].slice(0, 3).join(' · ')}</span></a>
             : <div className="lp-fact"><small><MapPin size={14} aria-hidden="true" />Locations</small><strong>Check each event or market</strong><span>No single visitor address; each listing has its own.</span></div>}
           {note?.since ? <div className="lp-fact"><small><Store size={14} aria-hidden="true" />Since</small><strong>{note.since}</strong></div> : null}
-          {place.phone || site || place.email ? <div className="lp-fact lp-fact-contact">
+          {place.phone || site || place.email || instagram ? <div className="lp-fact lp-fact-contact">
             <small><Phone size={14} aria-hidden="true" />Get in touch</small>
             <ul>
               {place.phone ? <li><a href={`tel:${place.phone.replace(/[^\d+]/g, '')}`}><Phone size={15} aria-hidden="true" />{place.phone}</a></li> : null}
               {site ? <li><a href={site} target="_blank" rel="noopener noreferrer"><Globe size={15} aria-hidden="true" />{host(site)}</a></li> : null}
               {place.email ? <li><a href={`mailto:${place.email}`}><Mail size={15} aria-hidden="true" />{place.email}</a></li> : null}
+              {instagram ? <li><a href={instagram} target="_blank" rel="noopener noreferrer"><Instagram size={15} aria-hidden="true" />Instagram</a></li> : null}
             </ul>
           </div> : null}
+          {place.offer?.trim() ? <div className="lp-fact lp-fact-offer"><small><BadgePercent size={14} aria-hidden="true" />Special offer</small><span>{place.offer.trim()}</span></div> : null}
           {hours.length ? <div className="lp-fact lp-fact-hours"><small><Clock size={14} aria-hidden="true" />Hours</small><ul>{hours.map(([d, h]) => <li key={d}><b>{d}</b>{h}</li>)}</ul></div> : null}
         </section>
 

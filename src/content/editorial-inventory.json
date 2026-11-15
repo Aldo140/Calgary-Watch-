@@ -28067,7 +28067,8 @@
       ],
       "images": [],
       "socials": {
-        "website": "https://www.pawsitivelynatural.ca/"
+        "website": "https://www.pawsitivelynatural.ca/",
+        "instagram": "https://www.instagram.com/pawsitivelynatural"
       },
       "services": [
         "Natural pet food",
@@ -28079,9 +28080,20 @@
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-11-11T00:30:00Z",
+      "updatedAt": "2026-11-15T01:30:00Z",
       "email": "info@pawsitivelynatural.ca",
-      "address": "2100 4 St SW, Calgary, AB"
+      "address": "2100 4 St SW, Calgary, AB",
+      "phone": "403-250-7297",
+      "hours": {
+        "Monday": "09:00–19:00",
+        "Tuesday": "09:00–19:00",
+        "Wednesday": "09:00–19:00",
+        "Thursday": "09:00–19:00",
+        "Friday": "09:00–19:00",
+        "Saturday": "09:00–19:00",
+        "Sunday": "11:00–17:00"
+      },
+      "offer": "10% off everything on the first Tuesday of every month. Did you miss our 10% off Tuesday? Don't worry, we've got you covered. Are you over 40? On the 2nd Wednesday of every month, save 10% off everything. Under 40? Save 10% off everything on the 3rd Wednesday of the month. Not to worry, we don't check IDs 😜"
     },
     {
       "id": "biz-the-bench-yyc",

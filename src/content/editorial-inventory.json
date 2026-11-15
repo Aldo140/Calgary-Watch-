@@ -27614,14 +27614,15 @@
         "Pizza by the slice",
         "Whole pies",
         "Takeout",
-        "Catering"
+        "Catering",
+        "Delivery"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-11-13T19:00:00Z",
+      "updatedAt": "2026-11-15T01:45:00Z",
       "email": "support@unclefatih.com",
       "address": "Calgary, AB"
     },

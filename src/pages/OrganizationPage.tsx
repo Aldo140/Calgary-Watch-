@@ -124,6 +124,8 @@ function useOwnerDemo(id: string, params: URLSearchParams) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, id]);
 }
+const UNVERIFIED_PUBLISH =
+  "One quick step before you publish: confirm your email address. We’ve opened it for you. Your changes stay saved here, so just come back and press Review & publish again.";
 export default function OrganizationPage() {
   const { id = "" } = useParams(),
     [params] = useSearchParams(),
@@ -296,6 +298,7 @@ export function OrganizationWorkspace({
   /** Development only: render without Firebase (see the page's `?demo=`). */
   demo?: { nextAt?: number; lastUpdated?: number };
 }) {
+  const { isEmailVerified, openVerification } = useAuth();
   const key = `organization-draft:${adminUserId ? `admin:${adminUserId}:${uid}` : uid}:${org.id}`;
   const [ops, setOps] = useState<OrganizationChange[]>(() => {
     if (readOnly) return [];
@@ -581,6 +584,13 @@ export function OrganizationWorkspace({
     return undefined;
   }
   function beginReview() {
+    // The publish service only accepts confirmed emails. Say so up front
+    // instead of letting "Publish now" fail behind the dialog.
+    if (!demo && !adminEdit && !isEmailVerified) {
+      setError(UNVERIFIED_PUBLISH);
+      openVerification();
+      return;
+    }
     try {
       prepareOrganizationBatch(org, entities, ops, Date.now(), adminEdit);
       setError("");
@@ -656,6 +666,12 @@ export function OrganizationWorkspace({
       request.current = undefined;
     } catch (e) {
       const code = (e as { code?: string }).code;
+      if (code === "functions/unauthenticated") {
+        setReview(false);
+        setError(UNVERIFIED_PUBLISH);
+        openVerification();
+        return;
+      }
       setError(
         code === "functions/not-found" || code === "functions/unavailable"
           ? "Organization publishing is temporarily unavailable. Your draft is saved on this device. Please try again later or email aldo@calgarywatch.ca."
@@ -1623,6 +1639,11 @@ export function OrganizationWorkspace({
           you.
         </p>
       </aside>
+      {error && !review && ops.length && !readOnly ? (
+        <p role="alert" className="pl-error ow-publish-error">
+          {error}
+        </p>
+      ) : null}
       {ops.length && !readOnly ? (
         <div className="organization-publishbar" data-locked={locked || undefined}>
           <span>
@@ -1671,6 +1692,11 @@ export function OrganizationWorkspace({
             </p>
           )}
           <ChangeList ops={ops} targets={targets} orgId={org.id} />
+          {error ? (
+            <p role="alert" className="pl-error">
+              {error}
+            </p>
+          ) : null}
           <div className="ow-confirm-acts">
             <button
               className="pl-btn"

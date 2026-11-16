@@ -29241,12 +29241,24 @@
           "url": "https://knifewear.com/",
           "kind": "official",
           "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Uncle Fatih's Pizza",
+          "url": "https://www.unclefatih.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-16T18:00:00Z"
+        },
+        {
+          "name": "Italiano Please!",
+          "url": "https://www.italianoplease.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-16T18:00:00Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-11-14T19:00:00Z",
-      "updatedAt": "2026-11-14T19:00:00Z",
+      "updatedAt": "2026-11-16T18:00:00Z",
       "image": {
         "src": "/images/photo/calgary4.webp",
         "alt": "Calgary in winter"
@@ -29289,6 +29301,14 @@
         {
           "entityId": "biz-knifewear",
           "note": "Knifewear"
+        },
+        {
+          "entityId": "biz-uncle-fatihs-pizza",
+          "note": "Uncle Fatih's Pizza"
+        },
+        {
+          "entityId": "biz-italiano-please",
+          "note": "Italiano Please!"
         }
       ],
       "relatedGuideIds": [
@@ -29386,6 +29406,22 @@
           "mapQuery": "Knifewear, 1406 9th Ave SE, Calgary, AB",
           "note": "A Japanese kitchen knife for the cook on your list. Knifewear is a Canadian-owned shop for handcrafted Japanese kitchen knives, with its Calgary store at 1406 9th Ave SE in Inglewood. Come in for a gyuto, santoku or nakiri from blacksmiths like Masashi Yamamoto and Moritaka Hamono, or bring your own knives in for sharpening and repairs. Not sure what to get? Try the Japanese Knife Gift Quiz on their site.",
           "tip": "Stocking Stuffer Sale, Dec 5–24: 10–30% off Knifewear-brand cookware, accessories and sharpening gear."
+        },
+        {
+          "name": "Uncle Fatih's Pizza",
+          "area": "Calgary",
+          "entityId": "biz-uncle-fatihs-pizza",
+          "mapQuery": "Uncle Fatih's Pizza, Calgary, AB",
+          "note": "Holiday catering from Uncle Fatih's Pizza. Feeding a crowd this December? Uncle Fatih's Pizza caters corporate, social and special events, from office lunches to family get-togethers. Choose from specialty pizzas in sizes from a 10\" small up to a 16\" XL, add wings in six classic flavours, and let everyone grab a slice.",
+          "tip": "Ask about catering for your holiday party at unclefatihspizza.toast.site/catering."
+        },
+        {
+          "name": "Italiano Please!",
+          "area": "Downtown",
+          "entityId": "biz-italiano-please",
+          "mapQuery": "Italiano Please!, 801 6 Ave SW, Calgary, AB",
+          "note": "The Romolo, at Italiano Please! December downtown means long days, shopping runs and office parties, and the Romolo is the lunch worth stepping out for. It's prosciutto and fresh mozzarella tucked inside pizza bianca that Italiano Please! bakes itself. Find it downtown at 200 - 801 6 Ave SW in the Amec Place building.",
+          "tip": "Stepping out from the office? It's right downtown in the Amec Place building."
         }
       ]
     },
@@ -29435,6 +29471,57 @@
       "email": "info@appleexpert.ca",
       "phone": "403-831-3352",
       "address": "1504 14 St SW, Calgary, AB T3C 1C9"
+    },
+    {
+      "id": "biz-solvync",
+      "kind": "business",
+      "slug": "solvync",
+      "title": "Solvync",
+      "name": "Solvync",
+      "website": "https://solvync.com/",
+      "summary": "Calgary Odoo ERP partner that moves growing businesses off spreadsheets and disconnected apps.",
+      "description": "Solvync is an Odoo ERP partner with a Calgary office at 431B 41 Ave NE. They help businesses outgrowing QuickBooks, spreadsheets and disconnected apps move finance, sales, inventory, CRM, projects and manufacturing into one Odoo system, from a focused first phase to multi-company rollouts, with local support and training after launch. Not sure Odoo fits? Start with their free fit audit.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "erp",
+        "odoo",
+        "business software",
+        "consulting"
+      ],
+      "sources": [
+        {
+          "name": "Solvync",
+          "url": "https://solvync.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-16T18:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://solvync.com/",
+        "instagram": "https://www.instagram.com/solvync/",
+        "facebook": "https://www.facebook.com/solvync",
+        "linkedin": "https://www.linkedin.com/company/solvync"
+      },
+      "services": [
+        "Odoo implementation",
+        "Customization",
+        "Migration to Odoo",
+        "Version upgrades",
+        "Odoo AI",
+        "Support and training"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-16T18:00:00Z",
+      "email": "info@solvync.com",
+      "address": "431B 41 Ave NE, Calgary, AB",
+      "phone": "825-777-2885"
     }
   ]
 }

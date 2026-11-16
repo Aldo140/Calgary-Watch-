@@ -21958,12 +21958,24 @@
           "url": "https://knifewear.com/",
           "kind": "official",
           "retrievedAt": "2026-11-14T19:00:00Z"
+        },
+        {
+          "name": "Uncle Fatih's Pizza",
+          "url": "https://www.unclefatih.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-16T18:00:00Z"
+        },
+        {
+          "name": "Italiano Please!",
+          "url": "https://www.italianoplease.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-16T18:00:00Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-11-14T19:00:00Z",
-      "updatedAt": "2026-11-14T19:00:00Z",
+      "updatedAt": "2026-11-16T18:00:00Z",
       "image": {
         "src": "/images/photo/calgary4.webp",
         "alt": "Calgary in winter"
@@ -22006,6 +22018,14 @@
         {
           "entityId": "biz-knifewear",
           "note": "Knifewear"
+        },
+        {
+          "entityId": "biz-uncle-fatihs-pizza",
+          "note": "Uncle Fatih's Pizza"
+        },
+        {
+          "entityId": "biz-italiano-please",
+          "note": "Italiano Please!"
         }
       ],
       "relatedGuideIds": [
@@ -22103,6 +22123,22 @@
           "mapQuery": "Knifewear, 1406 9th Ave SE, Calgary, AB",
           "note": "A Japanese kitchen knife for the cook on your list. Knifewear is a Canadian-owned shop for handcrafted Japanese kitchen knives, with its Calgary store at 1406 9th Ave SE in Inglewood. Come in for a gyuto, santoku or nakiri from blacksmiths like Masashi Yamamoto and Moritaka Hamono, or bring your own knives in for sharpening and repairs. Not sure what to get? Try the Japanese Knife Gift Quiz on their site.",
           "tip": "Stocking Stuffer Sale, Dec 5–24: 10–30% off Knifewear-brand cookware, accessories and sharpening gear."
+        },
+        {
+          "name": "Uncle Fatih's Pizza",
+          "area": "Calgary",
+          "entityId": "biz-uncle-fatihs-pizza",
+          "mapQuery": "Uncle Fatih's Pizza, Calgary, AB",
+          "note": "Holiday catering from Uncle Fatih's Pizza. Feeding a crowd this December? Uncle Fatih's Pizza caters corporate, social and special events, from office lunches to family get-togethers. Choose from specialty pizzas in sizes from a 10\" small up to a 16\" XL, add wings in six classic flavours, and let everyone grab a slice.",
+          "tip": "Ask about catering for your holiday party at unclefatihspizza.toast.site/catering."
+        },
+        {
+          "name": "Italiano Please!",
+          "area": "Downtown",
+          "entityId": "biz-italiano-please",
+          "mapQuery": "Italiano Please!, 801 6 Ave SW, Calgary, AB",
+          "note": "The Romolo, at Italiano Please! December downtown means long days, shopping runs and office parties, and the Romolo is the lunch worth stepping out for. It's prosciutto and fresh mozzarella tucked inside pizza bianca that Italiano Please! bakes itself. Find it downtown at 200 - 801 6 Ave SW in the Amec Place building.",
+          "tip": "Stepping out from the office? It's right downtown in the Amec Place building."
         }
       ]
     },
@@ -22513,6 +22549,99 @@
       "updatedAt": "2026-11-14T19:00:00Z",
       "address": "1406 9th Ave SE, Calgary, AB",
       "neighbourhood": "Inglewood"
+    },
+    {
+      "id": "biz-uncle-fatihs-pizza",
+      "kind": "business",
+      "slug": "uncle-fatihs-pizza",
+      "title": "Uncle Fatih's Pizza",
+      "name": "Uncle Fatih's Pizza",
+      "website": "https://www.unclefatih.com/",
+      "summary": "Calgary's relaxed pizza-by-the-slice shops.",
+      "description": "Uncle Fatih's Pizza runs cozy, laid-back pizza shops around Calgary, made with non-hydrogenated ingredients. Drop in for a slice, or grab a whole pie to take home.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "restaurant",
+        "pizza",
+        "slices",
+        "takeout"
+      ],
+      "sources": [
+        {
+          "name": "Uncle Fatih's Pizza",
+          "url": "https://www.unclefatih.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.unclefatih.com/",
+        "instagram": "https://www.instagram.com/unclefatih/"
+      },
+      "services": [
+        "Pizza by the slice",
+        "Whole pies",
+        "Takeout",
+        "Catering",
+        "Delivery"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-15T01:45:00Z",
+      "email": "support@unclefatih.com",
+      "address": "Calgary, AB"
+    },
+    {
+      "id": "biz-italiano-please",
+      "kind": "business",
+      "slug": "italiano-please",
+      "title": "Italiano Please!",
+      "name": "Italiano Please!",
+      "website": "https://www.italianoplease.com/",
+      "summary": "Downtown Italian spot known for sandwiches on its own pizza bianca, like the Romolo.",
+      "description": "Italiano Please! is an Italian restaurant downtown at 801 6 Ave SW. They bake their own pizza bianca and use it for sandwiches like the Romolo, with prosciutto and fresh mozzarella.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "italian",
+        "sandwiches",
+        "pizza bianca",
+        "downtown"
+      ],
+      "sources": [
+        {
+          "name": "Italiano Please!",
+          "url": "https://www.italianoplease.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-11T00:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.italianoplease.com/",
+        "instagram": "https://www.instagram.com/italianoplease.yyc/"
+      },
+      "services": [
+        "Italian sandwiches",
+        "Pizza bianca",
+        "Lunch"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-11T00:30:00Z",
+      "email": "contactus@italianoplease.com",
+      "address": "200 - 801 6 Ave SW, Calgary, AB",
+      "neighbourhood": "Downtown"
     }
   ],
   "occurrences": [

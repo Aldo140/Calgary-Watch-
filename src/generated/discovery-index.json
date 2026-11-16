@@ -21970,12 +21970,18 @@
           "url": "https://www.italianoplease.com/",
           "kind": "official",
           "retrievedAt": "2026-11-16T18:00:00Z"
+        },
+        {
+          "name": "Inglewood Night Market",
+          "url": "https://www.inglewoodnightmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-16T23:00:00Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-11-14T19:00:00Z",
-      "updatedAt": "2026-11-16T18:00:00Z",
+      "updatedAt": "2026-11-16T23:00:00Z",
       "image": {
         "src": "/images/photo/calgary4.webp",
         "alt": "Calgary in winter"
@@ -22026,6 +22032,10 @@
         {
           "entityId": "biz-italiano-please",
           "note": "Italiano Please!"
+        },
+        {
+          "entityId": "biz-inglewood-night-market",
+          "note": "Inglewood Night Market"
         }
       ],
       "relatedGuideIds": [
@@ -22139,6 +22149,14 @@
           "mapQuery": "Italiano Please!, 801 6 Ave SW, Calgary, AB",
           "note": "The Romolo, at Italiano Please! December downtown means long days, shopping runs and office parties, and the Romolo is the lunch worth stepping out for. It's prosciutto and fresh mozzarella tucked inside pizza bianca that Italiano Please! bakes itself. Find it downtown at 200 - 801 6 Ave SW in the Amec Place building.",
           "tip": "Stepping out from the office? It's right downtown in the Amec Place building."
+        },
+        {
+          "name": "The Last Stop Shop",
+          "area": "Crossroads Market",
+          "entityId": "biz-inglewood-night-market",
+          "mapQuery": "The Quonset at Crossroads Market, 1235 26 Ave SE, Calgary, AB",
+          "note": "The Last Stop Shop, from Inglewood Night Market. Still have a few names left on your Christmas list? The Last Stop Shop is a special bonus edition of the Inglewood Holiday Night Market: one last day, one last shop, full of local makers and businesses. It's on Saturday, December 19, 10 am to 5 pm, at The Quonset at Crossroads Market (1235 26 Ave SE). Free admission, and all ages are welcome.",
+          "tip": "Saturday, Dec 19, 10 am to 5 pm. Free admission, all ages."
         }
       ]
     },
@@ -22654,6 +22672,51 @@
       "email": "contactus@italianoplease.com",
       "address": "200 - 801 6 Ave SW, Calgary, AB",
       "neighbourhood": "Downtown"
+    },
+    {
+      "id": "biz-inglewood-night-market",
+      "kind": "business",
+      "slug": "inglewood-night-market",
+      "title": "Inglewood Night Market",
+      "name": "Inglewood Night Market",
+      "website": "https://www.inglewoodnightmarket.ca/",
+      "address": "Inglewood, Calgary, AB",
+      "summary": "Night market in Inglewood produced by Urban Productions Group.",
+      "description": "Inglewood Night Market brings local makers, food and music to Inglewood on summer evenings. It's produced by Urban Productions Group.",
+      "categories": [
+        "markets",
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "market",
+        "night-market",
+        "inglewood"
+      ],
+      "sources": [
+        {
+          "name": "Inglewood Night Market — official website",
+          "url": "https://www.inglewoodnightmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-28T20:00:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.inglewoodnightmarket.ca/"
+      },
+      "services": [
+        "Night markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-28T20:00:00.000Z",
+      "updatedAt": "2026-10-28T20:00:00.000Z",
+      "email": "jennifer@urbanproductionsgroup.com"
     }
   ],
   "occurrences": [

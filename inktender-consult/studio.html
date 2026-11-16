@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#050505">
+<meta name="theme-color" content="#060606">
 <title>Studio · Inktender Consult</title>
 <link rel="icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,53 +12,50 @@
 <link rel="stylesheet" href="/assets/styles.css">
 </head>
 <body>
-
 <div class="st-login" id="login">
-  <form id="loginForm">
+  <form id="loginForm" autocomplete="on">
     <span id="loginLogo"></span>
-    <h1>Studio login</h1>
-    <p>Consult sheets for Inktender Studios. Only you can see this.</p>
-    <div class="field"><label for="le">Email</label><input id="le" type="email" value="josh@inktender.com" autocomplete="username"></div>
-    <div class="field"><label for="lp">Password</label><input id="lp" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-    <button class="btn btn-green btn-block" type="submit">Open my sheets <span aria-hidden="true">→</span></button>
+    <h1>Studio sheets</h1>
+    <p>Every consult sheet your clients send, ready to print. Only the studio can see this.</p>
+    <div class="fld"><span class="label">Email</span><input class="inp" id="le" type="email" value="josh@inktender.com" autocomplete="username"></div>
+    <div class="fld"><span class="label">Password</span><input class="inp" id="lp" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn btn-green btn-block" type="submit">Open my sheets <span class="arr">&rarr;</span></button>
     <p class="note">Draft preview: any password opens the demo.<br>At launch this is a real private login.</p>
   </form>
 </div>
 
 <div class="st-app" id="app">
   <div class="st-bar">
-    <a class="brand" href="/studio"><span class="mark"><img src="/img/logo-white.png" alt="Inktender" style="width:100%;height:100%;object-fit:contain"></span><span class="btag">Studio<br>sheets</span></a>
-    <div class="r"><a class="btn btn-ghost btn-sm" href="/" target="_blank">Client view ↗</a><button class="btn btn-ghost btn-sm" id="logout">Log out</button></div>
+    <a class="brand" href="/studio" aria-label="Studio home"><span class="mark"><img src="/img/logo-white.png" alt="Inktender" style="width:100%;height:100%;object-fit:contain"></span></a>
+    <div class="r"><a class="btn btn-line btn-sm" href="/" target="_blank" rel="noopener">Client view &nearr;</a><button class="btn btn-line btn-sm" id="logout" type="button">Log out</button></div>
   </div>
   <div class="st-body">
     <aside class="st-side">
-      <div class="st-stats" id="stats"></div>
-
-      <div class="st-card" style="margin-top:14px">
+      <span class="label" id="hello">Good day, Josh</span>
+      <div class="st-stats" id="stats" style="margin-top:10px"></div>
+      <div class="st-tabs" role="group" aria-label="Filter sheets" id="tabs">
+        <button type="button" aria-pressed="true" data-f="all">All</button><button type="button" aria-pressed="false" data-f="new">New</button><button type="button" aria-pressed="false" data-f="wait">Waiting</button><button type="button" aria-pressed="false" data-f="printed">Printed</button><button type="button" aria-pressed="false" data-f="booked">Booked</button>
+      </div>
+      <div class="st-list" id="list"></div>
+      <div class="st-card">
         <h3>Send a personal link</h3>
-        <p class="s">Booked a consult? Make their link and paste it into a text, DM or email.</p>
+        <p class="s">Booked a consult? Make their link, paste it into a text or DM. They see their name and date the second it opens.</p>
         <form id="linkForm">
-          <div class="field"><label for="ln">Client's first name</label><input id="ln" type="text" placeholder="Greg" required></div>
-          <div class="grid2" style="gap:0 10px">
-            <div class="field"><label for="la">Artist</label><select id="la"><option value="josh">Josh</option><option value="jimmy">Jimmy</option><option value="kent">Kent</option></select></div>
-            <div class="field"><label for="ld">Consult</label><input id="ld" type="datetime-local"></div>
+          <div class="fld" style="margin-bottom:10px"><span class="label">Client's first name</span><input class="inp" id="ln" placeholder="Greg" autocomplete="off"></div>
+          <div class="two">
+            <div class="fld" style="margin-bottom:14px"><span class="label">Artist</span><select class="inp" id="la"><option value="josh">Josh</option><option value="jimmy">Jimmy</option><option value="kent">Kent</option></select></div>
+            <div class="fld" style="margin-bottom:14px"><span class="label">Consult</span><input class="inp" id="ld" type="datetime-local"></div>
           </div>
           <button class="btn btn-green btn-sm btn-block" type="submit">Make link</button>
         </form>
         <div class="linkout" id="linkOut">
           <code id="lUrl"></code>
           <div class="msg" id="lMsg"></div>
-          <div class="row"><button class="btn btn-green btn-sm" id="cpMsg" type="button">Copy message</button><button class="btn btn-ghost btn-sm" id="cpUrl" type="button">Copy link</button><a class="btn btn-ghost btn-sm" id="opUrl" target="_blank">Open</a></div>
+          <div class="row"><button class="btn btn-green btn-sm" id="cpMsg" type="button">Copy message</button><button class="btn btn-line btn-sm" id="cpUrl" type="button">Copy link</button><button class="btn btn-line btn-sm" id="share" type="button" hidden>Share</button><a class="btn btn-line btn-sm" id="opUrl" target="_blank" rel="noopener">Open</a></div>
         </div>
       </div>
-
-      <div class="st-tabs" role="group" aria-label="Filter sheets" id="tabs">
-        <button aria-pressed="true" data-f="all">All</button><button aria-pressed="false" data-f="new">New</button><button aria-pressed="false" data-f="wait">Waiting</button><button aria-pressed="false" data-f="printed">Printed</button><button aria-pressed="false" data-f="booked">Booked</button>
-      </div>
-      <div class="st-list" id="list"></div>
     </aside>
-
-    <section class="sheet-wrap" id="detail" aria-live="polite"></section>
+    <section class="st-detail" id="detail" aria-live="polite"></section>
   </div>
 </div>
 
@@ -67,125 +64,119 @@
 (function(){
 INK.draftBar('Demo data · Josh’s private login');
 INK.hexLogo(document.getElementById('loginLogo'));
+const $=s=>document.querySelector(s);
 
 /* ---------- demo sheets (fictional clients, refs from @inktender) ---------- */
 const DEMO=[
- {id:'d1',status:'new',name:'Greg Thompson',email:'greg@example.com',phone:'(403) 555-0148',contact:'Text',experience:'A few pieces',artist:'josh',
+ {id:'IT-7Q2KD',status:'new',name:'Greg Thompson',email:'greg@example.com',phone:'(403) 555-0148',contact:'Text',experience:'A few pieces',artist:'josh',kind:'Add to existing work',
   idea:'Biomech forearm piece that flows out of the elbow and wraps around the mask tattoo I already have on my upper arm. Want it to look like the mask is plugged into the arm. Mostly black and grey, maybe a hit of red in the cables.',
-  styles:['Biomech','Black & grey'],colour:'Black and grey with a colour accent',story:'Been following the bio work on your page for years. My buddy Kirk got his sleeve done with you.',
-  zones:['f:forearmR','b:forearmL','f:armR'],size:'Half sleeve / half leg',sizeNote:'Elbow to wrist, should connect to the mask',existing:'Yes, it needs to fit around existing work',
+  styles:['Biomech','Black & grey'],colour:'Colour accent',story:'Been following the bio work on your page for years. My buddy Kirk got his sleeve done with you.',
+  zones:['f:forearmR','b:forearmL','f:armR'],sizeIdx:4,sizeNote:'Elbow to wrist, should connect to the mask',existing:'Next to other tattoos',
   refs:[{src:'/img/work-14.jpg',note:'The flow of this one, how it wraps'},{src:'/img/work-06.jpg',note:'Love the mechanical depth'},{src:'/img/work-22.jpg',note:'Lines like this'}],spot:[{src:'/img/work-01.jpg'}],
-  links:'pinterest.com/gthompson/biomech',avoid:'No skulls in this one',budget:'$1,000 to $2,500',sessions:'Happy with multiple sessions',days:['Wed','Fri','Sat'],deadline:'',deadlineWhy:'',
-  skin:['Nothing'],meds:'No',allergies:'None',healthOther:'',submitted:'2026-11-14T19:12:00-07:00',consult:'2026-11-19T13:00'},
- {id:'d2',status:'printed',name:'Maya Ruiz',email:'maya@example.com',phone:'',contact:'Instagram DM',experience:'This is my first',artist:'josh',
+  links:'pinterest.com/gthompson/biomech',avoid:'No skulls in this one',budget:'$1,000 to $2,500',sessions:'Happy with multiple sessions',days:['Wed','Fri','Sat'],
+  skin:['Nothing flagged'],meds:'No',allergies:'None',submitted:'2026-11-14T19:12:00-06:00',consult:'2026-11-19T13:00'},
+ {id:'IT-4MR8B',status:'printed',name:'Maya Ruiz',email:'maya@example.com',contact:'Instagram DM',experience:'This is my first',artist:'josh',kind:'New piece',
   idea:'A portrait of my rottweiler Bruno on my thigh. I love the ornamental frame idea with flowers around it, something soft and pink to balance how tough he looks.',
-  styles:['Portrait','Ornamental','Bold colour'],colour:'Full colour',story:'Bruno passed in the spring. He was with me for 12 years.',
-  zones:['f:thighR'],size:'Large piece (back, chest, thigh)',sizeNote:'Front of the thigh, centred',existing:'No, clean skin',
-  refs:[{src:'/img/work-04.jpg',note:'Exactly this vibe!'}],spot:[],links:'',avoid:'Nothing too dark',budget:'Not sure, I’d like a range',sessions:'Prefer one sitting',days:['Sat','Sun'],deadline:'2027-03-14',deadlineWhy:'His birthday',
-  skin:['Nothing'],meds:'No',allergies:'Latex',healthOther:'A bit nervous about needles',submitted:'2026-11-12T11:02:00-07:00',consult:'2026-11-21T11:00'},
- {id:'d3',status:'booked',name:'Dev Kaur',email:'dev@example.com',phone:'(587) 555-0190',contact:'Text',experience:'Heavily tattooed',artist:'josh',
-  idea:'Finish my left arm as a Studio Ghibli half sleeve: Howl’s castle on the shoulder, Totoro and soot sprites lower down. Bright, painterly colour.',
-  styles:['Pop culture / anime','Bold colour'],colour:'Full colour',story:'',
-  zones:['f:shoulderL','f:armL','b:armR'],size:'Half sleeve / half leg',sizeNote:'',existing:'Yes, it needs to fit around existing work',
-  refs:[{src:'/img/work-19.jpg',note:'Colour like this'},{src:'/img/work-26.jpg',note:'Love the blossoms'}],spot:[],links:'',avoid:'',budget:'$2,500 to $5,000',sessions:'Up for full-day sessions',days:['Mon','Thu'],deadline:'',deadlineWhy:'',
-  skin:['Nothing'],meds:'No',allergies:'',healthOther:'',submitted:'2026-11-08T21:40:00-07:00',consult:'2026-11-12T15:00'},
+  styles:['Portrait','Bold colour'],colour:'Full colour',story:'Bruno passed in the spring. He was with me for 12 years.',
+  zones:['f:thighR'],sizeIdx:5,sizeNote:'Front of the thigh, centred',existing:'Clean skin',
+  refs:[{src:'/img/work-04.jpg',note:'Exactly this vibe!'}],spot:[],avoid:'Nothing too dark',budget:'Not sure, give me a range',sessions:'Prefer one sitting',days:['Sat','Sun'],deadline:'2027-03-14',deadlineWhy:'His birthday',
+  skin:['Nothing flagged'],meds:'No',allergies:'Latex',healthOther:'A bit nervous about needles',submitted:'2026-11-12T11:02:00-06:00',consult:'2026-11-21T11:00'},
+ {id:'IT-9DV3K',status:'booked',name:'Dev Kaur',email:'dev@example.com',phone:'(587) 555-0190',contact:'Text',experience:'Heavily tattooed',artist:'josh',kind:'Add to existing work',
+  idea:'Finish my left arm as a Studio Ghibli half sleeve: the castle on the shoulder, forest spirits lower down. Bright, painterly colour.',
+  styles:['Pop culture','Bold colour'],colour:'Full colour',
+  zones:['f:shoulderL','f:armL','b:armR'],sizeIdx:4,existing:'Next to other tattoos',
+  refs:[{src:'/img/work-19.jpg',note:'Colour like this'},{src:'/img/work-26.jpg',note:'Love the blossoms'}],spot:[],budget:'$2,500+',sessions:'Up for full-day sessions',days:['Mon','Thu'],
+  skin:['Nothing flagged'],meds:'No',allergies:'None',submitted:'2026-11-08T21:40:00-06:00',consult:'2026-11-12T15:00'}
 ];
-const WAIT=[{id:'w1',status:'wait',name:'Sam',artist:'kent',consult:'2026-11-25T12:00',sent:'2026-11-15T10:00:00-07:00'}];
+const WAIT=[{id:'w1',status:'wait',name:'Sam',artist:'kent',consult:'2026-11-25T12:00',sent:'2026-11-15T10:00:00-06:00',url:'/c/sam?a=kent&d=2026-11-25T12:00'}];
 
 function all(){
-  const mine=INK.get('ink_sheets',[]); const links=INK.get('ink_links',[]); const st=INK.get('ink_status',{});
-  const list=[...mine.map(s=>Object.assign(s,{status:st[s.id]||s.status||'new'})),...DEMO.map(s=>Object.assign({},s,{status:st[s.id]||s.status})),...links.map(l=>Object.assign({},l,{status:'wait'})),...WAIT];
-  return list;
+  const st=INK.get('ink_status',{});
+  const mine=INK.get('ink_sheets',[]).map(s=>Object.assign({},s,{status:st[s.id]||s.status||'new',mine:1}));
+  const links=INK.get('ink_links',[]).filter(l=>!mine.some(m=>m.name&&m.name.split(' ')[0].toLowerCase()===l.name.toLowerCase())).map(l=>Object.assign({},l,{status:'wait'}));
+  return [...mine,...DEMO.map(s=>Object.assign({},s,{status:st[s.id]||s.status})),...links,...WAIT];
 }
 let FILTER='all', CUR=null;
+const wide=()=>innerWidth>=1000;
 
 /* ---------- login ---------- */
-const login=document.getElementById('login'), app=document.getElementById('app');
-function enter(){login.style.display='none';app.classList.add('on');render()}
-if(sessionStorage.getItem('ink_in')) enter();
-document.getElementById('loginForm').onsubmit=e=>{e.preventDefault();try{sessionStorage.setItem('ink_in','1')}catch(_){}enter()};
-document.getElementById('logout').onclick=()=>{try{sessionStorage.removeItem('ink_in')}catch(_){}location.reload()};
+const login=$('#login'), app=$('#app');
+function enter(){login.style.display='none';app.classList.add('on');render(true)}
+try{ if(sessionStorage.getItem('ink_in')) enter() }catch(e){}
+$('#loginForm').onsubmit=e=>{e.preventDefault();try{sessionStorage.setItem('ink_in','1')}catch(_){}enter()};
+$('#logout').onclick=()=>{try{sessionStorage.removeItem('ink_in')}catch(_){}location.reload()};
+const hr=new Date().getHours(); $('#hello').textContent=(hr<12?'Morning':hr<17?'Afternoon':'Evening')+', Josh';
 
 /* ---------- link builder ---------- */
-const ld=document.getElementById('ld');
-const t=new Date(Date.now()+5*864e5); t.setHours(13,0,0,0);
+const ld=$('#ld');
+const t=new Date(Date.now()+3*864e5);
 ld.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')+'T13:00';
-document.getElementById('linkForm').onsubmit=e=>{
+$('#linkForm').onsubmit=e=>{
   e.preventDefault();
-  const n=document.getElementById('ln').value.trim(); if(!n) return;
-  const a=document.getElementById('la').value; const d=ld.value;
+  const n=$('#ln').value.trim(); if(!n){ $('#ln').focus(); return INK.toast('Add their first name') }
+  const a=$('#la').value, d=ld.value, A=INK.artists[a];
   const slug=n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  const url=location.origin+'/c/'+slug+INK.qs({artist:a,date:d}).replace(/^\?/,'?');
-  const A=INK.artists[a];
-  const msg='Hey '+n+'! Before your consult'+(d?' on '+INK.fmtDate(d):'')+', can you fill this out? Takes about 10 min and means we can get straight to drawing.\n'+url+'\n– '+A.first+', Inktender';
-  document.getElementById('lUrl').textContent=url; document.getElementById('lMsg').textContent=msg;
-  document.getElementById('opUrl').href=url; document.getElementById('linkOut').classList.add('on');
-  const links=INK.get('ink_links',[]); links.unshift({id:'l'+Date.now(),name:n,artist:a,consult:d,sent:new Date().toISOString(),url}); INK.set('ink_links',links);
+  const url=location.origin+'/c/'+slug+INK.qs({artist:a,date:d});
+  const msg='Hey '+n+'! Before your consult'+(d?' on '+INK.fmtDate(d):'')+', fill this out when you get a sec. Takes about 10 min and means we get straight to drawing.\n'+url+'\n– '+A.first+', Inktender';
+  $('#lUrl').textContent=url; $('#lMsg').textContent=msg; $('#opUrl').href=url;
+  const lo=$('#linkOut'); lo.classList.remove('on'); void lo.offsetWidth; lo.classList.add('on');
+  const links=INK.get('ink_links',[]); links.unshift({id:'l'+Date.now(),name:n,artist:a,consult:d,sent:new Date().toISOString(),url}); INK.set('ink_links',links.slice(0,20));
   render();
-  document.getElementById('cpMsg').onclick=()=>copy(msg,'Message copied. Paste it into a text or DM.');
-  document.getElementById('cpUrl').onclick=()=>copy(url,'Link copied');
+  $('#cpMsg').onclick=()=>copy(msg,'Message copied. Paste it into a text or DM.');
+  $('#cpUrl').onclick=()=>copy(url,'Link copied');
+  if(navigator.share){ $('#share').hidden=false; $('#share').onclick=()=>navigator.share({text:msg}).catch(()=>{}) }
 };
 function copy(s,m){ (navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>INK.toast(m)).catch(()=>{const ta=document.createElement('textarea');ta.value=s;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');INK.toast(m)}catch(e){};ta.remove()}) }
 
 /* ---------- list ---------- */
 const LBL={new:'New',wait:'Waiting',printed:'Printed',booked:'Booked'};
-function render(){
-  const L=all();
-  const c=k=>L.filter(s=>s.status===k).length;
-  document.getElementById('stats').innerHTML='<div class="g"><b>'+c('new')+'</b><span>New sheets</span></div><div><b>'+c('wait')+'</b><span>Waiting on client</span></div><div><b>'+L.filter(s=>s.consult&&new Date(s.consult)>new Date()).length+'</b><span>Upcoming consults</span></div>';
+function render(first){
+  const L=all(), c=k=>L.filter(s=>s.status===k).length;
+  const soon=L.filter(s=>s.consult&&new Date(s.consult)>new Date()&&new Date(s.consult)-new Date()<7*864e5).length;
+  $('#stats').innerHTML='<div class="hl"><b>'+c('new')+'</b><span>New sheets</span></div><div><b>'+c('wait')+'</b><span>Waiting on client</span></div><div><b>'+soon+'</b><span>Consults this week</span></div>';
   const show=L.filter(s=>FILTER==='all'||s.status===FILTER);
-  document.getElementById('list').innerHTML=show.map(s=>{
+  $('#list').innerHTML=show.map(s=>{
     const th=s.refs&&s.refs[0]?'<img src="'+s.refs[0].src+'" alt="">':'<span class="ph0">'+INK.esc((s.name||'?')[0])+'</span>';
-    const sub=s.status==='wait'?('Link sent · consult '+INK.fmtDate(s.consult,false)):((s.consult?INK.fmtDate(s.consult,false)+' · ':'')+(s.idea||''));
-    return '<button class="st-item'+(CUR===s.id?' on':'')+'" data-id="'+s.id+'">'+th+'<span style="min-width:0"><span class="nm">'+INK.esc(s.name)+'</span><span class="sub">'+INK.esc(sub)+'</span></span><span class="status '+s.status+'">'+LBL[s.status]+'</span></button>'}).join('')||'<p class="muted" style="font-size:14px;padding:10px 4px">Nothing here yet.</p>';
-  document.querySelectorAll('.st-item').forEach(b=>b.onclick=()=>{CUR=b.dataset.id;render();if(innerWidth<1000)document.getElementById('detail').scrollIntoView({behavior:'smooth'})});
+    const sub=s.status==='wait'?('Link sent · consult '+INK.fmtDate(s.consult,false)):((s.consult?INK.fmtDate(s.consult)+' · ':'')+(s.kind||''));
+    return '<button type="button" class="st-item'+(CUR===s.id&&wide()?' on':'')+'" data-id="'+s.id+'">'+th+'<span style="min-width:0"><span class="nm">'+INK.esc(s.name)+'</span><span class="sub">'+INK.esc(sub)+'</span></span><span class="status '+s.status+'">'+LBL[s.status]+'</span></button>'}).join('')||'<p class="muted" style="font-size:14px;padding:10px 4px">Nothing here yet.</p>';
+  $('#list').querySelectorAll('.st-item').forEach(b=>b.onclick=()=>open(b.dataset.id));
   if(!CUR && L.length) CUR=(L.find(s=>s.status==='new')||L[0]).id;
-  detail(L.find(s=>s.id===CUR));
+  if(wide()||$('#detail').classList.contains('open')) detail(L.find(s=>s.id===CUR));
 }
-document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{FILTER=b.dataset.f;document.querySelectorAll('#tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+function open(id){
+  CUR=id; const L=all(); detail(L.find(s=>s.id===id));
+  if(wide()){ render(); $('#detail').animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'}) }
+  else { $('#detail').classList.add('open'); $('#detail').scrollTop=0; document.body.style.overflow='hidden'; history.pushState({d:1},'') }
+}
+function closeDetail(){ $('#detail').classList.remove('open'); document.body.style.overflow='' }
+addEventListener('popstate',()=>closeDetail());
+$('#tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{FILTER=b.dataset.f;$('#tabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+function setStatus(id,v){const st=INK.get('ink_status',{});st[id]=v;INK.set('ink_status',st);render();INK.toast('Marked '+LBL[v].toLowerCase())}
 
-function setStatus(id,s){const st=INK.get('ink_status',{});st[id]=s;INK.set('ink_status',st);render()}
-
-/* ---------- printable sheet ---------- */
-function kv(rows){return '<dl class="kv">'+rows.filter(r=>r[1]&&String(r[1]).trim()).map(r=>'<dt>'+r[0]+'</dt><dd>'+INK.esc(r[1])+'</dd>').join('')+'</dl>'}
+/* ---------- detail ---------- */
 function detail(s){
-  const el=document.getElementById('detail'); if(!s){el.innerHTML='';return}
+  const el=$('#detail'); if(!s){el.innerHTML='';return}
   const A=INK.artists[s.artist];
+  const back='<button type="button" class="btn btn-line btn-sm st-back" id="stBack">&larr; All sheets</button>';
   if(s.status==='wait'){
-    el.innerHTML='<div class="sheet waiting"><p class="eyebrow" style="justify-content:center">Waiting on client</p><h2>'+INK.esc(s.name)+'</h2><p>Their personal link went out'+(s.consult?' for a consult on '+INK.esc(INK.fmtDate(s.consult)):'')+(A?' with '+A.first:'')+'. Their sheet shows up here, and in your inbox, the moment they hit send.</p>'+(s.url?'<a class="btn btn-ghost btn-sm" target="_blank" href="'+s.url+'">See what they see ↗</a>':'')+'</div>';
-    return;
+    el.innerHTML=back+'<div class="waiting"><span class="label">Waiting on client</span><h2>'+INK.esc(s.name)+'</h2><p>Their personal link went out'+(s.consult?' for a consult on '+INK.esc(INK.fmtDate(s.consult)):'')+(A?' with '+A.first:'')+'. The sheet lands here, and in your inbox, the moment they hit send.</p>'+(s.url?'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button type="button" class="btn btn-green btn-sm" id="nudge">Copy a nudge</button><a class="btn btn-line btn-sm" target="_blank" rel="noopener" href="'+s.url+'">See what they see &nearr;</a></div>':'')+'</div>';
+    const nb=$('#nudge'); if(nb) nb.onclick=()=>copy('Hey '+s.name+', quick reminder to fill out your consult sheet before '+INK.fmtDate(s.consult,false)+'. 10 min tops: '+(s.url.startsWith('http')?s.url:location.origin+s.url),'Nudge copied');
+  } else {
+    const notes=INK.get('ink_notes',{})[s.id]||'';
+    el.innerHTML=back+
+    '<div class="sheet-actions"><span class="sp">Sent '+INK.esc(new Date(s.submitted).toLocaleString('en-CA',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))+'</span>'+
+     '<button type="button" class="btn btn-green btn-sm" id="print">Print sheet</button>'+
+     (s.status!=='booked'?'<button type="button" class="btn btn-line btn-sm" data-s="booked">Mark booked</button>':'')+
+     (s.phone?'<a class="btn btn-line btn-sm" href="sms:'+INK.esc(s.phone.replace(/[^\d+]/g,''))+'">Text</a>':'')+
+     (s.email?'<a class="btn btn-line btn-sm" href="mailto:'+INK.esc(s.email)+'">Email</a>':'')+'</div>'+
+    INK.sheetHTML(s,{notes});
+    $('#print').onclick=()=>{ if(s.status==='new') setStatus(s.id,'printed'); setTimeout(()=>window.print(),80) };
+    el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>setStatus(s.id,b.dataset.s));
+    const n=$('#notes'); n.oninput=()=>{const a=INK.get('ink_notes',{});a[s.id]=n.value;INK.set('ink_notes',a);el.querySelector('.notes .lines').textContent=n.value};
   }
-  const notes=INK.get('ink_notes',{})[s.id]||'';
-  const fv=(s.zones||[]).filter(z=>z[0]==='f'), bv=(s.zones||[]).filter(z=>z[0]==='b');
-  el.innerHTML=
-  '<div class="sheet-actions"><span class="sp">Sent '+INK.esc(new Date(s.submitted).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))+'</span>'+
-   '<button class="btn btn-green btn-sm" id="print">Print sheet</button>'+
-   (s.status!=='printed'&&s.status!=='booked'?'<button class="btn btn-ghost btn-sm" data-s="printed">Mark printed</button>':'')+
-   (s.status!=='booked'?'<button class="btn btn-ghost btn-sm" data-s="booked">Mark booked</button>':'')+
-   (s.email?'<a class="btn btn-ghost btn-sm" href="mailto:'+INK.esc(s.email)+'">Email</a>':'')+(s.phone?'<a class="btn btn-ghost btn-sm" href="sms:'+INK.esc(s.phone.replace(/[^\d+]/g,''))+'">Text</a>':'')+'</div>'+
-  '<article class="sheet">'+
-   '<div class="sh-top"><div><h5>Consult sheet'+(A?' · '+A.first:'')+'</h5><h2>'+INK.esc(s.name)+'</h2><div class="meta">'+[s.consult?'Consult '+INK.fmtDate(s.consult):'',s.phone,s.email,s.contact?'Prefers '+s.contact:''].filter(Boolean).map(INK.esc).join(' · ')+'</div></div><img class="logo" src="/img/logo-white.png" alt="Inktender"></div>'+
-   '<div class="sh-grid"><div>'+
-     '<div class="blk"><h5>The idea</h5><p class="idea">'+INK.esc(s.idea)+'</p></div>'+
-     (s.story?'<div class="blk"><h5>The story</h5><p>'+INK.esc(s.story)+'</p></div>':'')+
-     '<div class="blk"><h5>Style</h5><div class="stags">'+(s.styles||[]).map(x=>'<span>'+INK.esc(x)+'</span>').join('')+(s.colour?'<span>'+INK.esc(s.colour)+'</span>':'')+'</div></div>'+
-     '<div class="blk"><h5>References</h5>'+((s.refs||[]).length?'<div class="refs">'+s.refs.map(r=>'<figure><img src="'+r.src+'" alt=""><figcaption>'+INK.esc(r.note||'')+'</figcaption></figure>').join('')+'</div>':'<p>None attached. Ask them to bring some.</p>')+'</div>'+
-     ((s.links||s.avoid)?'<div class="blk">'+kv([['Links',s.links],['Avoid',s.avoid]])+'</div>':'')+
-   '</div><div>'+
-     '<div class="blk"><h5>Placement</h5><div class="bm-mini">'+INK.bodySVG('f',s.zones,'')+INK.bodySVG('b',s.zones,'')+'</div><p style="margin-top:6px;font-size:13px">'+INK.esc((s.zones||[]).map(INK.zoneLabel).join(', '))+'</p></div>'+
-     '<div class="blk">'+kv([['Size',s.size],['Size notes',s.sizeNote],['Existing ink',s.existing],['Experience',s.experience]])+'</div>'+
-     ((s.spot||[]).length?'<div class="blk"><h5>The spot today</h5><div class="refs">'+s.spot.map(r=>'<figure><img src="'+r.src+'" alt=""></figure>').join('')+'</div></div>':'')+
-     '<div class="blk"><h5>Timing &amp; budget</h5>'+kv([['Budget',s.budget],['Sessions',s.sessions],['Good days',(s.days||[]).join(', ')],['Deadline',s.deadline?(s.deadline+(s.deadlineWhy?' · '+s.deadlineWhy:'')):'']])+'</div>'+
-     '<div class="blk"><h5>Skin &amp; health · private</h5><div class="health">'+kv([['Skin',(s.skin||[]).join(', ')],['Blood thinners',s.meds],['Allergies',s.allergies],['Other',s.healthOther]])+'</div></div>'+
-   '</div></div>'+
-   '<div class="blk notes"><h5>Consult notes</h5><textarea id="notes" placeholder="Your notes. They save to this sheet and print with it.">'+INK.esc(notes)+'</textarea><div class="lines">'+INK.esc(notes)+'</div></div>'+
-   '<div class="foot"><span>Inktender Studios · #206, 1802 1 St NW · (403) 971-6699</span><span>Sheet '+INK.esc(s.id)+'</span></div>'+
-  '</article>';
-  el.querySelectorAll('.bm-mini svg').forEach(sv=>sv.removeAttribute('class'));
-  document.getElementById('print').onclick=()=>{ if(s.status==='new') setStatus(s.id,'printed'); setTimeout(()=>window.print(),60) };
-  el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>setStatus(s.id,b.dataset.s));
-  const n=document.getElementById('notes'); n.oninput=()=>{const all=INK.get('ink_notes',{});all[s.id]=n.value;INK.set('ink_notes',all);el.querySelector('.lines').textContent=n.value};
+  $('#stBack').onclick=()=>history.back();
 }
+addEventListener('resize',()=>{ if(wide()&&$('#detail').classList.contains('open')){closeDetail()} });
 })();
 </script>
 </body>

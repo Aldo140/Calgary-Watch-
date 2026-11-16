@@ -4,350 +4,511 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#050505">
+<meta name="theme-color" content="#060606">
 <title>Your consult sheet · Inktender</title>
 <link rel="icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/styles.css">
 </head>
-<body>
-<div class="q-shell">
-  <div class="q-top">
-    <div class="row">
-      <a class="brand" href="/" id="homeLink" aria-label="Back to Inktender Consult"><span class="mark"><img src="/img/logo-white.png" alt="Inktender" style="width:100%;height:100%;object-fit:contain"></span></a>
-      <div class="who" id="who"></div>
-    </div>
-    <div class="needle"><i id="needle"></i></div>
-    <div class="q-steps" id="steps"></div>
-  </div>
+<body class="flow">
+<div class="qf">
+  <header class="qf-head">
+    <span class="mark" id="mark"></span>
+    <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    <span class="count" id="count">01/12</span>
+    <button class="peek" type="button" id="peek" aria-label="Open your consult sheet"><span class="pthumb" id="pthumb">&#x2B22;</span><b id="pcount">0/11</b></button>
+    <a class="x" id="close" href="/" aria-label="Save and close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+  </header>
 
-  <main class="q-main">
-  <form id="f" novalidate autocomplete="on">
+  <main class="stage" id="stage">
 
-  <!-- 1 YOU -->
-  <section class="q-panel" data-step="0" data-t="You">
-    <p class="eyebrow">01 · About you</p>
-    <h2 id="hiTitle">First, who are we drawing for?</h2>
-    <p class="why">So Josh knows who is walking in, and how to reach you about your design.</p>
-    <div class="grid2">
-      <div class="field" data-req="name"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="First and last"><div class="err">Add your name so we know whose sheet this is.</div></div>
-      <div class="field" data-req="email"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@email.com"><div class="err">We need an email to send your design notes.</div></div>
-      <div class="field"><label for="phone">Phone <span class="hint" style="display:inline">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(403) 555-0123"></div>
-      <div class="field"><span class="lab">Best way to reach you</span>
-        <div class="chips"><label class="chip"><input type="radio" name="contact" value="Text"><span>Text</span></label><label class="chip"><input type="radio" name="contact" value="Call"><span>Call</span></label><label class="chip"><input type="radio" name="contact" value="Email"><span>Email</span></label><label class="chip"><input type="radio" name="contact" value="Instagram DM"><span>Instagram</span></label></div>
+    <!-- 1 you -->
+    <section class="q" data-id="you"><div class="in">
+      <span class="label anim" id="youLabel">Before your consult</span>
+      <h2 class="anim" id="youH">First things first. What's your name?</h2>
+      <p class="sub anim" id="youSub">Ten minutes, about a dozen taps. It saves as you go, so you can leave and come back.</p>
+      <div class="fld anim"><span class="label">Your name</span><input class="inp" data-f="name" autocomplete="name" placeholder="First and last" enterkeyhint="next"><div class="err">We need a name for the top of your sheet.</div></div>
+      <div class="anim" id="artistPick">
+        <span class="label" style="color:var(--grey)">Who's tattooing you?</span>
+        <div class="opts" data-single="artist">
+          <button class="opt" type="button" data-v="josh"><span class="k">J</span><span><b>Josh Lamoureux</b><small>Biomech, illustrative, big colour</small></span></button>
+          <button class="opt" type="button" data-v="jimmy"><span class="k">J</span><span><b>Jimmy Munkaspeni</b><small>Painted realism, cover-ups, portraits</small></span></button>
+          <button class="opt" type="button" data-v="kent"><span class="k">K</span><span><b>Kent King</b><small>Versatile, clean, fine detail</small></span></button>
+          <button class="opt" type="button" data-v="any"><span class="k">?</span><span><b>Match me</b><small>The studio picks who fits your idea</small></span></button>
+        </div>
+        <div class="err">Pick an artist, or let us match you.</div>
       </div>
-    </div>
-    <div class="field"><span class="lab">How much ink do you have already?</span>
-      <div class="chips"><label class="chip"><input type="radio" name="experience" value="This is my first"><span>This is my first</span></label><label class="chip"><input type="radio" name="experience" value="A few pieces"><span>A few pieces</span></label><label class="chip"><input type="radio" name="experience" value="Heavily tattooed"><span>Heavily tattooed</span></label><label class="chip"><input type="radio" name="experience" value="Already an Inktender client"><span>Already an Inktender client</span></label></div>
-    </div>
-    <div class="field"><span class="lab">Who would you like to work with?</span>
-      <div class="chips cards" id="artistPick"></div>
-    </div>
-    <div class="field" data-req="age18"><label class="check"><input type="checkbox" name="age18" value="yes"> I'm 18 or older and will bring photo ID to my appointment.</label><div class="err">You need to be 18+ to get tattooed at Inktender.</div></div>
-  </section>
+    </div></section>
 
-  <!-- 2 IDEA -->
-  <section class="q-panel" data-step="1" data-t="Idea">
-    <p class="eyebrow">02 · The idea</p>
-    <h2>Tell us about the piece.</h2>
-    <p class="why">Rough is fine. Ramble if you want. The more Josh knows now, the more of your consult goes to actual drawing.</p>
-    <div class="field" data-req="idea"><label for="idea">Describe it in your own words</label>
-      <textarea id="idea" name="idea" placeholder="e.g. A biomech forearm piece that flows out of the elbow and wraps around the mask I already have. Mostly black and grey, maybe a hit of red in the cables."></textarea><div class="err">Give us at least a sentence or two about the idea.</div></div>
-    <div class="field"><span class="lab">Styles you're drawn to <span class="hint">Pick any. "Not sure" is a great answer.</span></span>
-      <div class="chips" id="styleChips"></div></div>
-    <div class="field"><span class="lab">Colour</span>
-      <div class="chips"><label class="chip"><input type="radio" name="colour" value="Full colour"><span>Full colour</span></label><label class="chip"><input type="radio" name="colour" value="Black and grey"><span>Black &amp; grey</span></label><label class="chip"><input type="radio" name="colour" value="Black and grey with a colour accent"><span>B&amp;G with a hit of colour</span></label><label class="chip"><input type="radio" name="colour" value="Open to the artist's call"><span>Your call</span></label></div></div>
-    <div class="field"><label for="story">Is there a story behind it? <span class="hint" style="display:inline">(optional)</span></label>
-      <textarea id="story" name="story" style="min-height:90px" placeholder="A pet, a person, a place, a band, a hard year. Anything that helps us get the feeling right."></textarea></div>
-  </section>
-
-  <!-- 3 PLACEMENT -->
-  <section class="q-panel" data-step="2" data-t="Placement">
-    <p class="eyebrow">03 · Placement &amp; size</p>
-    <h2>Where's it going?</h2>
-    <p class="why">Tap every spot it could cover. Flip to the back if it wraps around.</p>
-    <div class="field bodymap">
-      <div class="bm-fig">
-        <div class="bm-toggle" role="group" aria-label="Body view"><button type="button" aria-pressed="true" data-v="f">Front</button><button type="button" aria-pressed="false" data-v="b">Back</button></div>
-        <div id="bm"></div>
+    <!-- 2 kind -->
+    <section class="q" data-id="kind"><div class="in">
+      <span class="label anim">The piece</span>
+      <h2 class="anim">What are we making?</h2>
+      <p class="sub anim">Pick the closest. You'll explain it in your own words next.</p>
+      <div class="opts anim" data-single="kind" data-auto>
+        <button class="opt" type="button" data-v="New piece"><span class="k">A</span><span><b>A new piece</b><small>Fresh skin, fresh idea</small></span></button>
+        <button class="opt" type="button" data-v="Add to existing work"><span class="k">B</span><span><b>Add to what I have</b><small>Connect, extend or fill around a piece</small></span></button>
+        <button class="opt" type="button" data-v="Cover-up"><span class="k">C</span><span><b>A cover-up</b><small>Hide or transform something old</small></span></button>
+        <button class="opt" type="button" data-v="Rework / touch-up"><span class="k">D</span><span><b>Rework or touch-up</b><small>Bring an old piece back to life</small></span></button>
+        <button class="opt" type="button" data-v="Not sure yet"><span class="k">E</span><span><b>Not sure yet</b><small>Let's figure it out together</small></span></button>
       </div>
-      <div>
-        <span class="lab" style="font-weight:600;display:block;margin-bottom:9px">Spots you picked</span>
-        <div class="bm-picked" id="bmPicked"></div>
-        <div class="field" style="margin-top:22px"><span class="lab">Roughly how big?</span>
-          <div class="chips">
-            <label class="chip"><input type="radio" name="size" value="Palm-sized or smaller"><span>Palm-sized</span></label>
-            <label class="chip"><input type="radio" name="size" value="Hand-sized"><span>Hand-sized</span></label>
-            <label class="chip"><input type="radio" name="size" value="Half sleeve / half leg"><span>Half sleeve</span></label>
-            <label class="chip"><input type="radio" name="size" value="Full sleeve / full leg"><span>Full sleeve</span></label>
-            <label class="chip"><input type="radio" name="size" value="Large piece (back, chest, thigh)"><span>Large piece</span></label>
-            <label class="chip"><input type="radio" name="size" value="Not sure, need advice"><span>Not sure</span></label>
-          </div></div>
-        <div class="field"><label for="sizeNote">Anything about size or flow? <span class="hint" style="display:inline">(optional)</span></label><input id="sizeNote" name="sizeNote" type="text" placeholder="e.g. elbow to wrist, outer side only"></div>
+      <div class="err">Pick the closest one.</div>
+    </div></section>
+
+    <!-- 3 idea -->
+    <section class="q" data-id="idea"><div class="in">
+      <span class="label anim">In your words</span>
+      <h2 class="anim" id="ideaH">Tell us the idea.</h2>
+      <p class="sub anim">Messy is fine. What's in it, how it should feel, anything you already know you want.</p>
+      <div class="starters anim" id="starters">
+        <button type="button">The main thing in it is </button><button type="button">I want it to feel </button><button type="button">It should flow from </button><button type="button">Kind of like </button><button type="button">It's for </button>
       </div>
-    </div>
-    <div class="field"><span class="lab">Is there existing ink in or near this spot?</span>
-      <div class="chips">
-        <label class="chip"><input type="radio" name="existing" value="No, clean skin"><span>No, clean skin</span></label>
-        <label class="chip"><input type="radio" name="existing" value="Yes, it needs to fit around existing work"><span>Fit around existing work</span></label>
-        <label class="chip"><input type="radio" name="existing" value="Yes, this is a cover-up or rework"><span>Cover-up or rework</span></label>
-      </div></div>
-    <div class="field" id="spotWrap"><span class="lab">Photo of the spot <span class="hint">Especially helpful for cover-ups and add-ons. Natural light, no filter.</span></span>
-      <label class="drop" data-up="spot"><input type="file" accept="image/*" multiple><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h3l2-3h6l2 3h3v13H4z"/><circle cx="12" cy="13" r="4"/></svg><b>Add photos of the spot</b><small>Up to 4 · taken today is perfect</small></label>
-      <div class="thumbs" id="th-spot"></div></div>
-  </section>
+      <div class="fld anim"><textarea class="inp" data-f="idea" id="idea" placeholder="e.g. A biomech piece that looks like it's coming out from under the skin on my forearm, mostly black and grey with a hit of red."></textarea><div class="err">Give us at least a sentence. Your artist will do the rest.</div></div>
+      <div class="fld anim"><span class="label">Why it matters <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" data-f="story" placeholder="A person, a memory, a dog, a place…" enterkeyhint="next"></div>
+    </div></section>
 
-  <!-- 4 REFS -->
-  <section class="q-panel" data-step="3" data-t="References">
-    <p class="eyebrow">04 · Reference photos</p>
-    <h2>Show us what you're into.</h2>
-    <p class="why">Screenshots, Pinterest saves, other tattoos, a photo of your dog. Add a quick note on what you like about each one.</p>
-    <div class="field">
-      <label class="drop" data-up="refs"><input type="file" accept="image/*" multiple><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg><b>Add reference photos</b><small>Up to 8 · tap or drop images here</small></label>
-      <div class="thumbs" id="th-refs"></div></div>
-    <div class="field"><label for="links">Links <span class="hint" style="display:inline">(optional)</span><span class="hint">Pinterest boards, Instagram posts, anything.</span></label><textarea id="links" name="links" style="min-height:80px" placeholder="Paste links, one per line"></textarea></div>
-    <div class="field"><label for="avoid">Anything you definitely don't want?</label><textarea id="avoid" name="avoid" style="min-height:80px" placeholder="e.g. no skulls, nothing too cartoony, keep it off the inner arm"></textarea></div>
-  </section>
-
-  <!-- 5 TIMING -->
-  <section class="q-panel" data-step="4" data-t="Timing">
-    <p class="eyebrow">05 · Timing &amp; budget</p>
-    <h2>Let's plan the sessions.</h2>
-    <p class="why">No wrong answers. This just helps Josh plan sessions that fit your life and your wallet.</p>
-    <div class="field"><span class="lab">Rough budget for this piece</span>
-      <div class="chips">
-        <label class="chip"><input type="radio" name="budget" value="Under $500"><span>Under $500</span></label>
-        <label class="chip"><input type="radio" name="budget" value="$500 to $1,000"><span>$500 – $1,000</span></label>
-        <label class="chip"><input type="radio" name="budget" value="$1,000 to $2,500"><span>$1,000 – $2,500</span></label>
-        <label class="chip"><input type="radio" name="budget" value="$2,500 to $5,000"><span>$2,500 – $5,000</span></label>
-        <label class="chip"><input type="radio" name="budget" value="$5,000+"><span>$5,000+</span></label>
-        <label class="chip"><input type="radio" name="budget" value="Not sure, I'd like a range"><span>Give me a range</span></label>
-      </div></div>
-    <div class="field"><span class="lab">How do you feel about sessions?</span>
-      <div class="chips">
-        <label class="chip"><input type="radio" name="sessions" value="Prefer one sitting"><span>One sitting if possible</span></label>
-        <label class="chip"><input type="radio" name="sessions" value="Happy with multiple sessions"><span>Multiple sessions are fine</span></label>
-        <label class="chip"><input type="radio" name="sessions" value="Up for full-day sessions"><span>Full days, let's go</span></label>
-      </div></div>
-    <div class="field"><span class="lab">Days that usually work</span>
-      <div class="chips" id="dayChips"></div></div>
-    <div class="grid2">
-      <div class="field"><label for="deadline">Need it done by a date? <span class="hint" style="display:inline">(optional)</span></label><input id="deadline" name="deadline" type="date"></div>
-      <div class="field"><label for="deadlineWhy">What's the date for?</label><input id="deadlineWhy" name="deadlineWhy" type="text" placeholder="Wedding, trip, birthday…"></div>
-    </div>
-  </section>
-
-  <!-- 6 HEALTH -->
-  <section class="q-panel" data-step="5" data-t="Health">
-    <p class="eyebrow">06 · Skin &amp; health</p>
-    <h2>A few quick checks.</h2>
-    <p class="why">These affect how your skin takes ink and heals. Skip anything you'd rather talk about in person.</p>
-    <div class="private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Only your artist sees this section. It is never shared.</div>
-    <div class="field"><span class="lab">Anything going on with the skin in that spot?</span>
-      <div class="chips" id="skinChips"></div></div>
-    <div class="field"><span class="lab">Taking anything that thins your blood or affects healing?</span><span class="hint" style="margin:-4px 0 10px">Blood thinners, Accutane, chemo, daily aspirin and so on.</span>
-      <div class="chips"><label class="chip"><input type="radio" name="meds" value="No"><span>No</span></label><label class="chip"><input type="radio" name="meds" value="Yes"><span>Yes</span></label><label class="chip"><input type="radio" name="meds" value="Not sure"><span>Not sure</span></label></div></div>
-    <div class="field"><label for="allergies">Allergies (latex, adhesives, ointments, inks)</label><input id="allergies" name="allergies" type="text" placeholder="None that I know of"></div>
-    <div class="field"><label for="healthOther">Anything else your artist should know?</label><textarea id="healthOther" name="healthOther" style="min-height:80px" placeholder="Fainting with needles, diabetes, pregnancy, a past tattoo that healed badly…"></textarea></div>
-  </section>
-
-  <!-- 7 REVIEW -->
-  <section class="q-panel" data-step="6" data-t="Review">
-    <p class="eyebrow">07 · Review</p>
-    <h2>Look good?</h2>
-    <p class="why" id="reviewWhy">This is the sheet that gets printed for your consult. Tap edit on anything you want to change.</p>
-    <div class="review" id="review"></div>
-    <div class="field" style="margin-top:22px" data-req="consent"><label class="check"><input type="checkbox" name="consent" value="yes"> Send this to Inktender Studios. I understand the design is drawn at the consult and nothing is booked until a deposit is paid.</label><div class="err">Tick this to send your sheet.</div></div>
-  </section>
-
-  <!-- DONE -->
-  <section class="q-panel" data-step="7" data-t="Sent">
-    <div class="done-wrap">
-      <svg class="hexok" viewBox="0 0 120 120"><path d="M60 4 108 31v58L60 116 12 89V31z"/><path class="tick" d="m40 61 14 14 27-29"/></svg>
-      <p class="eyebrow" style="justify-content:center">Sheet sent</p>
-      <h2 id="doneH">You're all set.</h2>
-      <p id="doneP">Josh has your sheet. It will be printed and on the table at your consult.</p>
-      <div class="next-list">
-        <div><b>01</b><span id="nx1">Josh reads through your idea and refs before you arrive.</span></div>
-        <div><b>02</b><span>At the consult you sketch, size the piece and plan sessions together.</span></div>
-        <div><b>03</b><span>A deposit locks in your first session date.</span></div>
+    <!-- 4 style -->
+    <section class="q" data-id="style"><div class="in">
+      <span class="label anim">Style</span>
+      <h2 class="anim">Which of these is closest?</h2>
+      <p class="sub anim">All Inktender pieces. Pick as many as you like.</p>
+      <div class="cards anim" data-multi="styles" id="styleCards"></div>
+      <span class="label anim" style="display:block;margin:26px 0 10px;color:var(--grey)">Colour</span>
+      <div class="opts two anim" data-single="colour">
+        <button class="opt" type="button" data-v="Black & grey"><span><b>Black &amp; grey</b></span></button>
+        <button class="opt" type="button" data-v="Full colour"><span><b>Full colour</b></span></button>
+        <button class="opt" type="button" data-v="Colour accent"><span><b>A hit of colour</b></span></button>
+        <button class="opt" type="button" data-v="Artist's call"><span><b>Artist's call</b></span></button>
       </div>
-      <p style="margin-top:28px;font-size:14px" class="muted">Thought of something else? Text <a href="sms:+14039716699" style="color:var(--green)">(403) 971-6699</a> or reply to the email we send you.</p>
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap"><a class="btn btn-ghost btn-sm" href="https://www.instagram.com/inktender/" target="_blank" rel="noopener">Follow @inktender</a><a class="btn btn-ghost btn-sm" href="/">Back to start</a></div>
-    </div>
-  </section>
-  </form>
+      <div class="err">Pick a style or a colour so your artist knows the direction.</div>
+    </div></section>
+
+    <!-- 5 placement -->
+    <section class="q" data-id="place"><div class="in">
+      <span class="label anim">Placement</span>
+      <h2 class="anim">Where's it going?</h2>
+      <p class="sub anim">Tap every area it covers. Flip to the back for back, glutes and calves.</p>
+      <div class="bm anim">
+        <div class="bm-fig">
+          <div class="seg" id="seg"><span class="pill"></span><button type="button" data-v="f" aria-pressed="true">Front</button><button type="button" data-v="b" aria-pressed="false">Back</button></div>
+          <div id="bmHost"></div>
+        </div>
+        <div>
+          <span class="label" style="color:var(--grey);display:block;margin-bottom:8px">Marked</span>
+          <div class="picked" id="picked"></div>
+          <div class="err" style="margin-top:12px">Tap at least one spot on the body.</div>
+        </div>
+      </div>
+    </div></section>
+
+    <!-- 6 size -->
+    <section class="q" data-id="size"><div class="in">
+      <span class="label anim">Size</span>
+      <h2 class="anim">How big are we thinking?</h2>
+      <p class="sub anim">Slide it. Ballpark is perfect, it gets dialled in at the consult.</p>
+      <div class="size anim">
+        <div class="viz"><svg viewBox="0 0 150 150" aria-hidden="true">
+          <g class="hand"><rect x="44" y="68" width="62" height="64" rx="16"/><rect x="46" y="22" width="12" height="50" rx="6"/><rect x="61" y="14" width="12" height="56" rx="6"/><rect x="76" y="18" width="12" height="52" rx="6"/><rect x="91" y="28" width="12" height="44" rx="6"/><rect x="20" y="70" width="12" height="40" rx="6" transform="rotate(-38 26 90)"/></g>
+          <path class="hexs" id="hexs" d="M75 5 L135.6 40 L135.6 110 L75 145 L14.4 110 L14.4 40 Z"/>
+        </svg></div>
+        <div class="name" id="sizeName">Hand</div>
+        <div class="desc" id="sizeDesc"></div>
+        <input class="range" type="range" min="0" max="6" step="1" id="sizeRange" aria-label="Size">
+        <div class="ticks"><span>Coin</span><span>Sleeve</span><span>Big</span></div>
+      </div>
+      <div class="fld anim" style="margin-top:20px"><span class="label">Exact size or notes <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" data-f="sizeNote" placeholder="e.g. elbow to wrist, wraps all the way round" enterkeyhint="next"></div>
+    </div></section>
+
+    <!-- 7 skin today -->
+    <section class="q" data-id="existing"><div class="in">
+      <span class="label anim">The spot today</span>
+      <h2 class="anim">What's there right now?</h2>
+      <p class="sub anim">This changes everything about the design, so it's worth a second.</p>
+      <div class="opts anim" data-single="existing">
+        <button class="opt" type="button" data-v="Clean skin"><span class="k">A</span><span><b>Clean skin</b><small>Nothing there yet</small></span></button>
+        <button class="opt" type="button" data-v="Next to other tattoos"><span class="k">B</span><span><b>Next to other tattoos</b><small>It needs to sit with them</small></span></button>
+        <button class="opt" type="button" data-v="Over an old tattoo"><span class="k">C</span><span><b>Over an old tattoo</b><small>Cover-up or rework</small></span></button>
+      </div>
+      <div class="err">Pick one.</div>
+      <label class="drop anim" style="margin-top:18px" id="spotDrop">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
+        <span><b>Snap the spot</b><small>A quick photo of the area as it is now. Optional, but gold.</small></span>
+        <input type="file" accept="image/*" id="spotIn">
+      </label>
+      <div class="thumbs" id="spotThumbs"></div>
+      <span class="label anim" style="display:block;margin:26px 0 10px;color:var(--grey)">How much ink do you have?</span>
+      <div class="chips anim" data-single="experience">
+        <button class="chip" type="button" data-v="This is my first">This is my first</button>
+        <button class="chip" type="button" data-v="A few pieces">A few pieces</button>
+        <button class="chip" type="button" data-v="Heavily tattooed">Heavily tattooed</button>
+      </div>
+    </div></section>
+
+    <!-- 8 refs -->
+    <section class="q" data-id="refs"><div class="in">
+      <span class="label anim">References</span>
+      <h2 class="anim">Show, don't tell.</h2>
+      <p class="sub anim">Screenshots, Pinterest saves, other tattoos, a photo of your dog. Add a word on what you like about each.</p>
+      <label class="drop anim">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        <span><b>Add photos</b><small>From your camera roll. Up to 8.</small></span>
+        <input type="file" accept="image/*" multiple id="refIn">
+      </label>
+      <div class="thumbs" id="refThumbs"></div>
+      <span class="label anim" style="display:block;margin:26px 0 10px;color:var(--grey)">Or tap pieces from Inktender's page</span>
+      <div class="pickstrip anim" id="pickstrip"></div>
+      <div class="fld anim" style="margin-top:22px"><span class="label">Links <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" data-f="links" placeholder="Pinterest board, Instagram post…" inputmode="url" enterkeyhint="next"></div>
+      <div class="fld anim"><span class="label">Anything you don't want? <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" data-f="avoid" placeholder="e.g. no skulls, nothing too dark" enterkeyhint="next"></div>
+    </div></section>
+
+    <!-- 9 budget -->
+    <section class="q" data-id="budget"><div class="in">
+      <span class="label anim">Budget</span>
+      <h2 class="anim">What's the budget?</h2>
+      <p class="sub anim">No wrong answer. It lets your artist design to fit, so nothing gets redrawn later.</p>
+      <div class="opts anim" data-single="budget">
+        <button class="opt" type="button" data-v="Under $500"><span class="k">A</span><span><b>Under $500</b></span></button>
+        <button class="opt" type="button" data-v="$500 to $1,000"><span class="k">B</span><span><b>$500 to $1,000</b></span></button>
+        <button class="opt" type="button" data-v="$1,000 to $2,500"><span class="k">C</span><span><b>$1,000 to $2,500</b></span></button>
+        <button class="opt" type="button" data-v="$2,500+"><span class="k">D</span><span><b>$2,500 and up</b></span></button>
+        <button class="opt" type="button" data-v="Not sure, give me a range"><span class="k">E</span><span><b>Not sure</b><small>Give me a range at the consult</small></span></button>
+      </div>
+      <div class="err">Pick one, even "Not sure".</div>
+      <span class="label anim" style="display:block;margin:26px 0 10px;color:var(--grey)">Sessions</span>
+      <div class="chips anim" data-single="sessions">
+        <button class="chip" type="button" data-v="Prefer one sitting">One sitting</button>
+        <button class="chip" type="button" data-v="Happy with multiple sessions">A few sessions is fine</button>
+        <button class="chip" type="button" data-v="Up for full-day sessions">Full days, let's go</button>
+      </div>
+    </div></section>
+
+    <!-- 10 timing -->
+    <section class="q" data-id="timing"><div class="in">
+      <span class="label anim">Timing</span>
+      <h2 class="anim">When works for you?</h2>
+      <p class="sub anim">Days you could usually come in. The studio is open 11 to 5, every day.</p>
+      <div class="chips days anim" data-multi="days">
+        <button class="chip" type="button" data-v="Mon">Mon</button><button class="chip" type="button" data-v="Tue">Tue</button><button class="chip" type="button" data-v="Wed">Wed</button><button class="chip" type="button" data-v="Thu">Thu</button><button class="chip" type="button" data-v="Fri">Fri</button><button class="chip" type="button" data-v="Sat">Sat</button><button class="chip" type="button" data-v="Sun">Sun</button>
+      </div>
+      <span class="label anim" style="display:block;margin:28px 0 4px;color:var(--grey)">Need it done by a date? <span style="text-transform:none;letter-spacing:0">(optional)</span></span>
+      <div class="two-in anim">
+        <input class="inp" type="date" data-f="deadline" aria-label="Deadline">
+        <input class="inp" data-f="deadlineWhy" placeholder="Why? Trip, wedding…" enterkeyhint="next">
+      </div>
+    </div></section>
+
+    <!-- 11 health -->
+    <section class="q" data-id="health"><div class="in">
+      <span class="label anim">Skin &amp; health</span>
+      <h2 class="anim">Quick checks.</h2>
+      <p class="sub anim">So your artist can plan healing and keep you safe. One tap each.</p>
+      <div class="private anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Private. Only your artist sees this, and it's never shared.</div>
+      <div class="yn anim" id="yn"></div>
+      <div class="fld anim" id="allergyFld" style="display:none;margin-top:16px"><span class="label">Allergic to what?</span><input class="inp" data-f="allergyWhat" placeholder="e.g. latex, a type of ointment"></div>
+      <div class="fld anim" style="margin-top:18px"><span class="label">Anything else? <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" data-f="healthOther" placeholder="Nervous about needles? Tell us, we've got you." enterkeyhint="next"></div>
+      <div class="err">Answer each one so your artist can plan.</div>
+    </div></section>
+
+    <!-- 12 contact -->
+    <section class="q" data-id="contact"><div class="in">
+      <span class="label anim">Last one</span>
+      <h2 class="anim">How do we reach you?</h2>
+      <p class="sub anim">Only for this tattoo. No newsletters, no spam.</p>
+      <div class="fld anim" id="emailFld"><span class="label">Email</span><input class="inp" type="email" data-f="email" autocomplete="email" inputmode="email" placeholder="you@email.com" enterkeyhint="next"><div class="err">That email doesn't look right.</div></div>
+      <div class="fld anim"><span class="label">Phone</span><input class="inp" type="tel" data-f="phone" autocomplete="tel" inputmode="tel" placeholder="(403) 555-0123" enterkeyhint="done"></div>
+      <span class="label anim" style="display:block;margin:6px 0 10px;color:var(--grey)">Best way to reach you</span>
+      <div class="chips anim" data-single="contact">
+        <button class="chip" type="button" data-v="Text">Text</button><button class="chip" type="button" data-v="Call">Call</button><button class="chip" type="button" data-v="Email">Email</button><button class="chip" type="button" data-v="Instagram DM">Instagram DM</button>
+      </div>
+      <label class="check anim" style="margin-top:22px"><input type="checkbox" data-f="adult"> <span>I'm 18 or older</span></label>
+      <div class="err" id="contactErr">Add an email or phone, and confirm you're 18+.</div>
+    </div></section>
+
+    <!-- 13 review -->
+    <section class="q" data-id="review"><div class="in">
+      <span class="label anim">Review</span>
+      <h2 class="anim">Look right?</h2>
+      <p class="sub anim" id="revSub">This is exactly what prints for your artist. Tap a section to change it.</p>
+      <div class="jump anim" id="jump"></div>
+      <div class="review-sheet anim" id="reviewSheet"></div>
+      <label class="check anim"><input type="checkbox" data-f="consent"> <span>Inktender can keep this sheet to plan my tattoo.</span></label>
+      <div class="err">Tick the box so we can send it.</div>
+    </div></section>
+
+    <!-- 14 done -->
+    <section class="q" data-id="done"><div class="in">
+      <div class="done-head">
+        <span class="label anim">Sent</span>
+        <h2 class="anim" id="doneH">You're on the table.</h2>
+        <p class="sub anim" id="doneSub" style="margin:0 auto">Your sheet is printing at the studio.</p>
+      </div>
+      <div class="printer anim"><div class="slot"></div><div class="paper" id="paper"></div></div>
+      <div class="next3 anim" id="next3"></div>
+      <div class="anim" style="display:grid;gap:10px;margin-top:24px">
+        <a class="btn btn-green btn-block" id="doneBack" href="/">Back to the studio page</a>
+        <a class="btn btn-line btn-block" href="https://www.instagram.com/inktender/" target="_blank" rel="noopener">Follow @inktender &nearr;</a>
+      </div>
+    </div></section>
   </main>
 
-  <div class="q-nav" id="qnav">
-    <div class="row">
-      <span class="saved" id="saved">Saves as you go</span>
-      <button type="button" class="btn back" id="back" aria-label="Previous step"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-      <button type="button" class="btn btn-green next" id="next">Next <span aria-hidden="true">→</span></button>
-    </div>
-  </div>
+  <aside class="side" id="side" aria-label="Your consult sheet, live"><span class="label">Your sheet, live</span><div id="sideSheet"></div></aside>
+
+  <footer class="qf-foot" id="foot">
+    <button class="skip" type="button" id="skip">Skip for now</button>
+    <button class="btn back" type="button" id="back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="btn btn-green next" type="button" id="next">Next <span class="arr">&rarr;</span></button>
+  </footer>
 </div>
+
+<div class="sheetmodal" id="modal" role="dialog" aria-label="Your consult sheet"><div class="panel"><div class="grab"></div><div id="modalSheet"></div></div></div>
 
 <script src="/assets/common.js"></script>
 <script>
 (function(){
-INK.draftBar('Preview: answers stay in this browser');
-const P = INK.params(); const Q = INK.qs(P);
-document.getElementById('homeLink').href='/'+Q;
-const KEY='ink_draft_'+(P.name||'open').toLowerCase();
-const f=document.getElementById('f');
-const panels=[...document.querySelectorAll('.q-panel')];
-const LAST=6;
-let S = INK.get(KEY,{zones:[],refs:[],spot:[],styles:[],days:[],skin:[]});
-if(P.name && !S.name) S.name=P.name;
-if(P.artist && !S.artist) S.artist=P.artist;
-let step = Math.min(S._step||0, LAST);
-let view='f';
+INK.draftBar('Answers stay on this device');
+INK.hexLogo(document.getElementById('mark'));
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const P=INK.params(), slug=(P.name||'me').toLowerCase().replace(/[^a-z0-9]+/g,'-'), KEY='ink_draft_'+slug;
 
-// header
-const art=P.artist?INK.artists[P.artist]:null;
-document.getElementById('who').innerHTML = P.name ? ('<b>'+INK.esc(P.name)+'</b>'+(P.date?'<br>Consult '+INK.esc(INK.fmtDate(P.date)):'')) : 'Consult sheet<br><b>Inktender Studio</b>';
-if(P.name) document.getElementById('hiTitle').textContent='Hey '+P.name+'. Quick check on your details.';
+/* ---------- state ---------- */
+let s=INK.get(KEY,null)||{};
+if(P.name && !s.name) s.name=P.name;
+if(P.artist) s.artist=P.artist;
+if(P.date) s.consult=P.date;
+s.styles=s.styles||[]; s.zones=s.zones||[]; s.days=s.days||[]; s.refs=s.refs||[]; s.spot=s.spot||[]; s.h=s.h||{};
+const savedRefs=INK.get('ink_saved',[]);
+savedRefs.forEach(src=>{ if(!s.refs.some(r=>r.src===src)) s.refs.push({src,note:'From Inktender’s page'}) });
+const save=()=>{ if(!INK.set(KEY,s)) INK.toast('Storage is full. Try fewer photos.') };
 
-// generated chip groups
-const chipHTML=(name,vals,type='checkbox')=>vals.map(v=>'<label class="chip"><input type="'+type+'" name="'+name+'" value="'+INK.esc(v)+'"><span>'+INK.esc(v)+'</span></label>').join('');
-document.getElementById('styleChips').innerHTML=chipHTML('styles',['Biomech','Realism','Illustrative','Portrait','Painted realism','Black & grey','Bold colour','Pop culture / anime','Ornamental','Freehand','Fine line','Not sure yet']);
-document.getElementById('dayChips').innerHTML=chipHTML('days',['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Flexible']);
-document.getElementById('skinChips').innerHTML=chipHTML('skin',['Nothing','Eczema / psoriasis','Scarring or keloids','Moles or birthmarks','Recent sunburn','Stretch marks']);
-document.getElementById('artistPick').innerHTML=Object.values(INK.artists).map(a=>'<label class="chip"><input type="radio" name="artist" value="'+a.id+'"><span><img src="'+a.img+'" alt=""><em>'+a.first+'<small>'+a.styles.slice(0,2).join(' · ')+'</small></em></span></label>').join('')+
- '<label class="chip"><input type="radio" name="artist" value="any"><span><img src="/img/studio-3.jpg" alt=""><em>Match me<small>Best fit for the piece</small></em></span></label>';
+const A=()=>INK.artists[s.artist];
+const who=()=>A()?A().first:'your artist';
+const landing='/'+(P.name?'c/'+encodeURIComponent(P.name.toLowerCase().replace(/\s+/g,'-')):'')+INK.qs({artist:P.artist,date:P.date});
+$('#close').href=landing; $('#doneBack').href=landing;
 
-// step header
-const stepsEl=document.getElementById('steps');
-const hex='<svg viewBox="0 0 14 15"><path d="M7 1 13 4.5v6L7 14 1 10.5v-6z"/></svg>';
-stepsEl.innerHTML=panels.slice(0,LAST+1).map((p,i)=>'<button type="button" data-i="'+i+'">'+hex+'<span>'+String(i+1).padStart(2,'0')+'</span><span class="t">'+p.dataset.t+'</span></button>').join('');
-stepsEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i; if(i<=maxReached()) go(i)});
-function maxReached(){return Math.max(S._max||0,step)}
-
-// fill form from state
-function fill(){
-  [...f.elements].forEach(el=>{
-    if(!el.name) return; const v=S[el.name];
-    if(el.type==='checkbox'){ el.checked = Array.isArray(v)? v.includes(el.value) : v===el.value }
-    else if(el.type==='radio'){ el.checked = v===el.value }
-    else if(el.type!=='file' && v!=null){ el.value=v }
-  });
+/* ---------- personalise copy ---------- */
+if(P.name){
+  $('#youLabel').textContent='Hey '+P.name.split(' ')[0];
+  $('#youH').textContent='Ten minutes, then you’re ready.';
+  const dp=INK.dparts(P.date);
+  $('#youSub').textContent=(dp?'Your consult is '+dp.wd+', '+dp.mon+' '+dp.day+(dp.time?' at '+dp.time:'')+'. ':'')+'Answer what you can and it lands on '+(A()?A().first+'’s':'the studio’s')+' table, printed. It saves as you go.';
 }
-function read(el){
-  if(!el.name) return;
-  if(el.type==='checkbox'){
-    const group=f.querySelectorAll('input[type=checkbox][name="'+el.name+'"]');
-    if(group.length>1) S[el.name]=[...group].filter(x=>x.checked).map(x=>x.value);
-    else S[el.name]=el.checked?el.value:'';
-  } else if(el.type==='radio'){ if(el.checked) S[el.name]=el.value }
-  else if(el.type!=='file') S[el.name]=el.value;
-}
-let saveT;
-function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ const ok=INK.set(KEY,S); document.getElementById('saved').textContent= ok?'Saved · '+new Date().toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'}):'Too many photos to save offline'; },250) }
-f.addEventListener('input',e=>{read(e.target);save(); const fd=e.target.closest('.field'); if(fd) fd.classList.remove('bad')});
-f.addEventListener('change',e=>{read(e.target);save(); if(e.target.name==='existing') spotToggle()});
+if(P.artist) $('#artistPick').remove();
 
-// body map
-const bm=document.getElementById('bm');
-function drawBM(){
-  bm.innerHTML=INK.bodySVG(view,S.zones);
-  bm.querySelectorAll('.z').forEach(z=>{
-    const t=()=>{const k=z.dataset.k; const i=S.zones.indexOf(k); if(i>-1)S.zones.splice(i,1); else S.zones.push(k); z.classList.toggle('sel'); z.setAttribute('aria-checked',S.zones.includes(k)); picked(); save()};
-    z.addEventListener('click',t); z.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();t()}});
-  });
-}
-function picked(){ const el=document.getElementById('bmPicked'); el.innerHTML = S.zones.length? S.zones.map(k=>'<span class="tag g">'+INK.zoneLabel(k)+'</span>').join('') : '<span class="none">Nothing yet. Tap the figure.</span>' }
-document.querySelectorAll('.bm-toggle button').forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll('.bm-toggle button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawBM()});
-function spotToggle(){ /* always visible; nudge for add-ons */ }
+/* ---------- steps ---------- */
+const steps=$$('.q'); const ids=steps.map(q=>q.dataset.id);
+const QN=ids.indexOf('review')+1; /* numbered questions incl. review */
+let i=0, busy=false;
+const optional={refs:1,timing:1};
 
-// uploads
-const LIM={refs:8,spot:4};
-function drawThumbs(kind){
-  const box=document.getElementById('th-'+kind); const arr=S[kind]||[];
-  box.innerHTML=arr.map((r,i)=>'<div class="thumb"><img src="'+r.src+'" alt="Reference '+(i+1)+'"><button type="button" class="x" data-i="'+i+'" aria-label="Remove photo">×</button>'+(kind==='refs'?'<input type="text" placeholder="What do you like about it?" data-i="'+i+'" value="'+INK.esc(r.note||'')+'">':'')+'</div>').join('');
-  box.querySelectorAll('.x').forEach(b=>b.onclick=()=>{arr.splice(+b.dataset.i,1);drawThumbs(kind);save()});
-  box.querySelectorAll('input').forEach(inp=>inp.oninput=e=>{e.stopPropagation();arr[+inp.dataset.i].note=inp.value;save()});
-}
-document.querySelectorAll('.drop').forEach(d=>{
-  const kind=d.dataset.up, inp=d.querySelector('input');
-  async function add(files){
-    S[kind]=S[kind]||[];
-    for(const file of [...files]){ if(!file.type.startsWith('image/')) continue; if(S[kind].length>=LIM[kind]){INK.toast('That’s the max for now. Bring the rest to your consult.');break}
-      try{ S[kind].push({src:await INK.shrink(file, kind==='refs'?900:800), note:''}) }catch(e){} }
-    drawThumbs(kind); save();
-  }
-  inp.addEventListener('change',e=>{e.stopPropagation();add(inp.files);inp.value=''});
-  ['dragenter','dragover'].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.add('over')}));
-  ['dragleave','drop'].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.remove('over')}));
-  d.addEventListener('drop',e=>add(e.dataTransfer.files));
-});
-
-// validation
-function valid(i){
-  const p=panels[i]; let ok=true;
-  p.querySelectorAll('[data-req]').forEach(fd=>{
-    const k=fd.dataset.req; let v=S[k];
-    let good = !!(v && String(v).trim());
-    if(k==='email') good = /.+@.+\..+/.test(v||'');
-    if(k==='idea') good = (v||'').trim().length>=8;
-    fd.classList.toggle('bad',!good); if(!good) ok=false;
-  });
-  if(!ok){ const b=p.querySelector('.field.bad'); b&&b.scrollIntoView({behavior:'smooth',block:'center'}); }
-  return ok;
-}
-
-// review
-const dl=(rows)=>'<dl>'+rows.filter(r=>r[1]&&String(r[1]).trim()).map(r=>'<div><dt>'+r[0]+'</dt><dd>'+INK.esc(r[1])+'</dd></div>').join('')+'</dl>';
-function review(){
-  const A=S.artist&&INK.artists[S.artist]?INK.artists[S.artist].first:(S.artist==='any'?'Match me':'');
-  const blocks=[
-    ['About you',0,dl([['Name',S.name],['Email',S.email],['Phone',S.phone],['Reach me by',S.contact],['Experience',S.experience],['Artist',A]])],
-    ['The idea',1,dl([['Idea',S.idea],['Styles',(S.styles||[]).join(', ')],['Colour',S.colour],['Story',S.story]])],
-    ['Placement',2,dl([['Spots',(S.zones||[]).map(INK.zoneLabel).join(', ')],['Size',S.size],['Notes',S.sizeNote],['Existing ink',S.existing]])+((S.spot||[]).length?'<div class="rv-thumbs">'+S.spot.map(r=>'<img src="'+r.src+'" alt="">').join('')+'</div>':'')],
-    ['References',3,((S.refs||[]).length?'<div class="rv-thumbs">'+S.refs.map(r=>'<img src="'+r.src+'" alt="">').join('')+'</div>':'<p class="muted" style="font-size:14px">No photos yet. Totally fine, you can bring them.</p>')+dl([['Links',S.links],['Avoid',S.avoid]])],
-    ['Timing & budget',4,dl([['Budget',S.budget],['Sessions',S.sessions],['Days',(S.days||[]).join(', ')],['Deadline',S.deadline?(S.deadline+(S.deadlineWhy?' · '+S.deadlineWhy:'')):'']])],
-    ['Skin & health',5,dl([['Skin',(S.skin||[]).join(', ')],['Blood thinners',S.meds],['Allergies',S.allergies],['Other',S.healthOther]])]
-  ];
-  document.getElementById('review').innerHTML=blocks.map(b=>'<div class="rv-block"><h4>'+b[0]+'<button type="button" data-go="'+b[1]+'">Edit</button></h4>'+b[2]+'</div>').join('');
-  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(+b.dataset.go));
-}
-
-// navigation
-const needle=document.getElementById('needle'), next=document.getElementById('next'), back=document.getElementById('back');
-function go(i){
-  step=i; S._step=Math.min(i,LAST); S._max=Math.max(S._max||0,Math.min(i,LAST)); save();
-  panels.forEach((p,k)=>p.classList.toggle('on',k===i));
-  stepsEl.querySelectorAll('button').forEach((b,k)=>{b.classList.toggle('on',k===i);b.classList.toggle('done',k<i||i===7)});
-  needle.style.width = (i>=7?100:(i/LAST*100))+'%';
-  back.style.visibility = i===0||i===7?'hidden':'visible';
-  document.getElementById('qnav').style.display = i===7?'none':'';
-  next.innerHTML = i===LAST?'Send to '+(art?art.first:'Inktender')+' <span aria-hidden="true">→</span>':(i===5?'Review my sheet <span aria-hidden="true">→</span>':'Next <span aria-hidden="true">→</span>');
-  if(i===2){drawBM();picked()}
-  if(i===LAST) review();
-  const on=stepsEl.querySelector('.on'); on&&on.scrollIntoView({inline:'center',block:'nearest'});
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-next.onclick=()=>{
-  if(!valid(step)) return;
-  if(step<LAST){ go(step+1); return }
-  // submit (draft: stored locally for the studio view)
-  const sheets=INK.get('ink_sheets',[]);
-  const sheet=Object.assign({},S,{id:'s'+Date.now(),submitted:new Date().toISOString(),consult:P.date||'',status:'new'});
-  delete sheet._step; delete sheet._max;
-  sheets.unshift(sheet);
-  if(!INK.set('ink_sheets',sheets)){ sheet.refs=sheet.refs.slice(0,3); sheet.spot=sheet.spot.slice(0,1); sheets[0]=sheet; INK.set('ink_sheets',sheets) }
-  try{localStorage.removeItem(KEY)}catch(e){}
-  const first=(S.name||'').split(' ')[0];
-  document.getElementById('doneH').textContent= first? ('Done, '+first+'.') : "You're all set.";
-  document.getElementById('doneP').textContent = (art?art.first:'Josh')+' has your sheet. It will be printed and on the table'+(P.date?' at your consult on '+INK.fmtDate(P.date)+'.':' at your consult.');
-  if(art) document.getElementById('nx1').textContent=art.first+' reads through your idea and refs before you arrive.';
-  go(7);
+const valid={
+  you(){ return field('name',(s.name||'').trim().length>1) && (P.artist||group('#artistPick',!!s.artist)) },
+  kind(){ return group('[data-id=kind] .in',!!s.kind) },
+  idea(){ return field('idea',(s.idea||'').trim().length>=10) },
+  style(){ return group('[data-id=style] .in',s.styles.length>0||!!s.colour) },
+  place(){ return group('[data-id=place] .bm',s.zones.length>0) },
+  existing(){ return group('[data-id=existing] .in',!!s.existing) },
+  budget(){ return group('[data-id=budget] .in',!!s.budget) },
+  health(){ return group('[data-id=health] .in',['meds','allergy','skin','preg','cond'].every(k=>s.h[k])) },
+  contact(){
+    const em=(s.email||'').trim(), okE=!em||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);
+    $('#emailFld').classList.toggle('bad',!okE);
+    const ok=okE&&(em||(s.phone||'').replace(/\D/g,'').length>=10)&&s.adult;
+    $('#contactErr').style.display=ok?'none':(okE?'block':'none'); return ok;
+  },
+  review(){ return group('[data-id=review] .in',!!s.consent) }
 };
-back.onclick=()=>{ if(step>0) go(step-1) };
+function field(f,ok){ const el=$('[data-f='+f+']').closest('.fld'); el.classList.toggle('bad',!ok); return ok }
+function group(sel,ok){ const el=$(sel); el.classList.toggle('bad',!ok); return ok }
 
-fill(); ['refs','spot'].forEach(drawThumbs);
-go(step);
+function go(n,dir){
+  if(busy||n===i||n<0||n>=steps.length) return;
+  busy=true;
+  const from=steps[i], to=steps[n];
+  dir=dir||(n>i?1:-1);
+  from.classList.add('leaving'); from.classList.toggle('rev',dir<0);
+  setTimeout(()=>{
+    from.classList.remove('on','leaving','rev','back');
+    to.classList.toggle('back',dir<0);
+    to.scrollTop=0; to.classList.add('on');
+    i=n; s._step=i<ids.indexOf('done')?i:0; save(); chrome(); busy=false;
+    if(ids[i]==='review') drawReview();
+    if(ids[i]==='place') placePill();
+    if(matchMedia('(hover:hover) and (pointer:fine)').matches){ const f=to.querySelector('input.inp,textarea.inp'); if(f&&!f.value) setTimeout(()=>f.focus({preventScroll:true}),350) }
+  }, INK.reduced()?0:300);
+}
+function chrome(){
+  const id=ids[i], done=id==='done';
+  const n=Math.min(i+1,QN);
+  $('#bar').style.width=(done?100:(i/(QN-1))*100)+'%';
+  $('#count').textContent=done?'Sent':String(n).padStart(2,'0')+'/'+QN;
+  $('#foot').style.display=done?'none':'';
+  $('#back').style.display=i===0?'none':'';
+  const empty=optional[id]&&!filled(id);
+  $('#skip').style.display=(optional[id]&&!empty)?'none':(optional[id]?'block':'none');
+  $('#next').innerHTML=id==='review'?'Send to '+who()+' <span class="arr">&rarr;</span>':(empty?'Skip for now <span class="arr">&rarr;</span>':(id==='you'?'Let’s go <span class="arr">&rarr;</span>':'Next <span class="arr">&rarr;</span>'));
+  $('#skip').style.display='none';
+  $('#peek').classList.toggle('on',i>0&&!done&&id!=='review');
+}
+function filled(id){ return id==='refs'?(s.refs.length||s.links||s.avoid):id==='timing'?(s.days.length||s.deadline):true }
+
+$('#next').addEventListener('click',()=>{
+  const id=ids[i];
+  if(valid[id]&&!valid[id]()){ const e=steps[i].querySelector('.bad'); if(e){e.scrollIntoView({behavior:'smooth',block:'center'})} buzz(); return }
+  if(id==='review') return send();
+  if(id==='size'&&s.sizeIdx==null){ s.sizeIdx=2; changed() }
+  go(i+1);
+});
+$('#back').addEventListener('click',()=>go(i-1));
+function buzz(){ const b=$('#next'); b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-3px)'},{transform:'none'}],{duration:380,easing:'ease-out'}); if(navigator.vibrate) navigator.vibrate(18) }
+
+/* ---------- generic wiring ---------- */
+$$('[data-f]').forEach(el=>{
+  const f=el.dataset.f;
+  if(el.type==='checkbox') el.checked=!!s[f]; else if(s[f]!=null) el.value=s[f];
+  el.addEventListener(el.type==='checkbox'?'change':'input',()=>{
+    s[f]=el.type==='checkbox'?el.checked:el.value;
+    const fl=el.closest('.fld'); if(fl) fl.classList.remove('bad');
+    if(f==='allergyWhat') healthDerive();
+    changed(); if(optional[ids[i]]) chrome();
+  });
+  if(el.tagName==='INPUT'&&el.type!=='checkbox') el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const ins=[...steps[i].querySelectorAll('input.inp')]; const k=ins.indexOf(el); if(ins[k+1]) ins[k+1].focus(); else { el.blur(); $('#next').click() } } });
+});
+$$('[data-single]').forEach(g=>{
+  const f=g.dataset.single;
+  const paint=()=>g.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',s[f]===b.dataset.v));
+  paint();
+  g.addEventListener('click',e=>{const b=e.target.closest('[data-v]'); if(!b)return;
+    s[f]=(s[f]===b.dataset.v&&!g.hasAttribute('data-auto'))?'':b.dataset.v; paint();
+    g.closest('.bad')&&g.closest('.bad').classList.remove('bad');
+    changed(); if(f==='artist') chrome();
+    if(g.hasAttribute('data-auto')&&s[f]) setTimeout(()=>go(i+1),420);
+  });
+});
+function multi(g){
+  const f=g.dataset.multi;
+  const paint=()=>g.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',s[f].includes(b.dataset.v)));
+  paint();
+  g.addEventListener('click',e=>{const b=e.target.closest('[data-v]'); if(!b)return; const v=b.dataset.v;
+    s[f]=s[f].includes(v)?s[f].filter(x=>x!==v):[...s[f],v]; paint();
+    g.closest('.bad')&&g.closest('.bad').classList.remove('bad'); changed(); if(optional[ids[i]]) chrome() });
+}
+
+/* style cards from real work */
+const tick='<span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg></span>';
+$('#styleCards').innerHTML=INK.styleCards.map(c=>'<button class="card" type="button" data-v="'+c.v+'"><img src="'+c.img+'" alt="" loading="lazy"><span>'+c.v+'</span>'+tick+'</button>').join('');
+$$('[data-multi]').forEach(multi);
+
+/* idea starters */
+$('#starters').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; const t=$('#idea');
+  t.value=(t.value.trim()?t.value.replace(/\s*$/,'')+' ':'')+b.textContent; t.focus(); t.setSelectionRange(t.value.length,t.value.length); t.dispatchEvent(new Event('input')) });
+
+/* ---------- body map ---------- */
+let view='f';
+function drawBody(){ $('#bmHost').innerHTML=INK.bodySVG(view,s.zones);
+  $('#picked').innerHTML=s.zones.length?s.zones.map(k=>'<button type="button" class="tag" data-k="'+k+'">'+INK.zoneLabel(k)+' &times;</button>').join(''):'<span class="none">Nothing marked yet</span>' }
+function placePill(){ const on=$('#seg [aria-pressed=true]'), pill=$('#seg .pill'); pill.style.width=on.offsetWidth+'px'; pill.style.transform='translateX('+(on.offsetLeft-3)+'px)' }
+$('#seg').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b||b.dataset.v===view)return; view=b.dataset.v;
+  $$('#seg button').forEach(x=>x.setAttribute('aria-pressed',x===b)); placePill();
+  const svg=$('#bmHost svg'); svg.style.opacity=0; setTimeout(()=>{drawBody(); const n=$('#bmHost svg'); n.style.opacity=0; requestAnimationFrame(()=>n.style.opacity=1)},180) });
+function toggleZone(k){ s.zones=s.zones.includes(k)?s.zones.filter(x=>x!==k):[...s.zones,k]; $('[data-id=place] .bm').classList.remove('bad'); drawBody(); changed(); if(navigator.vibrate) navigator.vibrate(8) }
+$('#bmHost').addEventListener('click',e=>{const z=e.target.closest('.z'); if(z) toggleZone(z.dataset.k)});
+$('#bmHost').addEventListener('keydown',e=>{const z=e.target.closest('.z'); if(z&&(e.key===' '||e.key==='Enter')){e.preventDefault(); toggleZone(z.dataset.k); const n=$('#bmHost [data-k="'+z.dataset.k+'"]'); n&&n.focus()}});
+$('#picked').addEventListener('click',e=>{const t=e.target.closest('.tag'); if(t) toggleZone(t.dataset.k)});
+drawBody();
+
+/* ---------- size ---------- */
+const SC=[.16,.3,.44,.6,.78,.94,1.12];
+function drawSize(){ const k=s.sizeIdx==null?2:+s.sizeIdx, z=INK.sizes[k]; $('#sizeRange').value=k; $('#sizeRange').style.setProperty('--p',(k/6*100)+'%');
+  $('#sizeName').textContent=z.l; $('#sizeDesc').textContent=z.d; $('#hexs').style.transform='scale('+SC[k]+')' }
+$('#sizeRange').addEventListener('input',e=>{s.sizeIdx=+e.target.value; drawSize(); changed(); if(navigator.vibrate) navigator.vibrate(6)});
+drawSize();
+
+/* ---------- photos ---------- */
+function thumbs(host,arr,notes){
+  host.innerHTML=arr.map((r,k)=>'<div class="thumb"><img src="'+r.src+'" alt=""><button type="button" class="x" data-k="'+k+'" aria-label="Remove">&times;</button>'+(notes?'<input data-k="'+k+'" value="'+INK.esc(r.note||'')+'" placeholder="What do you like about it?">':'')+'</div>').join('');
+}
+async function addFiles(files,arr,max){
+  for(const f of [...files]){ if(arr.length>=max){INK.toast('That’s the max for now');break}
+    try{ arr.push({src:await INK.shrink(f,820,.72),note:''}) }catch(e){ INK.toast('Couldn’t read that photo') } }
+}
+$('#refIn').addEventListener('change',async e=>{await addFiles(e.target.files,s.refs,8); e.target.value=''; drawRefs(); changed(); chrome()});
+$('#spotIn').addEventListener('change',async e=>{s.spot=[]; await addFiles(e.target.files,s.spot,1); e.target.value=''; drawSpot(); changed()});
+function drawRefs(){ thumbs($('#refThumbs'),s.refs,true); drawStrip() }
+function drawSpot(){ thumbs($('#spotThumbs'),s.spot,false) }
+$('#refThumbs').addEventListener('click',e=>{const x=e.target.closest('.x'); if(!x)return; s.refs.splice(+x.dataset.k,1); syncSaved(); drawRefs(); changed(); chrome()});
+$('#refThumbs').addEventListener('input',e=>{const t=e.target.closest('input'); if(!t)return; s.refs[+t.dataset.k].note=t.value; changed()});
+$('#spotThumbs').addEventListener('click',e=>{if(e.target.closest('.x')){s.spot=[]; drawSpot(); changed()}});
+function drawStrip(){ $('#pickstrip').innerHTML=INK.work.map(w=>{const on=s.refs.some(r=>r.src===w.img); return '<button type="button" data-img="'+w.img+'" aria-pressed="'+on+'" aria-label="'+INK.esc(w.t)+'"><img src="'+w.img+'" alt="" loading="lazy">'+tick+'</button>'}).join('') }
+function syncSaved(){ INK.set('ink_saved',s.refs.filter(r=>r.src.startsWith('/img/')).map(r=>r.src)) }
+$('#pickstrip').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; const src=b.dataset.img; const k=s.refs.findIndex(r=>r.src===src);
+  if(k>=0) s.refs.splice(k,1); else { if(s.refs.length>=8) return INK.toast('8 references max'); s.refs.push({src,note:'From Inktender’s page'}) }
+  syncSaved(); drawRefs(); changed(); chrome() });
+drawRefs(); drawSpot();
+
+/* ---------- health ---------- */
+const H=[['meds','Blood thinners, or meds that slow healing'],['allergy','Allergies','Latex, ink, ointments'],['skin','A skin condition on that spot','Eczema, psoriasis, keloids'],['preg','Pregnant or nursing'],['cond','Diabetes, epilepsy or a heart condition']];
+$('#yn').innerHTML=H.map(h=>'<div class="row" data-k="'+h[0]+'"><span>'+h[1]+(h[2]?'<small>'+h[2]+'</small>':'')+'</span><div class="tg"><button type="button" data-v="No">No</button><button type="button" class="y" data-v="Yes">Yes</button></div></div>').join('');
+function paintYN(){ $$('#yn .row').forEach(r=>r.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',s.h[r.dataset.k]===b.dataset.v))); $('#allergyFld').style.display=s.h.allergy==='Yes'?'block':'none' }
+function healthDerive(){
+  s.meds=s.h.meds||''; s.allergies=s.h.allergy==='Yes'?(s.allergyWhat||'Yes, details at consult'):(s.h.allergy?'None':'');
+  const fl=[]; if(s.h.skin==='Yes')fl.push('Skin condition on the spot'); if(s.h.preg==='Yes')fl.push('Pregnant or nursing'); if(s.h.cond==='Yes')fl.push('Diabetes, epilepsy or heart');
+  s.skin=fl.length?fl:(s.h.skin&&s.h.preg&&s.h.cond?['Nothing flagged']:[]);
+}
+$('#yn').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; s.h[b.closest('.row').dataset.k]=b.dataset.v; paintYN(); healthDerive();
+  $('[data-id=health] .in').classList.remove('bad'); changed() });
+paintYN();
+
+/* ---------- live sheet ---------- */
+const FLASH={you:'Consult sheet',kind:'The piece',idea:'The piece',style:'Style',place:'Placement',size:'Placement',existing:'The spot today',refs:'References',budget:'Timing',timing:'Timing',health:'Skin',contact:'Consult sheet'};
+let rT;
+function changed(){ save(); clearTimeout(rT); rT=setTimeout(renderLive,120) }
+function renderLive(){
+  const html=INK.sheetHTML(s,{mini:true});
+  $('#sideSheet').innerHTML=html;
+  if($('#modal').classList.contains('on')) $('#modalSheet').innerHTML=INK.sheetHTML(s);
+  const key=FLASH[ids[i]];
+  if(key){ const h=[...$('#sideSheet').querySelectorAll('h5')].find(h=>h.textContent.startsWith(key)); const blk=h&&(h.closest('.blk')||h.closest('.sh-top')); if(blk) blk.classList.add('flash') }
+  const n=[s.name,s.kind,s.idea,s.styles.length||s.colour,s.zones.length,s.existing,s.refs.length,s.budget,s.days.length,s.h.meds,(s.email||s.phone)].filter(Boolean).length;
+  $('#pcount').textContent='Sheet '+n+'/11';
+  const r=s.refs[0]; const t=$('#pthumb'); if(r){t.style.backgroundImage='url("'+r.src+'")';t.textContent=''} else {t.style.backgroundImage='';t.innerHTML='&#x2B22;'}
+  const pk=$('#peek'); if(pk.classList.contains('on')){ pk.classList.remove('bump'); void pk.offsetWidth; pk.classList.add('bump') }
+}
+$('#peek').addEventListener('click',()=>{ $('#modalSheet').innerHTML=INK.sheetHTML(s); $('#modal').classList.add('on') });
+$('#modal').addEventListener('click',e=>{ if(e.target.id==='modal'||e.target.classList.contains('grab')) $('#modal').classList.remove('on') });
+let sy=0; $('#modal .panel').addEventListener('touchstart',e=>{sy=e.touches[0].clientY},{passive:true});
+$('#modal .panel').addEventListener('touchend',e=>{const p=$('#modal .panel'); if(p.scrollTop<=0&&e.changedTouches[0].clientY-sy>70) $('#modal').classList.remove('on')});
+
+/* ---------- review ---------- */
+const JUMP=[['Idea','idea'],['Style','style'],['Placement','place'],['Size','size'],['Refs','refs'],['Budget','budget'],['Timing','timing'],['Health','health'],['Contact','contact']];
+$('#jump').innerHTML=JUMP.map(j=>'<button type="button" class="chip" data-go="'+j[1]+'">'+j[0]+'</button>').join('');
+$('#jump').addEventListener('click',e=>{const b=e.target.closest('[data-go]'); if(b) go(ids.indexOf(b.dataset.go),-1)});
+function drawReview(){ $('#reviewSheet').innerHTML=INK.sheetHTML(s); $('#revSub').textContent='This is exactly what prints for '+who()+'. Tap a section to change it.' }
+
+/* ---------- send ---------- */
+function send(){
+  const sheet=JSON.parse(JSON.stringify(s));
+  sheet.id='IT-'+Date.now().toString(36).slice(-5).toUpperCase(); sheet.submitted=new Date().toISOString(); sheet.status='new';
+  delete sheet._step; delete sheet.h; delete sheet.consent; delete sheet.adult; delete sheet.allergyWhat;
+  const all=INK.get('ink_sheets',[]); all.unshift(sheet);
+  if(!INK.set('ink_sheets',all.slice(0,12))){ sheet.refs=sheet.refs.filter(r=>r.src.startsWith('/img/')); sheet.spot=[]; all[0]=sheet; INK.set('ink_sheets',all.slice(0,12)) }
+  try{localStorage.removeItem(KEY)}catch(e){} INK.set('ink_saved',[]);
+  const first=(s.name||'').split(' ')[0], dp=INK.dparts(s.consult);
+  $('#doneH').innerHTML=(first?INK.esc(first)+', you’re':'You’re')+' <span class="g">on the table.</span>';
+  $('#doneSub').textContent=who()[0].toUpperCase()+who().slice(1)+' has your sheet now'+(dp?' and it prints before '+dp.wd+', '+dp.mon+' '+dp.day:'')+'. Nothing else to fill in.';
+  $('#paper').innerHTML=INK.sheetHTML(sheet,{health:false});
+  $('#next3').innerHTML=[['1',who()[0].toUpperCase()+who().slice(1)+' reads it and starts thinking about the design'],['2','If anything’s missing, you’ll hear by '+(s.contact?s.contact.toLowerCase():'text or email')],['3',dp?'Show up '+dp.wd+(dp.time?' at '+dp.time:'')+' and talk design':'Show up and talk design']].map(r=>'<div><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join('');
+  go(ids.indexOf('done'),1);
+}
+
+/* ---------- start ---------- */
+const startAt=(s._step>0&&s._step<ids.indexOf('done'))?s._step:0;
+i=startAt; steps[i].classList.add('on'); chrome(); renderLive();
+if(startAt>0) setTimeout(()=>INK.toast('Welcome back. Picked up where you left off.'),500);
+if(ids[i]==='review') drawReview();
+if(ids[i]==='place') requestAnimationFrame(placePill);
+addEventListener('resize',()=>{ if(ids[i]==='place') placePill() });
+addEventListener('keydown',e=>{ if(e.key==='Escape') $('#modal').classList.remove('on') });
 })();
 </script>
 </body>

@@ -7227,5 +7227,120 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "hope-lutheran-calgary",
+      "name": "Hope Lutheran Church",
+      "approved": true,
+      "hosts": [
+        "www.hopelutheran.ca",
+        "hopelutheran.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "hope-holly-christmas-market-2026",
+        "input": {
+          "kind": "event",
+          "address": "3527 Boulton Rd NW, Calgary, AB",
+          "venue": "Hope Lutheran Church",
+          "organizer": "Hope Lutheran Church",
+          "pricing": "free",
+          "title": "Hope & Holly Christmas Market",
+          "summary": "Tables of hand-crafted gifts, preserves and baking at Hope Lutheran Church in Brentwood.",
+          "description": "Hope Lutheran Church hosts the Hope & Holly Christmas Market on Saturday, November 28, 2026 from 10 a.m. to 2 p.m. at 3527 Boulton Rd NW. Browse tables of hand-crafted items, baking and preserves like jams, jellies, pickles and salsa. Want to sell your own crafts? A table is $40: call Deborah at 403-282-6033.",
+          "sourceUrl": "https://www.hopelutheran.ca/events/hope-holly-christmas-market/2026-11-28",
+          "categories": [
+            "markets",
+            "holiday",
+            "community"
+          ],
+          "tags": [
+            "christmas market",
+            "crafts",
+            "baking"
+          ],
+          "start": "2026-11-28T10:00:00-06:00",
+          "end": "2026-11-28T14:00:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-eve-430-2026",
+        "input": {
+          "kind": "event",
+          "address": "3527 Boulton Rd NW, Calgary, AB",
+          "venue": "Hope Lutheran Church",
+          "organizer": "Hope Lutheran Church",
+          "pricing": "free",
+          "title": "Hope Lutheran Christmas Eve Service (4:30 p.m.)",
+          "summary": "A 4:30 p.m. Christmas Eve worship service at Hope Lutheran Church in Brentwood.",
+          "description": "Hope Lutheran Church holds a special Christmas Eve worship service on Thursday, December 24, 2026 at 4:30 p.m. (no Holy Communion) at 3527 Boulton Rd NW. A second service follows at 7 p.m. with Holy Communion. Everyone is welcome. Questions: 403-282-6033.",
+          "sourceUrl": "https://www.hopelutheran.ca/events/special-christmas-eve-worship-services/2026-12-24",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "church"
+          ],
+          "start": "2026-12-24T16:30:00-06:00",
+          "end": "2026-12-24T17:30:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-eve-700-2026",
+        "input": {
+          "kind": "event",
+          "address": "3527 Boulton Rd NW, Calgary, AB",
+          "venue": "Hope Lutheran Church",
+          "organizer": "Hope Lutheran Church",
+          "pricing": "free",
+          "title": "Hope Lutheran Christmas Eve Service (7 p.m.)",
+          "summary": "A 7 p.m. Christmas Eve worship service with Holy Communion at Hope Lutheran Church.",
+          "description": "Hope Lutheran Church holds a special Christmas Eve worship service with Holy Communion on Thursday, December 24, 2026 at 7 p.m. at 3527 Boulton Rd NW. An earlier service runs at 4:30 p.m. Everyone is welcome. Questions: 403-282-6033.",
+          "sourceUrl": "https://www.hopelutheran.ca/events/special-christmas-eve-worship-services/2026-12-24",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "church"
+          ],
+          "start": "2026-12-24T19:00:00-06:00",
+          "end": "2026-12-24T20:00:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-day-2026",
+        "input": {
+          "kind": "event",
+          "address": "3527 Boulton Rd NW, Calgary, AB",
+          "venue": "Hope Lutheran Church",
+          "organizer": "Hope Lutheran Church",
+          "pricing": "free",
+          "title": "Hope Lutheran Christmas Day Service",
+          "summary": "An 11 a.m. Christmas Day worship service with Holy Communion at Hope Lutheran Church.",
+          "description": "Hope Lutheran Church holds a special Christmas Day worship service with Holy Communion on Friday, December 25, 2026 at 11 a.m. at 3527 Boulton Rd NW. Everyone is welcome. Questions: 403-282-6033.",
+          "sourceUrl": "https://www.hopelutheran.ca/events/special-christmas-day-worship-service/2026-12-25",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas day",
+            "church"
+          ],
+          "start": "2026-12-25T11:00:00-06:00",
+          "end": "2026-12-25T12:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

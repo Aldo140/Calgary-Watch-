@@ -233,3 +233,4 @@
 .ow-pv-when { margin:0; display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-weight:800; color:#123c78; font-size:14px; }
 .ow-pv-cancel { padding:2px 8px; border-radius:999px; background:#fde8e6; color:#8a1f17; font-size:12px; }
 .ow-pv-host { margin:-6px 0 0; font-size:13px; color:#5b6b78; }
+.ow-publish-error { position:sticky; bottom:110px; z-index:5; margin:0 0 10px; }

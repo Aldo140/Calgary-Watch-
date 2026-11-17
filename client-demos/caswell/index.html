@@ -1,0 +1,1305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="description" content="Caswell Aviation: aerial photo and video, mapping, pilot training, BVLOS flight reviews and DJI repair in Calgary.">
+<link rel="icon" href="img/wings.png">
+<title>Caswell Aviation</title>
+<meta name="theme-color" content="#0b141c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --navy:#0b141c; --navy-2:#0f1c28; --navy-3:#162838; --gold:#e2b007; --gold-lt:#f6d771; --gold-dk:#8a6a00;
+  --paper:#f4f5f2; --card:#ffffff; --ink:#0d1822; --ink-2:#44525e; --muted:#76838c; --line:#dde1dc; --dline:#ffffff1c; --dtext:#b8c6cf;
+  --f-disp:"Archivo","Arial Black",system-ui,sans-serif; --f-body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --g:clamp(16px,4.4vw,44px); --top:60px; --tab:0px; --ease:cubic-bezier(.2,.8,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--navy);color:#fff;font:16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit}
+h1,h2,h3,.disp{font-family:var(--f-disp);font-stretch:125%;font-weight:800;letter-spacing:-.012em;line-height:.98;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.5rem,10.4vw,5.8rem)}
+h2{font-size:clamp(2rem,7.2vw,3.7rem)}
+h3{font-size:clamp(1.25rem,4.4vw,1.6rem);line-height:1.05}
+p{margin:0}
+.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-inline:var(--g)}
+.mono{font:500 .68rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase}
+.eyebrow{display:inline-flex;align-items:center;gap:.6rem;font:700 .68rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gold-lt)}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--gold)}
+.paper .eyebrow{color:var(--gold-dk)}
+.lede{font-size:clamp(1.02rem,2.6vw,1.16rem);color:var(--dtext);max-width:56ch}
+.paper .lede{color:var(--ink-2)}
+.gold{background:linear-gradient(180deg,var(--gold-lt),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+section{position:relative}
+.sec{padding-block:clamp(64px,11vw,128px)}
+.paper{background:var(--paper);color:var(--ink)}
+.deep{background:var(--navy-2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;min-height:52px;padding:.9rem 1.35rem;border-radius:14px;border:1.5px solid #ffffff3d;background:#ffffff0f;color:#fff;font:700 .98rem var(--f-body);text-decoration:none;cursor:pointer;transition:transform .2s var(--ease),background .2s,box-shadow .2s;backdrop-filter:blur(8px)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn.g{background:linear-gradient(180deg,var(--gold-lt),var(--gold));border-color:var(--gold);color:#1c1500;box-shadow:0 14px 34px #e2b00740}
+.btn.k{background:var(--ink);border-color:var(--ink);color:#fff}
+.paper .btn:not(.g):not(.k){border-color:var(--ink);color:var(--ink);background:transparent}
+.btn svg{width:18px;height:18px;flex:none}
+.arrow{display:inline-block;transition:transform .25s var(--ease)}
+a:hover .arrow,button:hover .arrow{transform:translateX(4px)}
+
+/* reveal */
+.js .rv{opacity:0;transform:translateY(38px) scale(.97);filter:blur(10px);transition:opacity .8s var(--ease) var(--d,0s),transform 1s var(--ease) var(--d,0s),filter .8s var(--ease) var(--d,0s)}
+.js .rv.in{opacity:1;transform:none;filter:none}
+.js .rv.zoom{transform:scale(.94)}
+.js .rv.zoom.in{transform:none}
+
+/* progress + header */
+.prog{display:none;position:fixed;inset:0 0 auto 0;height:3px;z-index:90;background:linear-gradient(90deg,var(--gold),var(--gold-lt));transform-origin:0 50%;transform:scaleX(0)}
+.top{position:fixed;inset:0 0 auto 0;z-index:80;height:calc(var(--top) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);transition:background .3s,box-shadow .3s,backdrop-filter .3s}
+.top.solid{background:#0b141ce6;backdrop-filter:blur(14px) saturate(1.3);box-shadow:0 1px 0 var(--dline)}
+.top .wrap{height:var(--top);display:flex;align-items:center;gap:1rem}
+.brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;margin-right:auto}
+.brand img{width:54px;height:auto}
+.brand{transition:opacity .35s,transform .35s}
+@media (max-width:959px){.athero .brand{opacity:0;transform:translateY(-10px);pointer-events:none}}
+.brand b{display:block;font:800 .92rem/1 var(--f-disp);font-stretch:125%;letter-spacing:.03em;text-transform:uppercase;color:var(--gold-lt)}
+.brand small{display:block;font:500 .54rem/1 var(--f-mono);letter-spacing:.2em;color:#9fb0bc;margin-top:4px;text-transform:uppercase}
+.links{display:none;gap:1.5rem;list-style:none;margin:0;padding:0}
+.links a{font-weight:600;font-size:.92rem;text-decoration:none;opacity:.82;position:relative;padding-block:.4rem}
+.links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:0 50%;transition:transform .3s var(--ease)}
+.links a:hover,.links a.on{opacity:1}.links a.on::after,.links a:hover::after{transform:scaleX(1)}
+.top .btn{min-height:42px;padding:.5rem 1rem;font-size:.88rem;display:none}
+.call{display:inline-flex;align-items:center;gap:.4rem;font:700 .74rem var(--f-mono);color:var(--gold-lt);text-decoration:none;border:1px solid #e2b00755;border-radius:11px;padding:.55rem .7rem;background:#0b141c66;backdrop-filter:blur(8px)}
+.call svg{width:14px;height:14px}
+.burger{width:44px;height:44px;border-radius:12px;border:1px solid var(--dline);background:#0b141c66;backdrop-filter:blur(8px);display:grid;place-items:center;cursor:pointer;padding:0}
+.burger i{display:block;width:18px;height:2px;background:#fff;border-radius:2px;box-shadow:0 6px 0 #fff,0 -6px 0 #fff;transition:.25s}
+.menu-open .burger i{box-shadow:none;transform:rotate(45deg)}
+.menu-open .burger i::after{content:"";position:absolute;width:18px;height:2px;background:#fff;border-radius:2px;transform:rotate(90deg)}
+.burger i{position:relative}
+
+/* full-screen menu */
+.menu{position:fixed;inset:0;z-index:75;background:radial-gradient(120% 70% at 100% 0,#1c3246,var(--navy) 62%);padding:calc(var(--top) + env(safe-area-inset-top,0px) + 8px) var(--g) calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;overflow:auto;visibility:hidden;clip-path:circle(0 at calc(100% - var(--g) - 22px) 30px);transition:clip-path .55s var(--ease),visibility 0s .55s}
+.menu-open .menu{visibility:visible;clip-path:circle(150% at calc(100% - var(--g) - 22px) 30px);transition:clip-path .75s var(--ease)}
+.mtop{display:flex;justify-content:space-between;align-items:center;font:600 .62rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:#8fa3ac}
+.menu a.m{opacity:0;transform:translateY(46px) rotate(var(--r)) scale(.84);transition:opacity .45s calc(var(--i)*65ms + .12s),transform .75s cubic-bezier(.2,1.25,.3,1) calc(var(--i)*65ms + .12s),box-shadow .2s;text-decoration:none}
+.menu-open .menu a.m{opacity:1;transform:none}
+.menu a.mhome{color:var(--gold-lt);border:1px solid var(--dline);border-radius:999px;padding:.5rem .9rem;background:#ffffff0a}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;grid-auto-rows:minmax(108px,1fr)}
+.menu a.mt{position:relative;overflow:hidden;border-radius:20px;border:1px solid #ffffff2e;display:flex;flex-direction:column;justify-content:flex-end;gap:.25rem;padding:.8rem;isolation:isolate;color:#fff}
+.menu a.mt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;animation:kb2 12s ease-in-out infinite alternate}
+@keyframes kb2{from{transform:scale(1.04)}to{transform:scale(1.22) translate(-3%,-2%)}}
+.menu a.mt::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0b141c59 0%,#0b141c1a 35%,#0b141cf0 100%)}
+.menu a.mt span{position:absolute;left:.8rem;top:.7rem;font:600 .6rem var(--f-mono);letter-spacing:.16em;color:var(--gold-lt)}
+.menu a.mt b{font:800 clamp(1rem,4.6vw,1.3rem)/1 var(--f-disp);font-stretch:125%}
+.menu a.mt em{font:600 .6rem var(--f-mono);font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-lt)}
+.menu a.mt.on{box-shadow:inset 0 0 0 2px var(--gold);border-color:var(--gold)}
+.menu a.mt:active{transform:scale(.96)}
+.menu .mfoot{display:grid;grid-template-columns:1fr 1fr;gap:10px}.menu .mfoot .btn{white-space:nowrap;padding-inline:.5rem;font-size:.86rem}
+
+
+/* bottom tabs (phone) */
+.tabs{position:fixed;inset:auto 0 0 0;z-index:70;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:#0b141cf2;backdrop-filter:blur(16px) saturate(1.4);border-top:1px solid var(--dline)}
+.tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 5px;border-radius:12px;text-decoration:none;font:600 .62rem var(--f-body);letter-spacing:.02em;color:#8fa3ac;transition:color .2s,background .2s;position:relative}
+.tabs svg{width:22px;height:22px;transition:transform .3s var(--ease)}
+.tabs a.on{color:var(--gold-lt)}
+.tabs a.on svg{transform:translateY(-2px)}
+.tabs a.on::before{content:"";position:absolute;top:-7px;width:22px;height:3px;border-radius:0 0 3px 3px;background:var(--gold)}
+.tabs a.q{color:#1c1500;background:linear-gradient(180deg,var(--gold-lt),var(--gold));margin-inline:4px;box-shadow:0 8px 20px #e2b00738}
+.tabs a.q.on::before{display:none}
+body{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+
+/* pages */
+.page{display:none}
+.page.on{display:block;animation:pagein .6s var(--ease)}
+@keyframes pagein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* HOME hero */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding:calc(var(--top) + 20px) 0 34px;isolation:isolate}
+.slides{position:absolute;inset:0;z-index:-2}
+.slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.02);transition:opacity 1.6s ease}
+.slides img.on{opacity:1;animation:kb 9s linear forwards}
+@keyframes kb{from{transform:scale(1.02) translate3d(0,0,0)}to{transform:scale(1.16) translate3d(-1.5%,-2%,0)}}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0b141cb8 0%,#0b141c33 26%,#0b141c8c 56%,#0b141cf7 92%,var(--navy) 100%)}
+.hud{position:absolute;inset:calc(var(--top) + 10px) 12px 12px;pointer-events:none;z-index:0}
+.hud i{position:absolute;width:22px;height:22px;border:2px solid #f6d771b3}
+.hud i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}.hud i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
+.hud i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}.hud i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+.hud .tl,.hud .tr{position:absolute;top:8px;font:500 .58rem var(--f-mono);letter-spacing:.14em;color:#e8eef2d9;text-transform:uppercase}
+.hud .tl{left:32px}.hud .tr{right:32px;display:flex;gap:.5rem;align-items:center}
+.rec{width:7px;height:7px;border-radius:50%;background:#ff4d7d;animation:blink 1.4s steps(2) infinite}
+@keyframes blink{50%{opacity:.2}}
+.wing{position:relative;width:min(76vw,400px);aspect-ratio:900/333;margin:0 auto clamp(18px,5vh,44px);filter:drop-shadow(0 18px 30px #000c)}
+.wing>img{position:absolute;inset:0;width:100%;height:100%;animation:rise 1s .1s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:none}}
+.wing .sheen{position:absolute;inset:0;-webkit-mask:url(img/wings.png) center/100% 100% no-repeat;mask:url(img/wings.png) center/100% 100% no-repeat;background:linear-gradient(105deg,transparent 35%,#fff9 50%,transparent 65%) -200% 0/250% 100% no-repeat;animation:sheen 5s 1.2s ease-in-out infinite}
+@keyframes sheen{0%,55%{background-position:-200% 0}100%{background-position:200% 0}}
+.prop{position:absolute;left:50%;top:66.3%;width:16.6%;aspect-ratio:1;margin:-8.3% 0 0 -8.3%;border-radius:50%;background:radial-gradient(circle,#2b3a47 0 58%,#1a2631 72%);box-shadow:inset 0 0 0 2px #e2b00766;animation:fade .6s .6s both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.prop svg{position:absolute;inset:0;width:100%;height:100%}
+.hero h1 span{display:block;overflow:hidden}
+.hero h1 span b{display:block;font-weight:inherit;animation:up 1s var(--ease) both}
+.hero h1 span:nth-child(2) b{animation-delay:.12s}
+@keyframes up{from{transform:translateY(105%)}to{transform:none}}
+.hero .lede{margin-top:1rem;color:#dfe7ec;animation:fade 1s .5s both}
+.hero .cta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1.5rem;animation:fade 1s .7s both}
+.telemetry{margin-top:1.4rem;display:flex;justify-content:space-between;gap:.6rem;border-top:1px solid #ffffff2e;padding-top:.8rem;font:500 .6rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:#c9d4db}
+.telemetry b{color:var(--gold-lt);font-weight:700}
+.telemetry span:nth-child(2){flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:959px){
+  .hero{min-height:500px;height:calc(100svh - 63px - env(safe-area-inset-bottom,0px));padding:calc(var(--top) + env(safe-area-inset-top,0px) + 4px) 0 14px;justify-content:stretch}
+  .hero>.wrap{flex:1;min-height:0;display:flex;flex-direction:column;width:100%}
+  .hero .wing{margin:auto;width:min(80vw,400px,40svh)}
+  .hero h1{font-size:clamp(1.7rem,min(9.9vw,6.3svh),3.4rem)}
+  .hero .cta .btn{white-space:nowrap;padding-inline:.6rem}
+  .hero .lede{margin-top:.7rem;font-size:clamp(.88rem,2.35svh,1.05rem);line-height:1.5}
+  .hero .cta{margin-top:1.1rem}
+  .hero .telemetry{margin-top:1rem}
+  .hud{inset:calc(var(--top) + env(safe-area-inset-top,0px) + 2px) 10px 8px}
+  .hud i:nth-child(3),.hud i:nth-child(4){display:none}
+}
+@media (max-width:959px) and (max-height:600px){.hero .lede{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.hero .cta .btn{padding-block:.8rem}.hud .tl,.hud .tr{display:none}}
+
+/* pre-flight checklist */
+.pre{background:var(--navy-2);border-block:1px solid var(--dline);padding:clamp(1.6rem,5vw,2.6rem) 0;position:relative;overflow:hidden}
+.prehead{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.prestat{font:600 .62rem var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:#7fe0a2;display:flex;align-items:center;gap:.5rem;opacity:0;transition:opacity .5s 1.3s}
+.prestat b{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 4px #3ddc8426}
+.chk{list-style:none;margin:1.1rem 0 0;padding:0;display:grid;gap:0}
+.chk li{display:flex;align-items:center;gap:.8rem;padding:.72rem 0;border-bottom:1px dashed #ffffff1f;opacity:.32;transition:opacity .4s calc(var(--i)*.18s + .1s)}
+.chk li i{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid #f6d77180;position:relative;transition:background .3s calc(var(--i)*.18s + .1s),border-color .3s calc(var(--i)*.18s + .1s)}
+.chk li i::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #1c1500;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);transition:transform .3s calc(var(--i)*.18s + .2s) var(--ease)}
+.chk li span{flex:1;font-weight:600;color:#fff;font-size:.98rem}
+.chk li em{font:600 .58rem var(--f-mono);font-style:normal;letter-spacing:.18em;text-transform:uppercase;color:#7fe0a2;opacity:0;transition:opacity .3s calc(var(--i)*.18s + .3s)}
+.pre.in .chk li{opacity:1}.pre.in .chk li i{background:var(--gold);border-color:var(--gold)}.pre.in .chk li i::after{transform:rotate(45deg) scale(1)}.pre.in .chk li em,.pre.in .prestat{opacity:1}
+.stamp{display:table;margin:1.1rem 0 0 auto;font:800 .8rem var(--f-disp);font-stretch:125%;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-lt);border:2px solid var(--gold);border-radius:8px;padding:.5rem .7rem;background:#0b141ce6;transform:rotate(-7deg) scale(1.6);opacity:0;transition:transform .45s 1.45s cubic-bezier(.3,1.6,.5,1),opacity .2s 1.45s}
+.pre.in .stamp{transform:rotate(-7deg) scale(1);opacity:1}
+html:not(.js) .chk li,html:not(.js) .chk li em,html:not(.js) .prestat{opacity:1}
+/* scroll to climb */
+.climb{position:relative;height:360vh;background:#000}
+.climb .stage{position:sticky;top:0;height:calc(100svh - 63px - env(safe-area-inset-bottom,0px));overflow:hidden;color:#fff}
+#climbImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:31% 50%;transform-origin:31% 64%;transform:scale(3.2);will-change:transform}
+.climb .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,transparent 30%,#0b141c99 100%),linear-gradient(180deg,#0b141ccc 0,transparent 22%,transparent 46%,#0b141cf2 88%)}
+.ret{position:absolute;left:50%;top:40%;width:min(46vw,220px);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none}
+.ret i{position:absolute;width:18px;height:18px;border:2px solid #fffc}
+.ret i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}.ret i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}.ret i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}.ret i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+.ret u{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;background:linear-gradient(#fffc,#fffc) center/100% 2px no-repeat,linear-gradient(#fffc,#fffc) center/2px 100% no-repeat}
+.tape{position:absolute;right:calc(var(--g) + 14px);top:calc(var(--top) + 34px);bottom:46%;width:2px;background:linear-gradient(#ffffff59,#ffffff59)}
+.tape span{position:absolute;right:10px;transform:translateY(50%);font:600 .58rem var(--f-mono);letter-spacing:.1em;color:#ffffffb3}
+.tape span::after{content:"";position:absolute;right:-14px;top:50%;width:8px;height:2px;background:#ffffff80}
+.tape .dr{position:absolute;left:50%;bottom:0;width:38px;height:38px;margin:0 0 -19px -19px;filter:drop-shadow(0 4px 8px #000c);will-change:bottom}
+.tape .dr svg{width:100%;height:100%}.tape .rot rect{transform-box:fill-box;transform-origin:center;animation:spin .25s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.read{position:absolute;left:var(--g);top:calc(var(--top) + 26px);display:grid}
+.read small,.read em{font:600 .6rem var(--f-mono);font-style:normal;letter-spacing:.18em;text-transform:uppercase;color:#ffffffb3}
+.read b{font:800 clamp(3.4rem,17vw,6rem)/.95 var(--f-disp);font-stretch:125%;color:var(--gold-lt);font-variant-numeric:tabular-nums;text-shadow:0 6px 30px #000a}
+.caps{position:absolute;left:var(--g);right:var(--g);bottom:54px;min-height:11.5rem}
+.ccap{position:absolute;left:0;right:0;bottom:0;opacity:0;transform:translateY(14px);transition:opacity .45s,transform .45s var(--ease);pointer-events:none;max-width:560px}
+.ccap.on{opacity:1;transform:none;pointer-events:auto}
+.ccap small{font:600 .64rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gold-lt)}
+.ccap h2{margin-top:.5rem;font-size:clamp(1.8rem,8.4vw,3.2rem)}
+.ccap p{margin-top:.5rem;color:#e3eaee;max-width:34ch;text-shadow:0 2px 12px #000}.ccap h2{text-shadow:0 4px 24px #000a}
+.climb .ccap .btn{margin-top:1rem;display:inline-flex}
+.climb .hint{position:absolute;left:0;right:0;bottom:16px;display:flex;justify-content:center;align-items:center;gap:.6rem;font:600 .58rem var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:#ffffffa6;transition:opacity .3s}
+.climb .hint i{width:1px;height:18px;background:#fff;transform-origin:top;animation:drip 1.6s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(0);transform-origin:bottom}}
+.climb.top .hint{opacity:0}
+@media (min-width:700px){.chk{grid-template-columns:1fr 1fr;column-gap:2.4rem}}
+@media (min-width:960px){.chk{grid-template-columns:repeat(3,1fr)}.stamp{position:absolute;margin:0;top:1.3rem;right:calc(var(--g) + 140px)}.climb .stage{height:100vh}.tape{bottom:30%;right:calc(var(--g) + 30px)}.ret{top:46%}.caps{bottom:70px}#climbImg{object-position:50% 50%}}
+@media (prefers-reduced-motion:reduce){.climb{height:auto}.climb .stage{position:relative}#climbImg{transform:none!important}.tape .rot rect,.climb .hint i{animation:none}}
+
+/* deck of services */
+.sechead{display:grid;gap:1rem;margin-bottom:clamp(1.6rem,5vw,3rem)}
+.deck{display:grid;gap:14px}
+.svc{position:sticky;top:calc(var(--top) + 12px + var(--i)*14px);display:flex;flex-direction:column;justify-content:flex-end;min-height:min(70svh,560px);border-radius:26px;overflow:hidden;text-decoration:none;padding:1.3rem;isolation:isolate;box-shadow:0 -10px 40px #0009;border:1px solid var(--dline)}
+.svc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1.2s var(--ease)}
+.svc:hover img{transform:scale(1.06)}
+.svc::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0b141c59 0%,#0b141c1a 35%,#0b141cf2 88%)}
+.svc .n{position:absolute;top:1.1rem;left:1.3rem;font:500 .64rem var(--f-mono);letter-spacing:.16em;color:#fff;display:flex;gap:.6rem;align-items:center;text-transform:uppercase}
+.svc .n b{color:var(--gold-lt)}
+.svc h3{font-size:clamp(1.9rem,8vw,2.6rem)}
+.svc p{color:#dfe7ec;margin-top:.5rem;max-width:36ch;font-size:.98rem}
+.svc .row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:1.1rem;padding-top:.9rem;border-top:1px solid #ffffff33}
+.svc .row small{display:block;font:500 .58rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#c9d4db}
+.svc .row b{font:800 1.7rem/1 var(--f-disp);font-stretch:125%;color:var(--gold-lt)}
+.go{width:48px;height:48px;border-radius:50%;background:var(--gold);color:#1c1500;display:grid;place-items:center;flex:none;transition:transform .3s var(--ease)}
+a:hover .go{transform:rotate(-45deg)}
+.go svg{width:20px;height:20px}
+.minis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;position:relative;z-index:2}
+.mini{border-radius:20px;border:1px solid var(--dline);background:var(--navy-3);padding:1.1rem;text-decoration:none;display:grid;gap:.5rem;min-height:150px;align-content:end;position:relative;overflow:hidden;isolation:isolate}
+.mini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:.5}
+.mini::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0b141c33,#0b141ceb)}
+.mini b{font:800 1.15rem/1.05 var(--f-disp);font-stretch:125%}
+.mini span{font-size:.82rem;color:#c9d4db}
+
+/* film */
+.feature{position:relative;border-radius:26px;overflow:hidden;aspect-ratio:16/10;border:1px solid var(--dline);background:#000;cursor:pointer;display:block;width:100%;padding:0;text-align:left}
+.feature img{width:100%;height:100%;object-fit:cover;opacity:.9;transition:transform 1.4s var(--ease)}
+.feature:hover img{transform:scale(1.05)}
+.feature::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,#0b141ce6)}
+.feature .meta{position:absolute;left:1.2rem;right:1.2rem;bottom:1.1rem;z-index:2;display:flex;align-items:center;gap:1rem}
+.play{width:64px;height:64px;border-radius:50%;background:var(--gold);display:grid;place-items:center;flex:none;box-shadow:0 0 0 0 #e2b00780;animation:pulse 2.4s infinite}
+.play::before{content:"";border-left:18px solid #1c1500;border-block:11px solid transparent;margin-left:5px}
+@keyframes pulse{70%{box-shadow:0 0 0 22px #e2b00700}100%{box-shadow:0 0 0 0 #e2b00700}}
+.feature .meta b{display:block;font:800 1.25rem/1.05 var(--f-disp);font-stretch:125%}
+.feature .meta small{font:500 .62rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#c9d4db}
+.feature iframe,.film iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+.rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(-1*var(--g));padding-inline:var(--g);scroll-padding-inline:var(--g)}
+.rail::-webkit-scrollbar{display:none}
+.rail>*{scroll-snap-align:start;flex:none}
+.film{position:relative;width:min(72vw,300px);aspect-ratio:16/10;border-radius:18px;overflow:hidden;border:1px solid var(--dline);background:#000;padding:0;cursor:pointer;text-align:left}
+.film img{width:100%;height:100%;object-fit:cover;opacity:.85;transition:transform .8s var(--ease)}
+.film:hover img{transform:scale(1.06)}
+.film span{position:absolute;left:12px;bottom:10px;right:12px;display:flex;align-items:center;gap:.55rem;font:700 .78rem/1.2 var(--f-body);text-shadow:0 1px 8px #000}
+.film span i{width:30px;height:30px;border-radius:50%;background:var(--gold);display:grid;place-items:center;flex:none}
+.film span i::before{content:"";border-left:9px solid #1c1500;border-block:6px solid transparent;margin-left:2px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--dline);border:1px solid var(--dline);border-radius:22px;overflow:hidden}
+.stats div{background:var(--navy-2);padding:1.3rem 1.1rem}
+.stats b{display:block;font:800 clamp(2.2rem,9vw,3.4rem)/1 var(--f-disp);font-stretch:125%;font-variant-numeric:tabular-nums}
+.stats div>span{display:block;margin-top:.5rem;font-size:.84rem;color:var(--dtext);line-height:1.35}
+
+/* BVLOS band */
+.sky{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.band{overflow:hidden;background:radial-gradient(120% 90% at 80% 0%,#1a2e40 0%,var(--navy) 60%)}
+.rules{display:grid;gap:10px;margin-top:1.8rem}
+.rule{display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:start;padding:1rem;border-radius:16px;border:1px solid var(--dline);background:#ffffff08;backdrop-filter:blur(6px)}
+.rule b{font:800 1.5rem/1 var(--f-disp);font-stretch:125%;color:var(--gold-lt);min-width:3.2rem}
+.rule span{font-size:.92rem;color:var(--dtext)}
+.rule span strong{display:block;color:#fff;font-weight:700}
+
+/* quotes */
+.voice{width:min(84vw,380px);border-radius:22px;border:1px solid var(--dline);background:var(--navy-2);padding:1.4rem;display:flex;flex-direction:column;gap:1.2rem;justify-content:space-between}
+.voice::before{content:"";width:40px;height:15px;background:var(--gold);-webkit-mask:url(img/wings.png) center/contain no-repeat;mask:url(img/wings.png) center/contain no-repeat}
+.voice p{font-size:1.1rem;line-height:1.42}
+.voice cite{font:500 .64rem var(--f-mono);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:#8fa3ac}
+.voice cite b{display:block;color:#fff;font:700 .92rem var(--f-body);letter-spacing:0;text-transform:none;margin-bottom:.2rem}
+.paper .voice{background:var(--card);border-color:var(--line);color:var(--ink)}
+.paper .voice cite b{color:var(--ink)}.paper .voice cite{color:var(--muted)}
+
+/* about teaser */
+.duo{display:grid;gap:clamp(24px,5vw,64px);align-items:center}
+.portrait{position:relative;border-radius:26px;overflow:hidden;aspect-ratio:4/3.3}
+.portrait img{width:100%;height:100%;object-fit:cover}
+.portrait figcaption,.cap{position:absolute;left:12px;bottom:12px;background:#0b141cd9;backdrop-filter:blur(6px);color:#fff;font:500 .6rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;padding:.4rem .6rem;border-radius:8px}
+.checks{list-style:none;margin:1.3rem 0 0;padding:0;display:grid;gap:.6rem}
+.checks li{display:grid;grid-template-columns:22px 1fr;gap:.7rem;font-size:.96rem;color:var(--dtext)}
+.paper .checks li{color:var(--ink-2)}
+.checks li::before{content:"";width:22px;height:22px;border-radius:50%;background:var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c1500' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/13px no-repeat;margin-top:.12rem}
+
+/* notes */
+.notes{display:grid;gap:0}
+.note{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;padding:1.15rem 0;border-top:1px solid var(--line);text-decoration:none}
+.note:last-child{border-bottom:1px solid var(--line)}
+.note .mono{color:var(--muted);display:block;margin-bottom:.35rem}
+.note .mono b{color:var(--gold-dk)}
+.note h3{font-size:clamp(1.1rem,4.2vw,1.45rem)}
+.note .go{background:var(--ink);color:#fff;width:42px;height:42px}
+
+/* final */
+.final{text-align:center;overflow:hidden}
+.final img{height:auto;width:min(60vw,300px);margin:0 auto 1.4rem;filter:drop-shadow(0 16px 30px #000a)}
+.final .tel{display:block;margin-top:1.4rem;font:800 clamp(2rem,9vw,3.4rem)/1 var(--f-disp);font-stretch:125%;text-decoration:none}
+.final .em{display:block;margin-top:.6rem;color:var(--dtext);text-decoration:none}
+.final .cta{display:grid;gap:10px;max-width:420px;margin:1.6rem auto 0}
+footer{border-top:1px solid var(--dline);padding:1.6rem 0 1.8rem;font-size:.8rem;color:#8fa3ac}
+footer .wrap{display:grid;gap:.9rem}
+footer nav{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem}
+footer nav a{text-decoration:none;color:#c9d4db;font-weight:600}
+footer .fine{font:500 .58rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:#6c7d88}
+
+/* inner page hero */
+.ph{min-height:74svh;display:flex;align-items:flex-end;overflow:hidden;padding:calc(var(--top) + 40px) 0 30px;isolation:isolate}
+.ph>img{position:absolute;inset:-6% 0 0 0;width:100%;height:112%;object-fit:cover;z-index:-2;will-change:transform}
+.ph::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0b141ca6 0%,#0b141c40 30%,#0b141cd9 74%,var(--navy) 100%)}
+.ph.plain{min-height:auto;padding-bottom:10px;background:radial-gradient(120% 90% at 85% 0%,#1a2e40 0%,var(--navy) 62%)}
+.ph.plain::before{display:none}
+.crumb{display:flex;gap:.5rem;align-items:center;font:500 .62rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#c9d4db;margin-bottom:1rem}
+.crumb a{text-decoration:none;color:var(--gold-lt)}
+.ph h1{font-size:clamp(2.4rem,10vw,5rem)}
+.ph .lede{margin-top:1rem;color:#dfe7ec}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:1.3rem}
+.facts span{font:600 .7rem var(--f-mono);letter-spacing:.06em;border:1px solid #ffffff38;background:#0b141c80;backdrop-filter:blur(8px);border-radius:999px;padding:.45rem .8rem;white-space:nowrap}
+.facts span b{color:var(--gold-lt)}
+
+/* gallery */
+.shot{position:relative;width:min(82vw,460px);aspect-ratio:4/5;border-radius:22px;overflow:hidden;margin:0;border:1px solid var(--dline)}
+.shot.wide{aspect-ratio:4/3;width:min(86vw,560px)}
+.shot img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.shot:hover img{transform:scale(1.05)}
+.shot figcaption{position:absolute;inset:auto 0 0 0;padding:2.4rem 1rem 1rem;background:linear-gradient(180deg,transparent,#0b141cf2);display:flex;justify-content:space-between;align-items:flex-end;gap:1rem}
+.shot figcaption b{font:800 1.2rem/1.05 var(--f-disp);font-stretch:125%}
+.shot figcaption small{font:500 .58rem var(--f-mono);letter-spacing:.12em;color:var(--gold-lt);text-transform:uppercase;white-space:nowrap}
+.railhint{display:flex;justify-content:space-between;align-items:center;margin-top:.9rem;font:500 .6rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#8fa3ac}
+.paper .railhint{color:var(--muted)}
+.inds{list-style:none;margin:1.4rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.inds li{font-size:.84rem;font-weight:600;border:1px solid var(--dline);background:#ffffff0a;border-radius:999px;padding:.45rem .85rem;display:flex;align-items:center;gap:.45rem}
+.inds li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+
+/* packages */
+.pkgs{display:grid;gap:12px}
+.pk{position:relative;border-radius:22px;background:var(--card);border:1.5px solid var(--line);padding:1.25rem;display:grid;gap:.9rem}
+.pk.hot{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 30px 60px #0b141c40}
+.pk .tag{position:absolute;top:-11px;right:16px;background:var(--gold);color:#1c1500;font:700 .58rem var(--f-mono);letter-spacing:.1em;padding:.25rem .5rem;border-radius:6px;text-transform:uppercase}
+.pk header{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem}
+.pk header small{display:block;font:500 .58rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.pk.hot header small{color:#8fa3ac}
+.pk .pr{font:800 2.3rem/1 var(--f-disp);font-stretch:125%}
+.pk.hot .pr{color:var(--gold-lt)}
+.pk ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pk li{border-radius:12px;background:var(--paper);padding:.6rem .5rem;text-align:center;font-size:.72rem;line-height:1.25;color:var(--ink-2)}
+.pk.hot li{background:#ffffff12;color:var(--dtext)}
+.pk li b{display:block;font:800 1.15rem/1.1 var(--f-disp);font-stretch:125%;color:var(--ink)}
+.pk.hot li b{color:#fff}
+.pk p{font-size:.88rem;color:var(--ink-2)}.pk.hot p{color:var(--dtext)}
+.pk .btn{width:100%}
+.strip{margin-top:14px;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.strip div{background:var(--card);padding:.85rem 1rem;font-size:.9rem;color:var(--ink-2)}
+.strip b{display:block;font:700 .58rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dk);margin-bottom:.15rem}
+
+/* mapping viewer */
+.screen{border-radius:20px;overflow:hidden;border:1px solid var(--dline);background:#060c12;box-shadow:0 30px 70px #000a}
+.screen .bar{display:flex;align-items:center;gap:6px;padding:.6rem .8rem;border-bottom:1px solid var(--dline)}
+.screen .bar i{width:9px;height:9px;border-radius:50%;background:#ffffff2e}
+.screen .bar span{margin-left:auto;font:500 .58rem var(--f-mono);letter-spacing:.12em;color:#8fa3ac;text-transform:uppercase}
+.screen .view{position:relative;aspect-ratio:16/9}
+.screen .view img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+.screen .view img.on{opacity:1}
+.seg{display:flex;gap:6px;padding:.6rem;border-top:1px solid var(--dline)}
+.seg button{flex:1;border:1px solid var(--dline);background:transparent;border-radius:10px;padding:.6rem .4rem;font-weight:700;font-size:.82rem;cursor:pointer;transition:.2s}
+.seg button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#1c1500}
+.twocards{display:grid;gap:12px;margin-top:14px}
+.dcard{border-radius:20px;border:1px solid var(--dline);background:#ffffff08;padding:1.2rem;display:grid;gap:.6rem}
+.dcard b.big{font:800 2rem/1 var(--f-disp);font-stretch:125%;color:var(--gold-lt)}
+.dcard b.big small{font:500 .6rem var(--f-mono);letter-spacing:.12em;color:#8fa3ac;text-transform:uppercase;margin-left:.4rem}
+.dcard p{font-size:.92rem;color:var(--dtext)}
+.calc{border-radius:20px;border:1px solid var(--dline);background:#ffffff08;padding:1.2rem;display:grid;gap:1rem;margin-top:14px}
+.calc input[type=range]{width:100%;accent-color:var(--gold);height:32px}
+.calc .row{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+.calc .big{font:800 clamp(2.6rem,12vw,3.6rem)/1 var(--f-disp);font-stretch:125%;color:var(--gold-lt);font-variant-numeric:tabular-nums}
+
+/* training */
+.ladder{display:grid;gap:14px}
+.rung{position:relative;border-radius:24px;background:var(--card);border:1px solid var(--line);padding:1.4rem;display:grid;gap:.9rem;color:var(--ink)}
+.rung.hot{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 30px 60px #0b141c40}
+.rung .lvl{display:flex;justify-content:space-between;font:700 .62rem var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dk)}
+.rung.hot .lvl{color:var(--gold-lt)}
+.rung h3{font-size:2rem}
+.rung .why{color:var(--ink-2)}.rung.hot .why{color:var(--dtext)}
+.rung dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.55rem 1rem;font-size:.9rem;border-top:1px solid var(--line);padding-top:.9rem}
+.rung.hot dl{border-color:var(--dline)}
+.rung dt{font:700 .58rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:.25rem}
+.rung.hot dt{color:#8fa3ac}
+.rung dd{margin:0}
+.buy{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem}
+.buy small{display:block;font:500 .58rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.buy b{font:800 2.2rem/1 var(--f-disp);font-stretch:125%}
+.rung.hot .buy b{color:var(--gold-lt)}
+.mods{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:m}
+.mods li{counter-increment:m;display:grid;grid-template-columns:auto 1fr auto;gap:.9rem;align-items:center;padding:.85rem 1rem;border-radius:14px;border:1px solid var(--dline);background:#ffffff08;font-weight:600}
+.mods li::before{content:"0" counter(m);font:700 .68rem var(--f-mono);color:var(--gold-lt);letter-spacing:.1em}
+.mods li::after{content:"VIDEO + PDF";font:500 .54rem var(--f-mono);letter-spacing:.12em;color:#8fa3ac}
+.route{position:relative;padding:1.6rem 0 .4rem}
+.route .rail{align-items:flex-start;gap:0}
+.stop{width:112px;position:relative;padding-top:26px;text-align:center}
+.stop::before{content:"";position:absolute;left:0;right:0;top:8px;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-lt))}
+.stop:first-child::before{left:50%}.stop:last-child::before{right:50%}
+.stop::after{content:"";position:absolute;left:50%;top:1px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--paper);border:3px solid var(--gold)}
+.stop.l1::after{background:var(--gold);box-shadow:0 0 0 4px #e2b00733}
+.stop b{display:block;font-weight:700;font-size:.9rem;line-height:1.15}
+.stop small{font:500 .56rem var(--f-mono);letter-spacing:.12em;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;font-size:.82rem;color:var(--ink-2);margin-top:.6rem}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;border:3px solid var(--gold);margin-right:.4rem;vertical-align:-1px}
+.legend i.f{background:var(--gold)}
+.tiles{display:grid;gap:12px}
+.tile{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--dline);background:var(--navy-2);display:grid}
+.tile figure{margin:0;aspect-ratio:16/10;overflow:hidden}
+.tile figure img{width:100%;height:100%;object-fit:cover}
+.tile .tx{padding:1.2rem;display:grid;gap:.55rem}
+.tile .tx b.p{font:800 1.6rem/1 var(--f-disp);font-stretch:125%;color:var(--gold-lt)}
+.tile .tx p{font-size:.92rem;color:var(--dtext)}
+
+/* checker */
+.checker{border-radius:24px;background:var(--card);color:var(--ink);overflow:hidden;box-shadow:0 30px 70px #0008}
+.checker .head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.05rem 1.2rem}
+.checker .head b{font:800 1.05rem var(--f-disp);font-stretch:125%}
+.checker .head span{font:700 .64rem var(--f-mono);letter-spacing:.1em;color:var(--gold-dk)}
+.bar2{height:5px;background:var(--line)}.bar2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-lt));transition:width .5s var(--ease)}
+.q{padding:1rem 1.2rem;border-bottom:1px solid var(--line)}
+.q p{font-weight:700;margin-bottom:.6rem}
+.opt{display:flex;flex-wrap:wrap;gap:8px}
+.opt input{position:absolute;opacity:0}
+.opt label{border:1.5px solid var(--line);border-radius:12px;padding:.6rem 1rem;font-size:.92rem;font-weight:600;cursor:pointer;transition:.15s;user-select:none;min-height:44px;display:flex;align-items:center}
+.opt input:checked+label{background:var(--ink);border-color:var(--ink);color:#fff}
+.opt input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
+.legs{list-style:none;margin:0;padding:1.1rem 1.2rem;display:grid;gap:.9rem}
+.legs li{display:grid;grid-template-columns:28px 1fr auto;gap:.8rem;align-items:start;position:relative}
+.legs .dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;background:#fff;font:700 .68rem var(--f-mono);color:var(--muted);z-index:1}
+.legs li.done .dot{background:var(--gold);border-color:var(--gold);color:#1c1500}
+.legs li.next .dot{border-color:var(--ink);color:var(--ink);box-shadow:0 0 0 4px #e2b00733}
+.legs li:not(:last-child)::after{content:"";position:absolute;left:13px;top:32px;height:calc(100% - 18px);border-left:2px dashed var(--line)}
+.legs .t{font-weight:700;line-height:1.25}.legs .t small{display:block;font-weight:400;color:var(--ink-2);font-size:.84rem}
+.legs li.done .t{color:var(--muted);text-decoration:line-through;text-decoration-color:#0002}
+.legs .p{font:600 .7rem var(--f-mono);color:var(--ink-2);white-space:nowrap;padding-top:.25rem}
+.nextbox{margin:0 1.2rem 1.2rem;border-radius:16px;background:var(--navy);color:#fff;padding:1.1rem;display:grid;gap:.8rem}
+.nextbox b{font:800 1.2rem/1.05 var(--f-disp);font-stretch:125%}
+
+/* forms */
+.form{display:grid;gap:14px}
+.fgrid{display:grid;gap:12px}
+.field{display:grid;gap:.35rem;min-width:0}
+.field label,.flabel{font:700 .62rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.field input,.field select,.field textarea{font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:.8rem .9rem;width:100%;min-width:0;min-height:50px;transition:border-color .2s,box-shadow .2s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--ink);box-shadow:0 0 0 4px #e2b00740}
+.panel{border-radius:24px;background:var(--card);border:1px solid var(--line);padding:1.2rem;display:grid;gap:1rem}
+.panel>h3{display:flex;align-items:center;gap:.7rem;font-size:1.15rem}
+.panel>h3 i{width:30px;height:30px;border-radius:9px;background:var(--navy);color:var(--gold-lt);display:grid;place-items:center;font:800 .82rem var(--f-disp);font-style:normal;flex:none}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chips input{position:absolute;opacity:0}
+.chips label{border:1.5px solid var(--line);border-radius:14px;padding:.8rem .85rem;font-weight:700;font-size:.92rem;line-height:1.2;cursor:pointer;display:grid;gap:.25rem;min-height:64px;align-content:center;transition:.18s var(--ease)}
+.chips label small{font:500 .6rem var(--f-mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.chips input:checked+label{background:var(--navy);border-color:var(--navy);color:#fff;transform:scale(1.02)}
+.chips input:checked+label small{color:var(--gold-lt)}
+.chips input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
+.summary{border-radius:24px;background:var(--navy);color:#fff;padding:1.3rem;display:grid;gap:.9rem;align-self:start}
+.summary dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.5rem 1rem;font-size:.92rem}
+.summary dt{color:#8fa3ac}.summary dd{margin:0;text-align:right;font-weight:600}
+.air{border-radius:14px;border:1px solid var(--dline);background:#ffffff0a;padding:.8rem .9rem;font-size:.86rem;color:var(--dtext)}
+.air b{display:block;font:700 .6rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#fff;margin-bottom:.2rem}
+.air.ctl{border-color:#e2b00780;background:#e2b00714}.air.ctl b{color:var(--gold-lt)}
+.total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--dline);padding-top:.9rem}
+.total b{font:800 2.2rem/1 var(--f-disp);font-stretch:125%;color:var(--gold-lt)}
+.ok{display:none;border-radius:14px;background:#1f8a5522;border:1px solid #1f8a5588;color:#0d5c37;padding:.9rem 1rem;font-size:.92rem;font-weight:600}
+.ok.show{display:block;animation:pagein .5s var(--ease)}
+.summary .ok{color:#9fe8c2}
+.hide{display:none!important}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:auto 1fr;gap:1rem;padding:1.1rem;border-radius:20px;border:1px solid var(--dline);background:#ffffff08}
+.steps li::before{content:counter(s);width:46px;height:46px;border-radius:14px;background:var(--gold);color:#1c1500;display:grid;place-items:center;font:800 1.2rem var(--f-disp);font-stretch:125%}
+.steps b{display:block;font-size:1.05rem}.steps span{font-size:.92rem;color:var(--dtext)}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:1.2rem;text-align:center;color:var(--muted);cursor:pointer;display:block;font-weight:600}
+.drop.over{border-color:var(--gold);background:#e2b00712}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:.6rem}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px}
+
+/* gear */
+.prod{border-radius:24px;background:var(--card);border:1px solid var(--line);color:var(--ink);overflow:hidden;display:grid}
+.prod figure{margin:0;aspect-ratio:1;background:#fff;overflow:hidden}
+.prod figure img{width:100%;height:100%;object-fit:contain}
+.prod .tx{padding:1.2rem;display:grid;gap:.8rem;border-top:1px solid var(--line)}
+.prod .tx p{font-size:.92rem;color:var(--ink-2)}
+.vars{display:flex;flex-wrap:wrap;gap:6px}
+.vars span{font:600 .7rem var(--f-mono);border:1px solid var(--line);border-radius:999px;padding:.35rem .7rem}
+.feats{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.feats li{display:grid;grid-template-columns:auto 1fr;gap:.9rem;padding:1rem;border-radius:16px;border:1px solid var(--dline);background:#ffffff08}
+.feats li i{font:800 1.1rem var(--f-disp);font-stretch:125%;font-style:normal;color:var(--gold-lt)}
+.feats b{display:block}.feats span{font-size:.9rem;color:var(--dtext)}
+
+/* about */
+.log{border-radius:20px;background:var(--navy-2);border:1px solid var(--dline);padding:1.1rem 1.2rem;font:500 .74rem var(--f-mono);letter-spacing:.04em;display:grid;grid-template-columns:auto 1fr;gap:.6rem 1.2rem;color:#dfe7ec}
+.log span{color:var(--gold-lt);letter-spacing:.12em}
+.press{display:grid;gap:.5rem;padding:1.2rem;border-radius:20px;border:1px solid var(--dline);background:#ffffff08;text-decoration:none}
+.press p{font-size:.94rem;color:var(--dtext)}
+
+@media (min-width:700px){
+  .hero .cta{display:flex}
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .pkgs{grid-template-columns:1fr 1fr}
+  .twocards,.tiles{grid-template-columns:1fr 1fr}
+  .fgrid{grid-template-columns:1fr 1fr}.fgrid .full{grid-column:1/-1}
+  .chips{grid-template-columns:repeat(3,1fr)}
+  .rules{grid-template-columns:1fr 1fr}
+  .final .cta{grid-template-columns:1fr 1fr}
+}
+@media (min-width:960px){
+  :root{--top:72px}
+  body{padding-bottom:0}
+  .tabs,.burger,.call{display:none}
+  .links{display:flex}.top .btn{display:inline-flex}
+  .brand img{width:64px}.brand b{font-size:1.02rem}
+  .hero{padding-bottom:56px}
+  .hero .wrap{display:grid;grid-template-columns:1.25fr .75fr;align-items:end;gap:3rem}
+  .wing{margin:0 0 0 auto;width:min(34vw,440px);align-self:center}
+  .hero .wrap>div:nth-child(2){order:-1}
+  .telemetry{grid-column:1/-1}
+  .hud{inset:calc(var(--top) + 14px) 22px 22px}
+  .sechead{grid-template-columns:1fr 1fr;align-items:end}
+  .deck{grid-template-columns:1fr 1fr}
+  .svc{position:relative;top:auto;min-height:480px}
+  .minis{grid-template-columns:repeat(2,1fr)}
+  .duo{grid-template-columns:1fr 1fr}
+  .duo.r>:first-child{order:2}
+  .notes{grid-template-columns:1fr}
+  .pkgs{grid-template-columns:repeat(4,1fr)}
+  .pk ul{grid-template-columns:1fr}
+  .pk li{display:flex;gap:.5rem;align-items:baseline;text-align:left;justify-content:flex-start}.pk li b{font-size:1rem}
+  .strip{grid-template-columns:repeat(4,1fr)}
+  .ladder{grid-template-columns:repeat(3,1fr);align-items:start}
+  .tiles.three{grid-template-columns:repeat(3,1fr)}
+  .quote{display:grid;grid-template-columns:1.25fr .75fr;gap:20px;align-items:start}
+  .summary{position:sticky;top:calc(var(--top) + 20px)}
+  .feats{grid-template-columns:1fr 1fr}
+  .mods{grid-template-columns:1fr 1fr}
+  .steps.h{grid-template-columns:repeat(3,1fr)}
+  .ph{min-height:68svh}
+  footer .wrap{grid-template-columns:1fr auto;align-items:center}
+  footer .fine{grid-column:1/-1}
+}
+/* ===== wow pass ===== */
+.wipe{position:fixed;inset:0;z-index:95;background:radial-gradient(90% 60% at 50% 40%,#1c3246,var(--navy) 70%);display:grid;place-items:center;clip-path:inset(100% 0 0 0);pointer-events:none;visibility:hidden}
+.wipe::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-lt))}
+.wipe.in{visibility:visible;animation:wipein .42s cubic-bezier(.7,0,.2,1) forwards}
+.wipe.out{visibility:visible;animation:wipeout .55s cubic-bezier(.7,0,.2,1) forwards}
+@keyframes wipein{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0)}}
+@keyframes wipeout{from{clip-path:inset(0)}to{clip-path:inset(0 0 100% 0)}}
+.wipe div{display:grid;justify-items:center;gap:1rem}
+.wipe img{width:150px;height:auto;filter:drop-shadow(0 12px 24px #000a)}
+.wipe.in img{animation:wlift .5s .1s var(--ease) both}
+@keyframes wlift{from{transform:translateY(40px) scale(.8);opacity:0}to{transform:none;opacity:1}}
+.wipe span{font:700 .68rem var(--f-mono);letter-spacing:.24em;text-transform:uppercase;color:var(--gold-lt)}
+.page.on{animation:none}
+/* page heroes */
+.ph{position:relative}
+.ph .wrap{position:relative}
+.ph>img{animation:phin 1.7s var(--ease) both}
+@keyframes phin{from{scale:1.3;filter:blur(8px) brightness(.6)}to{scale:1;filter:none}}
+.ph h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.14em;margin-bottom:-.14em}
+.ph h1 .w i{display:inline-block;font-style:normal;animation:up .95s var(--ease) both;animation-delay:calc(var(--w)*75ms + .35s)}
+.ph h1 .gold{background:none}.ph h1 .gold .w i{background:linear-gradient(180deg,var(--gold-lt),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ph .crumb{animation:fade .8s .3s both}
+.ph .lede{animation:fadeup .9s .8s both}
+.ph .facts span{animation:pop .6s cubic-bezier(.2,1.5,.4,1) both;animation-delay:1s}
+.ph .facts span:nth-child(2){animation-delay:1.1s}.ph .facts span:nth-child(3){animation-delay:1.2s}
+@keyframes fadeup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.7) translateY(10px)}to{opacity:1;transform:none}}
+.ph .hud{inset:calc(var(--top) + 8px) 10px 10px;animation:fade 1s 1.1s both}
+.ph .hud .tr u{text-decoration:none;font-variant-numeric:tabular-nums}
+.sig{animation:fadeup 1s 1.1s both}
+/* BVLOS radar */
+.radar{position:relative;width:min(80vw,380px);aspect-ratio:1;margin:1.8rem auto 0;border-radius:50%;border:1px solid #f6d77166;background:radial-gradient(circle,#15304a 0,#0b141c 72%);overflow:hidden;box-shadow:0 30px 80px #000a,inset 0 0 60px #0b141c}
+.radar::before{content:"";position:absolute;inset:0;background:linear-gradient(#ffffff14,#ffffff14) 50% 0/1px 100% no-repeat,linear-gradient(#ffffff14,#ffffff14) 0 50%/100% 1px no-repeat}
+.radar .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 72%,#f6d77105 72%,#f6d77180 100%);animation:spin 4s linear infinite}
+.radar>i{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);border:1px dashed #ffffff2e}
+.radar .r1{width:34%;height:34%;border:2px solid #7fe0a2;box-shadow:0 0 24px #7fe0a240,inset 0 0 24px #7fe0a21f}
+.radar .r2{width:64%;height:64%}.radar .r3{width:92%;height:92%}
+.radar>span{position:absolute;font:700 .52rem var(--f-mono);letter-spacing:.16em}
+.radar .vl{left:50%;top:50%;transform:translate(-50%,calc(-50% + 9.5vw));color:#7fe0a2;white-space:nowrap}
+.radar .bl{left:50%;top:9%;transform:translateX(-50%);color:var(--gold-lt)}
+.radar .me{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 #fff8;animation:ping 2s infinite}
+@keyframes ping{to{box-shadow:0 0 0 16px #fff0}}
+.radar u{position:absolute;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:var(--gold-lt);opacity:.15;animation:blip 4s linear infinite;animation-delay:var(--t)}
+@keyframes blip{0%{opacity:1;box-shadow:0 0 0 0 #f6d771cc,0 0 14px 3px #f6d771}30%{box-shadow:0 0 0 9px #f6d77100,0 0 0 0 #f6d77100}70%,100%{opacity:.15}}
+.radar .fly{position:absolute;width:34px;height:34px;margin:-17px;left:50%;top:50%;animation:flyout 9s ease-in-out infinite;filter:drop-shadow(0 4px 8px #000)}
+@keyframes flyout{0%,8%{left:50%;top:50%}45%,58%{left:82%;top:20%}92%,100%{left:50%;top:50%}}
+.rcap{text-align:center;margin-top:.9rem;font:600 .62rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#a9b8c2}
+.rcap b{color:var(--gold-lt)}
+/* repair scan */
+.scan{position:relative;margin-top:1.5rem;border-radius:18px;overflow:hidden;border:1px solid #ffffff4d;max-width:440px;aspect-ratio:384/215;box-shadow:0 24px 60px #000a}
+.scan>img{width:100%;height:100%;object-fit:cover;filter:saturate(.8) contrast(1.05)}
+.scan::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#0b141c00 0 3px,#0b141c33 3px 4px);pointer-events:none}
+.scan .line{position:absolute;left:0;right:0;top:0;height:2px;background:var(--gold-lt);box-shadow:0 0 22px 6px #f6d77199,0 -30px 40px 10px #f6d7711f;animation:scanl 3s ease-in-out infinite alternate}
+@keyframes scanl{to{top:calc(100% - 2px)}}
+.scan .bx{position:absolute;border:2px solid #7fe0a2;border-radius:6px;opacity:0;animation:bx 6s infinite}
+.scan .bx em{position:absolute;left:-2px;bottom:100%;font:700 .5rem var(--f-mono);font-style:normal;letter-spacing:.1em;text-transform:uppercase;background:#7fe0a2;color:#06220f;padding:2px 5px;white-space:nowrap;border-radius:3px 3px 0 0}
+.scan .b1{left:27%;top:47%;width:27%;height:47%;animation-delay:1s}
+.scan .b2{left:2%;top:26%;width:21%;height:62%;animation-delay:1.9s;border-color:var(--gold-lt)}.scan .b2 em{background:var(--gold-lt);color:#1c1500}
+.scan .b3{left:33%;top:14%;width:52%;height:22%;animation-delay:2.8s}
+@keyframes bx{0%,4%{opacity:0;transform:scale(1.2)}10%,78%{opacity:1;transform:none}86%,100%{opacity:0}}
+.scan .st{position:absolute;right:8px;bottom:8px;display:flex;align-items:center;gap:.4rem;font:700 .52rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;background:#0b141ccc;padding:4px 7px;border-radius:6px;color:#fff}
+.scan .st b{width:6px;height:6px;border-radius:50%;background:#7fe0a2;animation:blink 1s steps(2) infinite}
+/* route drone */
+.route .rdr{position:absolute;top:-4px;left:0;width:34px;height:34px;z-index:2;transition:left .25s linear;filter:drop-shadow(0 4px 6px #0006)}
+.route .rdr svg{width:100%;height:100%}.route .rdr svg g:first-child,.route .rdr svg g{stroke:#b88a00}.route .rdr rect{fill:#b88a00}
+.rnow{margin-top:.2rem;font:600 .62rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rnow b{color:#8a6a00}
+.stop{transition:transform .3s var(--ease)}.stop.cur{transform:translateY(4px) scale(1.12)}.stop.cur b{color:#8a6a00}
+/* logbook typing */
+.log b.typing::after{content:"";display:inline-block;width:.55em;height:1em;background:var(--gold-lt);vertical-align:-.15em;margin-left:2px;animation:blink .7s steps(2) infinite}
+/* quote: boarding pass */
+.summary{position:relative}
+.summary::before{content:"";position:absolute;left:-11px;right:-11px;top:44px;height:22px;pointer-events:none;background:radial-gradient(circle at 0 50%,var(--paper) 10px,transparent 11px),radial-gradient(circle at 100% 50%,var(--paper) 10px,transparent 11px),repeating-linear-gradient(90deg,#ffffff4d 0 6px,transparent 6px 12px) center/calc(100% - 48px) 1px no-repeat}
+.summary::after{content:"";height:34px;opacity:.45;background:repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px 5px,#fff 5px 6px,transparent 6px 9px,#fff 9px 12px,transparent 12px 14px,#fff 14px 15px,transparent 15px 19px)}
+.summary>span:first-child{padding-bottom:.9rem}
+/* tabs: press feedback */
+.tabs a:active svg{transform:scale(.8)}
+@media (min-width:960px){
+  .ph .sig{position:absolute;right:var(--g);bottom:0;margin:0;width:400px}
+  .ph .radar.sig{width:340px;bottom:-10px}
+  .ph .wrap>.rcap{position:absolute;right:var(--g);bottom:-44px;width:340px;margin:0}
+  .ph .wrap:has(.sig)>*:not(.sig):not(.rcap){max-width:58%}
+  .radar .vl{transform:translate(-50%,calc(-50% + 44px))}
+}
+@media (max-width:959px){.radar .vl{transform:translate(-50%,calc(-50% + min(10.5vw,50px)))}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .js .rv{opacity:1;transform:none;filter:none}
+}
+</style>
+</head>
+<body>
+
+
+<div class="prog" id="prog"></div>
+<div class="wipe" id="wipe" aria-hidden="true"><div><img src="img/wings.png" alt="" width="900" height="333"><span id="wipeT"></span></div></div>
+<header class="top" id="topbar">
+  <div class="wrap">
+    <a class="brand" href="#/home" aria-label="Caswell Aviation home"><img src="img/wings.png" alt="" width="900" height="333"><span><b>Caswell Aviation</b><small>Calgary RPAS · since 2016</small></span></a>
+    <ul class="links">
+      <li><a href="#/aerial">Aerial</a></li><li><a href="#/training">Training</a></li><li><a href="#/bvlos">BVLOS</a></li><li><a href="#/repair">Repair</a></li><li><a href="#/gear">Gear</a></li><li><a href="#/about">About</a></li>
+    </ul>
+    <a class="btn g" href="#/quote">Get a quote</a>
+    <a class="call" href="tel:+14037031136" aria-label="Call Grant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg>Call</a>
+    <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><i></i></button>
+  </div>
+</header>
+
+<nav class="menu" id="menu" aria-label="All pages">
+  <div class="mtop"><a class="m mhome" style="--i:0;--r:0deg" href="#/home">Home base</a><span>Pick a mission</span></div>
+  <div class="mgrid">
+    <a class="m mt" style="--i:1;--r:-5deg" href="#/aerial"><img src="img/estate.jpg" alt="" loading="lazy"><span>01</span><b>Aerial &amp; mapping</b><em>from $250</em></a>
+    <a class="m mt" style="--i:2;--r:4deg" href="#/training"><img src="img/field-pilot.jpg" alt="" loading="lazy"><span>02</span><b>Training</b><em>from $100</em></a>
+    <a class="m mt" style="--i:3;--r:5deg" href="#/bvlos"><img src="img/urban.jpg" alt="" loading="lazy"><span>03</span><b>BVLOS</b><em>$495 review</em></a>
+    <a class="m mt" style="--i:4;--r:-4deg" href="#/repair"><img src="img/gimbal.jpg" alt="" loading="lazy"><span>04</span><b>DJI repair</b><em>$60 / hr</em></a>
+    <a class="m mt" style="--i:5;--r:-5deg" href="#/gear"><img src="img/pilot-matrice.jpg" alt="" loading="lazy"><span>05</span><b>Gear &amp; gifts</b><em>$375</em></a>
+    <a class="m mt" style="--i:6;--r:4deg" href="#/about"><img src="img/grant-cockpit.jpg" alt="" loading="lazy"><span>06</span><b>About Grant</b><em>25+ years</em></a>
+  </div>
+  <div class="mfoot">
+    <a class="btn g" href="#/quote">Get a quote</a>
+    <a class="btn" href="tel:+14037031136">Call 403-703-1136</a>
+  </div>
+</nav>
+
+<main id="app">
+
+<!-- ============ HOME ============ -->
+<div class="page" data-page="home">
+  <section class="hero" aria-labelledby="h1">
+    <div class="slides" id="slides" aria-hidden="true">
+      <img class="on" src="img/memorial-aerial.jpg" alt="" data-cap="Memorial gardens · Calgary">
+      <img src="img/estate.jpg" alt="" data-cap="Acreage · Foothills" loading="lazy">
+      <img src="img/highway.jpg" alt="" data-cap="Construction progress" loading="lazy">
+      <img src="img/vacation.jpg" alt="" data-cap="Vacation destination" loading="lazy">
+      <img src="img/airport.jpg" alt="" data-cap="Airport controlled airspace" loading="lazy">
+    </div>
+    <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="tl">51.04° N · 114.07° W</span><span class="tr"><b class="rec"></b>REC</span></div>
+    <div class="wrap">
+      <div class="wing" aria-hidden="true"><img src="img/wings.png" alt="" width="900" height="333"><div class="sheen"></div>
+        <div class="prop"><svg viewBox="0 0 100 100" id="blades"><g fill="#f6d771" stroke="#8a6a00" stroke-width="1.2"><path d="M50 50 C46 34 47 16 50 8 C53 16 54 34 50 50Z"/><path d="M50 50 C46 34 47 16 50 8 C53 16 54 34 50 50Z" transform="rotate(120 50 50)"/><path d="M50 50 C46 34 47 16 50 8 C53 16 54 34 50 50Z" transform="rotate(240 50 50)"/></g><circle cx="50" cy="50" r="7" fill="#e2b007" stroke="#8a6a00" stroke-width="1.5"/><circle cx="50" cy="50" r="2.4" fill="#0b141c"/></svg></div>
+      </div>
+      <div>
+        <span class="eyebrow">Calgary drone pilot · since 2016</span>
+        <h1 id="h1" style="margin-top:.9rem"><span><b>Earned wings.</b></span><span><b class="gold">Now flying for you.</b></span></h1>
+        <p class="lede">Aerial photo and video, mapping, pilot training, BVLOS flight reviews and DJI repair, from a pilot with 25+ years in aviation.</p>
+        <div class="cta"><a class="btn g" href="#/quote">Get a quote</a><a class="btn" href="#/aerial">See the work <span class="arrow">→</span></a></div>
+      </div>
+      <div class="telemetry" aria-hidden="true"><span>ALT <b id="alt">0</b> m</span><span id="cap">Memorial gardens · Calgary</span><span>VLOS <b>●</b></span></div>
+    </div>
+  </section>
+
+  <section class="pre" id="pre" aria-label="Credentials">
+    <div class="wrap">
+      <div class="prehead"><span class="eyebrow">Pre-flight checklist</span><span class="prestat"><b></b>All green</span></div>
+      <ul class="chk"><li style="--i:0"><i></i><span>Transport Canada Advanced certificate</span><em>Check</em></li><li style="--i:1"><i></i><span>FAA Part 107 certificate</span><em>Check</em></li><li style="--i:2"><i></i><span>Insured to $2.5 million CAD</span><em>Check</em></li><li style="--i:3"><i></i><span>ParaZero parachute for flights over people</span><em>Check</em></li><li style="--i:4"><i></i><span>Day and night operations</span><em>Check</em></li><li style="--i:5"><i></i><span>Flying commercially since 2016</span><em>Check</em></li></ul>
+      <div class="stamp" aria-hidden="true">Cleared for takeoff</div>
+    </div>
+  </section>
+
+  <section class="climb" id="climb" aria-label="What Grant's drone sees as it climbs">
+    <div class="stage">
+      <img id="climbImg" src="img/acreage2.jpg" alt="Aerial view of an acreage with a sport court, shot by Grant">
+      <div class="vig" aria-hidden="true"></div>
+      <div class="ret" aria-hidden="true"><i></i><i></i><i></i><i></i><u></u></div>
+      <div class="tape" aria-hidden="true"><span style="bottom:0">0</span><span style="bottom:24.6%">30</span><span style="bottom:49.2%">60</span><span style="bottom:73.8%">90</span><span style="bottom:100%">122</span><div class="dr" id="climbDr"><svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#f6d771" stroke-width="2.4" stroke-linecap="round"><path d="M14 14L34 34M34 14L14 34"/></g><rect x="19" y="18" width="10" height="12" rx="4" fill="#f6d771"/><g fill="none" stroke="#f6d771" stroke-width="1.6"><circle cx="12" cy="12" r="7"/><circle cx="36" cy="12" r="7"/><circle cx="12" cy="36" r="7"/><circle cx="36" cy="36" r="7"/></g><g class="rot" fill="#fff"><rect x="6" y="11.2" width="12" height="1.6" rx=".8"/><rect x="30" y="11.2" width="12" height="1.6" rx=".8"/><rect x="6" y="35.2" width="12" height="1.6" rx=".8"/><rect x="30" y="35.2" width="12" height="1.6" rx=".8"/></g></svg></div></div>
+      <div class="read" aria-hidden="true"><small>Altitude</small><b id="cAlt">0</b><em>m above ground</em></div>
+      <div class="caps">
+        <div class="ccap on"><small>Wheels down</small><h2>Scroll to take off.</h2><p>From the driveway, this is all anyone sees.</p></div>
+        <div class="ccap"><small>30 metres</small><h2>Roofs and listings.</h2><p>Close enough to inspect a roof, wide enough to sell the house.</p></div>
+        <div class="ccap"><small>60 metres</small><h2>The whole property.</h2><p>Construction progress, events and acreages in a single frame.</p></div>
+        <div class="ccap"><small>122 metres · the legal ceiling</small><h2>As high as Canada allows.</h2><p>Farms, mapping and stockpiles, flown by a pilot who knows every rule up here.</p><a class="btn g" href="#/aerial">See what Grant shoots <span class="arrow">→</span></a></div>
+      </div>
+      <div class="hint" aria-hidden="true"><i></i>Scroll to climb</div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">What are we flying today?</span><h2 style="margin-top:.9rem">Four ways Grant gets you in the air.</h2></div><p class="lede rv" style="--d:.1s">Pick a mission. Every page shows real prices, real work and a quick way to book.</p></div>
+      <div class="deck">
+        <a class="svc" style="--i:0" href="#/aerial"><img src="img/house-tree.jpg" alt="Bungalow with mature trees, shot from a low drone pass" loading="lazy"><span class="n"><b>01</b>Aerial photo &amp; video</span><h3>See it from above.</h3><p>Real estate, construction, farms, events and memorial gardens. Thermal and RGB.</p><div class="row"><span><small>Packages from</small><b>$250</b></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+        <a class="svc" style="--i:1" href="#/aerial" data-to="mapping"><img src="img/mapelev.jpg" alt="Colour-coded roof elevation map in mapping software" loading="lazy"><span class="n"><b>02</b>Mapping &amp; stockpiles</span><h3>Acres in. Numbers out.</h3><p>Photo-stitched maps, 3D models, volumes and plant health, across Canada.</p><div class="row"><span><small>Per 100 acres</small><b>$300</b></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+        <a class="svc" style="--i:2" href="#/training"><img src="img/field-pilot.jpg" alt="Pilot in a safety vest flying a drone over farmland" loading="lazy"><span class="n"><b>03</b>Training &amp; flight reviews</span><h3>Get certified.</h3><p>Online course, in-person training, and flight reviewers from Victoria to St. John's.</p><div class="row"><span><small>Online course</small><b>$499</b></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+        <a class="svc" style="--i:3" href="#/repair"><img src="img/gimbal.jpg" alt="Close view of a drone camera gimbal" loading="lazy"><span class="n"><b>04</b>DJI drone repair</span><h3>Crashed it? Send a photo.</h3><p>Free damage assessment. You approve the estimate before any work starts.</p><div class="row"><span><small>Labour</small><b>$60/hr</b></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+      </div>
+      <div class="minis">
+        <a class="mini rv" href="#/bvlos"><img src="img/urban.jpg" alt="" loading="lazy"><span class="mono" style="color:var(--gold-lt)">New rules</span><b>BVLOS &amp; Level 1 Complex</b><span>Check your path <span class="arrow">→</span></span></a>
+        <a class="mini rv" style="--d:.08s" href="#/gear"><img src="img/pilot-matrice.jpg" alt="" loading="lazy"><span class="mono" style="color:var(--gold-lt)">$375</span><b>Fitek harnesses &amp; gift cards</b><span>Shop gear <span class="arrow">→</span></span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec deep">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Watch the work</span><h2 style="margin-top:.9rem">Footage speaks louder.</h2></div><p class="lede rv" style="--d:.1s">Grant's own films, straight from his packages. Tap any to play.</p></div>
+      <button class="feature rv zoom" type="button" data-yt="JhYRQL2TzQA" aria-label="Play film: Dancing Winds Ranch"><img src="img/film-ranch.jpg" alt="" loading="lazy"><span class="meta"><i class="play"></i><span><small>Deluxe package · edited film</small><b>Dancing Winds Ranch</b></span></span></button>
+      <div class="rail" style="margin-top:12px">
+        <button class="film" type="button" data-yt="B369lPZuEwE" aria-label="Play: Basic package sample"><img src="img/film-basic.jpg" alt="" loading="lazy"><span><i></i>Basic package sample</span></button>
+        <button class="film" type="button" data-yt="3Kd9IPG6_d8" aria-label="Play: Advanced package, edited film"><img src="img/film-advanced.jpg" alt="" loading="lazy"><span><i></i>Advanced package, edited film</span></button>
+        <button class="film" type="button" data-yt="H58BiLIQjzo" aria-label="Play: SCRHL promo"><img src="img/film-scrhl.jpg" alt="" loading="lazy"><span><i></i>SCRHL promo, day rate</span></button>
+        <button class="film" type="button" data-yt="wQciImIVMUg" aria-label="Play: Mapping package sample"><img src="img/film-mapping.jpg" alt="" loading="lazy"><span><i></i>Mapping package sample</span></button>
+      </div>
+      <div class="stats rv" style="margin-top:clamp(2rem,6vw,4rem)">
+        <div><b class="gold"><span data-count="25">25</span>+</b><span>years in aviation, manned aircraft and drones</span></div>
+        <div><b class="gold">$<span data-count="2.5" data-dec="1">2.5</span>M</b><span>insurance, to operate worldwide</span></div>
+        <div><b class="gold"><span data-count="21">21</span></b><span>cities with affiliate flight reviewers</span></div>
+        <div><b class="gold"><span data-count="6">6</span></b><span>provinces covered for imaging and mapping</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec band">
+    <canvas class="sky" aria-hidden="true"></canvas>
+    <div class="wrap duo">
+      <div class="rv"><span class="eyebrow">Since November 4, 2025</span><h2 style="margin-top:.9rem">Canada opened the sky <span class="gold">beyond line of sight.</span></h2><p class="lede" style="margin-top:1.1rem">Transport Canada's new rules created the Level 1 Complex certificate. Grant offers the flight review with KR Drone Works, and consults on BVLOS applications and SOPs.</p><a class="btn g" href="#/bvlos" style="margin-top:1.5rem">Check your BVLOS path <span class="arrow">→</span></a></div>
+      <div class="rules">
+        <div class="rule rv"><b>01</b><span><strong>Level 1 Complex exam</strong>Transport Canada online exam, 80%+ to book a review</span></div>
+        <div class="rule rv" style="--d:.06s"><b>20+</b><span><strong>Hours of ground school</strong>Required by Transport Canada before the review</span></div>
+        <div class="rule rv" style="--d:.12s"><b>$495</b><span><strong>Level 1 Complex flight review</strong>With KR Drone Works reviewers in 16 cities</span></div>
+        <div class="rule rv" style="--d:.18s"><b>SOP</b><span><strong>Consulting for operators</strong>BVLOS applications and standard operating procedures, quoted</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Client logbook</span><h2 style="margin-top:.9rem">Trusted on the ground.</h2></div></div>
+      <div class="rail">
+        <figure class="voice" style="margin:0"><p>"His attention to detail helped capture the exact photos and videos we were looking for."</p><cite><b>Mike Fricker</b>Edenbrook Memorial Gardens</cite></figure>
+        <figure class="voice" style="margin:0"><p>"Grant's drone photos replace aerial imagery by helicopter and plane."</p><cite><b>Sue Blanchard</b>Legacy Public Affairs</cite></figure>
+        <figure class="voice" style="margin:0"><p>"Grant knows drones. He's certified, licensed, insured, everything to make the experience flawless."</p><cite><b>Mark Mehling</b>Take Control Marketing</cite></figure>
+        <figure class="voice" style="margin:0"><p>"They were exactly what I needed. They are clear and from the right height and angles."</p><cite><b>Doug Latter</b>Denaby Equities</cite></figure>
+        <figure class="voice" style="margin:0"><p>"Anytime we need aerial photography, Grant will be our guy."</p><cite><b>Clint Clarkson</b>E-Learning Alchemy</cite></figure>
+      </div>
+      <div class="railhint"><span>Swipe</span><a href="#/about" data-to="voices" style="color:var(--gold-lt);text-decoration:none">All testimonials →</a></div>
+    </div>
+  </section>
+
+  <section class="sec deep">
+    <div class="wrap duo">
+      <figure class="portrait rv zoom" style="margin:0"><img src="img/grant-cockpit.jpg" alt="Grant Caswell smiling in the cockpit of a DHC-8" loading="lazy"><figcaption>Grant Caswell · DHC-8 flight deck</figcaption></figure>
+      <div class="rv" style="--d:.1s"><span class="eyebrow">Your pilot</span><h2 style="margin-top:.9rem">From the flight deck to your job site.</h2><p class="lede" style="margin-top:1.1rem">Grant Caswell spent 25+ years in aviation before founding Caswell Aviation in 2016. Every drone flight gets the same checklists and airspace discipline.</p>
+        <ul class="checks"><li>Transport Canada Advanced and FAA Part 107</li><li>Insured up to $2.5 million CAD</li><li>Free first consultation on drone rules</li></ul>
+        <a class="btn" href="#/about" style="margin-top:1.5rem">Meet Grant <span class="arrow">→</span></a></div>
+    </div>
+  </section>
+
+  <section class="sec paper">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Field notes</span><h2 style="margin-top:.9rem">Fresh from the logbook.</h2></div><p class="lede rv" style="--d:.1s">Guides and weekly vlogs from Grant. Each one leads somewhere useful.</p></div>
+      <div class="notes">
+        <a class="note rv" href="#/aerial" data-to="mapping"><span><span class="mono">Nov 16 · Planning</span><h3>How to create a drone mission plan for reliable survey flights</h3></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <a class="note rv" href="#/aerial"><span><span class="mono">Nov 10 · Construction</span><h3>Construction drone photography in Alberta: benefits and pricing</h3></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <a class="note rv" href="https://www.youtube.com/@grantcaswell9841" target="_blank" rel="noopener"><span><span class="mono">Nov 9 · Vlog · <b>By Grant</b></span><h3>VLOG #90, from Grant's weekly flight vlog</h3></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ AERIAL ============ -->
+<div class="page" data-page="aerial">
+  <section class="ph"><img src="img/estate.jpg" alt="Estate home on a green acreage from above" data-plx>
+    <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="tl">RGB + thermal</span><span class="tr"><b class="rec"></b>REC <u class="tc">00:00</u></span></div>
+    <div class="wrap"><div class="crumb"><a href="#/home">Home</a><span>/</span><span>Aerial &amp; mapping</span></div>
+      <h1>Aerial photo, video <span class="gold">&amp; mapping.</span></h1>
+      <p class="lede">Thermal and RGB imagery for listings, job sites, acreages and events. Flown legally, edited and delivered ready to show.</p>
+      <div class="facts"><span>Packages from <b>$250</b></span><span>Mapping <b>$300</b> / 100 acres</span><span><b>6</b> provinces</span></div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:clamp(32px,6vw,64px)">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Who Grant flies for</span><h2 style="margin-top:.9rem">Every kind of site.</h2></div></div>
+      <div class="rail">
+        <figure class="shot"><img src="img/house-tree.jpg" alt="Bungalow with mature trees" loading="lazy"><figcaption><b>Residential real estate</b><small>01 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/memorial-aerial.jpg" alt="Memorial gardens and pond" loading="lazy"><figcaption><b>Memorial gardens &amp; golf courses</b><small>02 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/acreage2.jpg" alt="Acreage with tennis court" loading="lazy"><figcaption><b>Acreages &amp; farms</b><small>03 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/highway.jpg" alt="Highway construction from above" loading="lazy"><figcaption><b>Construction inspections</b><small>04 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/airport.jpg" alt="Airport apron with aircraft" loading="lazy"><figcaption><b>Airport controlled airspace</b><small>05 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/event.jpg" alt="Group of people standing in a circle on a beach" loading="lazy"><figcaption><b>Events</b><small>06 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/vacation.jpg" alt="Tropical resort from above" loading="lazy"><figcaption><b>Vacation destinations</b><small>07 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/urban.jpg" alt="Neighbourhood and shopping centre from above" loading="lazy"><figcaption><b>Home &amp; business exteriors</b><small>08 / 09</small></figcaption></figure>
+        <figure class="shot"><img src="img/lodge.jpg" alt="Log lodge with a deck, from above" loading="lazy"><figcaption><b>Lodges &amp; rural properties</b><small>09 / 09</small></figcaption></figure>
+      </div>
+      <div class="railhint"><span>Swipe the gallery</span><span>All photos by Grant</span></div>
+      <ul class="inds rv"><li>Real estate</li><li>Construction &amp; inspections</li><li>Sporting &amp; entertainment events</li><li>Oil &amp; gas</li><li>Day and night</li></ul>
+    </div>
+  </section>
+
+  <section class="sec deep">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Films</span><h2 style="margin-top:.9rem">One sample per package.</h2></div><a class="rv" style="--d:.1s;color:var(--gold-lt);font-weight:700;text-decoration:none" href="https://www.youtube.com/@grantcaswell9841" target="_blank" rel="noopener">All films and vlogs on YouTube →</a></div>
+      <div class="rail">
+        <button class="film" type="button" data-yt="B369lPZuEwE" aria-label="Play: Basic package sample"><img src="img/film-basic.jpg" alt="" loading="lazy"><span><i></i>Basic package sample</span></button>
+        <button class="film" type="button" data-yt="3Kd9IPG6_d8" aria-label="Play: Advanced package, edited film"><img src="img/film-advanced.jpg" alt="" loading="lazy"><span><i></i>Advanced package, edited film</span></button>
+        <button class="film" type="button" data-yt="JhYRQL2TzQA" aria-label="Play: Dancing Winds Ranch"><img src="img/film-ranch.jpg" alt="" loading="lazy"><span><i></i>Dancing Winds Ranch, Deluxe</span></button>
+        <button class="film" type="button" data-yt="H58BiLIQjzo" aria-label="Play: SCRHL promo"><img src="img/film-scrhl.jpg" alt="" loading="lazy"><span><i></i>SCRHL promo, day rate</span></button>
+        <button class="film" type="button" data-yt="wQciImIVMUg" aria-label="Play: Mapping package sample"><img src="img/film-mapping.jpg" alt="" loading="lazy"><span><i></i>Mapping package sample</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec paper" id="packages">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Packages</span><h2 style="margin-top:.9rem">Starting points, not surprises.</h2></div><p class="lede rv" style="--d:.1s">Pick the closest fit. Grant confirms a firm quote once he knows the site.</p></div>
+      <div class="pkgs">
+        <article class="pk rv"><header><span><small>Basic · from</small><b class="pr">$250</b></span></header><ul><li><b>30</b>unedited photos</li><li><b>30 min</b>unedited video</li><li><b>1 hr</b>on site</li></ul><p>Ideal for real estate and inspection aerial imagery.</p><a class="btn k" href="#/quote" data-svc="aerial" data-pkg="Basic">Quote Basic</a></article>
+        <article class="pk hot rv" style="--d:.06s"><span class="tag">Most listings</span><header><span><small>Advanced · from</small><b class="pr">$500</b></span></header><ul><li><b>30</b>edited photos</li><li><b>10 min</b>edited video</li><li><b>1 hr</b>on site</li></ul><p>Ready-to-show imagery for real estate, projects and marketing.</p><a class="btn g" href="#/quote" data-svc="aerial" data-pkg="Advanced">Quote Advanced</a></article>
+        <article class="pk rv" style="--d:.12s"><header><span><small>Deluxe · from</small><b class="pr">$750</b></span></header><ul><li><b>60</b>edited photos</li><li><b>20 min</b>edited video</li><li><b>2 hrs</b>on site</li></ul><p>Comprehensive edited footage, ready for presentation or marketing on completion.</p><a class="btn k" href="#/quote" data-svc="aerial" data-pkg="Deluxe">Quote Deluxe</a></article>
+        <article class="pk rv" style="--d:.18s"><header><span><small>Day rate · from</small><b class="pr">$990</b></span></header><ul><li><b>100</b>edited photos</li><li><b>1 hr</b>edited video</li><li><b>12 hrs</b>max on site</li></ul><p>Or all unedited footage. Ideal for imagery spanning multiple days.</p><a class="btn k" href="#/quote" data-svc="aerial" data-pkg="Day rate">Quote Day rate</a></article>
+      </div>
+      <div class="strip rv"><div><b>Service area</b>Calgary, Cochrane, Airdrie, Strathmore, Okotoks</div><div><b>Across Canada</b>Affiliates in BC, AB, SK, MB, ON and QC</div><div><b>Travel</b>$0.50 per km round trip outside the service area</div><div><b>Imagery</b>Thermal and RGB, photo and video</div></div>
+    </div>
+  </section>
+
+  <section class="sec band" id="mapping">
+    <canvas class="sky" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Mapping &amp; stockpile analysis</span><h2 style="margin-top:.9rem">Acres in. <span class="gold">Numbers out.</span></h2></div><p class="lede rv" style="--d:.1s">Thermal, 3D mapping and stockpile analysis with photo-stitching included, flown across Canada.</p></div>
+      <div class="duo" style="align-items:start">
+        <div class="screen rv zoom">
+          <div class="bar"><i></i><i></i><i></i><span id="mapLbl">Roof survey · elevation</span></div>
+          <div class="view" id="mapView"><img class="on" src="img/mapelev.jpg" alt="Elevation heat map of a roof" loading="lazy"><img src="img/map2d.jpg" alt="2D stitched roof map" loading="lazy"><img src="img/map3d.jpg" alt="3D roof model" loading="lazy"></div>
+          <div class="seg" role="group" aria-label="Map view"><button type="button" aria-pressed="true" data-v="0" data-l="Roof survey · elevation">Elevation</button><button type="button" aria-pressed="false" data-v="1" data-l="Roof survey · 2D stitched">2D map</button><button type="button" aria-pressed="false" data-v="2" data-l="Roof survey · 3D model">3D model</button></div>
+        </div>
+        <div>
+          <div class="twocards" style="margin-top:0">
+            <div class="dcard rv"><span class="mono" style="color:var(--gold-lt)">Mapping</span><b class="big">$300<small>/ 100 acres + GST</small></b><p>Post-imagery photo-stitching of your site.</p></div>
+            <div class="dcard rv" style="--d:.08s"><span class="mono" style="color:var(--gold-lt)">Stockpile analysis</span><b class="big">$500<small>/ 100 acres + GST</small></b><p>3D modelling, volume, area and distance calculations, and plant health using DroneDeploy.</p></div>
+          </div>
+          <div class="calc rv">
+            <div class="seg" style="padding:0;border:0" role="group" aria-label="Survey type" id="rateSeg"><button type="button" data-rate="300" aria-pressed="true">Mapping</button><button type="button" data-rate="500" aria-pressed="false">Stockpile analysis</button></div>
+            <label for="acres" class="row"><span>Site size</span><span class="mono" id="acresL" style="color:var(--gold-lt)">160 acres</span></label>
+            <input type="range" id="acres" min="10" max="1000" step="10" value="160">
+            <div class="row"><span style="color:var(--dtext);font-size:.88rem">Ballpark, billed per 100 acres, + GST</span><span class="big" id="est">$600</span></div>
+            <a class="btn g" href="#/quote" data-svc="mapping">Request a mapping quote</a>
+            <p style="font-size:.8rem;color:#8fa3ac">$0.50/km round trip outside the service area. Hotel and meals extra on missions that need them.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ TRAINING ============ -->
+<div class="page" data-page="training">
+  <section class="ph"><img src="img/field-pilot.jpg" alt="Pilot in a safety vest flying a drone over a field" data-plx>
+    <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="tl">Ground school</span><span class="tr"><b class="rec"></b>REC <u class="tc">00:00</u></span></div>
+    <div class="wrap"><div class="crumb"><a href="#/home">Home</a><span>/</span><span>Training</span></div>
+      <h1>Learn from someone who <span class="gold">flies for a living.</span></h1>
+      <p class="lede">Exam prep online, in-person training across Canada, and flight reviewers from Victoria to St. John's.</p>
+      <div class="facts"><span>Course <b>$499</b></span><span>Advanced review <b>$250</b></span><span>ROC-A <b>$100</b></span></div>
+    </div>
+  </section>
+
+  <section class="sec paper" style="padding-top:clamp(40px,7vw,80px)">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Which certificate do you need?</span><h2 style="margin-top:.9rem">Three levels. One path.</h2></div></div>
+      <div class="ladder">
+        <article class="rung rv"><span class="lvl"><span>Level 01</span><span>Start here</span></span><h3>Basic</h3><p class="why">You want to fly small drones away from people, in uncontrolled airspace.</p>
+          <dl><dt>Exam</dt><dd>Transport Canada Basic online exam</dd><dt>Prep</dt><dd>Grant's online course: 8 video modules + 8 PDFs</dd><dt>Access</dt><dd>Within 24 hours, for 1 year</dd></dl>
+          <div class="buy"><span><small>Course covers Basic + Advanced</small><b>$499</b></span><a class="btn k" href="#/training" data-to="course">Add to cart</a></div></article>
+        <article class="rung hot rv" style="--d:.08s"><span class="lvl"><span>Level 02</span><span>Most pilots</span></span><h3>Advanced</h3><p class="why">You want to fly near people, or in controlled airspace like the zone around YYC.</p>
+          <dl><dt>Exam</dt><dd>TC Advanced exam, 80%+ to book a review</dd><dt>Review</dt><dd>In Calgary, or with affiliate reviewers in 21 cities</dd><dt>Retake</dt><dd>Second flight review 25% off</dd></dl>
+          <div class="buy"><span><small>Advanced flight review</small><b>$250</b></span><a class="btn g" href="#/training" data-to="network">Add to cart</a></div></article>
+        <article class="rung rv" style="--d:.16s"><span class="lvl"><span>Level 03</span><span>New in 2025</span></span><h3>Level 1 Complex</h3><p class="why">You want to fly beyond visual line of sight under the new BVLOS rules.</p>
+          <dl><dt>Needs</dt><dd>80%+ on the TC Level 1 Complex exam, 20+ hrs ground school</dd><dt>Review</dt><dd>With KR Drone Works reviewers in 16 cities</dd><dt>Teams</dt><dd>BVLOS and SOP consulting, quoted</dd></dl>
+          <div class="buy"><span><small>Level 1 Complex review</small><b>$495</b></span><a class="btn k" href="#/bvlos">Check my path</a></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="course">
+    <div class="wrap duo">
+      <div class="rv"><span class="eyebrow">Online course · $499</span><h2 style="margin-top:.9rem">Eight modules. Both exams.</h2><p class="lede" style="margin-top:1.1rem">Prepares you for the Basic and Advanced Transport Canada online RPAS exams. One video and one PDF per module, at your own pace.</p>
+        <ul class="checks"><li>Online access within 24 hours of purchase</li><li>1 year of access from your start date</li><li>Add in-person training at $100/hr for groups up to 10</li></ul>
+        <a class="btn g" href="#/training" data-to="course" style="margin-top:1.5rem">Add course to cart · $499</a></div>
+      <ol class="mods rv" style="--d:.1s"><li>Human factors</li><li>Systems and air frames</li><li>Theoretical and practical meteorology</li><li>Navigation</li><li>Radio and radiotelephony procedures</li><li>Air regulations</li><li>RPAS flight operations</li><li>Theory of flight</li></ol>
+    </div>
+  </section>
+
+  <section class="sec paper" id="network">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Flight reviewer network</span><h2 style="margin-top:.9rem">Victoria to St. John's.</h2></div><p class="lede rv" style="--d:.1s">Affiliate reviewers in 21 cities. Not near one? They travel to you at $0.50/km round trip.</p></div>
+      <div class="route rv"><div class="rdr" id="rdr" aria-hidden="true"><svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#f6d771" stroke-width="2.4" stroke-linecap="round"><path d="M14 14L34 34M34 14L14 34"/></g><rect x="19" y="18" width="10" height="12" rx="4" fill="#f6d771"/><g fill="none" stroke="#f6d771" stroke-width="1.6"><circle cx="12" cy="12" r="7"/><circle cx="36" cy="12" r="7"/><circle cx="12" cy="36" r="7"/><circle cx="36" cy="36" r="7"/></g></svg></div><div class="rail" id="routeRail"></div><div class="rnow" aria-hidden="true">Now over <b id="rnow">Victoria</b></div></div>
+      <div class="legend"><span><i></i>Advanced flight review, $250</span><span><i class="f"></i>Advanced + Level 1 Complex with KR Drone Works, $495</span></div>
+      <div class="railhint"><span>Swipe west to east</span><span>21 cities · 9 provinces</span></div>
+    </div>
+  </section>
+
+  <section class="sec deep">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">More ways to train</span><h2 style="margin-top:.9rem">In the room, on the radio.</h2></div></div>
+      <div class="tiles three">
+        <article class="tile rv"><figure><img src="img/warehouse.jpg" alt="Pilot flying a drone indoors in a warehouse" loading="lazy"></figure><div class="tx"><span class="mono" style="color:var(--gold-lt)">In-person training</span><b class="p">$100/hr + GST</b><p>Groups up to 10 students, maximum 6 hours a day, with a free 30-minute consultation when you register. Affiliates in BC, AB, SK, MB, ON and QC.</p></div></article>
+        <article class="tile rv" style="--d:.08s"><figure><img src="img/radio.jpg" alt="Hand-held aviation radio" loading="lazy" style="object-position:50% 30%"></figure><div class="tx"><span class="mono" style="color:var(--gold-lt)">ROC-A radio certificate</span><b class="p">$100 + GST</b><p>Written exam, oral exam and paperwork filed with Industry Canada. In person, or remotely on Zoom, Google Meet or Teams.</p></div></article>
+        <article class="tile rv" style="--d:.16s"><figure><img src="img/sop.jpg" alt="Binder of standard operating procedures" loading="lazy" style="object-position:50% 25%"></figure><div class="tx"><span class="mono" style="color:var(--gold-lt)">Team training, BVLOS &amp; SOPs</span><b class="p">Quoted</b><p>Hourly, daily and weekly rates based on class size, travel and content: exam prep, BVLOS applications, SOP preparation.</p><a class="btn" href="#/quote" data-svc="consult">Get a team quote</a></div></article>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ BVLOS ============ -->
+<div class="page" data-page="bvlos">
+  <section class="ph plain band"><canvas class="sky" aria-hidden="true"></canvas>
+    <div class="wrap"><div class="crumb"><a href="#/home">Home</a><span>/</span><span>BVLOS</span></div>
+      <h1>Beyond visual <span class="gold">line of sight.</span></h1>
+      <p class="lede">On November 4, 2025, Transport Canada opened routine BVLOS flying with a new Level 1 Complex certificate. Here's what it takes, and where Grant comes in.</p>
+      <div class="facts"><span>L1C flight review <b>$495</b></span><span>KR Drone Works · <b>16</b> cities</span></div>
+      <div class="radar sig" aria-hidden="true"><div class="sweep"></div><i class="r3"></i><i class="r2"></i><i class="r1"></i><u style="left:48.5%;top:22.9%;--t:3.96s"></u><u style="left:60.9%;top:26.9%;--t:0.28s"></u><u style="left:72.7%;top:27.9%;--t:0.51s"></u><u style="left:79.9%;top:32.4%;--t:0.66s"></u><u style="left:82.8%;top:45.2%;--t:0.91s"></u><u style="left:75.1%;top:56.6%;--t:1.16s"></u><u style="left:79.9%;top:78.5%;--t:1.48s"></u><u style="left:64.0%;top:75.0%;--t:1.67s"></u><u style="left:48.2%;top:93.9%;--t:2.03s"></u><u style="left:36.9%;top:79.6%;--t:2.27s"></u><u style="left:29.9%;top:64.8%;--t:2.60s"></u><u style="left:21.1%;top:58.3%;--t:2.82s"></u><u style="left:23.7%;top:53.0%;--t:2.93s"></u><u style="left:11.1%;top:36.6%;--t:3.21s"></u><u style="left:22.0%;top:27.1%;--t:3.44s"></u><u style="left:39.1%;top:20.1%;--t:3.78s"></u><span class="vl">VLOS</span><span class="bl">BVLOS</span><b class="me"></b><div class="fly"><svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#f6d771" stroke-width="2.4" stroke-linecap="round"><path d="M14 14L34 34M34 14L14 34"/></g><rect x="19" y="18" width="10" height="12" rx="4" fill="#f6d771"/><g fill="none" stroke="#f6d771" stroke-width="1.6"><circle cx="12" cy="12" r="7"/><circle cx="36" cy="12" r="7"/><circle cx="12" cy="36" r="7"/><circle cx="36" cy="36" r="7"/></g></svg></div></div>
+      <p class="rcap"><b>16</b> Level 1 Complex review cities on the radar</p>
+    </div>
+  </section>
+  <section class="sec band" style="padding-top:clamp(32px,6vw,56px)">
+    <div class="wrap duo" style="align-items:start">
+      <div>
+        <div class="rv"><span class="eyebrow">Transport Canada's requirements</span><h2 style="margin-top:.9rem">What the rules ask for.</h2></div>
+        <div class="rules" style="grid-template-columns:1fr">
+          <div class="rule rv"><b>18+</b><span><strong>Minimum age</strong>For the Level 1 Complex pilot certificate</span></div>
+          <div class="rule rv"><b>80%</b><span><strong>Level 1 Complex online exam</strong>Minimum score before you can book the flight review</span></div>
+          <div class="rule rv"><b>20+</b><span><strong>Hours of ground school</strong>Required by Transport Canada before the review</span></div>
+          <div class="rule rv"><b>$495</b><span><strong>Flight review</strong>Offered by Grant with KR Drone Works affiliate reviewers</span></div>
+          <div class="rule rv"><b>RPOC</b><span><strong>RPAS Operator Certificate</strong>Needed by operators for BVLOS. Grant consults on applications and SOPs</span></div>
+        </div>
+      </div>
+      <div class="checker rv" style="--d:.1s">
+        <div class="head"><b>Your BVLOS readiness</b><span id="ckc">0 of 5 done</span></div>
+        <div class="bar2"><i id="ckp"></i></div>
+        <div class="q"><p>Do you hold an Advanced RPAS certificate?</p><div class="opt"><input type="radio" name="q1" id="q1y" value="y" checked><label for="q1y">Yes</label><input type="radio" name="q1" id="q1n" value="n"><label for="q1n">Not yet</label></div></div>
+        <div class="q"><p>Passed the Level 1 Complex exam?</p><div class="opt"><input type="radio" name="q2" id="q2y" value="y"><label for="q2y">Yes</label><input type="radio" name="q2" id="q2n" value="n" checked><label for="q2n">Not yet</label></div></div>
+        <div class="q"><p>Ground school hours so far?</p><div class="opt"><input type="radio" name="q3" id="q3a" value="0" checked><label for="q3a">None</label><input type="radio" name="q3" id="q3b" value="10"><label for="q3b">Under 20</label><input type="radio" name="q3" id="q3c" value="20"><label for="q3c">20 or more</label></div></div>
+        <div class="q"><p>Who runs the flights?</p><div class="opt"><input type="radio" name="q4" id="q4a" value="me" checked><label for="q4a">Just me</label><input type="radio" name="q4" id="q4b" value="team"><label for="q4b">A team or company</label></div></div>
+        <ol class="legs" id="legs"></ol>
+        <div class="nextbox"><span class="mono" style="color:var(--gold-lt)">Your next step</span><b id="nextT"></b><a class="btn g" id="nextB" href="#/quote"></a></div>
+      </div>
+    </div>
+  </section>
+  <section class="sec paper">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Level 1 Complex flight reviews</span><h2 style="margin-top:.9rem">16 cities with KR Drone Works.</h2></div><p class="lede rv" style="--d:.1s">In Alberta, reviewers travel to you at $0.50/km round trip outside Calgary.</p></div>
+      <ul class="inds rv" style="margin-top:0" id="l1cCities"></ul>
+      <div class="fgrid" style="margin-top:1.6rem;max-width:560px"><a class="btn g" href="#/bvlos" data-to="top">Add review to cart · $495</a><a class="btn" href="#/quote" data-svc="consult">Ask about BVLOS consulting</a></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ REPAIR ============ -->
+<div class="page" data-page="repair">
+  <section class="ph"><img src="img/parazero.jpg" alt="Drone parts and parachute system on a workbench" data-plx>
+    <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="tl">Bench · Bridlewood</span><span class="tr"><b class="rec"></b>REC <u class="tc">00:00</u></span></div>
+    <div class="wrap"><div class="crumb"><a href="#/home">Home</a><span>/</span><span>DJI repair</span></div>
+      <h1>Crashed it? <span class="gold">Send a photo first.</span></h1>
+      <p class="lede">DJI drone repair in Calgary. The assessment is free, and nothing is charged until you approve the estimate.</p>
+      <div class="facts"><span>Assessment <b>free</b></span><span>Labour <b>$60/hr</b></span><span>Parts <b>at cost</b></span></div>
+      <div class="scan sig" aria-hidden="true"><img src="img/gimbal.jpg" alt=""><div class="line"></div><i class="bx b1"><em>Gimbal</em></i><i class="bx b2"><em>Landing gear</em></i><i class="bx b3"><em>Airframe</em></i><span class="st"><b></b>Free assessment</span></div>
+    </div>
+  </section>
+  <section class="sec" style="padding-top:clamp(32px,6vw,64px)">
+    <div class="wrap">
+      <ol class="steps h">
+        <li class="rv"><div><b>Free assessment</b><span>Send photos, then drop it off in Bridlewood or have it picked up at $0.50/km round trip.</span></div></li>
+        <li class="rv" style="--d:.08s"><div><b>You approve the estimate</b><span>Labour at $60 per hour. Parts at cost plus delivery from suppliers. You decide whether to go ahead.</span></div></li>
+        <li class="rv" style="--d:.16s"><div><b>Back in the air</b><span>Pick up in Bridlewood, Calgary, or have it delivered back to you.</span></div></li>
+      </ol>
+    </div>
+  </section>
+  <section class="sec paper">
+    <div class="wrap duo" style="align-items:start">
+      <div class="rv"><span class="eyebrow">Start a repair</span><h2 style="margin-top:.9rem">Tell Grant what happened.</h2><p class="lede" style="margin-top:1.1rem">Two minutes now saves a trip. Grant looks at your photos and replies with what to expect.</p>
+        <div class="strip" style="margin-top:1.4rem"><div><b>Service area</b>Calgary, Cochrane, Airdrie, Strathmore, Okotoks</div><div><b>Drop-off</b>Bridlewood community, Calgary</div></div></div>
+      <form class="panel rv" style="--d:.1s" id="repairForm" novalidate>
+        <div class="field"><label for="rModel">Drone model</label><select id="rModel"><option>DJI Mini 4 Pro</option><option>DJI Air 3</option><option>DJI Mavic 3</option><option>DJI Matrice 30</option><option>DJI Avata 2</option><option>Other DJI</option></select></div>
+        <div class="field"><label for="rWhat">What happened?</label><textarea id="rWhat" rows="3" placeholder="Clipped a tree on the way down. Gimbal won't level."></textarea></div>
+        <label class="drop" id="drop" for="rPics">Add photos of the damage<input id="rPics" type="file" accept="image/*" multiple hidden><div class="thumbs" id="thumbs"></div></label>
+        <div class="fgrid"><div class="field"><label for="rName">Name</label><input id="rName" autocomplete="name"></div><div class="field"><label for="rMail">Email or phone</label><input id="rMail" autocomplete="email"></div></div>
+        <button class="btn g" type="submit">Start free assessment</button>
+        <div class="ok" id="rOk">Got it. This is a sample form. On the live site it goes straight to Grant.</div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- ============ GEAR ============ -->
+<div class="page" data-page="gear">
+  <section class="ph"><img src="img/pilot-matrice.jpg" alt="Pilot wearing a Fitek Gear harness while an enterprise drone hovers overhead" data-plx>
+    <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="tl">Fitek Gear</span><span class="tr"><b class="rec"></b>REC <u class="tc">00:00</u></span></div>
+    <div class="wrap"><div class="crumb"><a href="#/home">Home</a><span>/</span><span>Gear &amp; gifts</span></div>
+      <h1>Stay focused. <span class="gold">Fly longer.</span></h1>
+      <p class="lede">Fitek Gear controller harnesses give hands-free stability on long inspection, cinematography and emergency response days.</p>
+      <div class="facts"><span>Harness <b>$375</b></span><span>Gift cards <b>$10 to $100</b></span></div>
+    </div>
+  </section>
+  <section class="sec" style="padding-top:clamp(32px,6vw,64px)">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Fitek Gear drone controller harness</span><h2 style="margin-top:.9rem">Built for all-day flying.</h2></div></div>
+      <ul class="feats">
+        <li class="rv"><i>01</i><div><b>Comfort-focused</b><span>Built around the Comox Harness in breathable mesh and closed-cell foam.</span></div></li>
+        <li class="rv"><i>02</i><div><b>Adjustable and ergonomic</b><span>Fine-tune the bracket and hinges for your viewing and operating angle.</span></div></li>
+        <li class="rv"><i>03</i><div><b>Neck pain relief</b><span>Adjustable load distribution takes the strain off on extended operations.</span></div></li>
+        <li class="rv"><i>04</i><div><b>Quick release</b><span>Detach and move your controller to a tripod or another setup.</span></div></li>
+        <li class="rv"><i>05</i><div><b>MOLLE compatible</b><span>Add bottle holsters, radio pouches or utility storage.</span></div></li>
+        <li class="rv"><i>06</i><div><b>Not sure it fits?</b><span>Contact Grant and he'll check your controller.</span></div></li>
+      </ul>
+    </div>
+  </section>
+  <section class="sec paper">
+    <div class="wrap">
+      <div class="tiles">
+        <article class="prod rv"><figure><img src="img/harness-autel-m.jpg" alt="Pilot wearing the harness with a smart controller" loading="lazy"></figure><div class="tx"><h3>Harness for DJI controllers</h3><p>Fits DJI RC Pro, RC Plus, RC Plus 2, RC 2 and Smart Controller.</p><div class="buy"><span><small>Fitek Gear</small><b>$375</b></span><a class="btn k" href="#/gear">Add to cart</a></div></div></article>
+        <article class="prod rv" style="--d:.08s"><figure><img src="img/harness-skydio.jpg" alt="Pilot wearing the multi-controller harness with a Skydio controller" loading="lazy"></figure><div class="tx"><h3>Harness for other controllers</h3><p>Fits any controller with a standard 1/4-inch inset nut. Includes the harness (DCH925) and multi-controller bracket (MDCB925).</p><div class="vars"><span>Skydio</span><span>Autel</span><span>CIRC</span><span>ACSL</span></div><div class="buy"><span><small>Fitek Gear</small><b>$375</b></span><a class="btn k" href="#/gear">Add to cart</a></div></div></article>
+      </div>
+      <div class="rail" style="margin-top:14px">
+        <figure class="shot wide" style="border-color:var(--line)"><img src="img/harness-circ.jpg" alt="Harness with a CIRC controller on an articulated arm" loading="lazy"><figcaption><b>CIRC controller</b><small>Multi-controller bracket</small></figcaption></figure>
+        <figure class="shot wide" style="border-color:var(--line)"><img src="img/harness-autel.jpg" alt="Pilot in a hard hat wearing the harness with an Autel controller" loading="lazy"><figcaption><b>Autel controller</b><small>Hands-free</small></figcaption></figure>
+        <figure class="shot wide" style="border-color:var(--line)"><img src="img/pilot-matrice.jpg" alt="Harness in the field with an enterprise drone" loading="lazy"><figcaption><b>In the field</b><small>Fitek Gear</small></figcaption></figure>
+      </div>
+      <div class="panel rv" style="margin-top:14px"><div class="buy"><span><small>Caswell Aviation gift card</small><b>$10 to $100</b></span><a class="btn g" href="#/gear">Add to cart</a></div><p style="color:var(--ink-2);font-size:.94rem">Give the gift of aerial videos or photos of an event or real estate. Choose $10, $25, $50 or $100.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<div class="page" data-page="about">
+  <section class="ph"><img src="img/grant-cockpit.jpg" alt="Grant Caswell in the cockpit of a DHC-8" data-plx style="object-position:40% 30%">
+    <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="tl">DHC-8 flight deck</span><span class="tr"><b class="rec"></b>REC <u class="tc">00:00</u></span></div>
+    <div class="wrap"><div class="crumb"><a href="#/home">Home</a><span>/</span><span>About</span></div>
+      <h1>Grant Caswell, <span class="gold">pilot.</span></h1>
+      <p class="lede">Over 25 years in the aviation industry, operating manned aircraft and drones.</p>
+    </div>
+  </section>
+  <section class="sec" style="padding-top:clamp(32px,6vw,64px)">
+    <div class="wrap duo" style="align-items:start">
+      <div class="rv"><span class="eyebrow">About Caswell Aviation Ltd</span><h2 style="margin-top:.9rem">Legal, ethical, safe.</h2>
+        <p class="lede" style="margin-top:1.1rem">Caswell Aviation offers experienced training packages, drone repair, and aerial photography and video for real estate, sporting events, the entertainment industry, construction inspections, exterior home and business building inspections, and oil industry operations.</p>
+        <ul class="checks"><li>Transport Canada licensed with an Advanced Operations certificate</li><li>FAA licensed with a Part 107 certificate</li><li>Insured up to $2.5 million CAD to operate throughout the world</li><li>Insured for urban areas, near aerodromes and helipads, and over people with ParaZero parachute technology</li><li>Day and night operations</li><li>Free initial consultation on RPAS regulations in North America</li></ul></div>
+      <div style="display:grid;gap:12px">
+        <div class="log rv"><span>LICENCE</span><b>CPL · multi-IFR · seaplane</b><span>RPAS</span><b>TC Advanced · FAA Part 107</b><span>EDUCATION</span><b>BComm, U of Calgary</b><span>BASE</span><b>Bridlewood, Calgary</b><span>FOUNDED</span><b>2016</b></div>
+        <a class="press rv" href="https://xraised.com/videos/the-rise-of-drone-technology-grant-caswell-discusses-caswell-aviations-vision-for-the-future/" target="_blank" rel="noopener"><span class="mono" style="color:var(--gold-lt)">In the press · Xraised interview</span><h3>The rise of drone technology</h3><p>Grant on confined-space drone operations, taking training abroad, scaling repair across Canada, and where unmanned aviation is heading.</p><span style="color:var(--gold-lt);font-weight:700">Watch the interview →</span></a>
+        <figure class="portrait rv" style="margin:0;aspect-ratio:16/9"><img src="img/warehouse.jpg" alt="Grant flying a drone indoors" loading="lazy"><figcaption>Indoor flight · training day</figcaption></figure>
+      </div>
+    </div>
+  </section>
+  <section class="sec paper" id="voices">
+    <div class="wrap">
+      <div class="sechead"><div class="rv"><span class="eyebrow">Client logbook</span><h2 style="margin-top:.9rem">What clients say.</h2></div></div>
+      <div class="rail">
+        <figure class="voice" style="margin:0"><p>"His attention to detail helped capture the exact photos and videos we were looking for."</p><cite><b>Mike Fricker</b>Edenbrook Memorial Gardens</cite></figure>
+        <figure class="voice" style="margin:0"><p>"Grant's drone photos replace aerial imagery by helicopter and plane."</p><cite><b>Sue Blanchard</b>Legacy Public Affairs</cite></figure>
+        <figure class="voice" style="margin:0"><p>"Grant knows drones. He's certified, licensed, insured, everything to make the experience flawless."</p><cite><b>Mark Mehling</b>Take Control Marketing</cite></figure>
+        <figure class="voice" style="margin:0"><p>"They were exactly what I needed. They are clear and from the right height and angles."</p><cite><b>Doug Latter</b>Denaby Equities</cite></figure>
+        <figure class="voice" style="margin:0"><p>"The pictures and video turned out great… thank you!"</p><cite><b>Heather Waldner</b>Mountainview Memorial Gardens</cite></figure>
+        <figure class="voice" style="margin:0"><p>"His knowledge is top rate and his work is thorough."</p><cite><b>Danton Lalonde</b>Gratisites</cite></figure>
+        <figure class="voice" style="margin:0"><p>"Anytime we need aerial photography, Grant will be our guy."</p><cite><b>Clint Clarkson</b>E-Learning Alchemy</cite></figure>
+      </div>
+      <div class="railhint"><span>Swipe</span><span>7 clients</span></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ QUOTE ============ -->
+<div class="page" data-page="quote">
+  <section class="ph plain band"><canvas class="sky" aria-hidden="true"></canvas>
+    <div class="wrap"><div class="crumb"><a href="#/home">Home</a><span>/</span><span>Get a quote</span></div>
+      <h1>Tell Grant <span class="gold">about the job.</span></h1>
+      <p class="lede">Two minutes, three steps. Grant replies with a firm quote and a flight window.</p>
+    </div>
+  </section>
+  <section class="sec paper" style="padding-top:clamp(28px,5vw,48px)">
+    <div class="wrap">
+      <form class="quote form" id="quoteForm" novalidate>
+        <div class="form">
+          <div class="panel"><h3><i>1</i>What do you need?</h3>
+            <div class="chips" id="svc">
+              <input type="radio" name="svc" id="s1" value="aerial" data-l="Aerial photo & video" checked><label for="s1">Aerial photo &amp; video<small>from $250</small></label>
+              <input type="radio" name="svc" id="s2" value="mapping" data-l="Mapping"><label for="s2">Mapping<small>$300 / 100 acres</small></label>
+              <input type="radio" name="svc" id="s3" value="stockpile" data-l="Stockpile analysis"><label for="s3">Stockpile analysis<small>$500 / 100 acres</small></label>
+              <input type="radio" name="svc" id="s4" value="training" data-l="In-person training"><label for="s4">In-person training<small>$100/hr</small></label>
+              <input type="radio" name="svc" id="s5" value="consult" data-l="BVLOS & SOP consulting"><label for="s5">BVLOS &amp; SOP consulting<small>quoted</small></label>
+              <input type="radio" name="svc" id="s6" value="special" data-l="Special project"><label for="s6">Special project<small>quoted</small></label>
+            </div>
+            <div id="pkgBox"><span class="flabel">Closest package</span>
+              <div class="chips" id="pkg" style="margin-top:.5rem">
+                <input type="radio" name="pkg" id="p1" value="Basic" data-price="250"><label for="p1">Basic<small>$250 · unedited</small></label>
+                <input type="radio" name="pkg" id="p2" value="Advanced" data-price="500" checked><label for="p2">Advanced<small>$500 · edited</small></label>
+                <input type="radio" name="pkg" id="p3" value="Deluxe" data-price="750"><label for="p3">Deluxe<small>$750 · 2 hrs</small></label>
+                <input type="radio" name="pkg" id="p4" value="Day rate" data-price="990"><label for="p4">Day rate<small>$990 · 12 hrs</small></label>
+              </div></div>
+            <div id="acreBox" class="hide"><label for="qAcres" class="flabel" style="display:flex;justify-content:space-between"><span>Site size</span><span id="qAcresL" style="color:var(--gold-dk)">160 acres</span></label><input type="range" id="qAcres" min="10" max="1000" step="10" value="160" style="width:100%;accent-color:var(--gold);height:36px"></div>
+          </div>
+          <div class="panel"><h3><i>2</i>Where and when?</h3>
+            <div class="fgrid">
+              <div class="field"><label for="bArea">Area</label><select id="bArea"><option value="sw">Calgary SW</option><option value="nw">Calgary NW</option><option value="ne">Calgary NE, near YYC</option><option value="se">Calgary SE</option><option value="spr">Springbank, west of city</option><option value="coch">Cochrane</option><option value="air">Airdrie</option><option value="str">Strathmore</option><option value="oko">Okotoks</option><option value="else">Elsewhere in Canada</option></select></div>
+              <div class="field"><label for="bDate">Preferred date</label><input id="bDate" type="date"></div>
+              <div class="field full"><label for="bAddr">Site address</label><input id="bAddr" placeholder="123 Example Way SW, Calgary" autocomplete="street-address"></div>
+              <div class="field full"><label for="bNotes">Anything Grant should know?</label><textarea id="bNotes" rows="3" placeholder="Listing goes live Friday. Want the backyard and the park behind it."></textarea></div>
+            </div>
+          </div>
+          <div class="panel"><h3><i>3</i>How does Grant reach you?</h3>
+            <div class="fgrid">
+              <div class="field"><label for="bName">Name</label><input id="bName" autocomplete="name"></div>
+              <div class="field"><label for="bPhone">Phone</label><input id="bPhone" type="tel" autocomplete="tel"></div>
+              <div class="field"><label for="bEmail">Email</label><input id="bEmail" type="email" autocomplete="email"></div>
+              <div class="field"><label for="bSrc">How did you find Grant?</label><select id="bSrc"><option>Google search</option><option>A Caswell blog article or vlog</option><option>LinkedIn message</option><option>ChatGPT or another AI</option><option>Referral</option><option>Other</option></select></div>
+            </div>
+          </div>
+        </div>
+        <aside class="summary" aria-live="polite">
+          <span class="mono" style="color:var(--gold-lt)">Quote request</span>
+          <dl><dt>Service</dt><dd id="sSvc">Aerial photo &amp; video</dd><dt id="sDetL">Package</dt><dd id="sDet">Advanced</dd><dt>Area</dt><dd id="sArea">Calgary SW</dd><dt>Date</dt><dd id="sDate">-</dd></dl>
+          <div class="air" id="air"><b>Airspace</b>Uncontrolled. Standard Advanced operation.</div>
+          <div class="total"><span id="sTotL">Starting at, + GST</span><b id="sTot">$500</b></div>
+          <button class="btn g" type="submit">Request a quote</button>
+          <div class="ok" id="qOk">Request ready. This is a sample form. On the live site it lands in Grant's inbox with every detail.</div>
+          <p style="font-size:.8rem;color:#8fa3ac">Prefer to talk? Call or text <a href="tel:+14037031136" style="color:var(--gold-lt)">403-703-1136</a>.</p>
+        </aside>
+      </form>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<section class="sec final band" aria-labelledby="fh">
+  <canvas class="sky" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <img src="img/wings.png" alt="Caswell Aviation wings" width="900" height="333" loading="lazy">
+    <h2 id="fh">Cleared for takeoff?</h2>
+    <a class="tel gold" href="tel:+14037031136">403-703-1136</a>
+    <a class="em" href="mailto:caswellaviation@shaw.ca">caswellaviation@shaw.ca · Calgary, Alberta</a>
+    <div class="cta"><a class="btn g" href="#/quote">Get a quote</a><a class="btn" href="tel:+14037031136">Call or text Grant</a></div>
+  </div>
+</section>
+<footer><div class="wrap">
+  <span>© 2026 Caswell Aviation Ltd · Calgary, Alberta</span>
+  <nav aria-label="Footer"><a href="#/aerial">Aerial</a><a href="#/training">Training</a><a href="#/bvlos">BVLOS</a><a href="#/repair">Repair</a><a href="#/gear">Gear</a><a href="#/about">About</a><a href="#/quote">Quote</a></nav>
+  <span class="fine">Concept by Arctos Launchpad · built to run on Shopify · sample forms, nothing is sent</span>
+</div></footer>
+
+<nav class="tabs" aria-label="Main">
+  <a href="#/home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1z"/></svg>Home</a>
+  <a href="#/aerial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="6" r="2.5"/><path d="M7.5 6h9M9 6v4a3 3 0 006 0V6M12 13v3"/><rect x="9.5" y="16" width="5" height="4" rx="1"/></svg>Aerial</a>
+  <a href="#/training"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v5"/></svg>Training</a>
+  <a href="#/repair"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6a4 4 0 005 5L10 20.5a2.1 2.1 0 01-3-3L16.5 8M14.5 6l3-3M19.5 11l2-2"/></svg>Repair</a>
+  <a class="q" href="#/quote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg>Quote</a>
+</nav>
+
+<script>
+document.documentElement.classList.add('js');
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,$=i=>document.getElementById(i),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const PAGES=['home','aerial','training','bvlos','repair','gear','about','quote'];
+// reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+// router
+let cur='';
+const NAMES={home:'Home base',aerial:'Aerial & mapping',training:'Training',bvlos:'BVLOS',repair:'DJI repair',gear:'Gear & gifts',about:'About Grant',quote:'Get a quote'};let wT=0;
+function route(name,opts={}){if(!PAGES.includes(name))name='home';
+  document.body.classList.remove('menu-open');$('burger').setAttribute('aria-expanded','false');
+  const after=()=>{
+    if(opts.svc){const r=document.querySelector(`input[name=svc][value="${opts.svc}"]`);if(r)r.checked=true}
+    if(opts.pkg){const r=document.querySelector(`input[name=pkg][value="${opts.pkg}"]`);if(r)r.checked=true}
+    if(name==='quote')updQuote();
+    if(opts.to){const t=opts.to==='top'?document.querySelector('.page.on'):$(opts.to);if(t)requestAnimationFrame(()=>scrollTo({top:t.getBoundingClientRect().top+scrollY-70,behavior:RM?'instant':'smooth'}))}};
+  if(name===cur){after();return}
+  const first=!cur;cur=name;
+  const swap=()=>{$$('.page').forEach(p=>p.classList.toggle('on',p.dataset.page===name));
+    $$('.links a,.tabs a,.menu a.m').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#/'+name));
+    $$('.page.on .rv').forEach(el=>{el.classList.remove('in');io.observe(el)});
+    if(!opts.to)scrollTo({top:0,behavior:'instant'});sizeSkies();onScroll();tc0=Date.now();after()};
+  const w=$('wipe');clearTimeout(wT);
+  if(first||RM){w.className='wipe';swap();return}
+  $('wipeT').textContent=NAMES[name];w.className='wipe in';
+  wT=setTimeout(()=>{swap();w.className='wipe out';wT=setTimeout(()=>{w.className='wipe'},560)},440)}
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#/"]');if(!a)return;e.preventDefault();const n=a.getAttribute('href').slice(2);
+  route(n,{to:a.dataset.to,svc:a.dataset.svc,pkg:a.dataset.pkg});try{history.pushState({n},'','#/'+n)}catch(_){}});
+addEventListener('popstate',()=>route((location.hash||'#/home').slice(2)));
+$('burger').addEventListener('click',()=>{const o=document.body.classList.toggle('menu-open');$('burger').setAttribute('aria-expanded',o)});
+// scroll: header, progress, parallax
+const topbar=$('topbar'),prog=$('prog');let tick=false;
+const climb=$('climb'),cImg=$('climbImg'),cAlt=$('cAlt'),cDr=$('climbDr'),cCaps=$$('#climb .ccap');let cI=0;
+function upClimb(){if(!climb||!climb.offsetParent)return;const r=climb.getBoundingClientRect(),st=climb.firstElementChild.offsetHeight;if(r.bottom<0||r.top>innerHeight)return;
+  const p=RM?1:Math.min(1,Math.max(0,-r.top/Math.max(1,r.height-st))),e=1-Math.pow(1-p,2.2);
+  if(!RM)cImg.style.transform=`scale(${(3.2-2.2*e).toFixed(3)})`;cAlt.textContent=Math.round(p*122);cDr.style.bottom=(p*100).toFixed(1)+'%';
+  const k=p<.1?0:p<.4?1:p<.72?2:3;if(k!==cI){cCaps[cI].classList.remove('on');cCaps[k].classList.add('on');cI=k}climb.classList.toggle('top',p>.92)}
+if('IntersectionObserver'in window){const po=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');po.disconnect()}}),{threshold:.35});po.observe($('pre'))}else $('pre').classList.add('in');
+function onScroll(){const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;topbar.classList.toggle('solid',y>24);{const hp=document.querySelector('.page.on'),he=hp&&hp.dataset.page==='home'&&hp.querySelector('.hero');topbar.classList.toggle('athero',!!he&&y<he.offsetHeight-90)}prog.style.transform=`scaleX(${h>0?Math.min(1,y/h):0})`;
+  if(!RM){const im=document.querySelector('.page.on [data-plx]');if(im&&y<innerHeight)im.style.transform=`translate3d(0,${y*.22}px,0) scale(${1+y*.0003})`}upClimb();tick=false}
+addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});
+// hero slides + telemetry + prop
+(function(){const s=$$('#slides img');let i=0;if(!RM)setInterval(()=>{if(cur!=='home'||document.hidden)return;s[i].classList.remove('on');i=(i+1)%s.length;s[i].classList.add('on');$('cap').textContent=s[i].dataset.cap},5600);
+  const alt=$('alt'),bl=$('blades');let a=0,v=0,t0=performance.now();
+  function f(t){const el=(t-t0)/1000;v=Math.min(26,v+.18);a=(a+v)%360;bl.style.transform=`rotate(${a}deg)`;bl.style.transformOrigin='50% 50%';alt.textContent=Math.min(120,Math.round(Math.max(0,el-.8)*46));if(cur==='home')requestAnimationFrame(f);else setTimeout(()=>requestAnimationFrame(f),600)}
+  if(RM){alt.textContent='120'}else requestAnimationFrame(f)})();
+// count up
+(function(){const o=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;o.unobserve(e.target);const el=e.target,to=+el.dataset.count,dec=+el.dataset.dec||0;if(RM){el.textContent=to.toFixed(dec);return}const t0=performance.now();
+  (function f(t){const k=Math.min(1,(t-t0)/1400),v=to*(1-Math.pow(1-k,3));el.textContent=v.toFixed(dec);if(k<1)requestAnimationFrame(f)})(t0)}),{threshold:.6});$$('[data-count]').forEach(e=>o.observe(e))})();
+// contour skies
+const skies=$$('canvas.sky').map(c=>({c,x:c.getContext('2d'),w:0,h:0}));
+function sizeSkies(){skies.forEach(s=>{const r=s.c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);s.w=r.width;s.h=r.height;if(!r.width)return;s.c.width=r.width*d;s.c.height=r.height*d;s.x.setTransform(d,0,0,d,0,0)})}
+(function(){let t=0;function draw(){skies.forEach(s=>{if(!s.w)return;const r=s.c.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;const {x,w,h}=s;x.clearRect(0,0,w,h);
+  for(let k=0;k<10;k++){x.beginPath();x.strokeStyle=`rgba(226,176,7,${.05+k*.007})`;x.lineWidth=1;for(let i=0;i<=w;i+=8){const y=h*.08+k*h*.1+Math.sin(i*.006+k*.7+t*.4)*24+Math.sin(i*.017-t*.3)*9;i?x.lineTo(i,y):x.moveTo(i,y)}x.stroke()}});
+  if(!RM){t+=.008;requestAnimationFrame(draw)}}addEventListener('resize',sizeSkies);sizeSkies();draw()})();
+// films
+$$('[data-yt]').forEach(b=>b.addEventListener('click',()=>{if(b.querySelector('iframe'))return;const f=document.createElement('iframe');f.src='https://www.youtube-nocookie.com/embed/'+b.dataset.yt+'?autoplay=1&rel=0';f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.title=b.getAttribute('aria-label');b.appendChild(f)}));
+// map viewer
+$$('.screen .seg button').forEach(b=>b.addEventListener('click',()=>{$$('.screen .seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('#mapView img').forEach((im,i)=>im.classList.toggle('on',i==b.dataset.v));$('mapLbl').textContent=b.dataset.l}));
+// mapping calc
+(function(){const r=$('acres'),bs=$$('#rateSeg button');let rate=300;function u(){const a=+r.value;$('acresL').textContent=a+' acres';$('est').textContent='$'+(Math.ceil(a/100)*rate).toLocaleString('en-CA')}
+  bs.forEach(b=>b.addEventListener('click',()=>{bs.forEach(x=>x.setAttribute('aria-pressed',x===b));rate=+b.dataset.rate;u()}));r.addEventListener('input',u);u()})();
+// reviewer route
+(function(){const adv=[['Victoria','BC',1],['Vancouver','BC',1],['Fort McMurray','AB',1],['Edmonton','AB',1],['Red Deer','AB',1],['Calgary','AB',1],['Saskatoon','SK',1],['Moose Jaw','SK',1],['Regina','SK',0],['Winnipeg','MB',1],['Sudbury','ON',0],['Toronto','ON',1],['Hamilton','ON',0],['Peterborough','ON',0],['Markham','ON',0],['Kingston','ON',1],['Ottawa','ON',1],['Montreal','QC',1],['Moncton','NB',1],['Charlottetown','PE',1],["St. John's",'NL',1]];
+  $('routeRail').innerHTML=adv.map(([c,p,l])=>`<div class="stop${l?' l1':''}"><b>${c}</b><small>${p}</small></div>`).join('');
+  $('l1cCities').innerHTML=adv.filter(a=>a[2]).map(([c,p])=>`<li>${c}, ${p}</li>`).join('')})();
+// BVLOS checker
+(function(){const v=n=>(document.querySelector(`input[name=${n}]:checked`)||{}).value;
+  function render(){const adv=v('q1')==='y',exam=v('q2')==='y',gs=+v('q3'),team=v('q4')==='team';
+    const s=[{t:'Advanced pilot certificate',s:'Online course + Advanced flight review',done:adv,p:'$499 + $250',c:'See Advanced training',h:'#/training'},
+      {t:'Level 1 Complex exam',s:'Transport Canada online exam, 80%+',done:exam,p:'TC online',c:'Ask Grant about the exam',h:'#/quote',svc:'consult'},
+      {t:'20 hours of ground school',s:gs>=20?'Logged':gs?'Under 20 hours so far':'Required before the review',done:gs>=20,p:'TC rule',c:'Ask Grant what comes next',h:'#/quote',svc:'consult'},
+      {t:'Level 1 Complex flight review',s:'With KR Drone Works reviewers',done:false,p:'$495',c:'Book the $495 review',h:'#/quote',svc:'consult'},
+      {t:team?'RPAS Operator Certificate':'RPOC for your own flights',s:team?'SOPs sized to your operation':'Needed for BVLOS operations',done:false,p:'quoted',c:'Book an SOP consult',h:'#/quote',svc:'consult'}];
+    const nx=s.findIndex(i=>!i.done),dn=s.filter(i=>i.done).length;
+    $('legs').innerHTML=s.map((i,k)=>`<li class="${i.done?'done':k===nx?'next':''}"><span class="dot">${i.done?'✓':k+1}</span><span class="t">${i.t}<small>${i.s}</small></span><span class="p">${i.p}</span></li>`).join('');
+    const n=s[nx],b=$('nextB');$('nextT').textContent=n.t;b.innerHTML=n.c+' <span class="arrow">→</span>';b.setAttribute('href',n.h);if(n.svc)b.dataset.svc=n.svc;else delete b.dataset.svc;
+    $('ckc').textContent=dn+' of 5 done';$('ckp').style.width=(dn/5*100)+'%'}
+  $$('.checker input').forEach(i=>i.addEventListener('change',render));render()})();
+// quote
+function updQuote(){const svc=document.querySelector('input[name=svc]:checked'),pk=document.querySelector('input[name=pkg]:checked'),s=svc.value,a=+$('qAcres').value;
+  $('pkgBox').classList.toggle('hide',s!=='aerial');$('acreBox').classList.toggle('hide',s!=='mapping'&&s!=='stockpile');$('qAcresL').textContent=a+' acres';
+  $('sSvc').textContent=svc.dataset.l;const money=n=>'$'+n.toLocaleString('en-CA');
+  if(s==='aerial'){$('sDetL').textContent='Package';$('sDet').textContent=pk.value;$('sTotL').textContent='Starting at, + GST';$('sTot').textContent=money(+pk.dataset.price)}
+  else if(s==='mapping'||s==='stockpile'){$('sDetL').textContent='Site size';$('sDet').textContent=a+' acres';$('sTotL').textContent='Ballpark, + GST';$('sTot').textContent=money(Math.ceil(a/100)*(s==='mapping'?300:500))}
+  else if(s==='training'){$('sDetL').textContent='Rate';$('sDet').textContent='Groups up to 10';$('sTotL').textContent='Per hour, + GST';$('sTot').textContent='$100'}
+  else{$('sDetL').textContent='Pricing';$('sDet').textContent='Based on scope';$('sTotL').textContent='Grant replies with';$('sTot').textContent='A quote'}
+  const ar=$('bArea');$('sArea').textContent=ar.options[ar.selectedIndex].text;const dv=$('bDate').value;$('sDate').textContent=dv?new Date(dv+'T12:00').toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'}):'-';
+  const air=$('air');if(ar.value==='ne'){air.className='air ctl';air.innerHTML='<b>Controlled airspace · near YYC</b>Advanced operations are allowed here with air traffic control permission. Allow extra lead time.'}
+  else if(ar.value==='spr'){air.className='air ctl';air.innerHTML='<b>Near Springbank airport</b>Advanced operations are allowed with air traffic control permission. Allow extra lead time.'}
+  else if(ar.value==='else'){air.className='air';air.innerHTML='<b>Outside the service area</b>Flown with affiliates in BC, AB, SK, MB, ON and QC, or travel at $0.50/km round trip.'}
+  else{air.className='air';air.innerHTML='<b>Airspace</b>Uncontrolled. Standard Advanced operation.'}$('qOk').classList.remove('show')}
+(function(){const d=new Date();d.setDate(d.getDate()+5);$('bDate').value=d.toISOString().slice(0,10);$('quoteForm').addEventListener('input',updQuote);$('quoteForm').addEventListener('submit',e=>{e.preventDefault();$('qOk').classList.add('show')});updQuote()})();
+// repair
+(function(){const inp=$('rPics'),th=$('thumbs'),dz=$('drop');function show(f){th.innerHTML='';[...f].slice(0,6).forEach(x=>{if(!x.type.startsWith('image/'))return;const i=new Image();i.alt='Damage photo';i.src=URL.createObjectURL(x);th.appendChild(i)})}
+  inp.addEventListener('change',()=>show(inp.files));['dragover','dragenter'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over')}));['dragleave','drop'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('over')}));dz.addEventListener('drop',e=>show(e.dataTransfer.files));
+  $('repairForm').addEventListener('submit',e=>{e.preventDefault();$('rOk').classList.add('show')})})();
+// wow pass: word reveals, timecode, route drone, logbook typing
+$$('.ph h1').forEach(h=>{let n=0;const walk=el=>[...el.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/(\s+)/).forEach(t=>{if(!t)return;if(/^\s+$/.test(t)){f.appendChild(document.createTextNode(' '));return}const w=document.createElement('span');w.className='w';const i=document.createElement('i');i.style.setProperty('--w',n++);i.textContent=t;w.appendChild(i);f.appendChild(w)});c.replaceWith(f)}else if(c.nodeType===1)walk(c)});walk(h)});
+let tc0=Date.now();setInterval(()=>{const t=Math.floor((Date.now()-tc0)/1000),v=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');$$('.page.on .tc').forEach(e=>e.textContent=v)},1000);
+(function(){const rail=$('routeRail'),dr=$('rdr'),now=$('rnow');if(!rail||!dr)return;function up(){const st=$$('.stop',rail);if(!st.length)return;const m=rail.scrollWidth-rail.clientWidth,p=m>0?rail.scrollLeft/m:0,k=Math.round(p*(st.length-1));dr.style.left=(p*(rail.parentNode.clientWidth-34)).toFixed(1)+'px';st.forEach((x,i)=>x.classList.toggle('cur',i===k));now.textContent=st[k].querySelector('b').textContent}rail.addEventListener('scroll',up,{passive:true});setTimeout(up,0)})();
+(function(){const lg=document.querySelector('.log');if(!lg||RM||!('IntersectionObserver'in window))return;const bs=$$('b',lg),tx=bs.map(b=>b.textContent);let done=false;new IntersectionObserver((es,o)=>{if(done||!es[0].isIntersecting)return;done=true;o.disconnect();bs.forEach(b=>b.textContent='');let k=0;(function next(){if(k>=bs.length)return;const b=bs[k],t=tx[k];let c=0;b.classList.add('typing');const iv=setInterval(()=>{b.textContent=t.slice(0,++c);if(c>=t.length){clearInterval(iv);b.classList.remove('typing');k++;setTimeout(next,160)}},26)})()},{threshold:.5}).observe(lg)})();
+// boot
+route((location.hash||'#/home').slice(2));
+</script>
+
+</body>
+</html>

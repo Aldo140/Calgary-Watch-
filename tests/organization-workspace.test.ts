@@ -44,13 +44,21 @@ test('organization confirmed upcoming events do not disappear after fourteen day
  const entity={...organizationEvent(org,id,now),...add.changes};
  assert.equal(publishedInventory(entity,new Date(now+20*86400000)),true);
 });
+const usedFour=(db:any,id:string)=>db.data.set(`owner_business_edit_limits/${id}`,{lastSubmittedAt:now-2,recent:[now-5,now-4,now-3,now-2],editId:'earlier'});
+test('owners get five publishes in any seven days; the sixth waits for the oldest to age out',async()=>{
+ const db=memory();const ids=['1','2','3','4','5','6'].map(n=>`${n}2345678-1234-1234-1234-123456789abc`);
+ for(let i=0;i<5;i++){const r=await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:ids[i],operations:[{entityId:org.id,action:'edit',changes:{phone:`403-555-010${i}`}}]},now+i);assert.equal(r.nextAt,i<4?0:now+7*86400000);}
+ await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:ids[5],operations:[{entityId:org.id,action:'edit',changes:{phone:'403-555-0109'}}]},now+10),/5 updates for this week/);
+ await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:ids[5],operations:[{entityId:org.id,action:'edit',changes:{phone:'403-555-0109'}}]},now+7*86400000+1);
+ assert.deepEqual(db.data.get(`owner_business_edit_limits/${org.id}`).recent,[now+2,now+3,now+4,now+7*86400000+1]);
+});
 test('server commits publication, shared allowance and admin audit together; retries do not consume another week',async()=>{
  const db=memory(),input={organizationId:org.id,requestId:uuid,operations:[add,{entityId:org.id,action:'edit' as const,changes:{phone:'403-555-0101'}}]};
- const result=await submitOrganizationBatch(db,'u',input,now);assert.equal(result.nextAt,now+7*86400000);
+ usedFour(db,org.id);const result=await submitOrganizationBatch(db,'u',input,now);assert.equal(result.nextAt,now-5+7*86400000);
  assert.ok(db.data.has(`${ORGANIZATION_LIVE}/${id}`));assert.equal(db.data.get(`owner_listing_edits/${uuid}`).notificationPending,true);
  assert.equal((await submitOrganizationBatch(db,'u',input,now+100)).nextAt,result.nextAt);
  await assert.rejects(submitOrganizationBatch(db,'u',{...input,operations:[{...add,changes:{...add.changes,title:'Different payload'}}]},now+100),/Invalid save identifier/);
- await assert.rejects(submitOrganizationBatch(db,'u',{...input,requestId:'22345678-1234-1234-1234-123456789abc'},now+100),/seven complete/);
+ await assert.rejects(submitOrganizationBatch(db,'u',{...input,requestId:'22345678-1234-1234-1234-123456789abc'},now+100),/updates for this week/);
 });
 test('failed atomic submission consumes no allowance and publishes nothing',async()=>{
  const db=memory(),before=structuredClone([...db.data]);db.failNext();
@@ -58,8 +66,8 @@ test('failed atomic submission consumes no allowance and publishes nothing',asyn
 });
 test('a second representative shares the same organization allowance',async()=>{
  const db=memory();db.data.set(`listing_claims/v_event`,{uid:'v',entityId:event.id,status:'approved',approvedOrganizationId:org.id});
- await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations:[add]},now);
- await assert.rejects(submitOrganizationBatch(db,'v',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{entityId:org.id,action:'edit',changes:{phone:'403'}}]},now+1000),/seven complete/);
+ usedFour(db,org.id);await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations:[add]},now);
+ await assert.rejects(submitOrganizationBatch(db,'v',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{entityId:org.id,action:'edit',changes:{phone:'403'}}]},now+1000),/updates for this week/);
  await submitOrganizationBatch(db,'v',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{entityId:org.id,action:'edit',changes:{phone:'403'}}]},now+7*86400000);
 });
 test('server rejects event-only or revoked access and any pending legacy save before publishing',async()=>{
@@ -110,11 +118,11 @@ test('members cannot enable admin mode by forging the flag or selected member UI
  assert.equal(db.data.has(`${ORGANIZATION_LIVE}/${id}`),false);
 });
 test('ordinary owner edits preserve admin-managed images and keep normal seven-day limits',async()=>{
- const db=memory();db.data.set('users/staff',{role:'admin'});
+ const db=memory();db.data.set('users/staff',{role:'admin'});usedFour(db,org.id);
  await submitOrganizationBatch(db,'staff',{organizationId:org.id,requestId:uuid,adminEdit:true,operations:[{entityId:org.id,action:'edit',changes:{image:{src:'/images/approved.jpg',alt:'Approved'}}}]},now);
  await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{entityId:org.id,action:'edit',changes:{phone:'403-555-0111'}}]},now+1);
  const projection=db.data.get(`${ORGANIZATION_LIVE}/${org.id}`);assert.equal(mergeOrganizationContent(all,[projection]).find(e=>e.id===org.id)!.image!.src,'/images/approved.jpg');
- await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'32345678-1234-1234-1234-123456789abc',operations:[add]},now+2),/seven complete/);
+ await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'32345678-1234-1234-1234-123456789abc',operations:[add]},now+2),/updates for this week/);
 });
 test('admin updates supersede conflicting queued edits and release only their pending reservation',async()=>{
  const db=memory();db.data.set('users/staff',{role:'admin'});db.data.set('owner_listing_edits/queued',{uid:'u',rootId:org.id,entityId:org.id,status:'queued'});db.data.set(`owner_listing_edit_limits/${org.id}`,{editId:'queued',lastSubmittedAt:new Date(now-1)});
@@ -142,14 +150,14 @@ test('a one-off organizer saves a private profile and adds events in one atomic 
  const profile=standaloneOrganization(single as any),newId=`${profile.id}-event-${uuid}`;
  const db=memory();db.data.set(`${ORGANIZATION_CATALOG}/${single.id}`,{entity:single});db.data.set(`listing_claims/u_${single.id}`,{uid:'u',entityId:single.id,status:'approved'});
  const operations=[{entityId:profile.id,action:'edit' as const,changes:{title:'Community collective',phone:'403-555-0100'}},{entityId:single.id,action:'edit' as const,changes:{summary:'Confirmed details.'}},{...add,entityId:newId}];
- await submitOrganizationBatch(db,'u',{organizationId:profile.id,requestId:uuid,operations},now);
+ usedFour(db,single.id);await submitOrganizationBatch(db,'u',{organizationId:profile.id,requestId:uuid,operations},now);
  assert.equal(db.data.get(`${MANAGEMENT_PROFILES}/${profile.sourceListingId}`).entity.phone,'403-555-0100');
  assert.equal(db.data.has(`${ORGANIZATION_LIVE}/${profile.id}`),false,'Management profiles must never enter public discovery');
  assert.equal(db.data.get(`${ORGANIZATION_LIVE}/${newId}`).entity.organizerEntityId,profile.id);
  assert.equal(db.data.get(`owner_business_edit_limits/${single.id}`).lastSubmittedAt,now);
  assert.equal(db.data.has(`owner_business_edit_limits/${profile.id}`),false,'One allowance across old and new management URLs');
  assert.equal(db.data.get(`${ORGANIZATION_LIVE}/${single.id}`).changes.summary,'Confirmed details.');
- await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:profile.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{entityId:single.id,action:'edit',changes:{summary:'Too soon'}}]},now+1),/seven complete/);
+ await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:profile.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{entityId:single.id,action:'edit',changes:{summary:'Too soon'}}]},now+1),/updates for this week/);
 });
 test('one-off workspaces do not grant a similarly named event or broader organization access',async()=>{
  const {standaloneOrganization}=await import('../src/lib/claimOrganization');const profile=standaloneOrganization(event as any),db=memory();
@@ -179,8 +187,8 @@ test('an ordinary listing projection cannot override a canonical organizer assoc
 });
 test('legacy listing workspaces share the actual organization allowance rather than creating a second one',async()=>{
  const {standaloneOrganization}=await import('../src/lib/claimOrganization');const profile=standaloneOrganization(event as any),db=memory();
- db.data.set(`listing_claims/u_${event.id}`,{uid:'u',entityId:event.id,status:'approved'});db.data.set(`owner_business_edit_limits/${org.id}`,{lastSubmittedAt:now-100,editId:'other-representative'});
- await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:profile.id,requestId:uuid,operations:[{entityId:event.id,action:'edit',changes:{title:'Attempted second submission'}}]},now),/seven complete/);
+ db.data.set(`listing_claims/u_${event.id}`,{uid:'u',entityId:event.id,status:'approved'});db.data.set(`owner_business_edit_limits/${org.id}`,{lastSubmittedAt:now-100,recent:[now-104,now-103,now-102,now-101,now-100],editId:'other-representative'});
+ await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:profile.id,requestId:uuid,operations:[{entityId:event.id,action:'edit',changes:{title:'Attempted second submission'}}]},now),/updates for this week/);
 });
 test('a one-off market keeps its dates in the existing public listing and can add an event',async()=>{
  const {standaloneOrganization,MANAGEMENT_PROFILES}=await import('../src/lib/claimOrganization');const market=all.find(e=>e.kind==='market'&&e.sources.some(s=>s.kind==='official'))! as any,profile=standaloneOrganization(market),db=memory();
@@ -200,13 +208,13 @@ test('approval repair moves the shared one-off workspace and allowance without l
  db.data.set('users/staff',{uid:'staff',role:'admin'});
  for(const uid of ['u','v']){db.data.set(`users/${uid}`,{uid,role:'user',accountType:'business',businessSince:20,businessListings:[event.id]});db.data.set(`listing_claims/${uid}_${event.id}`,{uid,entityId:event.id,entityTitle:event.title,status:'approved',reviewedAt:100,approvalEmailStatus:'sent'});}
  db.data.set(`${ORGANIZATION_LIVE}/${childId}`,{entityId:childId,organizationId:profile.id,entity:{...event,id:childId,organizerEntityId:profile.id},createdInWorkspace:true,changes:{},deleted:false,updatedAt:now-200,batchId:'original'});
- db.data.set(`owner_business_edit_limits/${event.id}`,{lastSubmittedAt:now-100,editId:'old-save'});
+ db.data.set(`owner_business_edit_limits/${event.id}`,{lastSubmittedAt:now-100,recent:[now-104,now-103,now-102,now-101,now-100],editId:'old-save'});
  await assert.rejects(approveOrganizationClaim(db,'staff',{uid:'u',entityId:event.id,organizationId:org.id},{},now),/Confirm shared/);
  assert.equal(db.data.get(`${ORGANIZATION_LIVE}/${childId}`).organizationId,profile.id);
  await approveOrganizationClaim(db,'staff',{uid:'u',entityId:event.id,organizationId:org.id,confirmSharedAccess:true},{},now);
  for(const uid of ['u','v']){const c=db.data.get(`listing_claims/${uid}_${event.id}`);assert.equal(c.approvedOrganizationId,org.id);assert.equal(c.reviewedAt,100);assert.equal(c.approvalEmailStatus,'sent');assert.ok(db.data.get(`users/${uid}`).businessListings.includes(org.id));assert.equal(db.data.get(`organization_managers/${uid}_${org.id}`).uid,uid);}
  const moved=db.data.get(`${ORGANIZATION_LIVE}/${childId}`);assert.equal(moved.organizationId,org.id);assert.equal(moved.entity.organizerEntityId,org.id);assert.deepEqual(moved.entity.image,event.image);assert.equal(db.data.get(`owner_business_edit_limits/${org.id}`).lastSubmittedAt,now-100);
- await assert.rejects(submitOrganizationBatch(db,'v',{organizationId:org.id,requestId:uuid,operations:[{entityId:childId,action:'edit',changes:{title:'Too soon'}}]},now),/seven complete/);
+ await assert.rejects(submitOrganizationBatch(db,'v',{organizationId:org.id,requestId:uuid,operations:[{entityId:childId,action:'edit',changes:{title:'Too soon'}}]},now),/updates for this week/);
  await submitOrganizationBatch(db,'v',{organizationId:org.id,requestId:uuid,operations:[{entityId:childId,action:'edit',changes:{title:'Still manageable after migration'}}]},now+7*86400000);
  assert.equal(db.data.get(`${ORGANIZATION_LIVE}/${childId}`).entity.title,'Still manageable after migration');
 });
@@ -265,7 +273,7 @@ test('organization profiles can set a contact email; slug, verification and imag
 });
 
 test('a 100-show programme commits atomically under one weekly allowance',async()=>{
- const db=memory();const operations=Array.from({length:100},(_,i)=>({...add,entityId:`${org.id}-event-12345678-1234-4234-8234-${i.toString(16).padStart(12,'0')}`,changes:{...add.changes,title:`Confirmed show ${i}`}}));const result=await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations},now);assert.ok(result.nextAt>now);assert.equal([...db.data.keys()].filter(k=>k.startsWith(ORGANIZATION_LIVE+'/')).length,100);await assert.rejects(()=>submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{...operations[0],entityId:`${org.id}-event-22345678-1234-1234-1234-123456789abc`}]},now+1),/seven complete days/);
+ const db=memory();usedFour(db,org.id);const operations=Array.from({length:100},(_,i)=>({...add,entityId:`${org.id}-event-12345678-1234-4234-8234-${i.toString(16).padStart(12,'0')}`,changes:{...add.changes,title:`Confirmed show ${i}`}}));const result=await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations},now);assert.ok(result.nextAt>now);assert.equal([...db.data.keys()].filter(k=>k.startsWith(ORGANIZATION_LIVE+'/')).length,100);await assert.rejects(()=>submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{...operations[0],entityId:`${org.id}-event-22345678-1234-1234-1234-123456789abc`}]},now+1),/updates for this week/);
 });
 
 test('oversized 100-listing audit aborts the whole save and preserves the allowance',async()=>{

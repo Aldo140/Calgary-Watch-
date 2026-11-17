@@ -47,7 +47,6 @@ import {
   MAX_ORGANIZATION_CHANGES,
   approvedOrganization,
   organizationEvent,
-  organizationNextAt,
   ORGANIZATION_CATALOG,
   ORGANIZATION_LIVE,
   prepareOrganizationBatch,
@@ -57,7 +56,11 @@ import {
 } from "../lib/organizationWorkspace";
 import {
   OWNER_BUSINESS_LIMITS,
+  OWNER_EDITS_PER_WEEK,
+  ownerAllowanceNextAt,
   ownerEditableFields,
+  ownerSubmissionTimes,
+  ownerUpdatesLeft,
   parseOwnerField,
 } from "../lib/ownerListingEdits";
 import { OwnerFieldEditor } from "../components/entity/OwnerFieldEditor";
@@ -349,7 +352,8 @@ export function OrganizationWorkspace({
   }, []);
   const [targetId, setTargetId] = useState(org.id),
     [rows, setRows] = useState<OrganizationProjection[]>([]),
-    [nextAt, setNextAt] = useState(0),
+    [serverNextAt, setNextAt] = useState(0),
+    [sentAt, setSentAt] = useState<number[]>([]),
     [loaded, setLoaded] = useState(false),
     [busy, setBusy] = useState(false),
     [review, setReview] = useState(false),
@@ -361,6 +365,9 @@ export function OrganizationWorkspace({
     [pane, setPane] = useState<"edit" | "preview">("edit"),
     [published, setPublished] = useState<{ at: number; next: number }>(),
     [copied, setCopied] = useState(false);
+  // Up to OWNER_EDITS_PER_WEEK publishes in any rolling seven days.
+  const nextAt = Math.max(serverNextAt, ownerAllowanceNextAt(sentAt, clock)),
+    updatesLeft = ownerUpdatesLeft(sentAt, clock);
   const [initialRequest] = useState<string | undefined>(() => {
     if (readOnly) return undefined;
     try {
@@ -418,12 +425,7 @@ export function OrganizationWorkspace({
     ])
       .then(([rate, content, linked, profile, sourceLive, sourceCatalog]) => {
         if (active) {
-          setNextAt((current) =>
-            Math.max(
-              current,
-              organizationNextAt(rate.data()?.lastSubmittedAt ?? 0),
-            ),
-          );
+          setSentAt((current) => [...current, ...ownerSubmissionTimes(rate.data())]);
           setCatalog([
             ...(sourceCatalog?.exists() ? [sourceCatalog.data().entity] : []),
             ...(profile.exists() ? [profile.data().entity] : []),
@@ -469,14 +471,13 @@ export function OrganizationWorkspace({
     const incoming = organizationLiveRows(org.id);
     if (!incoming.length) return;
     setRows((current) => mergeOrganizationRows(current, incoming));
-    setNextAt((current) =>
-      Math.max(
-        current,
-        ...incoming
-          .filter((row) => !row.submittedByAdmin)
-          .map((row) => organizationNextAt(row.updatedAt)),
-      ),
-    );
+    setSentAt((current) => [
+      ...current,
+      ...incoming
+        .filter((row) => !row.submittedByAdmin)
+        .map((row) => row.updatedAt)
+        .filter((t): t is number => typeof t === "number"),
+    ]);
   }, [org.id, liveVersion]);
   const entities = useMemo(
     () =>
@@ -618,10 +619,11 @@ export function OrganizationWorkspace({
     setBusy(true);
     setError("");
     if (demo) {
-      setNextAt(Date.now() + 7 * 86400000);
+      const at = Date.now();
+      setSentAt((current) => [...current, at]);
       setOps([]);
       setReview(false);
-      setPublished({ at: Date.now(), next: Date.now() + 7 * 86400000 });
+      setPublished({ at, next: ownerAllowanceNextAt([...sentAt, at], at) });
       setBusy(false);
       return;
     }
@@ -655,6 +657,7 @@ export function OrganizationWorkspace({
       });
       if (org.managementOnly) setReload((n) => n + 1);
       setNextAt(result.data.nextAt);
+      if (!adminEdit) setSentAt((current) => [...current, Date.now()]);
       setOps([]);
       setReview(false);
       setPublished({ at: Date.now(), next: result.data.nextAt });
@@ -970,7 +973,7 @@ export function OrganizationWorkspace({
           </li>
           <li>
             <strong>Publish</strong>
-            <span>It goes live right away. No approval needed. Once a week, so bundle your changes.</span>
+            <span>It goes live right away. No approval needed. Up to {OWNER_EDITS_PER_WEEK} times a week.</span>
           </li>
         </ol>
       ) : null}
@@ -1653,7 +1656,7 @@ export function OrganizationWorkspace({
                 ? `You can publish again on ${day(nextAt)}. Your changes stay saved here until then.`
                 : adminEdit
                   ? "Admin publishing does not use the business’s weekly update."
-                  : "Goes live right away. No approval needed."}
+                  : `Goes live right away. No approval needed. ${updatesLeft} of ${OWNER_EDITS_PER_WEEK} updates left this week.`}
             </small>
           </span>
           <button
@@ -1685,10 +1688,11 @@ export function OrganizationWorkspace({
           ) : (
             <p>
               Here’s everything that will change on your page. It goes live as
-              soon as you publish, with no approval step. You can publish once
-              a week, so your next update opens{" "}
-              {day(Date.now() + 7 * 86400000)}. Spot something after that?
-              Email us and we’ll fix it for you.
+              soon as you publish, with no approval step. You can publish up to{" "}
+              {OWNER_EDITS_PER_WEEK} times in any seven days, and this will be
+              update {OWNER_EDITS_PER_WEEK - updatesLeft + 1} of{" "}
+              {OWNER_EDITS_PER_WEEK}. Need more? Email us and we’ll fix it for
+              you.
             </p>
           )}
           <ChangeList ops={ops} targets={targets} orgId={org.id} />

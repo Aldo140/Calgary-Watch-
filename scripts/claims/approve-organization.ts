@@ -4,7 +4,7 @@ import {claimApprovalWrites} from '../../src/lib/claimApproval';
 import {businessAccountPatch} from '../../src/lib/businessAccount';
 import {claimId,type ListingClaim} from '../../src/lib/claims';
 import {ORGANIZATION_CATALOG,ORGANIZATION_LIVE} from '../../src/lib/organizationWorkspace';
-import {OWNER_BUSINESS_LIMITS,OWNER_LIMITS,OWNER_EDITS} from '../../src/lib/ownerListingEdits';
+import {OWNER_BUSINESS_LIMITS,OWNER_LIMITS,OWNER_EDITS,OWNER_EDITS_PER_WEEK,ownerSubmissionTimes,ownerWindow} from '../../src/lib/ownerListingEdits';
 /**
  * Approval and expansion must not strand events in a former one-off workspace.
  * `options.system` is for trusted server scripts only (promote-organizer-claims.ts);
@@ -56,7 +56,8 @@ export async function approveOrganizationClaim(db:Firestore,actorUid:string,inpu
   if(expand){
    const latest=Math.max(0,...rates.map(({rate,reservation})=>Math.max(Number(rate.get('lastSubmittedAt')??0),reservation.get('lastSubmittedAt')?.toMillis?.()??0)));
    const canonical=rates.find(r=>r.id===organizationId);
-   if(latest>Number(canonical?.rate.get('lastSubmittedAt')??0))tx.set(db.collection(OWNER_BUSINESS_LIMITS).doc(organizationId!),{lastSubmittedAt:latest,editId:canonical?.rate.get('editId')??`approval-${now}`});
+   const sentAt=rates.flatMap(({rate,reservation})=>[...ownerSubmissionTimes(rate.data()),reservation.get('lastSubmittedAt')?.toMillis?.()??0]);
+   if(latest>Number(canonical?.rate.get('lastSubmittedAt')??0)||ownerWindow(sentAt,now).length>ownerWindow(ownerSubmissionTimes(canonical?.rate.data()),now).length)tx.set(db.collection(OWNER_BUSINESS_LIMITS).doc(organizationId!),{lastSubmittedAt:latest,recent:ownerWindow(sentAt,now).slice(-OWNER_EDITS_PER_WEEK),editId:canonical?.rate.get('editId')??`approval-${now}`});
    for(const queued of conflicts){tx.update(queued.ref??db.collection(OWNER_EDITS).doc(queued.id),{status:'failed',error:'Organization access was expanded. Include these changes in the organization workspace.',notificationPending:true,supersededBy:actorUid});const old=rates.find(r=>r.id===queued.get('rootId'));if(old?.reservation.get('editId')===queued.id)tx.delete(db.collection(OWNER_LIMITS).doc(old.id));}
    tx.set(db.collection('organization_access_changes').doc(),{actorUid,uid:c.uid,claimId:claimId(c.uid,c.entityId),from:privateId,to:organizationId,movedEntityIds:[...moved.keys()],representativeUids:[c.uid,...peers.map(p=>p.get('uid'))],createdAt:now});
   }

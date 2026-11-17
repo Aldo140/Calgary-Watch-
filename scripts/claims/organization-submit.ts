@@ -1,8 +1,8 @@
 import {MANAGEMENT_PROFILES,standaloneOrganization,type ManagementOrganization} from '../../src/lib/claimOrganization';
 import {isApprovedAdminEmail} from '../../src/constants/admin';
 import {createHash} from 'node:crypto';
-import { MAX_ORGANIZATION_CHANGES, ORGANIZATION_CATALOG, ORGANIZATION_LIVE, mergeOrganizationContent, prepareOrganizationBatch, organizationNextAt, type OrganizationChange } from '../../src/lib/organizationWorkspace';
-import { OWNER_EDITS, OWNER_LIMITS, OWNER_BUSINESS_LIMITS, OWNER_CONTENT, applyOwnerOccurrences } from '../../src/lib/ownerListingEdits';
+import { MAX_ORGANIZATION_CHANGES, ORGANIZATION_CATALOG, ORGANIZATION_LIVE, mergeOrganizationContent, prepareOrganizationBatch, type OrganizationChange } from '../../src/lib/organizationWorkspace';
+import { OWNER_EDITS, OWNER_LIMITS, OWNER_BUSINESS_LIMITS, OWNER_CONTENT, OWNER_EDITS_PER_WEEK, applyOwnerOccurrences, ownerAllowanceNextAt, ownerAllowanceRecord, ownerSubmissionTimes } from '../../src/lib/ownerListingEdits';
 import type { Firestore } from 'firebase-admin/firestore';
 import type { Business, DiscoveryEntity } from '../../src/types/discovery';
 /** Authenticated callable boundary. Every authority, allowance, projection and audit commits together. */
@@ -19,12 +19,14 @@ export async function submitOrganizationBatch(db:Firestore,uid:string,input:{org
     const adminEdit=input.adminEdit===true;
     if(adminEdit&&!(actor.data()?.role==='admin'||identity.emailVerified===true&&isApprovedAdminEmail(identity.email)))throw Error('Administrator access required.');
     if(!adminEdit&&!claims.docs.some(d=>{const c=d.data();return c.status==='approved'&&(standalone?c.entityId===sourceId&&!c.approvedOrganizationId:c.entityId===orgId||c.approvedOrganizationId===orgId);} ))throw Error('Your organization management access has not been confirmed.');
-    if(old.exists){if(old.get('uid')!==uid||old.get('rootId')!==orgId||old.get('requestHash')!==requestHash)throw Error('Invalid save identifier.');return {publishedAt:old.get('publishedAt'),nextAt:adminEdit?organizationNextAt(rate.data()?.lastSubmittedAt??0):organizationNextAt(old.get('appliedAt'))};}
+    if(old.exists){if(old.get('uid')!==uid||old.get('rootId')!==orgId||old.get('requestHash')!==requestHash)throw Error('Invalid save identifier.');return {publishedAt:old.get('publishedAt'),nextAt:ownerAllowanceNextAt(ownerSubmissionTimes(rate.data()),now)};}
     const seed=source?.data()?.entity;
     if(standalone&&(!seed||!['event','market'].includes(seed.kind)||seed.status!=='published'||seed.developmentOnly))throw Error('This listing is not available for organization management.');
     const org=(standalone?{...standaloneOrganization(seed),...management?.data()?.entity}:catalog.exists?(orgLive.exists?mergeOrganizationContent([catalog.data()?.entity],[{...orgLive.data(),deleted:false} as any])[0]:{...catalog.data()?.entity,...orgLegacy.data()?.changes}):undefined) as ManagementOrganization|undefined;if(!org||(!adminEdit&&org.kind!=='business')||!['business','event','market'].includes(org.kind)||org.id!==orgId)throw Error('Organization catalogue is not ready. Contact CalgaryWatch.');
     const reserved=reservation.data()?.lastSubmittedAt?.toMillis?.()??0;
-    if(!adminEdit&&Math.max(organizationNextAt(rate.data()?.lastSubmittedAt??0),organizationNextAt(reserved))>now)throw Error('This business has already used its submission. Wait seven complete days.');
+    const sentAt=[...ownerSubmissionTimes(rate.data()),...(reserved?[reserved]:[])];
+    const opensAt=ownerAllowanceNextAt(sentAt,now);
+    if(!adminEdit&&opensAt>now)throw Error(`This business has used its ${OWNER_EDITS_PER_WEEK} updates for this week. Your changes stay saved; you can publish again on ${new Date(opensAt).toLocaleString('en-CA',{timeZone:'America/Edmonton',weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'})}.`);
     const entities:DiscoveryEntity[]=[org];
     const datesById=new Map<string,import('../../src/types/discovery').MarketOccurrence[]>();
     const liveById=new Map<string,any>();
@@ -52,11 +54,11 @@ export async function submitOrganizationBatch(db:Firestore,uid:string,input:{org
     if(adminEdit)for(const queued of conflicts)tx.set(queued.ref??db.collection(OWNER_EDITS).doc(queued.id),{...queued.data(),status:'failed',error:'Superseded by an administrator update.',notificationPending:true,supersededBy:uid});
     if(standalone)tx.set(db.collection(MANAGEMENT_PROFILES).doc(sourceId),{entity:JSON.parse(JSON.stringify(prepared.find(p=>p.entity.id===orgId)?.entity??org)),sourceListingId:sourceId,updatedAt:now});
     for(const p of prepared.filter(p=>!standalone||p.entity.id!==orgId))tx.set(db.collection(ORGANIZATION_LIVE).doc(p.entity.id),{...(p.entity.kind==='market'?{occurrences:applyOwnerOccurrences(datesById.get(p.entity.id)??[],[{entityId:p.entity.id,changes:p.operation.changes}],true)}:{}),submittedByAdmin:adminEdit,workspaceAssociationConfirmed:liveById.get(p.entity.id)?.workspaceAssociationConfirmed===true,createdInWorkspace:p.operation.action==='add'||liveById.get(p.entity.id)?.createdInWorkspace===true,adminMedia:{...liveById.get(p.entity.id)?.adminMedia,...(adminEdit?Object.fromEntries(Object.entries(p.operation.changes).filter(([key])=>['image','images'].includes(key))):{})},changes:{...liveById.get(p.entity.id)?.changes,...(p.deleted?{}:Object.fromEntries(Object.entries(p.operation.changes).filter(([key])=>!['image','images'].includes(key))))},entityId:p.entity.id,organizationId:(standalone&&p.entity.id===sourceId&&'organizerEntityId' in p.entity&&p.entity.organizerEntityId&&p.entity.organizerEntityId!==orgId?p.entity.organizerEntityId:org.kind==='business'?orgId:('organizerEntityId' in p.entity?p.entity.organizerEntityId:undefined)??orgId),entity:JSON.parse(JSON.stringify(p.entity)),deleted:p.deleted,updatedAt:now,batchId:input.requestId});
-    if(!adminEdit)tx.set(db.collection(OWNER_BUSINESS_LIMITS).doc(allowanceId),{lastSubmittedAt:now,editId:input.requestId});
+    if(!adminEdit)tx.set(db.collection(OWNER_BUSINESS_LIMITS).doc(allowanceId),{...ownerAllowanceRecord(ownerSubmissionTimes(rate.data()),now),editId:input.requestId});
     const audit=(p:typeof prepared[number],before:boolean)=>{const entity=before?p.before:p.deleted?null:p.entity;if(!entity)return null;return {entityId:entity.id,title:entity.title,fields:Object.fromEntries(Object.keys(p.operation.changes).map(field=>[field,field==='occurrences'?(before?datesById.get(entity.id)??[]:p.operation.changes.occurrences):(entity as unknown as Record<string,unknown>)[field]??null]))};};
     const before={listings:prepared.map(p=>audit(p,true))},after={listings:prepared.map(p=>audit(p,false))};
     if(new TextEncoder().encode(JSON.stringify({before,after})).length>850000)throw Error('This submission is too large to save safely. Shorten long descriptions or contact CalgaryWatch for a programme import. Your allowance has not been used.');
     tx.create(receipt,{requestHash,uid,...(adminEdit?{actorRole:'admin',subjectUid:input.subjectUid??null}:{}),rootId:orgId,entityId:orgId,entityTitle:org.title,changes:{listings:input.operations.map(o=>({entityId:o.entityId,action:o.action}))},before,after,status:'applied',createdAt:new Date(now),appliedAt:now,publishedAt:now,notificationPending:true,publicationPending:false,live:true});
-    return {publishedAt:now,nextAt:adminEdit?organizationNextAt(rate.data()?.lastSubmittedAt??0):organizationNextAt(now)};
+    return {publishedAt:now,nextAt:ownerAllowanceNextAt(adminEdit?sentAt:[...sentAt,now],now)};
   });
 }

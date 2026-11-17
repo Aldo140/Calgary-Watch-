@@ -6,7 +6,8 @@ export const OWNER_LIMITS = 'owner_listing_edit_limits';
 export const OWNER_BUSINESS_LIMITS = 'owner_business_edit_limits';
 export const OWNER_CONTENT = 'owner_listing_content';
 export const OWNER_EDIT_INTERVAL = 7 * 86400000;
-export const OWNER_EDIT_POLICY = 'Save one update every seven days per business, shared across your profile and linked events. Change several fields in one save. Updates publish automatically without admin approval, normally after the next publishing run. CalgaryWatch is notified. You cannot add, change or delete images here; email us about images.';
+export const OWNER_EDITS_PER_WEEK = 5;
+export const OWNER_EDIT_POLICY = 'Save up to 5 updates in any seven days per business, shared across your profile and linked events. Change several fields in one save. Updates publish automatically without admin approval, normally after the next publishing run. CalgaryWatch is notified. You cannot add, change or delete images here; email us about images.';
 export type OwnerEdit = { uid: string; rootId: string; entityId: string; entityTitle: string; changes: Record<string, unknown>; status: 'queued' | 'applied' | 'failed'; createdAt: unknown; notificationPending: boolean; publicationPending?: boolean; publicationWarning?: string; nextPublicationAttemptAt?: number; publicationAttempts?: number; publishedAt?: number; error?: string; appliedAt?: number; before?: Record<string, unknown>; after?: Record<string, unknown> };
 const common = ['title','summary','description','address','venue','neighbourhood','categories','tags','coordinates'];
 const byKind = { business: ['website','email','phone','hours','socials','services','offer','priceLevel'], event: ['start','end','pricing','priceRange','tickets','cancelled','organizer'], market: ['occurrences','amenities','parking','transit','petFriendly','familyFriendly','organizer'] };
@@ -57,6 +58,30 @@ export function ownerEditPatch(entity: DiscoveryEntity, changes: Record<string, 
 }
 export function ownerBusinessId(entity: DiscoveryEntity, rootId: string): string { return (entity.kind === 'event'||entity.kind==='market') && entity.organizerEntityId ? entity.organizerEntityId : rootId; }
 export function nextOwnerEditAt(last: number): number { return last ? last + OWNER_EDIT_INTERVAL : 0; }
+const millis = (v: unknown): number => typeof v === 'number' ? v : (v as { toMillis?: () => number } | null)?.toMillis?.() ?? 0;
+/** Every recorded submission time on an allowance document: the rolling `recent` list plus the legacy `lastSubmittedAt`. */
+export function ownerSubmissionTimes(rate?: { lastSubmittedAt?: unknown; recent?: unknown } | null): number[] {
+  if (!rate) return [];
+  const recent = Array.isArray(rate.recent) ? rate.recent.map(millis) : [];
+  return [...recent, millis(rate.lastSubmittedAt)].filter(t => t > 0);
+}
+/** Submissions still inside the rolling seven days, oldest first, without duplicates. */
+export function ownerWindow(times: readonly number[], now: number): number[] {
+  return [...new Set(times.filter(t => t > 0 && t > now - OWNER_EDIT_INTERVAL))].sort((a, b) => a - b);
+}
+/** When the business can publish again: 0 while it has fewer than OWNER_EDITS_PER_WEEK submissions in the last seven days. */
+export function ownerAllowanceNextAt(times: readonly number[], now: number): number {
+  const w = ownerWindow(times, now);
+  return w.length < OWNER_EDITS_PER_WEEK ? 0 : w[w.length - OWNER_EDITS_PER_WEEK] + OWNER_EDIT_INTERVAL;
+}
+/** Allowance document fields after a submission at `at`. */
+export function ownerAllowanceRecord(times: readonly number[], at: number): { lastSubmittedAt: number; recent: number[] } {
+  return { lastSubmittedAt: at, recent: ownerWindow([...times, at], at).slice(-OWNER_EDITS_PER_WEEK) };
+}
+/** How many publishes are left this week. */
+export function ownerUpdatesLeft(times: readonly number[], now: number): number {
+  return Math.max(0, OWNER_EDITS_PER_WEEK - ownerWindow(times, now).length);
+}
 export function parseOwnerField(field: string, text: string): unknown {
   if(['hours','socials','coordinates','priceRange','occurrences'].includes(field))return JSON.parse(text);
   if(['categories','tags','services','amenities'].includes(field))return text.split(',').map(s=>s.trim()).filter(Boolean);

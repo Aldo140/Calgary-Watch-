@@ -1,6 +1,6 @@
 import { appendFileSync, readFileSync } from 'node:fs';
 import { inventoryDatabase } from '../discovery/firebase';
-import { ownerPublicationRetryDelay, applyOwnerOccurrences, OWNER_BUSINESS_LIMITS, ownerBusinessId, nextOwnerEditAt, OWNER_CONTENT, OWNER_EDITS, OWNER_LIMITS, ownerEditPatch, ownerEditTargets, type OwnerEdit } from '../../src/lib/ownerListingEdits';
+import { ownerPublicationRetryDelay, applyOwnerOccurrences, OWNER_BUSINESS_LIMITS, ownerBusinessId, ownerAllowanceNextAt, ownerAllowanceRecord, ownerSubmissionTimes, OWNER_CONTENT, OWNER_EDITS, OWNER_LIMITS, ownerEditPatch, ownerEditTargets, type OwnerEdit } from '../../src/lib/ownerListingEdits';
 import type { MarketOccurrence, DiscoveryEntity } from '../../src/types/discovery';
 import { isQuotaExhausted } from '../lib/quota';
 
@@ -25,14 +25,15 @@ export async function applyOwnerEdit(db: any, id: string, entities: readonly Dis
     const businessRate=(await tx.get(businessRateRef)).data();
     const submitted=typeof edit.createdAt==='number'?edit.createdAt:(edit.createdAt as {toMillis?:()=>number;seconds?:number})?.toMillis?.()??((edit.createdAt as {seconds?:number})?.seconds??0)*1000;
     if(!submitted)throw new InvalidOwnerEdit('This update is missing a server submission time.');
-    if(submitted<nextOwnerEditAt(businessRate?.lastSubmittedAt??0))throw new InvalidOwnerEdit(`This business has used its weekly update. The next save is available ${new Date(nextOwnerEditAt(businessRate.lastSubmittedAt)).toISOString()}.`);
+    const sentAt=ownerSubmissionTimes(businessRate);const opensAt=ownerAllowanceNextAt(sentAt,submitted);
+    if(submitted<opensAt)throw new InvalidOwnerEdit(`This business has used its weekly updates. The next save is available ${new Date(opensAt).toISOString()}.`);
     const previous=content.data();
     if(previous&&previous.rootId!==ownerBusinessId(target,edit.rootId))throw new InvalidOwnerEdit('This listing is managed through a different organization profile. Contact CalgaryWatch.');
     const base={...target,...previous?.changes} as DiscoveryEntity;
     let patch:Record<string,unknown>;
     try {patch=ownerEditPatch(base,edit.changes);if(patch.occurrences)applyOwnerOccurrences(occurrences,[{entityId:target.id,changes:patch}],true);}catch(error){throw new InvalidOwnerEdit(error instanceof Error?error.message:'Invalid changes.');}
     const before=Object.fromEntries(Object.keys(patch).map(key=>[key,(base as unknown as Record<string,unknown>)[key]??null]));
-    tx.set(businessRateRef,{lastSubmittedAt:submitted});
+    tx.set(businessRateRef,ownerAllowanceRecord(sentAt,submitted));
     tx.set(contentRef,{rootId:ownerBusinessId(target,edit.rootId),entityId:edit.entityId,changes:{...previous?.changes,...patch},appliedAt:now});
     tx.update(editRef,{status:'applied',appliedAt:now,entityTitle:target.title,before,after:patch,notificationPending:true,publicationPending:true,publicationAttempts:1,nextPublicationAttemptAt:now+ownerPublicationRetryDelay(1)});
     return true;

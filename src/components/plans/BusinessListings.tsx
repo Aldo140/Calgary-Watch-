@@ -39,7 +39,7 @@ export function BusinessListings({ claims, business, previewUid }: { claims: Cla
       <div className="pd-biz-head">
         <p className="pd-kicker">{isBusiness ? <><BadgeCheck size={14} aria-hidden="true" /> Business account{business?.since ? ` · since ${formatSince(business.since, { month: 'short', year: 'numeric' })}` : ''}</> : <><Store size={14} aria-hidden="true" /> For organizers</>}</p>
         <h2 id="pd-biz">{isBusiness ? 'Organizer desk' : 'Your claim'}</h2>
-        <p className="pd-biz-lede">{isBusiness ? 'Edit your page any time and see a preview first. Changes go live as soon as you publish, once a week.' : 'Once we confirm it, you can update the listing and add events from here.'}</p>
+        <p className="pd-biz-lede">{isBusiness ? 'Edit your page any time and see a preview first. Changes go live as soon as you publish, up to 5 times a week.' : 'Once we confirm it, you can update the listing and add events from here.'}</p>
       </div>
       <div className="pd-biz-cards">
         {organizations.map((org) => {

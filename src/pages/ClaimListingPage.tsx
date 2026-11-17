@@ -354,7 +354,7 @@ function ClaimForm({ id }: { id: string }) {
                 {benefits.map((p) => <li key={p.title}><p.icon size={18} aria-hidden="true" /><span><strong>{p.title}</strong>{p.body}</span></li>)}
                 <li><BadgeCheck size={18} aria-hidden="true" /><span><strong>A verified badge</strong>Your listing shows it’s confirmed by your organization. Claiming is free and doesn’t buy placement.</span></li>
               </ul>
-              <p className="cl-publishing-note">Changes publish right away, one submission every seven days per business (bundle several in one). Images stay with CalgaryWatch: <a href="mailto:aldo@calgarywatch.ca">email us</a> for artwork changes.</p>
+              <p className="cl-publishing-note">Changes publish right away, up to 5 updates a week per business. Images stay with CalgaryWatch: <a href="mailto:aldo@calgarywatch.ca">email us</a> for artwork changes.</p>
             </motion.section>
           </aside>
         </div>

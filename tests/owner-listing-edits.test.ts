@@ -86,8 +86,8 @@ test('weekly allowance is shared per business for seven complete days',()=>{
 });
 
 test('direct event representatives cannot bypass the shared parent-business weekly allowance',async()=>{
-  const db=memory();queued(db);await applyOwnerEdit(db,'save',all,100);
   const {OWNER_BUSINESS_LIMITS}=await import('../src/lib/ownerListingEdits');
+  const db=memory();queued(db);db.data.set(`${OWNER_BUSINESS_LIMITS}/${root.id}`,{lastSubmittedAt:9,recent:[6,7,8,9]});await applyOwnerEdit(db,'save',all,100);
   assert.equal(db.data.get(`${OWNER_BUSINESS_LIMITS}/${root.id}`).lastSubmittedAt,10);
   db.data.set(`listing_claims/other_${event.id}`,{uid:'other',entityId:event.id,status:'approved'});
   db.data.set(`${OWNER_EDITS}/other-save`,{uid:'other',rootId:event.id,entityId:event.id,changes:{summary:'Other representative'},createdAt:20,status:'queued'});

@@ -78,26 +78,34 @@ a:hover .arrow,button:hover .arrow{transform:translateX(4px)}
 .burger{width:44px;height:44px;border-radius:12px;border:1px solid var(--dline);background:#0b141c66;backdrop-filter:blur(8px);display:grid;place-items:center;cursor:pointer;padding:0}
 .burger i{display:block;width:18px;height:2px;background:#fff;border-radius:2px;box-shadow:0 6px 0 #fff,0 -6px 0 #fff;transition:.25s}
 .menu-open .burger i{box-shadow:none;transform:rotate(45deg)}
-.menu-open .burger i::after{content:"";position:absolute;width:18px;height:2px;background:#fff;border-radius:2px;transform:rotate(90deg)}
+.menu-open .burger i::after{content:"";position:absolute;left:0;top:0;width:18px;height:2px;background:#fff;border-radius:2px;transform:rotate(90deg)}
 .burger i{position:relative}
 
 /* full-screen menu */
-.menu{position:fixed;inset:0;z-index:75;background:radial-gradient(120% 70% at 100% 0,#1c3246,var(--navy) 62%);padding:calc(var(--top) + env(safe-area-inset-top,0px) + 8px) var(--g) calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;overflow:auto;visibility:hidden;clip-path:circle(0 at calc(100% - var(--g) - 22px) 30px);transition:clip-path .55s var(--ease),visibility 0s .55s}
+.menu{position:fixed;inset:0;z-index:75;isolation:isolate;background:radial-gradient(120% 70% at 100% 0,#1c3246,var(--navy) 62%);padding:calc(var(--top) + env(safe-area-inset-top,0px) + 10px) var(--g) calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;overflow:auto;visibility:hidden;clip-path:circle(0 at calc(100% - var(--g) - 22px) 30px);transition:clip-path .55s var(--ease),visibility 0s .55s}
 .menu-open .menu{visibility:visible;clip-path:circle(150% at calc(100% - var(--g) - 22px) 30px);transition:clip-path .75s var(--ease)}
-.mtop{display:flex;justify-content:space-between;align-items:center;font:600 .62rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:#8fa3ac}
-.menu a.m{opacity:0;transform:translateY(46px) rotate(var(--r)) scale(.84);transition:opacity .45s calc(var(--i)*65ms + .12s),transform .75s cubic-bezier(.2,1.25,.3,1) calc(var(--i)*65ms + .12s),box-shadow .2s;text-decoration:none}
+.menu::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;background:repeating-radial-gradient(circle at 110% 108%,transparent 0 38px,#f6d7710f 38px 39px)}
+.mwm{position:absolute;z-index:-1;right:-34%;bottom:15%;width:120%;height:auto;opacity:0;transform:translateY(30px) rotate(-8deg);transition:opacity 1s .3s,transform 1.4s .2s var(--ease);pointer-events:none}
+.menu-open .mwm{opacity:.06;transform:rotate(-8deg)}
+.mtop{display:flex;justify-content:space-between;align-items:center;font:600 .6rem var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:#8fa3ac}
+.mtop span:first-child{color:var(--gold-lt);display:flex;align-items:center;gap:.6rem}
+.mtop span:first-child::before{content:"";width:22px;height:2px;background:var(--gold)}
+.mlist{position:relative;flex:1;display:grid;align-content:center;padding-left:34px}
+.mline{position:absolute;left:8px;top:1.6rem;bottom:1.6rem;width:2px;background:linear-gradient(180deg,var(--gold-lt),var(--gold) 70%,#e2b00700);transform:scaleY(0);transform-origin:top;transition:transform .3s}
+.menu-open .mline{transform:scaleY(1);transition:transform 1.1s .2s cubic-bezier(.6,0,.2,1)}
+.menu a.m{position:relative;display:grid;grid-template-columns:1fr auto;align-items:baseline;column-gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--dline);text-decoration:none;color:#fff;opacity:0;transform:translateX(30px);transition:opacity .45s calc(var(--i)*70ms + .2s),transform .7s var(--ease) calc(var(--i)*70ms + .2s)}
+.menu a.m:last-child{border-bottom:0}
 .menu-open .menu a.m{opacity:1;transform:none}
-.menu a.mhome{color:var(--gold-lt);border:1px solid var(--dline);border-radius:999px;padding:.5rem .9rem;background:#ffffff0a}
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;grid-auto-rows:minmax(108px,1fr)}
-.menu a.mt{position:relative;overflow:hidden;border-radius:20px;border:1px solid #ffffff2e;display:flex;flex-direction:column;justify-content:flex-end;gap:.25rem;padding:.8rem;isolation:isolate;color:#fff}
-.menu a.mt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;animation:kb2 12s ease-in-out infinite alternate}
-@keyframes kb2{from{transform:scale(1.04)}to{transform:scale(1.22) translate(-3%,-2%)}}
-.menu a.mt::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0b141c59 0%,#0b141c1a 35%,#0b141cf0 100%)}
-.menu a.mt span{position:absolute;left:.8rem;top:.7rem;font:600 .6rem var(--f-mono);letter-spacing:.16em;color:var(--gold-lt)}
-.menu a.mt b{font:800 clamp(1rem,4.6vw,1.3rem)/1 var(--f-disp);font-stretch:125%}
-.menu a.mt em{font:600 .6rem var(--f-mono);font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-lt)}
-.menu a.mt.on{box-shadow:inset 0 0 0 2px var(--gold);border-color:var(--gold)}
-.menu a.mt:active{transform:scale(.96)}
+.menu a.m::before{content:"";position:absolute;left:-32px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--navy);border:2px solid var(--gold);transform:scale(0);transition:transform .4s cubic-bezier(.2,1.6,.4,1) calc(var(--i)*70ms + .3s)}
+.menu-open .menu a.m::before{transform:scale(1)}
+.menu a.m span{grid-column:1/-1;font:600 .54rem var(--f-mono);letter-spacing:.22em;color:#8fa3ac}
+.menu a.m b{font:800 clamp(1.45rem,7.2vw,2.1rem)/1.05 var(--f-disp);font-stretch:125%;letter-spacing:-.01em}
+.menu a.m em{font:600 .62rem var(--f-mono);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:#a9b8c2;white-space:nowrap}
+.menu a.m.on b{color:var(--gold-lt)}.menu a.m.on span{color:var(--gold-lt)}
+.menu a.m.on::before{background:var(--gold);box-shadow:0 0 0 0 #e2b007aa;animation:wp 1.8s 1s infinite}
+.menu a.m.on span::after{content:" · you are here"}
+@keyframes wp{to{box-shadow:0 0 0 12px #e2b00700}}
+.menu a.m:active b{transform:translateX(6px)}.menu a.m b{transition:transform .2s,color .2s}
 .menu .mfoot{display:grid;grid-template-columns:1fr 1fr;gap:10px}.menu .mfoot .btn{white-space:nowrap;padding-inline:.5rem;font-size:.86rem}
 
 
@@ -658,14 +666,16 @@ footer .fine{font:500 .58rem var(--f-mono);letter-spacing:.1em;text-transform:up
 </header>
 
 <nav class="menu" id="menu" aria-label="All pages">
-  <div class="mtop"><a class="m mhome" style="--i:0;--r:0deg" href="#/home">Home base</a><span>Pick a mission</span></div>
-  <div class="mgrid">
-    <a class="m mt" style="--i:1;--r:-5deg" href="#/aerial"><img src="img/estate.jpg" alt="" loading="lazy"><span>01</span><b>Aerial &amp; mapping</b><em>from $250</em></a>
-    <a class="m mt" style="--i:2;--r:4deg" href="#/training"><img src="img/field-pilot.jpg" alt="" loading="lazy"><span>02</span><b>Training</b><em>from $100</em></a>
-    <a class="m mt" style="--i:3;--r:5deg" href="#/bvlos"><img src="img/urban.jpg" alt="" loading="lazy"><span>03</span><b>BVLOS</b><em>$495 review</em></a>
-    <a class="m mt" style="--i:4;--r:-4deg" href="#/repair"><img src="img/gimbal.jpg" alt="" loading="lazy"><span>04</span><b>DJI repair</b><em>$60 / hr</em></a>
-    <a class="m mt" style="--i:5;--r:-5deg" href="#/gear"><img src="img/pilot-matrice.jpg" alt="" loading="lazy"><span>05</span><b>Gear &amp; gifts</b><em>$375</em></a>
-    <a class="m mt" style="--i:6;--r:4deg" href="#/about"><img src="img/grant-cockpit.jpg" alt="" loading="lazy"><span>06</span><b>About Grant</b><em>25+ years</em></a>
+  <img class="mwm" src="img/wings.png" alt="" aria-hidden="true" width="900" height="333">
+  <div class="mtop"><span>Flight plan</span><span>CYYC · 51.04° N</span></div>
+  <div class="mlist"><i class="mline" aria-hidden="true"></i>
+    <a class="m" style="--i:0" href="#/home"><span>WP 01</span><b>Home base</b><em></em></a>
+    <a class="m" style="--i:1" href="#/aerial"><span>WP 02</span><b>Aerial &amp; mapping</b><em>from $250</em></a>
+    <a class="m" style="--i:2" href="#/training"><span>WP 03</span><b>Training</b><em>from $100</em></a>
+    <a class="m" style="--i:3" href="#/bvlos"><span>WP 04</span><b>BVLOS</b><em>$495 review</em></a>
+    <a class="m" style="--i:4" href="#/repair"><span>WP 05</span><b>DJI repair</b><em>$60 / hr</em></a>
+    <a class="m" style="--i:5" href="#/gear"><span>WP 06</span><b>Gear &amp; gifts</b><em>$375</em></a>
+    <a class="m" style="--i:6" href="#/about"><span>WP 07</span><b>About Grant</b><em>25+ years</em></a>
   </div>
   <div class="mfoot">
     <a class="btn g" href="#/quote">Get a quote</a>

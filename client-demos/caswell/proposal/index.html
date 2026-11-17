@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Website proposal for Caswell Aviation · Arctos Launchpad</title>
+<meta name="description" content="A new Caswell Aviation website on your existing Shopify store. Prepared for Grant Caswell by Arctos Launchpad.">
+<meta name="theme-color" content="#0b141c">
+<link rel="icon" href="../img/wings.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{--navy:#0b141c;--navy-2:#0f1c28;--gold:#e2b007;--gold-lt:#f6d771;--paper:#f4f5f2;--ink:#0d1822;--ink-2:#44525e;--muted:#76838c;--line:#dde1dc;--dline:#ffffff1c;--dtext:#b8c6cf;
+  --f-disp:"Archivo","Arial Black",system-ui,sans-serif;--f-body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--g:clamp(20px,5vw,56px);--ease:cubic-bezier(.2,.8,.2,1)}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.02rem/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+h1,h2,h3{font-family:var(--f-disp);font-stretch:125%;font-weight:800;letter-spacing:-.012em;line-height:1;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.4rem,9.6vw,5.2rem)}
+h2{font-size:clamp(1.8rem,6.2vw,3rem)}
+p{margin:0}
+.wrap{max-width:1040px;margin-inline:auto;padding-inline:var(--g)}
+.eyebrow{display:inline-flex;align-items:center;gap:.6rem;font:700 .66rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:#8a6a00}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--gold)}
+.dark .eyebrow{color:var(--gold-lt)}
+.gold{background:linear-gradient(180deg,var(--gold-lt),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:52px;padding:.8rem 1.3rem;border-radius:14px;font-weight:700;text-decoration:none;border:1px solid #ffffff38;color:#fff;background:#ffffff0f;transition:transform .2s var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn.g{background:linear-gradient(180deg,var(--gold-lt),var(--gold));color:#1c1500;border-color:transparent;box-shadow:0 12px 30px #e2b00740}
+.btn.k{background:var(--navy);border-color:var(--navy)}
+/* hero */
+.dark{background:var(--navy);color:#fff}
+.hero{position:relative;overflow:hidden;padding:26px 0 clamp(48px,9vw,90px);background:radial-gradient(120% 80% at 90% 0,#1c3246,var(--navy) 62%)}
+.hero::before{content:"";position:absolute;inset:0;opacity:.5;background:repeating-radial-gradient(circle at 105% 110%,transparent 0 44px,#f6d7710f 44px 45px);pointer-events:none}
+.bar{position:relative;display:flex;justify-content:space-between;align-items:center;gap:1rem;font:600 .62rem var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:#a9b8c2}
+.bar b{color:#fff;font-weight:700}
+.hero .wings{width:min(52vw,230px);height:auto;margin:clamp(34px,8vw,70px) 0 1.6rem;filter:drop-shadow(0 16px 30px #000a);animation:rise 1s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(20px) scale(.92)}to{opacity:1;transform:none}}
+.hero h1{position:relative;margin-top:1rem;animation:rise 1s .1s var(--ease) both}
+.hero .lede{position:relative;margin-top:1.2rem;max-width:56ch;color:#dfe7ec;font-size:1.08rem;animation:rise 1s .2s var(--ease) both}
+.hero .cta{position:relative;display:flex;flex-wrap:wrap;gap:10px;margin-top:1.8rem;animation:rise 1s .3s var(--ease) both}
+.meta{position:relative;margin-top:2.4rem;display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--dline);border:1px solid var(--dline);border-radius:18px;overflow:hidden}
+.meta div{background:#0b141ccc;padding:1rem 1.1rem}
+.meta small{display:block;font:600 .56rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:#8fa3ac}
+.meta b{display:block;margin-top:.3rem;font-weight:700}
+/* price strip */
+.price{margin-top:calc(-1 * clamp(26px,5vw,44px));position:relative;z-index:2}
+.price .box{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 30px 70px #0d182224}
+.price .box div{background:#fff;padding:1.3rem 1.3rem 1.4rem}
+.price small{font:600 .6rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.price b{display:block;margin-top:.35rem;font:800 clamp(2.2rem,9vw,3.2rem)/1 var(--f-disp);font-stretch:125%}
+.price span{display:block;margin-top:.45rem;font-size:.92rem;color:var(--ink-2)}
+section{padding:clamp(56px,10vw,104px) 0}
+.sechead{display:grid;gap:1rem;margin-bottom:clamp(1.6rem,4vw,2.6rem)}
+.sechead p{color:var(--ink-2);max-width:60ch}
+.dark .sechead p{color:var(--dtext)}
+/* screens */
+.screens{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,2.4vw,24px);margin-top:2rem}
+.screens figure{margin:0}
+.screens img{width:100%;border-radius:clamp(14px,3vw,26px);border:1px solid #ffffff2e;box-shadow:0 30px 60px #000a}
+.screens figure:nth-child(2){transform:translateY(clamp(14px,3vw,34px))}
+.screens figcaption{margin-top:.8rem;font:600 .56rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#a9b8c2;text-align:center}
+.screens figure:nth-child(2) figcaption{margin-top:.8rem}
+.see{margin-top:clamp(3rem,7vw,4.4rem);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.see code{font:600 .8rem var(--f-mono);color:var(--gold-lt)}
+/* list */
+.gets{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:n}
+.gets li{counter-increment:n;display:grid;grid-template-columns:auto 1fr;gap:1rem;padding:1.2rem;border-radius:20px;background:#fff;border:1px solid var(--line)}
+.gets li::before{content:"0" counter(n);font:700 .7rem var(--f-mono);letter-spacing:.1em;color:#8a6a00;padding-top:.3rem}
+.gets b{display:block;font:800 1.12rem/1.2 var(--f-disp);font-stretch:112%}
+.gets span{display:block;margin-top:.35rem;color:var(--ink-2);font-size:.97rem}
+.same{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.same li{display:flex;gap:.8rem;align-items:flex-start;padding:1rem 1.1rem;border-radius:16px;border:1px solid var(--dline);background:#ffffff08}
+.same li::before{content:"";flex:none;width:22px;height:22px;border-radius:50%;background:var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c1500' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/14px no-repeat;margin-top:.15rem}
+/* terms */
+.terms{border-radius:24px;border:1px solid var(--line);background:#fff;overflow:hidden}
+.terms div{display:grid;gap:.2rem;padding:1.1rem 1.3rem;border-bottom:1px solid var(--line)}
+.terms div:last-child{border-bottom:0}
+.terms dt,.terms small{font:600 .6rem var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.terms b{font-weight:700;font-size:1.06rem}
+.terms span{color:var(--ink-2);font-size:.95rem}
+.note{margin-top:1.2rem;padding:1.2rem 1.3rem;border-radius:20px;background:#fbf3d4;border:1px solid #ecd98a;color:#4a3a00;font-size:.97rem}
+.note b{color:#2b2200}
+/* steps */
+.steps{list-style:none;margin:0;padding:0 0 0 30px;position:relative;display:grid;gap:1.4rem}
+.steps::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,var(--gold-lt),var(--gold))}
+.steps li{position:relative}
+.steps li::before{content:"";position:absolute;left:-30px;top:.35rem;width:14px;height:14px;border-radius:50%;background:var(--navy);border:2px solid var(--gold)}
+.steps small{font:600 .6rem var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gold-lt)}
+.steps b{display:block;margin-top:.2rem;font:800 1.2rem/1.2 var(--f-disp);font-stretch:112%}
+.steps span{display:block;margin-top:.3rem;color:var(--dtext);font-size:.97rem}
+/* work */
+.work{display:grid;gap:10px}
+.work a{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.1rem 1.3rem;border-radius:18px;background:#fff;border:1px solid var(--line);text-decoration:none;font:800 1.1rem var(--f-disp);font-stretch:112%;transition:transform .2s var(--ease),border-color .2s}
+.work a:hover{transform:translateX(4px);border-color:var(--gold)}
+.work a span{font:600 .6rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+/* go */
+.go{text-align:center;background:radial-gradient(90% 70% at 50% 0,#1c3246,var(--navy) 70%)}
+.go img{width:min(46vw,200px);height:auto;margin:0 auto 1.4rem;filter:drop-shadow(0 14px 26px #000a)}
+.go p{margin:1rem auto 0;max-width:46ch;color:var(--dtext)}
+.go .cta{display:grid;gap:10px;max-width:420px;margin:1.8rem auto 0}
+.sig{margin-top:2.2rem;font:600 .62rem var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:#8fa3ac}
+.sig b{color:#fff}
+.js .rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.js .rv.in{opacity:1;transform:none}
+@media (min-width:760px){
+  .meta{grid-template-columns:repeat(4,1fr)}
+  .price .box{grid-template-columns:repeat(3,1fr)}
+  .sechead{grid-template-columns:1fr 1fr;align-items:end}
+  .gets{grid-template-columns:1fr 1fr}
+  .same{grid-template-columns:1fr 1fr}
+  .terms div{grid-template-columns:200px 1fr 1fr;align-items:baseline;gap:1rem}
+  .work{grid-template-columns:repeat(3,1fr)}
+  .go .cta{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}}
+@media print{.js .rv{opacity:1;transform:none}.hero .cta,.see,.go .cta{display:none}}
+</style>
+</head>
+<body>
+<header class="hero dark">
+  <div class="wrap">
+    <div class="bar"><span><b>Arctos Launchpad</b> · website proposal</span><span>Nov 17, 2026</span></div>
+    <img class="wings" src="../img/wings.png" alt="Caswell Aviation wings" width="900" height="333">
+    <span class="eyebrow">Prepared for Grant Caswell</span>
+    <h1>A new Caswell Aviation site, <span class="gold">on the Shopify you already run.</span></h1>
+    <p class="lede">Grant, this is the full site we talked about, built around what you told me on our call. It costs the same each month as your blog app does today, and the posts are included.</p>
+    <div class="cta"><a class="btn g" href="../">Open the live site →</a><a class="btn" href="#investment">See the price</a></div>
+    <div class="meta">
+      <div><small>For</small><b>Caswell Aviation Ltd</b></div>
+      <div><small>From</small><b>Aldo, Arctos Launchpad</b></div>
+      <div><small>Platform</small><b>Your Shopify store</b></div>
+      <div><small>Live in</small><b>About 2 weeks</b></div>
+    </div>
+  </div>
+</header>
+
+<div class="price"><div class="wrap"><div class="box">
+  <div><small>To start</small><b>$350</b><span>One time, when you say go.</span></div>
+  <div><small>Monthly</small><b>$140</b><span>CAD. The same as your blog app costs now.</span></div>
+  <div><small>Term</small><b>12 mo</b><span>Then month to month.</span></div>
+</div></div></div>
+
+<section>
+  <div class="wrap">
+    <div class="sechead"><div class="rv"><span class="eyebrow">What you get</span><h2 style="margin-top:.9rem">Seven things, all in the preview today.</h2></div><p class="rv">Nothing here is a mock-up. Every page, form and calculator below already works in the live preview.</p></div>
+    <ol class="gets">
+      <li class="rv"><div><b>An eight-page site, designed for phones first</b><span>Home, Aerial, Training, BVLOS, Repair, Gear, About and Quote, using your own photos, films, testimonials and gold wings.</span></div></li>
+      <li class="rv"><div><b>Cart where the price is fixed</b><span>The online course, flight reviews, the Level 1 Complex review, ROC-A, Fitek harnesses and gift cards stay add-to-cart, on clearer pages.</span></div></li>
+      <li class="rv"><div><b>A quote request where it isn't</b><span>Imagery, mapping, special projects and consulting get a three-step form that lands in your inbox, in place of $0.00 cart items.</span></div></li>
+      <li class="rv"><div><b>A BVLOS page for your LinkedIn outreach</b><span>The Level 1 Complex path with a readiness checker, so those messages link to one clear offer.</span></div></li>
+      <li class="rv"><div><b>You see where inquiries come from</b><span>Every form asks how they found you, so you can tell what the outreach and the blog are bringing in.</span></div></li>
+      <li class="rv"><div><b>Your blog posts, handled</b><span>About four new search-focused posts a week, in your voice, published automatically, with a weekly email showing what went out. Your existing posts and vlogs stay.</span></div></li>
+      <li class="rv"><div><b>Small edits included</b><span>Up to one hour a month for prices, photos and wording.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="dark">
+  <div class="wrap">
+    <div class="sechead"><div class="rv"><span class="eyebrow">The site</span><h2 style="margin-top:.9rem">Built to be used on a phone.</h2></div><p class="rv">Your wings and a spinning prop up front, a scroll that climbs from the driveway to 122 metres, and a live radar on the BVLOS page.</p></div>
+    <div class="screens rv">
+      <figure><img src="shot-home.jpg" alt="Home page of the new Caswell Aviation site on a phone" width="390" height="664" loading="lazy"><figcaption>Home</figcaption></figure>
+      <figure><img src="shot-climb.jpg" alt="Scroll to climb scene showing an acreage from 30 metres" width="390" height="664" loading="lazy"><figcaption>Scroll to climb</figcaption></figure>
+      <figure><img src="shot-bvlos.jpg" alt="BVLOS page with a radar" width="390" height="664" loading="lazy"><figcaption>BVLOS radar</figcaption></figure>
+    </div>
+    <div class="see rv"><a class="btn g" href="../">Open the live site →</a><code>caswell-aviation-preview.vercel.app</code></div>
+  </div>
+</section>
+
+<section class="dark" style="padding-top:0">
+  <div class="wrap">
+    <div class="sechead"><div class="rv"><span class="eyebrow">What stays the same</span><h2 style="margin-top:.9rem">Nothing changes in how you run the store.</h2></div><p class="rv">The new site goes onto your current Shopify store as a new theme. Everything behind it stays yours and stays put.</p></div>
+    <ul class="same">
+      <li class="rv">Your Shopify phone app, the same one you use for the hockey league store</li>
+      <li class="rv">Your products, prices and on-the-fly discount codes</li>
+      <li class="rv">Blockify and your other apps</li>
+      <li class="rv">Shopify checkout, hosting and security</li>
+      <li class="rv">Your current theme, saved so you can switch back in one click</li>
+      <li class="rv">Your existing blog posts and weekly vlogs</li>
+    </ul>
+  </div>
+</section>
+
+<section id="investment">
+  <div class="wrap">
+    <div class="sechead"><div class="rv"><span class="eyebrow">Investment</span><h2 style="margin-top:.9rem">$350 to start, then what you already pay.</h2></div><p class="rv">Your blog app runs about $100 US a month, which is roughly $140 CAD. This plan costs the same and includes the site.</p></div>
+    <dl class="terms rv">
+      <div><dt>Website build</dt><b>$350 CAD, one time</b><span>When you say go.</span></div>
+      <div><dt>Monthly plan</dt><b>$140 CAD a month</b><span>About 4 blog posts a week, 1 hour of edits, site care. Starts the month the site goes live.</span></div>
+      <div><dt>Term</dt><b>12 months</b><span>Then month to month, with 30 days' notice to stop.</span></div>
+      <div><dt>Shopify and apps</dt><b>No change</b><span>Paid to Shopify as now.</span></div>
+      <div><dt>Hockey store posts</dt><b>+$50 CAD a month</b><span>Optional, whenever you want it.</span></div>
+    </dl>
+    <p class="note rv"><b>The fine print, in plain words.</b> The site is a $1,500 build, and the 12-month term is what lets me keep the upfront part to $350. If you stopped before the build is covered, you would pay the remainder: $1,500 minus everything paid so far. After that nothing is owed, and the site stays yours whether or not you keep the monthly plan.</p>
+  </div>
+</section>
+
+<section class="dark">
+  <div class="wrap">
+    <div class="sechead"><div class="rv"><span class="eyebrow">Flight plan</span><h2 style="margin-top:.9rem">Live about two weeks after your go.</h2></div><p class="rv">You preview everything on your phone before anything goes public.</p></div>
+    <ol class="steps">
+      <li class="rv"><small>Day 1</small><b>You say go</b><span>I send a Shopify collaborator request, which you approve. Your password and payments stay yours.</span></li>
+      <li class="rv"><small>Week 1</small><b>The theme is built</b><span>As an unpublished copy you can preview on your phone.</span></li>
+      <li class="rv"><small>Week 2</small><b>Tested and tuned</b><span>Quote forms are tested with real emails, your edits are made, and the blog posts are set up.</span></li>
+      <li class="rv"><small>Launch</small><b>You press publish</b><span>Or tell me to. The old theme stays saved.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sechead"><div class="rv"><span class="eyebrow">Our work</span><h2 style="margin-top:.9rem">A few sites we've built.</h2></div><p class="rv">Arctos Launchpad is a Calgary studio. We design and build sites for local businesses and stay on to run them.</p></div>
+    <div class="work rv">
+      <a href="https://arctoslaunchpad.com/work/nicsdelite">Nic's Delite <span>View →</span></a>
+      <a href="https://arctoslaunchpad.com/work/vow-motion">Vow Motion <span>View →</span></a>
+      <a href="https://arctoslaunchpad.com/work/so-social-collective">So Social Collective <span>View →</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="go dark">
+  <div class="wrap">
+    <img src="../img/wings.png" alt="" width="900" height="333" loading="lazy">
+    <h2>Cleared for takeoff?</h2>
+    <p>Reply "go" by text or email and I'll send the collaborator request. I'm also happy to walk through it for 15 minutes on Wednesday, Friday, or Thursday after 6 pm.</p>
+    <div class="cta"><a class="btn g" href="sms:+15872290648">Text Aldo "go"</a><a class="btn" href="mailto:aldo@arctoslaunchpad.com?subject=Caswell%20Aviation%20website%3A%20go">Email Aldo</a></div>
+    <p class="sig"><b>Aldo · Arctos Launchpad</b><br>587-229-0648 · aldo@arctoslaunchpad.com</p>
+  </div>
+</section>
+<script>
+document.documentElement.classList.add('js');
+(function(){var els=[].slice.call(document.querySelectorAll('.rv'));if(!('IntersectionObserver'in window)){els.forEach(function(e){e.classList.add('in')});return}
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -5% 0px'});els.forEach(function(e){io.observe(e)})})();
+</script>
+</body>
+</html>

@@ -27398,6 +27398,50 @@
       "neighbourhood": "Sunnyside"
     },
     {
+      "id": "biz-ma-pies",
+      "kind": "business",
+      "slug": "ma-pies",
+      "title": "Ma Pies",
+      "name": "Ma Pies",
+      "website": "https://mapies.ca/",
+      "summary": "Calgary-made artisan frozen pies at the Calgary Farmers' Market.",
+      "description": "Ma Pies makes artisan frozen pies in Calgary with a light, flaky, buttery crust: pocket pies like Tourtière, family pies and galettes. Find them at both Calgary Farmers' Market locations or order online.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "bakery",
+        "pies",
+        "frozen pies"
+      ],
+      "sources": [
+        {
+          "name": "Ma Pies",
+          "url": "https://mapies.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-17T02:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mapies.ca/",
+        "instagram": "https://www.instagram.com/ma_pies/",
+        "facebook": "https://www.facebook.com/ma.pies.yyc"
+      },
+      "services": [
+        "Frozen pies",
+        "Online ordering"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-17T02:45:00Z",
+      "email": "hello@mapies.ca",
+      "address": "Calgary Farmers' Market, Calgary, AB"
+    },
+    {
       "id": "biz-crossfit-pyro",
       "kind": "business",
       "slug": "crossfit-pyro",
@@ -29271,12 +29315,24 @@
           "url": "https://www.inglewoodnightmarket.ca/",
           "kind": "official",
           "retrievedAt": "2026-11-16T23:00:00Z"
+        },
+        {
+          "name": "Ma Pies",
+          "url": "https://mapies.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-17T02:45:00Z"
+        },
+        {
+          "name": "MarshaSophia",
+          "url": "https://www.marshasophia.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-17T02:45:00Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-11-14T19:00:00Z",
-      "updatedAt": "2026-11-16T23:00:00Z",
+      "updatedAt": "2026-11-17T02:45:00Z",
       "image": {
         "src": "/images/photo/calgary4.webp",
         "alt": "Calgary in winter"
@@ -29331,6 +29387,14 @@
         {
           "entityId": "biz-inglewood-night-market",
           "note": "Inglewood Night Market"
+        },
+        {
+          "entityId": "biz-ma-pies",
+          "note": "Ma Pies"
+        },
+        {
+          "entityId": "biz-marshasophia",
+          "note": "MarshaSophia"
         }
       ],
       "relatedGuideIds": [
@@ -29452,6 +29516,22 @@
           "mapQuery": "The Quonset at Crossroads Market, 1235 26 Ave SE, Calgary, AB",
           "note": "The Last Stop Shop, from Inglewood Night Market. Still have a few names left on your Christmas list? The Last Stop Shop is a special bonus edition of the Inglewood Holiday Night Market: one last day, one last shop, full of local makers and businesses. It's on Saturday, December 19, 10 am to 5 pm, at The Quonset at Crossroads Market (1235 26 Ave SE). Free admission, and all ages are welcome.",
           "tip": "Saturday, Dec 19, 10 am to 5 pm. Free admission, all ages."
+        },
+        {
+          "name": "Ma Pies",
+          "area": "Calgary Farmers' Market",
+          "entityId": "biz-ma-pies",
+          "mapQuery": "Calgary Farmers' Market South, 510 77 Ave SE, Calgary, AB",
+          "note": "Ma Pies, Calgary Farmers' Market. December pick: stock the freezer before the holiday rush. Ma Pies makes artisan frozen pies with a light, flaky, buttery crust: pocket pies like Tourtière, family pies, and galettes. The pocket pies bake from frozen in about 20 minutes, which makes them an easy answer for drop-in guests or a busy December weeknight. Find them at the Calgary Farmers' Market at both locations or order online at mapies.ca.",
+          "tip": "Order online at mapies.ca, or find them at both Calgary Farmers' Market locations."
+        },
+        {
+          "name": "MarshaSophia",
+          "area": "Kensington",
+          "entityId": "biz-marshasophia",
+          "mapQuery": "MarshaSophia, 1081 2 Ave NW, Calgary, AB",
+          "note": "A Splendor Gift Card from MarshaSophia. For the friend who can't eat gluten and always gets left out at gift time. MarshaSophia Gluten-Free Bakery & More is a dedicated, celiac-safe bakery in Kensington, with gluten-free and dairy-free breads, pastries, cakes and savoury favourites, plus vegan, vegetarian and keto-friendly options. A physical Splendor Gift Card, from $10 to $50, lets them pick their own treats.",
+          "tip": "Splendor Gift Cards run from $10 to $50."
         }
       ]
     },

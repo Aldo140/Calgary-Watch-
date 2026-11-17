@@ -26,6 +26,9 @@ describe('Local shelves', () => {
     assert.equal(shelfOf({ ...shop('j', 'Vaycay Brew Co', ['nightlife', 'food'], ['brewery']), services: ['Bar'] }), 'bars');
     assert.equal(shelfOf({ ...shop('k', 'PB and J YYC', ['food'], ['sandwiches']), services: ['Dining'] }), 'restaurants');
     assert.equal(shelfOf(shop('l', 'Yuk Yuk’s Calgary', ['nightlife', 'arts'], ['comedy'])), 'stages');
+    // Owner feedback: a bakery is not a coffee shop, even one with a café.
+    assert.equal(shelfOf(shop('m', 'MarshaSophia', ['food'], ['gluten-free', 'bakery', 'cafe'])), 'bakeries');
+    assert.equal(shelfOf(shop('n', 'Choklat', ['food'], ['chocolate', 'truffles'])), 'bakeries');
   });
 
   it('puts every published profile on a known shelf', () => {

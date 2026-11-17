@@ -7,7 +7,7 @@ import { organizerEvents, organizerMarkets } from './organizations';
  * and community halls, and the independent shops we'd send a friend to. Every profile
  * sits on exactly one shelf, so the page reads like a well-kept directory, not a pile.
  */
-export type ShelfId = 'stages' | 'culture' | 'markets' | 'restaurants' | 'bars' | 'coffee' | 'days-out' | 'day-trips' | 'community' | 'seasonal' | 'shops';
+export type ShelfId = 'stages' | 'culture' | 'markets' | 'restaurants' | 'bars' | 'bakeries' | 'coffee' | 'days-out' | 'day-trips' | 'community' | 'seasonal' | 'shops';
 
 export interface Shelf { id: ShelfId; label: string; line: string; tone: string; ink: string }
 
@@ -18,6 +18,7 @@ export const SHELVES: Shelf[] = [
   { id: 'restaurants', label: 'Restaurants', line: 'Independent kitchens worth booking a table at.', tone: '#e2673a', ink: '#151515' },
   { id: 'bars', label: 'Bars & breweries', line: 'Pubs, taprooms, lounges and the nights they run all year.', tone: '#9c2f5c', ink: '#fff' },
   { id: 'shops', label: 'Shops & services', line: 'Independent shops, studios and the people who keep a neighbourhood running.', tone: '#2f6f8f', ink: '#fff' },
+  { id: 'bakeries', label: 'Bakeries & sweets', line: 'Bread, pies, pastries and chocolate made in town.', tone: '#b5653a', ink: '#fff' },
   { id: 'coffee', label: 'Coffee & corner shops', line: 'Independents worth crossing the river for.', tone: '#c98a2e', ink: '#151515' },
   { id: 'days-out', label: 'Days out', line: 'Big days with the kids, the grandparents or both.', tone: '#00c2e0', ink: '#151515' },
   { id: 'community', label: 'Community groups', line: 'Community associations and the volunteers who run the neighbourhood.', tone: '#1554d1', ink: '#fff' },
@@ -49,6 +50,8 @@ export function shelfOf(p: Pick<Business, 'title' | 'categories' | 'tags'> & { s
   if (has(c, 'family') || has(t, 'zoo', 'attraction')) return 'days-out';
   if (has(c, 'food') && (has(t, 'restaurant') || has(s, 'dining'))) return 'restaurants';
   if (has(c, 'nightlife')) return 'bars';
+  // Bakeries, pie shops and chocolatiers aren't coffee shops (MarshaSophia owner feedback).
+  if (has(c, 'food') && has(t, 'bakery', 'bakeshop', 'pastry', 'pie', 'pies', 'cakes', 'cupcakes', 'cookies', 'croissants', 'chocolate', 'dessert', 'ice cream')) return 'bakeries';
   if (has(t, 'coffee', 'espresso', 'organic coffee') || (has(c, 'food') && !has(t, 'organization', 'organizer'))) return 'coffee';
   if (has(c, 'community')) return 'community';
   // Shops, studios and services aren't galleries: only arts, music or heritage profiles fall through to culture.

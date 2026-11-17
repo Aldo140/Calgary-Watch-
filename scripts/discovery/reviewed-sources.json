@@ -7202,6 +7202,12 @@
         "id": "christmas-at-the-movies-2026",
         "input": {
           "kind": "event",
+          "image": {
+            "src": "https://calgarywatch.ca/images/orgs/calgary-civic-symphony-christmas-at-the-movies-2026.webp",
+            "alt": "Christmas at the Movies poster: a snowy street and a theatre marquee reading Polar Express, Love Actually, The Holiday",
+            "credit": "Image courtesy of Calgary Civic Symphony",
+            "presentation": "poster"
+          },
           "title": "Calgary Civic Symphony: Christmas at the Movies",
           "summary": "Holiday film scores from It's a Wonderful Life to the Grinch, with 13-year-old violinist Sacha Jorba-Wu.",
           "description": "The Calgary Civic Symphony's 50th-season holiday concert plays film music from It's a Wonderful Life, The Holiday, Love Actually, How the Grinch Stole Christmas, A Charlie Brown Christmas, The Red Violin and more. Rising Star Sacha Jorba-Wu, 13, joins as guest violinist, and Music Director Rolf Bertsch conducts from the piano. Tickets through Werklund Centre.",

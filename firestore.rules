@@ -908,6 +908,20 @@ service cloud.firestore {
         get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + rootId)).data.uid == request.auth.uid &&
         get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + rootId)).data.entityId == rootId;
     }
+    // Owner workspace publishes, applied by the owner-updates workflow with the
+    // same claim and allowance checks as the callable. Owners only queue.
+    match /organization_submissions/{requestId} {
+      allow read: if isAdmin() || (isAuthenticated() && (resource == null || resource.data.uid == request.auth.uid));
+      allow create: if isAuthenticated() && request.auth.token.email_verified == true &&
+        requestId.matches('^[a-f0-9-]{36}$') &&
+        request.resource.data.keys().hasOnly(['uid','organizationId','operations','adminEdit','subjectUid','status','createdAt']) &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.organizationId is string && request.resource.data.organizationId.size() <= 124 &&
+        request.resource.data.operations is list && request.resource.data.operations.size() > 0 && request.resource.data.operations.size() <= 100 &&
+        request.resource.data.adminEdit is bool && (request.resource.data.adminEdit == false || isAdmin()) &&
+        request.resource.data.status == 'queued' && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
     match /owner_listing_edit_limits/{rootId} {
       allow read: if isAdmin() || approvedListingOwner(rootId);
       allow create, update: if approvedListingOwner(rootId) &&

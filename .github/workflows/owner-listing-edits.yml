@@ -28,6 +28,14 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
           TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+      # Owner workspace publishes queued from the browser (no Cloud Functions on the free plan).
+      - name: Apply queued organization publishes
+        id: orgs
+        run: npx tsx scripts/claims/apply-organization-submissions.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
       # A Pick made live, paused or changed on the admin vetting desk. One read.
       # Skipped while a deploy is running: starting another would cancel it.
       - name: Check for Pick changes
@@ -43,7 +51,7 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
       - name: Publish updated site
-        if: ${{ steps.apply.outputs.publish == 'true' || steps.picks.outputs.publish == 'true' }}
+        if: ${{ steps.apply.outputs.publish == 'true' || steps.orgs.outputs.publish == 'true' || steps.picks.outputs.publish == 'true' }}
         run: gh workflow run deploy-firebase.yml --ref main
         env:
           GH_TOKEN: ${{ github.token }}

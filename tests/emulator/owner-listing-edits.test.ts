@@ -75,7 +75,7 @@ test('members cannot forge organization scope or write trusted catalogue/live pr
   await assert.rejects(setDoc(doc(db,'organization_live_content','biz-test'),{entityId:'biz-test',organizationId:'biz-test',deleted:false}));
 });
 
-test('real organization transactions serialize two representatives against one weekly allowance',async()=>{
+test('real organization transactions serialize two representatives against the last weekly publish',async()=>{
   const {initializeApp:initializeAdmin,deleteApp:deleteAdmin}=await import('firebase-admin/app');
   const {getFirestore:getAdminDb}=await import('firebase-admin/firestore');
   const {submitOrganizationBatch}=await import('../../scripts/claims/organization-submit');
@@ -85,6 +85,8 @@ test('real organization transactions serialize two representatives against one w
   const app=initializeAdmin({projectId},'organization-transactions'),admin=getAdminDb(app);
   try{
     await admin.collection('organization_catalog').doc(org.id).set({entity:org});
+    // Four of the week's five publishes already used: only one of the two racing saves may land.
+    const t=Date.now();await admin.collection('owner_business_edit_limits').doc(org.id).set({lastSubmittedAt:t-60000,recent:[t-240000,t-180000,t-120000,t-60000],editId:'earlier'});
     await Promise.all(['u1','u2'].map(uid=>admin.collection('listing_claims').doc(`${uid}_${org.id}`).set({uid,entityId:org.id,status:'approved'})));
     const attempts=await Promise.allSettled(['u1','u2'].map((uid,i)=>submitOrganizationBatch(admin,uid,{organizationId:org.id,requestId:`${i+1}2345678-1234-1234-1234-123456789abc`,operations:[{entityId:org.id,action:'edit',changes:{phone:`403-555-010${i}`}}]})));
     assert.equal(attempts.filter(result=>result.status==='fulfilled').length,1, attempts.flatMap(result=>result.status==='rejected'?[String(result.reason)]:[]).join(' | '));
@@ -113,4 +115,19 @@ test('organization approval unlocks only explicitly linked Market HQ and revocat
   await assert.rejects(getDoc(doc(owner,'market_vendor_contacts','market-unrelated__sample')),/permission/i);
   await assert.rejects(setDoc(doc(owner,'organization_management_profiles','org-fake'),{entity:{title:'Injected'}}),/permission/i);
  }finally{await admin.terminate();await deleteAdmin(app);}
+});
+
+test('owners can only queue their own organization publishes; status and admin scope cannot be forged',async()=>{
+  const id='12345678-1234-1234-1234-123456789abc',u1=client('u1'),ops=[{entityId:'biz-test',action:'edit',changes:{phone:'403'}}];
+  const queued=(uid:string,extra:Record<string,unknown>={})=>({uid,organizationId:'biz-test',operations:ops,adminEdit:false,status:'queued',createdAt:serverTimestamp(),...extra});
+  await assert.rejects(setDoc(doc(client('u2',false),'organization_submissions',id),queued('u2')),/permission/i);
+  await assert.rejects(setDoc(doc(u1,'organization_submissions',id),queued('u2')),/permission/i);
+  await assert.rejects(setDoc(doc(u1,'organization_submissions',id),queued('u1',{status:'published'})),/permission/i);
+  await assert.rejects(setDoc(doc(u1,'organization_submissions',id),queued('u1',{adminEdit:true})),/permission/i);
+  await assert.rejects(setDoc(doc(u1,'organization_submissions','not-a-uuid'),queued('u1')),/permission/i);
+  await setDoc(doc(u1,'organization_submissions',id),queued('u1'));
+  assert.equal((await getDoc(doc(u1,'organization_submissions',id))).get('status'),'queued');
+  await assert.rejects(getDoc(doc(client('u2'),'organization_submissions',id)),/permission/i);
+  await assert.rejects(setDoc(doc(u1,'organization_submissions',id),queued('u1')),/permission/i);
+  await assert.rejects(deleteDoc(doc(u1,'organization_submissions',id)),/permission/i);
 });

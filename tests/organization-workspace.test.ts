@@ -279,3 +279,18 @@ test('a 100-show programme commits atomically under one weekly allowance',async(
 test('oversized 100-listing audit aborts the whole save and preserves the allowance',async()=>{
  const db=memory();const operations=Array.from({length:100},(_,i)=>{const entityId=`large-event-${i}`;db.data.set(`${ORGANIZATION_CATALOG}/${entityId}`,{entity:{...event,id:entityId,description:'a'.repeat(5000)}});return{entityId,action:'edit' as const,changes:{description:'b'.repeat(5000)}};});await assert.rejects(()=>submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations},now),/too large to save safely/);assert.equal([...db.data.keys()].filter(k=>k.startsWith(ORGANIZATION_LIVE+'/')).length,0);assert.equal(db.data.has('owner_business_edit_limits/'+org.id),false);
 });
+
+test('queued browser publishes are applied by the workflow with the same claim and allowance checks',async()=>{
+ const {applyOrganizationSubmission}=await import('../scripts/claims/apply-organization-submissions');
+ const db=memory(),verified=async()=>({emailVerified:true});
+ db.data.set(`organization_submissions/${uuid}`,{uid:'u',organizationId:org.id,operations:[{entityId:org.id,action:'edit',changes:{phone:'403-555-0199'}}],adminEdit:false,status:'queued',createdAt:now});
+ assert.equal(await applyOrganizationSubmission(db,uuid,verified,now),'published');
+ assert.equal(db.data.get(`organization_submissions/${uuid}`).status,'published');assert.equal(db.data.get(`${ORGANIZATION_LIVE}/${org.id}`).entity.phone,'403-555-0199');
+ assert.equal(await applyOrganizationSubmission(db,uuid,verified,now+1),'skipped');
+ const other='22345678-1234-1234-1234-123456789abc';
+ db.data.set(`organization_submissions/${other}`,{uid:'stranger',organizationId:org.id,operations:[{entityId:org.id,action:'edit',changes:{phone:'1'}}],adminEdit:false,status:'queued',createdAt:now});
+ assert.equal(await applyOrganizationSubmission(db,other,verified,now+2),'failed');assert.match(db.data.get(`organization_submissions/${other}`).error,/not been confirmed/);
+ const unverified='32345678-1234-1234-1234-123456789abc';
+ db.data.set(`organization_submissions/${unverified}`,{uid:'u',organizationId:org.id,operations:[{entityId:org.id,action:'edit',changes:{phone:'2'}}],adminEdit:false,status:'queued',createdAt:now});
+ assert.equal(await applyOrganizationSubmission(db,unverified,async()=>({}),now+3),'failed');assert.match(db.data.get(`organization_submissions/${unverified}`).error,/Confirm your email/);
+});

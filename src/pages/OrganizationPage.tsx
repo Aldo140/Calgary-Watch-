@@ -31,7 +31,10 @@ import {
   getDoc,
   getDocs,
   limit,
+  onSnapshot,
   query,
+  serverTimestamp,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -49,6 +52,7 @@ import {
   organizationEvent,
   ORGANIZATION_CATALOG,
   ORGANIZATION_LIVE,
+  ORGANIZATION_SUBMISSIONS,
   prepareOrganizationBatch,
   mergeOrganizationContent,
   type OrganizationChange,
@@ -364,7 +368,8 @@ export function OrganizationWorkspace({
     ),
     [pane, setPane] = useState<"edit" | "preview">("edit"),
     [published, setPublished] = useState<{ at: number; next: number }>(),
-    [copied, setCopied] = useState(false);
+    [copied, setCopied] = useState(false),
+    [queued, setQueued] = useState<{ id: string; at: number }>();
   // Up to OWNER_EDITS_PER_WEEK publishes in any rolling seven days.
   const nextAt = Math.max(serverNextAt, ownerAllowanceNextAt(sentAt, clock)),
     updatesLeft = ownerUpdatesLeft(sentAt, clock);
@@ -383,6 +388,56 @@ export function OrganizationWorkspace({
     else dialog.current?.close();
   }, [review]);
   useOrganizationDraftPersistence(key, readOnly, ops, request, setError);
+  // A publish sent earlier (this visit or a previous one) that is still waiting.
+  useEffect(() => {
+    if (!db || demo || readOnly || !initialRequest) return;
+    getDoc(doc(db, ORGANIZATION_SUBMISSIONS, initialRequest))
+      .then((snap) => {
+        if (snap.exists()) setQueued({ id: initialRequest, at: Date.now() });
+      })
+      .catch(() => undefined);
+  }, [initialRequest, demo, readOnly]);
+  useEffect(() => {
+    if (!db || !queued) return;
+    return onSnapshot(
+      doc(db, ORGANIZATION_SUBMISSIONS, queued.id),
+      (snap) => {
+        const status = snap.get("status");
+        if (status === "published") {
+          const at = Number(snap.get("publishedAt")) || Date.now();
+          if (!adminEdit) setSentAt((current) => [...current, at]);
+          setNextAt(Number(snap.get("nextAt")) || 0);
+          setOps([]);
+          setQueued(undefined);
+          request.current = undefined;
+          try {
+            localStorage.removeItem(key + ":request");
+          } catch {
+            /* nothing stored */
+          }
+          setPublished({ at, next: Number(snap.get("nextAt")) || 0 });
+          setReload((n) => n + 1);
+          setNotice(
+            adminEdit
+              ? "Admin changes are live and recorded under your account. The business’s weekly allowance was not used."
+              : "",
+          );
+        } else if (status === "failed") {
+          setQueued(undefined);
+          request.current = undefined;
+          try {
+            localStorage.removeItem(key + ":request");
+          } catch {
+            /* nothing stored */
+          }
+          setError(
+            `${snap.get("error") || "Your changes could not be published."} Your changes are still saved here. If it keeps happening, email aldo@calgarywatch.ca and we'll publish them for you.`,
+          );
+        }
+      },
+      () => undefined,
+    );
+  }, [queued?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     let active = true;
     if (demo) {
@@ -530,7 +585,7 @@ export function OrganizationWorkspace({
     return () => clearTimeout(timer);
   }, [nextAt]);
   const locked = !adminEdit && nextAt > Math.max(clock, Date.now()),
-    disabled = readOnly || busy || review;
+    disabled = readOnly || busy || review || Boolean(queued);
   function update(field: string, value: string) {
     if (disabled || !target) return;
     request.current = undefined;
@@ -634,38 +689,23 @@ export function OrganizationWorkspace({
       } catch {
         /* Current-session retries still preserve the request identifier. */
       }
-      const { getFunctions, httpsCallable } =
-        await import("firebase/functions");
-      const call = httpsCallable<
-        {
-          organizationId: string;
-          requestId: string;
-          operations: OrganizationChange[];
-          adminEdit?: boolean;
-          subjectUid?: string;
-        },
-        { nextAt: number }
-      >(
-        getFunctions(db!.app, "northamerica-northeast1"),
-        "submitOrganizationBatch",
-      );
-      const result = await call({
-        organizationId: org.id,
-        requestId: request.current,
-        operations: ops,
-        ...(adminEdit ? { adminEdit: true, subjectUid: uid } : {}),
-      });
-      if (org.managementOnly) setReload((n) => n + 1);
-      setNextAt(result.data.nextAt);
-      if (!adminEdit) setSentAt((current) => [...current, Date.now()]);
-      setOps([]);
+      // Publishing is queued in Firestore and applied by the owner-updates
+      // workflow (every 15 minutes) with the same claim and allowance checks.
+      const ref = doc(db!, ORGANIZATION_SUBMISSIONS, request.current);
+      const existing = await getDoc(ref).catch(() => undefined);
+      if (!existing?.exists())
+        await setDoc(ref, {
+          uid: adminEdit && adminUserId ? adminUserId : uid,
+          organizationId: org.id,
+          operations: ops,
+          adminEdit: Boolean(adminEdit),
+          ...(adminEdit && uid ? { subjectUid: uid } : {}),
+          status: "queued",
+          createdAt: serverTimestamp(),
+        });
       setReview(false);
-      setPublished({ at: Date.now(), next: result.data.nextAt });
-      setNotice(
-        adminEdit
-          ? "Admin changes are live and recorded under your account. The business’s weekly allowance was not used."
-          : "",
-      );
+      setQueued({ id: request.current, at: Date.now() });
+      return;
       request.current = undefined;
     } catch (e) {
       const code = (e as { code?: string }).code;
@@ -918,6 +958,16 @@ export function OrganizationWorkspace({
           Admin preview — read-only. This is this member’s organization
           workspace.
         </p>
+      ) : null}
+      {queued ? (
+        <section className="ow-success" aria-labelledby="ow-queued" role="status">
+          <h2 id="ow-queued">Sent! Going live shortly</h2>
+          <p>
+            Your changes are on their way. They go live on your page within
+            about 15 minutes, with no approval needed. You can close this page;
+            we’ll finish it for you.
+          </p>
+        </section>
       ) : null}
       {published && !adminEdit ? (
         <section className="ow-success" aria-labelledby="ow-success">

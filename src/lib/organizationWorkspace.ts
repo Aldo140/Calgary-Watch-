@@ -5,6 +5,9 @@ import { ownerEditPatch, ownerEditableFields, OWNER_EDIT_INTERVAL } from './owne
 export const MAX_ORGANIZATION_CHANGES=100;
 export const ORGANIZATION_CATALOG='organization_catalog';
 export const ORGANIZATION_LIVE='organization_live_content';
+/** Owner publishes queued from the browser; the quarter-hourly owner-updates workflow applies them (no Cloud Functions on the free plan). */
+export const ORGANIZATION_SUBMISSIONS='organization_submissions';
+export type OrganizationSubmission={uid:string;organizationId:string;operations:OrganizationChange[];adminEdit:boolean;subjectUid?:string;status:'queued'|'published'|'failed';createdAt:unknown;publishedAt?:number;nextAt?:number;error?:string};
 export type OrganizationChange={entityId:string;action:'edit'|'add'|'delete';changes:Record<string,unknown>};
 export type OrganizationProjection={entityId:string;organizationId:string;entity:DiscoveryEntity;deleted:boolean;changes?:Record<string,unknown>;submittedByAdmin?:boolean;createdInWorkspace?:boolean;workspaceAssociationConfirmed?:boolean;adminMedia?:Record<string,unknown>;occurrences?:MarketOccurrence[];updatedAt:number;batchId:string};
 export function approvedOrganization(claim:{status:string;entityId:string;approvedOrganizationId?:string},entities:readonly DiscoveryEntity[]):Business|undefined {

@@ -53,10 +53,9 @@ export const DATE_PICKS: DatePick[] = [
     take: 'Two Olympians, Cassie Campbell-Pascall and Clara Hughes, open the festival. A good first date if one of you is the sporty one.',
   },
   {
-    sourceId: 'vaycay-brew-co', recordId: 'monday-karaoke-2026-11-09', vibe: 'Laugh together',
-    take: 'Vaycay’s last karaoke night, so it’s now or never: sing for a $25 gift card over $2 oysters and half-price bottles of wine and bubbles.',
-    quote: { text: 'Mondays: Karaoke, 1/2 price bottles of wine, $2 oysters -- perfect for date night.', by: 'Shanon De Ocampo, Vaycay Brew Pub' },
-    tip: 'Karaoke runs 6:30 to 9:30 in Marda Loop, and the best singer wins a $25 gift card.',
+    sourceId: 'vaycay-brew-co', recordId: 'wednesday-trivia-2026-11-25', vibe: 'Laugh together',
+    take: 'Wednesday trivia and wings at Vaycay in Marda Loop: a team of two is plenty, and losing a round together is half the fun.',
+    tip: 'Karaoke has ended at Vaycay, but Monday $2 oysters and half-price bottles carry on if you’d rather a quieter night.',
   },
 ];
 

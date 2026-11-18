@@ -22841,6 +22841,151 @@
       "verifiedAt": "2026-10-28T20:00:00.000Z",
       "updatedAt": "2026-10-28T20:00:00.000Z",
       "email": "jennifer@urbanproductionsgroup.com"
+    },
+    {
+      "id": "biz-hope-lutheran-calgary",
+      "kind": "business",
+      "slug": "hope-lutheran-calgary",
+      "title": "Hope Lutheran Church",
+      "name": "Hope Lutheran Church",
+      "website": "https://www.hopelutheran.ca/",
+      "address": "3527 Boulton Rd NW, Calgary, AB",
+      "summary": "A welcoming Lutheran church in Brentwood, with Sunday worship at 10 a.m. in person and online.",
+      "description": "Hope Lutheran Church at 3527 Boulton Rd NW worships every Sunday at 10 a.m., in person and livestreamed on YouTube. The church calls itself a spiritual home where belonging is the promise and compassion is the way of life. This December it hosts the Hope & Holly Christmas Market on November 28, Christmas Eve services at 4:30 and 7 p.m., and a Christmas Day service with Holy Communion at 11 a.m.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "brentwood"
+      ],
+      "sources": [
+        {
+          "name": "Hope Lutheran Church",
+          "url": "https://www.hopelutheran.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-18T04:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.hopelutheran.ca/"
+      },
+      "services": [
+        "Sunday worship",
+        "Livestreamed services",
+        "Christmas services",
+        "Hall rentals"
+      ],
+      "phone": "403-282-6033",
+      "email": "church@hopelutheran.ca",
+      "neighbourhood": "Brentwood",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-18T04:00:00Z",
+      "updatedAt": "2026-11-18T04:00:00Z"
+    },
+    {
+      "id": "biz-calgary-first-church-of-the-nazarene",
+      "kind": "business",
+      "slug": "calgary-first-church-of-the-nazarene",
+      "title": "Calgary First Church of the Nazarene",
+      "name": "Calgary First Church of the Nazarene",
+      "website": "https://www.firstnaz.ca/",
+      "address": "65 Richard Way SW, Calgary, AB T3E 7M8",
+      "summary": "A southwest Calgary church with Sunday worship at 10 a.m. and family events like the Gingerbread Bash.",
+      "description": "Calgary First Church of the Nazarene meets every Sunday at 10 a.m., in person at 65 Richard Way SW and online. It runs ministries for kids, youth and senior adults, and family events through the year. This December: the fourth annual Gingerbread Bash on December 6 and a Christmas Eve service at 4 p.m.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "lincoln-park"
+      ],
+      "sources": [
+        {
+          "name": "Calgary First Church of the Nazarene",
+          "url": "https://www.firstnaz.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-18T04:00:00Z"
+        },
+        {
+          "name": "First Naz events",
+          "url": "https://firstnaz.churchcenter.com/registrations",
+          "kind": "official",
+          "retrievedAt": "2026-11-18T04:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.firstnaz.ca/"
+      },
+      "services": [
+        "Sunday worship",
+        "Kids and youth ministry",
+        "Family events",
+        "Christmas services"
+      ],
+      "phone": "403-242-1718",
+      "email": "info@firstnaz.ca",
+      "neighbourhood": "Lincoln Park",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-18T04:00:00Z",
+      "updatedAt": "2026-11-18T04:00:00Z"
+    },
+    {
+      "id": "biz-rockland-park-hoa",
+      "kind": "business",
+      "slug": "rockland-park-hoa",
+      "title": "Rockland Park HOA",
+      "name": "Rockland Park HOA",
+      "address": "90 Rowley Way NW, Calgary, AB",
+      "summary": "The homeowners association for Rockland Park in northwest Calgary, with a few events open to everyone.",
+      "description": "The Rockland Park Homeowners Association runs lifestyle programming for the Rockland Park community at 90 Rowley Way NW. Most of its events are for residents, but some are open to the public: this December, A Market of Winter Wonder (free, December 5) and a Building Festive Centrepieces workshop (December 12). Not sure if an event is open to you? Email lifestyle@rocklandparkhoa.ca.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "homeowners association",
+        "rockland-park"
+      ],
+      "sources": [
+        {
+          "name": "Rockland Park HOA, December events sent to CalgaryWatch",
+          "url": "https://calgarywatch.ca/local/rockland-park-hoa",
+          "kind": "editorial",
+          "retrievedAt": "2026-11-18T04:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events",
+        "Workshops",
+        "Winter market"
+      ],
+      "email": "lifestyle@rocklandparkhoa.ca",
+      "neighbourhood": "Rockland Park",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-18T04:00:00Z",
+      "updatedAt": "2026-11-18T04:00:00Z"
     }
   ],
   "occurrences": [

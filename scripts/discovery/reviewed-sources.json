@@ -7282,7 +7282,7 @@
           "pricing": "free",
           "title": "Hope Lutheran Christmas Eve Service (4:30 p.m.)",
           "summary": "A 4:30 p.m. Christmas Eve worship service at Hope Lutheran Church in Brentwood.",
-          "description": "Hope Lutheran Church holds a special Christmas Eve worship service on Thursday, December 24, 2026 at 4:30 p.m. (no Holy Communion) at 3527 Boulton Rd NW. A second service follows at 7 p.m. with Holy Communion. Everyone is welcome. Questions: 403-282-6033.",
+          "description": "Hope Lutheran Church holds a special Christmas Eve worship service on Thursday, December 24, 2026 at 4:30 p.m. at 3527 Boulton Rd NW. A second service follows at 7 p.m. Neither Christmas Eve service includes Holy Communion; the Christmas Day service at 11 a.m. does. Everyone is welcome. Questions: 403-282-6033.",
           "sourceUrl": "https://www.hopelutheran.ca/events/special-christmas-eve-worship-services/2026-12-24",
           "categories": [
             "community",
@@ -7306,8 +7306,8 @@
           "organizer": "Hope Lutheran Church",
           "pricing": "free",
           "title": "Hope Lutheran Christmas Eve Service (7 p.m.)",
-          "summary": "A 7 p.m. Christmas Eve worship service with Holy Communion at Hope Lutheran Church.",
-          "description": "Hope Lutheran Church holds a special Christmas Eve worship service with Holy Communion on Thursday, December 24, 2026 at 7 p.m. at 3527 Boulton Rd NW. An earlier service runs at 4:30 p.m. Everyone is welcome. Questions: 403-282-6033.",
+          "summary": "A 7 p.m. Christmas Eve worship service at Hope Lutheran Church in Brentwood.",
+          "description": "Hope Lutheran Church holds a special Christmas Eve worship service on Thursday, December 24, 2026 at 7 p.m. at 3527 Boulton Rd NW. This service does not include Holy Communion; Holy Communion is offered at the Christmas Day service at 11 a.m. An earlier Christmas Eve service runs at 4:30 p.m. Everyone is welcome. Questions: 403-282-6033.",
           "sourceUrl": "https://www.hopelutheran.ca/events/special-christmas-eve-worship-services/2026-12-24",
           "categories": [
             "community",
@@ -7332,7 +7332,7 @@
           "pricing": "free",
           "title": "Hope Lutheran Christmas Day Service",
           "summary": "An 11 a.m. Christmas Day worship service with Holy Communion at Hope Lutheran Church.",
-          "description": "Hope Lutheran Church holds a special Christmas Day worship service with Holy Communion on Friday, December 25, 2026 at 11 a.m. at 3527 Boulton Rd NW. Everyone is welcome. Questions: 403-282-6033.",
+          "description": "Hope Lutheran Church holds a special Christmas Day worship service with Holy Communion on Friday, December 25, 2026 at 11 a.m. at 3527 Boulton Rd NW. It is the Christmas service with Holy Communion this year. Everyone is welcome. Questions: 403-282-6033.",
           "sourceUrl": "https://www.hopelutheran.ca/events/special-christmas-day-worship-service/2026-12-25",
           "categories": [
             "community",
@@ -7345,6 +7345,151 @@
           ],
           "start": "2026-12-25T11:00:00-06:00",
           "end": "2026-12-25T12:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-first-church-of-the-nazarene",
+      "name": "Calgary First Church of the Nazarene",
+      "approved": true,
+      "hosts": [
+        "firstnaz.churchcenter.com",
+        "www.firstnaz.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "gingerbread-bash-2026",
+        "input": {
+          "kind": "event",
+          "title": "Gingerbread Bash",
+          "summary": "A family Christmas party with gingerbread decorating, pizza, hot chocolate by the firepit and inflatables.",
+          "description": "Calgary First Church of the Nazarene hosts its fourth annual Gingerbread Bash on Sunday, December 6, 2026 from 4 to 6:30 p.m. at 65 Richard Way SW. The whole family can decorate gingerbread, eat pizza, drink hot chocolate at the outdoor firepit, and play on inflatables, games and crafts. It costs $7 a person, with a family maximum of $35. Children must come with an adult. Register on the church's event page.",
+          "address": "65 Richard Way SW, Calgary, AB T3E 7M8",
+          "venue": "Calgary First Church of the Nazarene",
+          "organizer": "Calgary First Church of the Nazarene",
+          "neighbourhood": "Lincoln Park",
+          "pricing": "paid",
+          "priceRange": [
+            7,
+            7
+          ],
+          "tickets": "https://firstnaz.churchcenter.com/registrations/events/3673637",
+          "sourceUrl": "https://firstnaz.churchcenter.com/registrations/events/3673637",
+          "categories": [
+            "family",
+            "holiday",
+            "community"
+          ],
+          "tags": [
+            "christmas",
+            "gingerbread",
+            "kids",
+            "church"
+          ],
+          "start": "2026-12-06T16:00:00-06:00",
+          "end": "2026-12-06T18:30:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-eve-2026",
+        "input": {
+          "kind": "event",
+          "title": "First Church of the Nazarene Christmas Eve Service",
+          "summary": "A 4 p.m. Christmas Eve service of songs, prayers and a message of hope, with snacks from 3:30.",
+          "description": "Calgary First Church of the Nazarene celebrates Christmas Eve on Thursday, December 24, 2026 with a special service of songs, prayers and a message of hope from 4 to 5 p.m. at 65 Richard Way SW. Come at 3:30 p.m. for snacks and drinks. All are welcome.",
+          "address": "65 Richard Way SW, Calgary, AB T3E 7M8",
+          "venue": "Calgary First Church of the Nazarene",
+          "organizer": "Calgary First Church of the Nazarene",
+          "neighbourhood": "Lincoln Park",
+          "pricing": "free",
+          "sourceUrl": "https://firstnaz.churchcenter.com/registrations/events/3673693",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "church"
+          ],
+          "start": "2026-12-24T16:00:00-06:00",
+          "end": "2026-12-24T17:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "rockland-park-hoa",
+      "name": "Rockland Park HOA (sent by email to CalgaryWatch, Nov 17, 2026)",
+      "approved": true,
+      "hosts": [
+        "calgarywatch.ca"
+      ],
+      "kind": "editorial"
+    },
+    "records": [
+      {
+        "id": "market-of-winter-wonder-2026",
+        "input": {
+          "kind": "event",
+          "title": "A Market of Winter Wonder",
+          "summary": "A free winter market open to everyone at Rockland Park's residents' centre in northwest Calgary.",
+          "description": "The Rockland Park Homeowners Association hosts A Market of Winter Wonder on Saturday, December 5, 2026 from 11 a.m. to 4 p.m. at 90 Rowley Way NW. It's free and open to the public, not just residents. Details came straight from the HOA; questions go to lifestyle@rocklandparkhoa.ca.",
+          "address": "90 Rowley Way NW, Calgary, AB",
+          "venue": "Rockland Park",
+          "organizer": "Rockland Park HOA",
+          "neighbourhood": "Rockland Park",
+          "pricing": "free",
+          "sourceUrl": "https://calgarywatch.ca/local/rockland-park-hoa",
+          "categories": [
+            "markets",
+            "holiday",
+            "community"
+          ],
+          "tags": [
+            "christmas market",
+            "winter market",
+            "free"
+          ],
+          "start": "2026-12-05T11:00:00-06:00",
+          "end": "2026-12-05T16:00:00-06:00"
+        }
+      },
+      {
+        "id": "festive-centrepieces-2026",
+        "input": {
+          "kind": "event",
+          "title": "Building Festive Centrepieces",
+          "summary": "A two-hour hands-on workshop to make your own holiday table centrepiece in Rockland Park.",
+          "description": "The Rockland Park Homeowners Association runs a Building Festive Centrepieces workshop on Saturday, December 12, 2026 from 1 to 3 p.m. at 90 Rowley Way NW. It's open to the public, and the HOA lists three prices: $75, $80 and $85. To book or ask which price applies to you, email lifestyle@rocklandparkhoa.ca.",
+          "address": "90 Rowley Way NW, Calgary, AB",
+          "venue": "Rockland Park",
+          "organizer": "Rockland Park HOA",
+          "neighbourhood": "Rockland Park",
+          "pricing": "paid",
+          "priceRange": [
+            75,
+            85
+          ],
+          "sourceUrl": "https://calgarywatch.ca/local/rockland-park-hoa",
+          "categories": [
+            "holiday",
+            "learning",
+            "community"
+          ],
+          "tags": [
+            "workshop",
+            "christmas",
+            "centrepieces",
+            "crafts"
+          ],
+          "start": "2026-12-12T13:00:00-06:00",
+          "end": "2026-12-12T15:00:00-06:00"
         }
       }
     ]

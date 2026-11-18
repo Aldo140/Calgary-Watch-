@@ -1,0 +1,49 @@
+name: Owner publish clock
+
+# Owners press Publish in their workspace and see "Sent! Going live shortly".
+# The publish is queued in Firestore (no Cloud Functions on the free plan) and
+# was applied by the quarter-hourly owner-updates schedule, which GitHub only
+# fired every 3 to 8 hours: Uncle Fatih's waited over two hours on Nov 17, 2026,
+# with the editor locked. This run stays awake for just under six hours,
+# listens for queued publishes, applies each within seconds, starts a deploy,
+# then starts the next run. The schedule only restarts the chain if it breaks.
+# Public repository: runner minutes are free. A listener costs Firestore reads
+# only when a publish arrives.
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: owner-publish-clock
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Apply owner publishes as they arrive
+        run: npx tsx scripts/claims/apply-organization-submissions.ts --watch-minutes 335
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+      - name: Start the next run
+        if: always()
+        run: gh workflow run owner-publish-clock.yml --ref main || echo "::warning::couldn't start the next clock; the schedule restarts it"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}

@@ -5,10 +5,25 @@ import { ownerEditPatch, ownerEditableFields, OWNER_EDIT_INTERVAL } from './owne
 export const MAX_ORGANIZATION_CHANGES=100;
 export const ORGANIZATION_CATALOG='organization_catalog';
 export const ORGANIZATION_LIVE='organization_live_content';
-/** Owner publishes queued from the browser; the quarter-hourly owner-updates workflow applies them (no Cloud Functions on the free plan). */
+/** Owner publishes queued from the browser; the owner-publish clock workflow applies them within a minute or two (no Cloud Functions on the free plan). */
 export const ORGANIZATION_SUBMISSIONS='organization_submissions';
 export type OrganizationSubmission={uid:string;organizationId:string;operations:OrganizationChange[];adminEdit:boolean;subjectUid?:string;status:'queued'|'published'|'failed';createdAt:unknown;publishedAt?:number;nextAt?:number;error?:string};
 export type OrganizationChange={entityId:string;action:'edit'|'add'|'delete';changes:Record<string,unknown>};
+/**
+ * The draft left after a publish goes live: changes identical to what was sent
+ * are dropped, anything edited after sending stays for the next update.
+ */
+export function withoutSent(current:OrganizationChange[],sent:OrganizationChange[]):OrganizationChange[] {
+  const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
+  return current.flatMap(op=>{
+    const s=sent.find(x=>x.entityId===op.entityId);
+    if(!s)return [op];
+    if(s.action!==op.action)return [op];
+    if(op.action==='delete')return [];
+    const changes=Object.fromEntries(Object.entries(op.changes).filter(([k,v])=>!same(v,s.changes?.[k])));
+    return Object.keys(changes).length?[{entityId:op.entityId,action:'edit' as const,changes}]:[];
+  });
+}
 export type OrganizationProjection={entityId:string;organizationId:string;entity:DiscoveryEntity;deleted:boolean;changes?:Record<string,unknown>;submittedByAdmin?:boolean;createdInWorkspace?:boolean;workspaceAssociationConfirmed?:boolean;adminMedia?:Record<string,unknown>;occurrences?:MarketOccurrence[];updatedAt:number;batchId:string};
 export function approvedOrganization(claim:{status:string;entityId:string;approvedOrganizationId?:string},entities:readonly DiscoveryEntity[]):Business|undefined {
   if(claim.status!=='approved')return;

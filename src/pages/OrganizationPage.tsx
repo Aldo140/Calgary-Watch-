@@ -57,6 +57,7 @@ import {
   mergeOrganizationContent,
   type OrganizationChange,
   type OrganizationProjection,
+  withoutSent,
 } from "../lib/organizationWorkspace";
 import {
   OWNER_BUSINESS_LIMITS,
@@ -369,7 +370,7 @@ export function OrganizationWorkspace({
     [pane, setPane] = useState<"edit" | "preview">("edit"),
     [published, setPublished] = useState<{ at: number; next: number }>(),
     [copied, setCopied] = useState(false),
-    [queued, setQueued] = useState<{ id: string; at: number }>();
+    [queued, setQueued] = useState<{ id: string; at: number; sent?: OrganizationChange[] }>();
   // Up to OWNER_EDITS_PER_WEEK publishes in any rolling seven days.
   const nextAt = Math.max(serverNextAt, ownerAllowanceNextAt(sentAt, clock)),
     updatesLeft = ownerUpdatesLeft(sentAt, clock);
@@ -393,7 +394,8 @@ export function OrganizationWorkspace({
     if (!db || demo || readOnly || !initialRequest) return;
     getDoc(doc(db, ORGANIZATION_SUBMISSIONS, initialRequest))
       .then((snap) => {
-        if (snap.exists()) setQueued({ id: initialRequest, at: Date.now() });
+        if (snap.exists() && snap.get("status") === "queued")
+          setQueued({ id: initialRequest, at: Date.now(), sent: snap.get("operations") });
       })
       .catch(() => undefined);
   }, [initialRequest, demo, readOnly]);
@@ -407,7 +409,10 @@ export function OrganizationWorkspace({
           const at = Number(snap.get("publishedAt")) || Date.now();
           if (!adminEdit) setSentAt((current) => [...current, at]);
           setNextAt(Number(snap.get("nextAt")) || 0);
-          setOps([]);
+          // Keep anything edited after this was sent; drop what just went live.
+          setOps((current) =>
+            withoutSent(current, (snap.get("operations") as OrganizationChange[]) ?? queued.sent ?? []),
+          );
           setQueued(undefined);
           request.current = undefined;
           try {
@@ -585,7 +590,8 @@ export function OrganizationWorkspace({
     return () => clearTimeout(timer);
   }, [nextAt]);
   const locked = !adminEdit && nextAt > Math.max(clock, Date.now()),
-    disabled = readOnly || busy || review || Boolean(queued);
+    disabled = readOnly || busy || review,
+    sending = Boolean(queued);
   function update(field: string, value: string) {
     if (disabled || !target) return;
     request.current = undefined;
@@ -670,7 +676,7 @@ export function OrganizationWorkspace({
     }
   }
   async function submit() {
-    if (readOnly || busy || (!db && !demo)) return;
+    if (readOnly || busy || queued || (!db && !demo)) return;
     setBusy(true);
     setError("");
     if (demo) {
@@ -704,9 +710,10 @@ export function OrganizationWorkspace({
           createdAt: serverTimestamp(),
         });
       setReview(false);
-      setQueued({ id: request.current, at: Date.now() });
-      return;
+      setQueued({ id: request.current, at: Date.now(), sent: ops });
+      // Edits made while this one is on its way become the next update.
       request.current = undefined;
+      return;
     } catch (e) {
       const code = (e as { code?: string }).code;
       if (code === "functions/unauthenticated") {
@@ -904,7 +911,9 @@ export function OrganizationWorkspace({
             <strong>
               {published
                 ? "Your changes are live"
-                : ops.length
+                : sending
+                  ? "Sending your update"
+                  : ops.length
                   ? `${plural(changeCount, "change")} not published yet`
                   : org.managementOnly
                     ? "Your listing is live"
@@ -913,7 +922,9 @@ export function OrganizationWorkspace({
             <small>
               {published
                 ? `Published ${fmt(published.at)}`.replace(/\.?$/, ".")
-                : ops.length
+                : sending
+                  ? "Usually live within about 10 minutes."
+                  : ops.length
                   ? "Saved on this device as you type. Visitors see them once you publish."
                   : lastUpdated
                     ? `Last updated ${fmt(lastUpdated)}`.replace(/\.?$/, ".")
@@ -963,9 +974,10 @@ export function OrganizationWorkspace({
         <section className="ow-success" aria-labelledby="ow-queued" role="status">
           <h2 id="ow-queued">Sent! Going live shortly</h2>
           <p>
-            Your changes are on their way. They go live on your page within
-            about 15 minutes, with no approval needed. You can close this page;
-            we’ll finish it for you.
+            Your changes are on their way and usually show on your page within
+            about 10 minutes, with no approval needed. You can close this page;
+            we’ll finish it for you. You can keep editing here meanwhile, and
+            anything new becomes your next update.
           </p>
         </section>
       ) : null}
@@ -1702,7 +1714,9 @@ export function OrganizationWorkspace({
           <span>
             <strong>{plural(changeCount, "change")} ready</strong>
             <small>
-              {locked
+              {sending
+                ? "Your last update is going live now. Publish these once it’s on your page."
+                : locked
                 ? `You can publish again on ${day(nextAt)}. Your changes stay saved here until then.`
                 : adminEdit
                   ? "Admin publishing does not use the business’s weekly update."
@@ -1711,10 +1725,10 @@ export function OrganizationWorkspace({
           </span>
           <button
             className="pl-btn"
-            disabled={disabled || locked || !loaded || !ops.length}
+            disabled={disabled || sending || locked || !loaded || !ops.length}
             onClick={beginReview}
           >
-            Review & publish
+            {sending ? "Sending…" : "Review & publish"}
           </button>
         </div>
       ) : null}

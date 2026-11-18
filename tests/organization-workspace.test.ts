@@ -294,3 +294,14 @@ test('queued browser publishes are applied by the workflow with the same claim a
  db.data.set(`organization_submissions/${unverified}`,{uid:'u',organizationId:org.id,operations:[{entityId:org.id,action:'edit',changes:{phone:'2'}}],adminEdit:false,status:'queued',createdAt:now});
  assert.equal(await applyOrganizationSubmission(db,unverified,async()=>({}),now+3),'failed');assert.match(db.data.get(`organization_submissions/${unverified}`).error,/Confirm your email/);
 });
+
+test('after a publish goes live, edits made while it was on its way stay in the draft',async()=>{
+  const { withoutSent } = await import('../src/lib/organizationWorkspace');
+  const sent=[{entityId:'biz',action:'edit' as const,changes:{phone:'403-452-8144',offer:'10% off pick up'}},{entityId:'ev1',action:'delete' as const,changes:{}}];
+  assert.deepEqual(withoutSent(sent,sent),[]);
+  const later=[{entityId:'biz',action:'edit' as const,changes:{phone:'403-452-8144',offer:'10% off pick up',description:'New words'}},{entityId:'ev2',action:'add' as const,changes:{title:'Party'}}];
+  assert.deepEqual(withoutSent(later,sent),[{entityId:'biz',action:'edit',changes:{description:'New words'}},{entityId:'ev2',action:'add',changes:{title:'Party'}}]);
+  const page=readFileSync('src/pages/OrganizationPage.tsx','utf8');
+  assert.match(page,/disabled = readOnly \|\| busy \|\| review,/,'fields stay editable while a publish is on its way');
+  assert.ok(readFileSync('.github/workflows/owner-publish-clock.yml','utf8').includes('--watch-minutes'),'an always-awake clock applies queued publishes');
+});

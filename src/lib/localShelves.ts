@@ -44,7 +44,7 @@ export function shelfOf(p: Pick<Business, 'title' | 'categories' | 'tags'> & { s
   if (has(t, 'outside-calgary', 'day-trip') || has(c, 'day-trip')) return 'day-trips';
   // Seasonal is for things that are only here for a season. A bar open all year is not seasonal.
   if (has(c, 'holiday')) return 'seasonal';
-  if (/community association|\bBIA\b|business improvement|\bYMCA\b/i.test(title)) return 'community';
+  if (/community association|\bBIA\b|business improvement|\bYMCA\b/i.test(title) || has(t, 'church')) return 'community';
   if (has(t, 'theatre', 'performing arts', 'live theatre', 'opera', 'ballet', 'dance', 'comedy', 'improv', 'dinner-theatre') || /theatre|opera|ballet|werklund/i.test(title)) return 'stages';
   if (has(c, 'markets') || has(t, 'farmers-market', 'artisan-market', 'makers') || /market/i.test(title)) return 'markets';
   if (has(c, 'family') || has(t, 'zoo', 'attraction')) return 'days-out';

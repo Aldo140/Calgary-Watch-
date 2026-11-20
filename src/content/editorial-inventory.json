@@ -29327,12 +29327,24 @@
           "url": "https://www.marshasophia.ca/",
           "kind": "official",
           "retrievedAt": "2026-11-17T02:45:00Z"
+        },
+        {
+          "name": "Edelweiss Village",
+          "url": "https://edelweissimports.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:00:00Z"
+        },
+        {
+          "name": "Rebound Centre",
+          "url": "https://reboundcentre.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:00:00Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-11-14T19:00:00Z",
-      "updatedAt": "2026-11-17T02:45:00Z",
+      "updatedAt": "2026-11-19T19:00:00Z",
       "image": {
         "src": "/images/photo/calgary4.webp",
         "alt": "Calgary in winter"
@@ -29395,6 +29407,14 @@
         {
           "entityId": "biz-marshasophia",
           "note": "MarshaSophia"
+        },
+        {
+          "entityId": "biz-edelweiss-village",
+          "note": "Edelweiss Village"
+        },
+        {
+          "entityId": "biz-rebound-centre",
+          "note": "Rebound Centre"
         }
       ],
       "relatedGuideIds": [
@@ -29532,6 +29552,22 @@
           "mapQuery": "MarshaSophia, 1081 2 Ave NW, Calgary, AB",
           "note": "A Splendor Gift Card from MarshaSophia. For the friend who can't eat gluten and always gets left out at gift time. MarshaSophia Gluten-Free Bakery & More is a dedicated, celiac-safe bakery in Kensington, with gluten-free and dairy-free breads, pastries, cakes and savoury favourites, plus vegan, vegetarian and keto-friendly options. A physical Splendor Gift Card, from $10 to $50, lets them pick their own treats.",
           "tip": "Splendor Gift Cards run from $10 to $50."
+        },
+        {
+          "name": "Edelweiss Village",
+          "area": "North Hill",
+          "entityId": "biz-edelweiss-village",
+          "mapQuery": "Edelweiss Village, 1921 20 Ave NW, Calgary, AB",
+          "note": "At Edelweiss Village, discover our in-house-made Stollen alongside authentic varieties imported from Germany — from different flavours and festive tins to Stollen bites and even a Stollen Advent Calendar! Enjoy it with a cozy cup of coffee or give it as a thoughtful holiday gift.",
+          "tip": "Find more at edelweissimports.com. Copy provided and approved by Edelweiss Village."
+        },
+        {
+          "name": "Rebound Centre",
+          "area": "Southeast Calgary",
+          "entityId": "biz-rebound-centre",
+          "mapQuery": "Rebound Centre, Unit C11, 6215 3 St SE, Calgary, AB",
+          "note": "Give a secondhand treasure a new home this December. Look out for festive finds such as the Lighted Santa Tree House decoration and Poinsettia LED candles, alongside vintage decor and furniture. It's a great way to make your holiday shopping a little more sustainable.",
+          "tip": "Check reboundcentre.com for current stock and upcoming pop-ups. Copy approved by Rebound Centre."
         }
       ]
     },
@@ -29777,6 +29813,109 @@
       "verification": "source-checked",
       "verifiedAt": "2026-11-18T04:00:00Z",
       "updatedAt": "2026-11-18T04:00:00Z"
+    },
+    {
+      "id": "biz-edelweiss-village",
+      "kind": "business",
+      "slug": "edelweiss-village",
+      "title": "Edelweiss Village",
+      "name": "Edelweiss Village",
+      "website": "https://edelweissimports.com/",
+      "address": "1921 20 Ave NW, Calgary, AB",
+      "summary": "Calgary's German and European specialty food shop, bakery and café, with festive Stollen made in-house and imported from Germany.",
+      "description": "Edelweiss Village offers German and European specialty foods, bakery items and seasonal gifts in northwest Calgary. Its Christmas Stollen collection includes in-house-made loaves and imported varieties, Stollen bites, festive tins and an Advent calendar. Confirm stock with the store.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "german",
+        "european",
+        "bakery",
+        "pastry",
+        "stollen",
+        "holiday gifts"
+      ],
+      "sources": [
+        {
+          "name": "Edelweiss Village official shop",
+          "url": "https://edelweissimports.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:00:00Z"
+        },
+        {
+          "name": "Edelweiss Village product",
+          "url": "https://edelweissimports.com/products/edelweiss-stollen/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://edelweissimports.com/"
+      },
+      "services": [
+        "Bakery",
+        "European specialty groceries",
+        "Seasonal gifts"
+      ],
+      "phone": "403-282-6600",
+      "email": "shipping@edelweissimports.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-19T19:00:00Z",
+      "updatedAt": "2026-11-19T19:00:00Z"
+    },
+    {
+      "id": "biz-rebound-centre",
+      "kind": "business",
+      "slug": "rebound-centre",
+      "title": "Rebound Centre",
+      "name": "Rebound Centre",
+      "website": "https://reboundcentre.com/",
+      "address": "Unit C11, 6215 3 St SE, Calgary, AB",
+      "summary": "Secondhand furniture, home décor and vintage finds, available online and at Calgary pop-up shopping days.",
+      "description": "Rebound Centre helps useful furniture, décor and vintage pieces find new homes. Shop seasonal secondhand finds online or visit a Calgary pop-up at Unit C11, 6215 3 St SE. Pop-up dates and stock vary; check the official website before visiting.",
+      "categories": [
+        "shopping"
+      ],
+      "tags": [
+        "secondhand",
+        "vintage",
+        "home decor",
+        "furniture",
+        "thrift",
+        "sustainable shopping"
+      ],
+      "sources": [
+        {
+          "name": "Rebound Centre official shop",
+          "url": "https://reboundcentre.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://reboundcentre.com/"
+      },
+      "services": [
+        "Secondhand furnishings",
+        "Vintage décor",
+        "Online shopping",
+        "Pop-up shop"
+      ],
+      "email": "hello@reboundcentre.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-19T19:00:00Z",
+      "updatedAt": "2026-11-19T19:00:00Z"
     }
   ]
 }

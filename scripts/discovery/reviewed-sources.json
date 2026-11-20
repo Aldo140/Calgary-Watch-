@@ -7493,5 +7493,45 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "rebound-centre",
+      "name": "Rebound Centre",
+      "approved": true,
+      "hosts": [
+        "reboundcentre.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "rebound-centre-pop-up-2026-11-20",
+        "input": {
+          "kind": "event",
+          "title": "Rebound Centre In-Store Pop-Up",
+          "summary": "Browse seasonal secondhand décor, vintage finds and furniture at Rebound Centre's southeast Calgary pop-up.",
+          "description": "Rebound Centre hosts an in-store pop-up on Friday, November 20, 2026, from 11 a.m. to 5 p.m. at Unit C11, 6215 3 St SE in Calgary. Browse secondhand furniture, vintage décor and seasonal pieces. Selection varies; check the organizer's website for current details.",
+          "address": "Unit C11, 6215 3 St SE, Calgary, AB",
+          "venue": "Rebound Centre",
+          "organizer": "Rebound Centre",
+          "neighbourhood": "Manchester Industrial",
+          "pricing": "unknown",
+          "sourceUrl": "https://reboundcentre.com/pages/our-store",
+          "categories": [
+            "shopping",
+            "community"
+          ],
+          "tags": [
+            "secondhand",
+            "pop-up shop",
+            "thrift",
+            "holiday gifts"
+          ],
+          "start": "2026-11-20T11:00:00-06:00",
+          "end": "2026-11-20T17:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

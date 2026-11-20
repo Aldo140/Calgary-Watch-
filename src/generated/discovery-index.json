@@ -23125,6 +23125,141 @@
       "verification": "source-checked",
       "verifiedAt": "2026-11-19T19:00:00Z",
       "updatedAt": "2026-11-19T19:00:00Z"
+    },
+    {
+      "id": "biz-una-pizza-wine-17th-ave",
+      "kind": "business",
+      "slug": "una-pizza-wine-17th-ave",
+      "title": "UNA Pizza + Wine — 17th Ave",
+      "name": "UNA Pizza + Wine — 17th Ave",
+      "website": "https://unapizzeria.com/",
+      "address": "618 17th Ave SW, Calgary, AB",
+      "neighbourhood": "Beltline",
+      "summary": "UNA's 17th Ave Calgary location for California-influenced thin-crust pizza, wine and neighbourhood dining.",
+      "description": "UNA Pizza + Wine serves California-influenced thin-crust pizza, food and carefully selected wines. This is the 17th Ave Calgary location; confirm reservations, availability and the current menu with UNA's website.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza",
+        "wine",
+        "restaurant",
+        "dining"
+      ],
+      "sources": [
+        {
+          "name": "UNA official locations",
+          "url": "https://unapizzeria.com/locations/una-calgary-17th/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:40:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://unapizzeria.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "phone": "403-453-1183",
+      "email": "contact@unapizzeria.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-19T19:40:00Z",
+      "updatedAt": "2026-11-19T19:40:00Z"
+    },
+    {
+      "id": "biz-una-pizza-wine-bridgeland",
+      "kind": "business",
+      "slug": "una-pizza-wine-bridgeland",
+      "title": "UNA Pizza + Wine — Bridgeland",
+      "name": "UNA Pizza + Wine — Bridgeland",
+      "website": "https://unapizzeria.com/",
+      "address": "#110 69 7a Street NE, Calgary, AB",
+      "neighbourhood": "Bridgeland",
+      "summary": "UNA's Bridgeland Calgary location for California-influenced thin-crust pizza, wine and neighbourhood dining.",
+      "description": "UNA Pizza + Wine serves California-influenced thin-crust pizza, food and carefully selected wines. This is the Bridgeland Calgary location; confirm reservations, availability and the current menu with UNA's website.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza",
+        "wine",
+        "restaurant",
+        "dining"
+      ],
+      "sources": [
+        {
+          "name": "UNA official locations",
+          "url": "https://unapizzeria.com/locations/una-bridgeland/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:40:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://unapizzeria.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "phone": "403-453-1183",
+      "email": "contact@unapizzeria.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-19T19:40:00Z",
+      "updatedAt": "2026-11-19T19:40:00Z"
+    },
+    {
+      "id": "biz-una-pizza-wine-broadcast",
+      "kind": "business",
+      "slug": "una-pizza-wine-broadcast",
+      "title": "UNA Pizza + Wine — Broadcast",
+      "name": "UNA Pizza + Wine — Broadcast",
+      "website": "https://unapizzeria.com/",
+      "address": "8529 Broadcast Ave SW, Calgary, AB",
+      "neighbourhood": "West District",
+      "summary": "UNA's Broadcast Calgary location for California-influenced thin-crust pizza, wine and neighbourhood dining.",
+      "description": "UNA Pizza + Wine serves California-influenced thin-crust pizza, food and carefully selected wines. This is the Broadcast Calgary location; confirm reservations, availability and the current menu with UNA's website.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "pizza",
+        "wine",
+        "restaurant",
+        "dining"
+      ],
+      "sources": [
+        {
+          "name": "UNA official locations",
+          "url": "https://unapizzeria.com/locations/",
+          "kind": "official",
+          "retrievedAt": "2026-11-19T19:40:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://unapizzeria.com/"
+      },
+      "services": [
+        "Dining"
+      ],
+      "phone": "403-453-1183",
+      "email": "contact@unapizzeria.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-19T19:40:00Z",
+      "updatedAt": "2026-11-19T19:40:00Z"
     }
   ],
   "occurrences": [

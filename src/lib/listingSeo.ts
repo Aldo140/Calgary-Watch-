@@ -185,7 +185,11 @@ export function listingTitle(entity: DiscoveryEntity, all: readonly DiscoveryEnt
         `${title}${year}: Dates, Times & Tickets`,
         `${title}${year}: Dates & Times`,
       ] : [];
+      // An announced festival whose dates aren't out yet (tag "dates tbd"): searched as "<name> 2027".
+      const tbdYear = !upcoming && entity.tags.some(t => t.toLowerCase() === 'dates tbd') ? tidy(entity.summary).match(/\b20\d\d\b/)?.[0] : undefined;
+      const tbdTitles = tbdYear ? [`${title}${hasCalgary(title) ? '' : ' Calgary'} ${tbdYear}: Dates TBD & What to Expect`, `${title} ${tbdYear}: Dates TBD`] : [];
       return withBrand(fit([
+        ...tbdTitles,
         ...seriesTitles,
         ...(upcoming ? [`${title}: Upcoming Events${where}`, `${title}: Upcoming Events${city}`] : []),
         `${title}${where}`,

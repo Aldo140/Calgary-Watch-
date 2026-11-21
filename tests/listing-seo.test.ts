@@ -122,3 +122,8 @@ test('an ended event is noindex but keeps its links followed, so its search valu
   assert.equal(config.follow, true);
   assert.match(renderRouteHtml(shell, entityPath(ended), origin), /<meta name="robots" content="noindex, follow"/);
 });
+
+test('an announced festival with no dates yet is titled for "<name> 2027" searches', () => {
+  const fest = { ...profile, id: 'biz-fest', slug: 'chinook-blast', title: 'Chinook Blast', name: 'Chinook Blast', tags: ['organizer', 'dates tbd'], summary: 'Calgary’s free winter festival returns in February 2027. Dates TBD.' } as Business;
+  assert.equal(listingTitle(fest, [fest]), 'Chinook Blast Calgary 2027: Dates TBD & What to Expect | CalgaryWatch');
+});

@@ -108,6 +108,52 @@ async function collections() {
   for (const [id, n] of rows) console.log(`  ${String(n).padStart(7)}  ${id}`);
 }
 
+/**
+ * Community Watch funnel per week (Mon, Calgary time), last 12 weeks: resident reports posted
+ * (incidents a person wrote, not the ingest), and the report_* / watch_opened product events.
+ * Counts only, never names or text: these logs are public. About 1,600 reads.
+ */
+async function watchFunnel() {
+  const db = opsDb();
+  const since = Date.now() - 12 * 7 * 86_400_000;
+  const week = (ms: number) => {
+    const d = new Date(ms - 6 * 3_600_000);
+    d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+    return d.toISOString().slice(0, 10);
+  };
+  const rows = new Map<string, Record<string, number>>();
+  const bump = (ms: number, key: string) => {
+    if (!(ms >= since)) return;
+    const w = week(ms);
+    const row = rows.get(w) ?? {};
+    row[key] = (row[key] ?? 0) + 1;
+    rows.set(w, row);
+  };
+  const incidents = await db.collection('incidents').where('timestamp', '>=', since).select('authorUid', 'timestamp', 'source_type').get();
+  for (const d of incidents.docs) {
+    const x = d.data();
+    if (x.authorUid && x.authorUid !== 'system' && !x.source_type) bump(Number(x.timestamp), 'resident_reports');
+  }
+  const names = ['watch_opened', 'report_viewed', 'report_started', 'report_submitted'];
+  const events = await db.collection('product_events').where('ts', '>=', since).select('name', 'ts').get();
+  for (const d of events.docs) {
+    const x = d.data();
+    if (names.includes(x.name)) bump(Number(x.ts), x.name);
+  }
+  const views = db.collection('page_views');
+  const organic: Array<[string, number]> = [];
+  for (const path of ['/', '/community', '/map', '/calgary-neighbourhood-watch']) {
+    organic.push([path, (await views.where('path', '==', path).where('traffic_source', '==', 'organic_search').count().get()).data().count]);
+  }
+  const cols = ['resident_reports', ...names];
+  console.log('\nCommunity Watch funnel per week (Monday, Calgary):');
+  console.log(`  week        ${cols.map(c => c.padStart(17)).join('')}`);
+  for (const [w, row] of [...rows].sort()) console.log(`  ${w}  ${cols.map(c => String(row[c] ?? 0).padStart(17)).join('')}`);
+  console.log('\nOrganic-search page views, all time:');
+  for (const [path, n] of organic) console.log(`  ${String(n).padStart(7)}  ${path}`);
+}
+
 try { await timeline(); } catch (e) { console.log(`Monitoring unavailable: ${String((e as Error).message ?? e).slice(0, 300)}`); }
 try { await realtime(); } catch (e) { console.log(`Realtime metrics unavailable: ${String((e as Error).message ?? e).slice(0, 300)}`); }
+try { await watchFunnel(); } catch (e) { console.log(isQuotaExhausted(e) ? 'Watch funnel skipped: quota exhausted.' : `Watch funnel failed: ${String(e).slice(0, 300)}`); }
 try { await collections(); } catch (e) { console.log(isQuotaExhausted(e) ? 'Collection counts skipped: quota exhausted.' : `Collection counts failed: ${String(e).slice(0, 300)}`); }

@@ -10,6 +10,8 @@ export interface EntityBase {
   updatedAt: string; developmentOnly?: boolean; neighbourhood?: string;
   /** Set by the build only when an admin approved a listing claim for it (src/lib/verified.ts). Not the source check above. */
   ownerVerifiedAt?: string;
+  /** A listing we set up for an owner: hidden from the site until an approved claim stamps ownerVerifiedAt. Only /claim can open it. */
+  awaitingClaim?: boolean;
   /** Server-applied content version, used only to acknowledge successful publication. */
   ownerContentAppliedAt?: number;
   scores?: { featured?: number; editorial?: number; demand?: number; popularity?: number };

@@ -96,19 +96,19 @@ function ClaimForm({ id }: { id: string }) {
   const claims = useMyClaims(subjectUid);
   const claimLoadError = useClaimLoadError(subjectUid);
   const listing = useMemo(() => {
-    const inventory=discoveryRepository.list();
+    const inventory=discoveryRepository.claimable();
     const context=inventory.find(e=>e.id===params.get('listing'));
     return context&&claimOrganization(context,inventory)?.claimEntity.id===id?context:inventory.find(e=>e.id===id&&!e.developmentOnly&&['event','market','business'].includes(e.kind));
   },[id,params]);
-  const proposed=listing?claimOrganization(listing,discoveryRepository.list()):undefined;
+  const proposed=listing?claimOrganization(listing,discoveryRepository.claimable()):undefined;
   const legacyClaim=claims?.find(c=>c.entityId===id);
   const canonicalClaim=claims?.find(c=>c.entityId===proposed?.claimEntity.id||c.status==='approved'&&c.approvedOrganizationId===proposed?.claimEntity.id);
   const entity=legacyClaim&&!canonicalClaim?listing:proposed?.claimEntity??listing;
-  const organization=entity?.id===proposed?.claimEntity.id?proposed:entity?claimOrganization(entity,discoveryRepository.list()):undefined;
+  const organization=entity?.id===proposed?.claimEntity.id?proposed:entity?claimOrganization(entity,discoveryRepository.claimable()):undefined;
 
   const parentClaim = (entity?.kind === 'event'||entity?.kind==='market') ? claims?.find(c => c.status === 'approved' && c.entityId === entity.organizerEntityId) : undefined;
   const claim = parentClaim ?? claims?.find((c) => (c.entityId === entity?.id||c.status==='approved'&&c.approvedOrganizationId===entity?.id)) ?? null;
-  const management=(claim?approvedManagementOrganization(claim,discoveryRepository.list()):undefined)??(adminView&&entity?claimOrganization(entity,discoveryRepository.list())?.profile:undefined);
+  const management=(claim?approvedManagementOrganization(claim,discoveryRepository.claimable()):undefined)??(adminView&&entity?claimOrganization(entity,discoveryRepository.claimable())?.profile:undefined);
   const profile=management??(legacyClaim&&entity&&(entity.kind==='event'||entity.kind==='market')?standaloneOrganization(entity):organization?.profile);
   const sites = entity ? sourceDomains(entity.sources) : [];
   const [draft, setDraft] = useState<ClaimDraft>(() => {

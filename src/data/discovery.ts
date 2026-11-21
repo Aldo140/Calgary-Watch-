@@ -31,6 +31,6 @@ const entities = isDevServer
   : (inventory.entities as DiscoveryEntity[]);
 let activeRepository = createDiscoveryRepository(entities, inventory.occurrences as MarketOccurrence[], isDevServer);
 export const discoveryRepository: typeof activeRepository = {
-  list:()=>activeRepository.list(), occurrences:()=>activeRepository.occurrences(), find:(kind,slug)=>activeRepository.find(kind,slug),
+  list:()=>activeRepository.list(), occurrences:()=>activeRepository.occurrences(), find:(kind,slug)=>activeRepository.find(kind,slug), claimable:()=>activeRepository.claimable(),
 };
 export function setOrganizationContent(rows:OrganizationProjection[]){activeRepository=createDiscoveryRepository(mergeOrganizationContent(entities,rows),mergeOrganizationOccurrences(inventory.occurrences as MarketOccurrence[],rows),isDevServer);}

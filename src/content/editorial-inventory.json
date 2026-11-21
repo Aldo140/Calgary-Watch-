@@ -12286,8 +12286,8 @@
       "name": "Verb Theatre",
       "website": "https://www.verbtheatre.com/",
       "address": "Calgary, AB",
-      "summary": "Independent Calgary theatre company.",
-      "description": "Verb Theatre is an independent Calgary theatre company creating and presenting its own productions. Check its site for what's coming up.",
+      "summary": "Independent Calgary theatre company presenting inventive new work, including a December 2026 Christmas comedy at Theatre 1308.",
+      "description": "Verb Theatre is an independent Calgary theatre company presenting inventive, community-focused productions. Its holiday comedy The Brightest Most Shiniest Star You Ever Did See, by Conrad Belau and featuring Meg Farhall, runs December 2–12, 2026 at Theatre 1308, 1308 Edmonton Trail. For performance times, accessibility information and tickets, follow Verb Theatre's official show page. An ASL-interpreted performance is scheduled for December 10.",
       "categories": [
         "arts"
       ],
@@ -12302,6 +12302,12 @@
           "url": "https://www.verbtheatre.com/",
           "kind": "official",
           "retrievedAt": "2026-10-29T09:00:00Z"
+        },
+        {
+          "name": "Verb Theatre — The Brightest Most Shiniest Star You Ever Did See",
+          "url": "https://www.verbtheatre.com/the-brightest-star",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T18:00:00Z"
         }
       ],
       "images": [],
@@ -12309,14 +12315,15 @@
         "website": "https://www.verbtheatre.com/"
       },
       "services": [
-        "Productions"
+        "Theatre productions",
+        "Holiday performances"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-29T09:00:00Z",
+      "updatedAt": "2026-11-20T18:00:00Z",
       "email": "info@verbtheatre.com"
     },
     {
@@ -30051,6 +30058,63 @@
       "verification": "source-checked",
       "verifiedAt": "2026-11-19T19:40:00Z",
       "updatedAt": "2026-11-19T19:40:00Z"
+    },
+    {
+      "id": "biz-bike-root",
+      "kind": "business",
+      "slug": "bike-root",
+      "title": "The Bike Root",
+      "name": "The Bike Root",
+      "website": "https://bikeroot.ca/",
+      "address": "Arts Parkade, University of Calgary, Calgary, AB",
+      "neighbourhood": "University of Calgary",
+      "summary": "Volunteer-run community DIY bicycle workshop at the University of Calgary, with repair tools, refurbished bikes and parts.",
+      "description": "The Bike Root is a volunteer-run community DIY bike workshop based in the northwest corner of the Arts Parkade at the University of Calgary. Members can use the space and tools for bicycle maintenance and repairs; the group also sells refurbished bikes, parts and accessories, and welcomes volunteers. The volunteer-managed schedule can change, so check Bike Root's website for current hours and access instructions before visiting.",
+      "categories": [
+        "community",
+        "recreation",
+        "shopping"
+      ],
+      "tags": [
+        "cycling",
+        "bicycle repair",
+        "DIY workshop",
+        "volunteer",
+        "refurbished bicycles",
+        "University of Calgary"
+      ],
+      "sources": [
+        {
+          "name": "Bike Root official website",
+          "url": "https://bikeroot.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T18:00:00Z"
+        },
+        {
+          "name": "Bike Root shop location",
+          "url": "https://bikeroot.ca/the-shop/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T18:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bikeroot.ca/"
+      },
+      "services": [
+        "DIY bicycle repairs",
+        "Refurbished bikes",
+        "Bike parts and accessories",
+        "Volunteering"
+      ],
+      "email": "info@bikeroot.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T18:00:00Z",
+      "updatedAt": "2026-11-20T18:00:00Z"
     },
     {
       "id": "biz-floors-on-crowfoot",

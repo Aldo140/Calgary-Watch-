@@ -73,7 +73,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
     return () => { a(); b(); c(); };
   }, [attempt]);
 
-  const entities = useMemo(() => new Map(discoveryRepository.list().map((e) => [e.id, e])), []);
+  const entities = useMemo(() => new Map(discoveryRepository.claimable().map((e) => [e.id, e])), []);
   const by = user?.email ?? 'admin';
 
   async function decide(c: ListingClaim, approve: boolean) {

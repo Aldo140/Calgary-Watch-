@@ -50,6 +50,8 @@ export interface DiscoveryRepository {
   list(): readonly DiscoveryEntity[];
   occurrences(): readonly MarketOccurrence[];
   find(kind: EntityKind, slug: string): DiscoveryEntity | undefined;
+  /** Everything list() has plus listings awaiting their owner's claim, for the claim page only. */
+  claimable(): readonly DiscoveryEntity[];
 }
 /** Feed text cleaned for display: decoded entities, no mojibake (cleanText.ts). */
 /**
@@ -80,9 +82,13 @@ function cleanEntity<T extends DiscoveryEntity>(e: T): T {
   };
 }
 
+/** Set up for an owner and not yet claimed: not live anywhere on the site. */
+export const awaitingOwner = (e: DiscoveryEntity) => Boolean(e.awaitingClaim && !e.ownerVerifiedAt);
+
 export function createDiscoveryRepository(entities: DiscoveryEntity[], occurrences: MarketOccurrence[] = [], development = false): DiscoveryRepository {
-  const visible = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e))).map(cleanEntity);
-  return { list: () => visible, occurrences: () => occurrences.filter(o => visible.some(e => e.id === o.marketId)), find: (kind, slug) => visible.find(e => e.kind === kind && e.slug === slug) };
+  const ready = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e))).map(cleanEntity);
+  const visible = ready.filter(e => !awaitingOwner(e));
+  return { list: () => visible, claimable: () => ready, occurrences: () => occurrences.filter(o => visible.some(e => e.id === o.marketId)), find: (kind, slug) => visible.find(e => e.kind === kind && e.slug === slug) };
 }
 
 const calgaryHm = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });

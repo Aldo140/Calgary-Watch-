@@ -23260,6 +23260,4210 @@
       "verification": "source-checked",
       "verifiedAt": "2026-11-19T19:40:00Z",
       "updatedAt": "2026-11-19T19:40:00Z"
+    },
+    {
+      "id": "biz-floors-on-crowfoot",
+      "kind": "business",
+      "slug": "floors-on-crowfoot",
+      "name": "Floors On Crowfoot",
+      "title": "Floors On Crowfoot",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "Floors On Crowfoot is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "carpet",
+        "tile"
+      ],
+      "address": "64 Crowfoot Circle NW, Calgary, AB",
+      "website": "https://www.floorsoncrowfoot.com/",
+      "sources": [
+        {
+          "name": "Floors On Crowfoot official website",
+          "url": "https://www.floorsoncrowfoot.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.floorsoncrowfoot.com/"
+      },
+      "services": [
+        "Flooring",
+        "Carpet",
+        "Tile"
+      ],
+      "email": "darrell@floorsoncrowfoot.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 587-741-7858",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-crowfoot-brake-and-muffler",
+      "kind": "business",
+      "slug": "crowfoot-brake-and-muffler",
+      "name": "Crowfoot Brake and Muffler",
+      "title": "Crowfoot Brake and Muffler",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Crowfoot Brake and Muffler is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "112 100 Crowfoot Gate NW, Calgary, AB",
+      "website": "https://www.cars-inc.ca/",
+      "sources": [
+        {
+          "name": "Crowfoot Brake and Muffler official website",
+          "url": "https://www.cars-inc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cars-inc.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "shop@cars-inc.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-239-1213",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-sheila-s-window-toppers",
+      "kind": "business",
+      "slug": "sheila-s-window-toppers",
+      "name": "Sheila's Window Toppers",
+      "title": "Sheila's Window Toppers",
+      "summary": "A Calgary blinds and window coverings shop.",
+      "description": "Sheila's Window Toppers is a Calgary blinds and window coverings shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "blinds",
+        "window coverings"
+      ],
+      "address": "250 Crowfoot Crescent NW, Calgary, AB",
+      "website": "https://www.sheilaswindowtoppers.com/",
+      "sources": [
+        {
+          "name": "Sheila's Window Toppers official website",
+          "url": "https://www.sheilaswindowtoppers.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sheilaswindowtoppers.com/"
+      },
+      "services": [
+        "Blinds",
+        "Window coverings"
+      ],
+      "email": "info@sheilaswindowtoppers.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-547-4013",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-stephen-cleaners",
+      "kind": "business",
+      "slug": "stephen-cleaners",
+      "name": "Stephen Cleaners",
+      "title": "Stephen Cleaners",
+      "summary": "A Calgary dry cleaner.",
+      "description": "Stephen Cleaners is a Calgary dry cleaner. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dry cleaning",
+        "alterations"
+      ],
+      "address": "240 Crowfoot Crescent NW, Calgary, AB",
+      "website": "https://stephencleaners.ca/crowfoot-location/",
+      "sources": [
+        {
+          "name": "Stephen Cleaners official website",
+          "url": "https://stephencleaners.ca/crowfoot-location/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://stephencleaners.ca/crowfoot-location/"
+      },
+      "services": [
+        "Dry cleaning",
+        "Alterations"
+      ],
+      "email": "customerservice@stephencleaners.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-547-2424",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-the-gear-shop",
+      "kind": "business",
+      "slug": "the-gear-shop",
+      "name": "The Gear Shop",
+      "title": "The Gear Shop",
+      "summary": "A Calgary auto repair shop.",
+      "description": "The Gear Shop is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "2501 Alyth Road SE, Calgary, AB",
+      "website": "https://thegearshop.ca/",
+      "sources": [
+        {
+          "name": "The Gear Shop official website",
+          "url": "https://thegearshop.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thegearshop.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "orders@thegearshop.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-261-0011",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-gold-star-auto",
+      "kind": "business",
+      "slug": "gold-star-auto",
+      "name": "Gold Star Auto",
+      "title": "Gold Star Auto",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Gold Star Auto is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "1812 17 Avenue SE, Calgary, AB",
+      "website": "https://goldstarauto.ca/",
+      "sources": [
+        {
+          "name": "Gold Star Auto official website",
+          "url": "https://goldstarauto.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://goldstarauto.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@goldstarauto.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-455-5559",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-cascade-vans-and-interiors",
+      "kind": "business",
+      "slug": "cascade-vans-and-interiors",
+      "name": "Cascade Vans & Interiors",
+      "title": "Cascade Vans & Interiors",
+      "summary": "A Calgary van conversion and interiors shop.",
+      "description": "Cascade Vans & Interiors is a Calgary van conversion and interiors shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "van conversions",
+        "auto repair"
+      ],
+      "address": "6420 79 Avenue SE, Calgary, AB",
+      "website": "https://www.cascadevans.com/",
+      "sources": [
+        {
+          "name": "Cascade Vans & Interiors official website",
+          "url": "https://www.cascadevans.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cascadevans.com/"
+      },
+      "services": [
+        "Van conversions",
+        "Auto repair"
+      ],
+      "email": "info@cascadevans.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-250-3861",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-auto-select-car-repair",
+      "kind": "business",
+      "slug": "auto-select-car-repair",
+      "name": "Auto Select Car Repair",
+      "title": "Auto Select Car Repair",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Auto Select Car Repair is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "9650 Harvest Hills Boulevard N, Calgary, AB",
+      "website": "https://harvesthillsauto.ca/",
+      "sources": [
+        {
+          "name": "Auto Select Car Repair official website",
+          "url": "https://harvesthillsauto.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://harvesthillsauto.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "service@harvesthillsauto.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-226-9933",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-silverback",
+      "kind": "business",
+      "slug": "silverback",
+      "name": "Silverback",
+      "title": "Silverback",
+      "summary": "A Calgary tailoring, sewing and upholstery shop.",
+      "description": "Silverback is a Calgary tailoring, sewing and upholstery shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tailor",
+        "alterations"
+      ],
+      "address": "1514 Meridian Road NE, Calgary, AB",
+      "website": "https://www.silverback.ca/",
+      "sources": [
+        {
+          "name": "Silverback official website",
+          "url": "https://www.silverback.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.silverback.ca/"
+      },
+      "services": [
+        "Tailor",
+        "Alterations"
+      ],
+      "email": "info@silverback.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-569-7222",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bit-by-bit",
+      "kind": "business",
+      "slug": "bit-by-bit",
+      "name": "Bit by bit",
+      "title": "Bit by bit",
+      "summary": "A Calgary electronics and device repair shop.",
+      "description": "Bit by bit is a Calgary electronics and device repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "phone repair",
+        "electronics repair"
+      ],
+      "address": "1043 40 Avenue NW, Calgary, AB",
+      "website": "https://gobitbybit.ca/",
+      "sources": [
+        {
+          "name": "Bit by bit official website",
+          "url": "https://gobitbybit.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://gobitbybit.ca/"
+      },
+      "services": [
+        "Phone repair",
+        "Electronics repair"
+      ],
+      "email": "service@gobitbybit.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-668-8462",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-joyride-automotive",
+      "kind": "business",
+      "slug": "joyride-automotive",
+      "name": "Joyride Automotive",
+      "title": "Joyride Automotive",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Joyride Automotive is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "4645 Varsity Drive NW, Calgary, AB",
+      "website": "https://www.joyrideautomotive.com/",
+      "sources": [
+        {
+          "name": "Joyride Automotive official website",
+          "url": "https://www.joyrideautomotive.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.joyrideautomotive.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@joyrideautomotive.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-247-8618",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bootsma-heating-and-air-conditioning",
+      "kind": "business",
+      "slug": "bootsma-heating-and-air-conditioning",
+      "name": "Bootsma Heating and Air Conditioning",
+      "title": "Bootsma Heating and Air Conditioning",
+      "summary": "A Calgary furnace, heating and air conditioning company.",
+      "description": "Bootsma Heating and Air Conditioning is a Calgary furnace, heating and air conditioning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furnace",
+        "hvac",
+        "heating",
+        "air conditioning"
+      ],
+      "address": "4535 22 Avenue NW, Calgary, AB",
+      "website": "https://bootsmahvac.ca/",
+      "sources": [
+        {
+          "name": "Bootsma Heating and Air Conditioning official website",
+          "url": "https://bootsmahvac.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bootsmahvac.ca/"
+      },
+      "services": [
+        "Furnace",
+        "Hvac",
+        "Heating",
+        "Air conditioning"
+      ],
+      "email": "info@bootsmahvac.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-208-8989",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-dreams-eco-xpress-car-wash",
+      "kind": "business",
+      "slug": "dreams-eco-xpress-car-wash",
+      "name": "Dreams Eco Xpress Car Wash",
+      "title": "Dreams Eco Xpress Car Wash",
+      "summary": "A Calgary car wash and detailing shop.",
+      "description": "Dreams Eco Xpress Car Wash is a Calgary car wash and detailing shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "car wash",
+        "detailing"
+      ],
+      "address": "5280 28 Avenue SE, Calgary, AB",
+      "website": "https://dreamscarwash.ca/calgary-se-eastpoint",
+      "sources": [
+        {
+          "name": "Dreams Eco Xpress Car Wash official website",
+          "url": "https://dreamscarwash.ca/calgary-se-eastpoint",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://dreamscarwash.ca/calgary-se-eastpoint"
+      },
+      "services": [
+        "Car wash",
+        "Detailing"
+      ],
+      "email": "info@dreamscarwash.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-475-8003",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-galaxy-movers-calgary",
+      "kind": "business",
+      "slug": "galaxy-movers-calgary",
+      "name": "Galaxy Movers Calgary",
+      "title": "Galaxy Movers Calgary",
+      "summary": "A Calgary moving company.",
+      "description": "Galaxy Movers Calgary is a Calgary moving company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "movers",
+        "moving"
+      ],
+      "address": "396 Cornerstone Passage NE, Calgary, AB",
+      "website": "https://galaxymoverscalgary.ca/",
+      "sources": [
+        {
+          "name": "Galaxy Movers Calgary official website",
+          "url": "https://galaxymoverscalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://galaxymoverscalgary.ca/"
+      },
+      "services": [
+        "Movers",
+        "Moving"
+      ],
+      "email": "info@galaxymoverscalgary.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-fishman-s",
+      "kind": "business",
+      "slug": "fishman-s",
+      "name": "Fishman's",
+      "title": "Fishman's",
+      "summary": "A Calgary dry cleaner.",
+      "description": "Fishman's is a Calgary dry cleaner. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dry cleaning",
+        "alterations"
+      ],
+      "address": "3527 Garrison Gate SW, Calgary, AB",
+      "website": "https://fishmans.ca/",
+      "sources": [
+        {
+          "name": "Fishman's official website",
+          "url": "https://fishmans.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://fishmans.ca/"
+      },
+      "services": [
+        "Dry cleaning",
+        "Alterations"
+      ],
+      "email": "customercare@fishmans.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-228-6995",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-total-glass",
+      "kind": "business",
+      "slug": "total-glass",
+      "name": "Total Glass",
+      "title": "Total Glass",
+      "summary": "A Calgary auto glass shop.",
+      "description": "Total Glass is a Calgary auto glass shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto glass",
+        "windshield"
+      ],
+      "address": "4001 19 Street NE, Calgary, AB",
+      "website": "https://www.totalglassinc.ca/",
+      "sources": [
+        {
+          "name": "Total Glass official website",
+          "url": "https://www.totalglassinc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.totalglassinc.ca/"
+      },
+      "services": [
+        "Auto glass",
+        "Windshield"
+      ],
+      "email": "info@totalglassinc.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-826-0675",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-millhouse-carpet-and-flooring",
+      "kind": "business",
+      "slug": "millhouse-carpet-and-flooring",
+      "name": "Millhouse Carpet and Flooring",
+      "title": "Millhouse Carpet and Flooring",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "Millhouse Carpet and Flooring is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "carpet",
+        "tile"
+      ],
+      "address": "Bay 3 - 2220 32 Avenue NE, Calgary, AB",
+      "website": "https://www.millhousecarpet.com/",
+      "sources": [
+        {
+          "name": "Millhouse Carpet and Flooring official website",
+          "url": "https://www.millhousecarpet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.millhousecarpet.com/"
+      },
+      "services": [
+        "Flooring",
+        "Carpet",
+        "Tile"
+      ],
+      "email": "general@millhousecarpet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-291-9737",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-prostar-plumbing-and-heating",
+      "kind": "business",
+      "slug": "prostar-plumbing-and-heating",
+      "name": "ProStar Plumbing & Heating",
+      "title": "ProStar Plumbing & Heating",
+      "summary": "A Calgary plumbing and heating company.",
+      "description": "ProStar Plumbing & Heating is a Calgary plumbing and heating company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "plumber",
+        "plumbing",
+        "heating"
+      ],
+      "address": "1620 Summer Street SW, Calgary, AB",
+      "website": "https://prostarplumbing.ca/",
+      "sources": [
+        {
+          "name": "ProStar Plumbing & Heating official website",
+          "url": "https://prostarplumbing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://prostarplumbing.ca/"
+      },
+      "services": [
+        "Plumber",
+        "Plumbing",
+        "Heating"
+      ],
+      "email": "info@prostarplumbing.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-250-7232",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-simmering-upholstery",
+      "kind": "business",
+      "slug": "simmering-upholstery",
+      "name": "Simmering Upholstery",
+      "title": "Simmering Upholstery",
+      "summary": "A Calgary tailoring, sewing and upholstery shop.",
+      "description": "Simmering Upholstery is a Calgary tailoring, sewing and upholstery shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tailor",
+        "alterations"
+      ],
+      "address": "1902 10 Avenue SW, Calgary, AB",
+      "website": "https://www.simmeringupholstery.ca/",
+      "sources": [
+        {
+          "name": "Simmering Upholstery official website",
+          "url": "https://www.simmeringupholstery.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.simmeringupholstery.ca/"
+      },
+      "services": [
+        "Tailor",
+        "Alterations"
+      ],
+      "email": "info@simmeringupholstery.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-244-4656",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-horton-road-carwash-and-detailing",
+      "kind": "business",
+      "slug": "horton-road-carwash-and-detailing",
+      "name": "Horton Road Carwash & Detailing",
+      "title": "Horton Road Carwash & Detailing",
+      "summary": "A Calgary car wash and detailing shop.",
+      "description": "Horton Road Carwash & Detailing is a Calgary car wash and detailing shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "car wash",
+        "detailing"
+      ],
+      "address": "9516 Horton Road SW, Calgary, AB",
+      "website": "https://hortonroadcarwash.ca/",
+      "sources": [
+        {
+          "name": "Horton Road Carwash & Detailing official website",
+          "url": "https://hortonroadcarwash.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://hortonroadcarwash.ca/"
+      },
+      "services": [
+        "Car wash",
+        "Detailing"
+      ],
+      "email": "info@hortonroadcarwash.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-587-896-2586",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-gilbert-s-mountain-movers",
+      "kind": "business",
+      "slug": "gilbert-s-mountain-movers",
+      "name": "Gilbert's Mountain Movers",
+      "title": "Gilbert's Mountain Movers",
+      "summary": "A Calgary moving company.",
+      "description": "Gilbert's Mountain Movers is a Calgary moving company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "movers",
+        "moving"
+      ],
+      "address": "4799 68 Avenue SE, Calgary, AB",
+      "website": "https://mountainmovers.ca",
+      "sources": [
+        {
+          "name": "Gilbert's Mountain Movers official website",
+          "url": "https://mountainmovers.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mountainmovers.ca"
+      },
+      "services": [
+        "Movers",
+        "Moving"
+      ],
+      "email": "info@mountainmovers.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-raybern-motors",
+      "kind": "business",
+      "slug": "raybern-motors",
+      "name": "Raybern Motors",
+      "title": "Raybern Motors",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Raybern Motors is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "1165 D 44 Avenue SE, Calgary, AB",
+      "website": "https://www.raybernmotors.com/",
+      "sources": [
+        {
+          "name": "Raybern Motors official website",
+          "url": "https://www.raybernmotors.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.raybernmotors.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "service@raybernmotors.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-252-8144",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bandw-locksmith",
+      "kind": "business",
+      "slug": "bandw-locksmith",
+      "name": "B&W Locksmith",
+      "title": "B&W Locksmith",
+      "summary": "A Calgary locksmith.",
+      "description": "B&W Locksmith is a Calgary locksmith. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "locksmith"
+      ],
+      "address": "1135 44 Avenue SE, Calgary, AB",
+      "website": "https://bnwlocksmith.com/",
+      "sources": [
+        {
+          "name": "B&W Locksmith official website",
+          "url": "https://bnwlocksmith.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bnwlocksmith.com/"
+      },
+      "services": [
+        "Locksmith"
+      ],
+      "email": "info@bnwlocksmith.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-313-7882",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-unlimited-performance-and-exhaust",
+      "kind": "business",
+      "slug": "unlimited-performance-and-exhaust",
+      "name": "Unlimited Performance & Exhaust",
+      "title": "Unlimited Performance & Exhaust",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Unlimited Performance & Exhaust is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "1259 Highfield Crescent SE, Calgary, AB",
+      "website": "https://www.unlimitedperformance.com/",
+      "sources": [
+        {
+          "name": "Unlimited Performance & Exhaust official website",
+          "url": "https://www.unlimitedperformance.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.unlimitedperformance.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "sales@unlimitedperformance.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-243-4949",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-pwf-floors-and-decors-calgary",
+      "kind": "business",
+      "slug": "pwf-floors-and-decors-calgary",
+      "name": "PWF Floors & Decors - Calgary",
+      "title": "PWF Floors & Decors - Calgary",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "PWF Floors & Decors - Calgary is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "carpet",
+        "tile"
+      ],
+      "address": "1010 42 Avenue SE, Calgary, AB",
+      "website": "https://pwffloors.ca/calgary",
+      "sources": [
+        {
+          "name": "PWF Floors & Decors - Calgary official website",
+          "url": "https://pwffloors.ca/calgary",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://pwffloors.ca/calgary"
+      },
+      "services": [
+        "Flooring",
+        "Carpet",
+        "Tile"
+      ],
+      "email": "info@pwffloors.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-452-2700",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-julian-tile",
+      "kind": "business",
+      "slug": "julian-tile",
+      "name": "Julian Tile",
+      "title": "Julian Tile",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "Julian Tile is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "carpet",
+        "tile"
+      ],
+      "address": "1125 42 Avenue SE, Calgary, AB",
+      "website": "https://www.juliantile.com/juliantile-calgary",
+      "sources": [
+        {
+          "name": "Julian Tile official website",
+          "url": "https://www.juliantile.com/juliantile-calgary",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.juliantile.com/juliantile-calgary"
+      },
+      "services": [
+        "Flooring",
+        "Carpet",
+        "Tile"
+      ],
+      "email": "info@juliantile.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-287-8453",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bowest-appliances",
+      "kind": "business",
+      "slug": "bowest-appliances",
+      "name": "Bowest Appliances",
+      "title": "Bowest Appliances",
+      "summary": "A Calgary appliance store and service shop.",
+      "description": "Bowest Appliances is a Calgary appliance store and service shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "appliances",
+        "appliance repair"
+      ],
+      "address": "7948 Bowness Road NW, Calgary, AB",
+      "website": "https://www.bowestappliances.ca/",
+      "sources": [
+        {
+          "name": "Bowest Appliances official website",
+          "url": "https://www.bowestappliances.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bowestappliances.ca/"
+      },
+      "services": [
+        "Appliances",
+        "Appliance repair"
+      ],
+      "email": "sales@bowestappliances.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-286-0900",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-men-in-kilts-calgary",
+      "kind": "business",
+      "slug": "men-in-kilts-calgary",
+      "name": "Men In Kilts - Calgary",
+      "title": "Men In Kilts - Calgary",
+      "summary": "A Calgary window and exterior cleaning company.",
+      "description": "Men In Kilts - Calgary is a Calgary window and exterior cleaning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "window cleaning",
+        "gutter cleaning"
+      ],
+      "address": "1915 27 Avenue NE, Calgary, AB",
+      "website": "https://www.meninkilts.com/calgary/",
+      "sources": [
+        {
+          "name": "Men In Kilts - Calgary official website",
+          "url": "https://www.meninkilts.com/calgary/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.meninkilts.com/calgary/"
+      },
+      "services": [
+        "Window cleaning",
+        "Gutter cleaning"
+      ],
+      "email": "calgary@meninkilts.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-800-777-5458",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-services-pro",
+      "kind": "business",
+      "slug": "services-pro",
+      "name": "Services Pro",
+      "title": "Services Pro",
+      "summary": "A Calgary cleaning company.",
+      "description": "Services Pro is a Calgary cleaning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "cleaning",
+        "cleaner"
+      ],
+      "address": "2016 25 Avenue NE, Calgary, AB",
+      "website": "https://servicespro.ca/",
+      "sources": [
+        {
+          "name": "Services Pro official website",
+          "url": "https://servicespro.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://servicespro.ca/"
+      },
+      "services": [
+        "Cleaning",
+        "Cleaner"
+      ],
+      "email": "info@servicespro.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-439-7776",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-precision-builders",
+      "kind": "business",
+      "slug": "precision-builders",
+      "name": "Precision Builders",
+      "title": "Precision Builders",
+      "summary": "A Calgary builder and renovation shop.",
+      "description": "Precision Builders is a Calgary builder and renovation shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "renovations",
+        "repairs"
+      ],
+      "address": "4201 Brandon Street SE, Calgary, AB",
+      "website": "https://precisionbuilders.net/",
+      "sources": [
+        {
+          "name": "Precision Builders official website",
+          "url": "https://precisionbuilders.net/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://precisionbuilders.net/"
+      },
+      "services": [
+        "Renovations",
+        "Repairs"
+      ],
+      "email": "info@precisionbuilders.net",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-287-1575",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-best-solution-windows-and-doors",
+      "kind": "business",
+      "slug": "best-solution-windows-and-doors",
+      "name": "Best Solution Windows & Doors",
+      "title": "Best Solution Windows & Doors",
+      "summary": "A Calgary windows and doors company.",
+      "description": "Best Solution Windows & Doors is a Calgary windows and doors company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "windows",
+        "doors"
+      ],
+      "address": "4020 4 Street SE, Calgary, AB",
+      "website": "https://calgarywindows.ca/",
+      "sources": [
+        {
+          "name": "Best Solution Windows & Doors official website",
+          "url": "https://calgarywindows.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarywindows.ca/"
+      },
+      "services": [
+        "Windows",
+        "Doors"
+      ],
+      "email": "office@calgarywindows.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 587-407-3085",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-vadel",
+      "kind": "business",
+      "slug": "vadel",
+      "name": "Vadel",
+      "title": "Vadel",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "Vadel is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "carpet",
+        "tile"
+      ],
+      "address": "3829 15A Street SE, Calgary, AB",
+      "website": "https://vadel.ca/",
+      "sources": [
+        {
+          "name": "Vadel official website",
+          "url": "https://vadel.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://vadel.ca/"
+      },
+      "services": [
+        "Flooring",
+        "Carpet",
+        "Tile"
+      ],
+      "email": "info@vadel.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-250-1988",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-just-in-time-furnace",
+      "kind": "business",
+      "slug": "just-in-time-furnace",
+      "name": "Just in Time Furnace",
+      "title": "Just in Time Furnace",
+      "summary": "A Calgary furnace, heating and air conditioning company.",
+      "description": "Just in Time Furnace is a Calgary furnace, heating and air conditioning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furnace",
+        "hvac",
+        "heating",
+        "air conditioning"
+      ],
+      "address": "320b 65 Avenue SE, Calgary, AB",
+      "website": "https://justintimefurnace.com/",
+      "sources": [
+        {
+          "name": "Just in Time Furnace official website",
+          "url": "https://justintimefurnace.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://justintimefurnace.com/"
+      },
+      "services": [
+        "Furnace",
+        "Hvac",
+        "Heating",
+        "Air conditioning"
+      ],
+      "email": "info@justintimefurnace.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-333-6666",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-riegel-tuning",
+      "kind": "business",
+      "slug": "riegel-tuning",
+      "name": "Riegel Tuning",
+      "title": "Riegel Tuning",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Riegel Tuning is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "5329 1A Street SW, Calgary, AB",
+      "website": "https://www.riegeltuning.com/",
+      "sources": [
+        {
+          "name": "Riegel Tuning official website",
+          "url": "https://www.riegeltuning.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.riegeltuning.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@riegeltuning.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-refine-automotive-salon",
+      "kind": "business",
+      "slug": "refine-automotive-salon",
+      "name": "Refine Automotive Salon",
+      "title": "Refine Automotive Salon",
+      "summary": "A Calgary auto detailing and paint protection studio.",
+      "description": "Refine Automotive Salon is a Calgary auto detailing and paint protection studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "detailing",
+        "paint protection"
+      ],
+      "address": "5524 1A Street SW, Calgary, AB",
+      "website": "https://refinesalon.com/",
+      "sources": [
+        {
+          "name": "Refine Automotive Salon official website",
+          "url": "https://refinesalon.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://refinesalon.com/"
+      },
+      "services": [
+        "Detailing",
+        "Paint protection"
+      ],
+      "email": "office@refinesalon.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-301-0222",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-a-1-auto-body",
+      "kind": "business",
+      "slug": "a-1-auto-body",
+      "name": "A-1 Auto Body",
+      "title": "A-1 Auto Body",
+      "summary": "A Calgary auto body and collision shop.",
+      "description": "A-1 Auto Body is a Calgary auto body and collision shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto body",
+        "collision repair"
+      ],
+      "address": "5304 1A Street SE, Calgary, AB",
+      "website": "https://www.a1autobody.com/",
+      "sources": [
+        {
+          "name": "A-1 Auto Body official website",
+          "url": "https://www.a1autobody.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.a1autobody.com/"
+      },
+      "services": [
+        "Auto body",
+        "Collision repair"
+      ],
+      "email": "info@a1autobody.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-253-7867",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-nuway-floors-and-interiors",
+      "kind": "business",
+      "slug": "nuway-floors-and-interiors",
+      "name": "NuWay Floors & Interiors",
+      "title": "NuWay Floors & Interiors",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "NuWay Floors & Interiors is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "carpet",
+        "tile"
+      ],
+      "address": "219 50 Avenue SE, Calgary, AB",
+      "website": "https://www.nuwayfloors.com/",
+      "sources": [
+        {
+          "name": "NuWay Floors & Interiors official website",
+          "url": "https://www.nuwayfloors.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.nuwayfloors.com/"
+      },
+      "services": [
+        "Flooring",
+        "Carpet",
+        "Tile"
+      ],
+      "email": "info@nuwayfloors.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-252-3551",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-heritage-autopro-and-tire",
+      "kind": "business",
+      "slug": "heritage-autopro-and-tire",
+      "name": "Heritage Autopro & Tire",
+      "title": "Heritage Autopro & Tire",
+      "summary": "A Calgary auto repair and tire shop.",
+      "description": "Heritage Autopro & Tire is a Calgary auto repair and tire shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair",
+        "tires"
+      ],
+      "address": "203 58 Avenue SW, Calgary, AB",
+      "website": "https://www.heritageautopro.com/",
+      "sources": [
+        {
+          "name": "Heritage Autopro & Tire official website",
+          "url": "https://www.heritageautopro.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.heritageautopro.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair",
+        "Tires"
+      ],
+      "email": "info@heritageautopro.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-253-1210",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-eurocraft-collision-centre",
+      "kind": "business",
+      "slug": "eurocraft-collision-centre",
+      "name": "Eurocraft Collision Centre",
+      "title": "Eurocraft Collision Centre",
+      "summary": "A Calgary auto body and collision shop.",
+      "description": "Eurocraft Collision Centre is a Calgary auto body and collision shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto body",
+        "collision repair"
+      ],
+      "address": "5801 1A Street SW, Calgary, AB",
+      "website": "https://eurocraftcollision.com/",
+      "sources": [
+        {
+          "name": "Eurocraft Collision Centre official website",
+          "url": "https://eurocraftcollision.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://eurocraftcollision.com/"
+      },
+      "services": [
+        "Auto body",
+        "Collision repair"
+      ],
+      "email": "eurocraft@eurocraftcollision.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-252-4579",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-street-heat",
+      "kind": "business",
+      "slug": "street-heat",
+      "name": "Street Heat",
+      "title": "Street Heat",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Street Heat is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "5218 1A Street SE, Calgary, AB",
+      "website": "https://streetheatinc.com/",
+      "sources": [
+        {
+          "name": "Street Heat official website",
+          "url": "https://streetheatinc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://streetheatinc.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@streetheatinc.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-292-0039",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-cactus-moving",
+      "kind": "business",
+      "slug": "cactus-moving",
+      "name": "Cactus Moving",
+      "title": "Cactus Moving",
+      "summary": "A Calgary moving company.",
+      "description": "Cactus Moving is a Calgary moving company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "movers",
+        "moving"
+      ],
+      "address": "1108 6 Avenue SW, Calgary, AB",
+      "website": "https://www.cactusmoving.ca/",
+      "sources": [
+        {
+          "name": "Cactus Moving official website",
+          "url": "https://www.cactusmoving.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cactusmoving.ca/"
+      },
+      "services": [
+        "Movers",
+        "Moving"
+      ],
+      "email": "hello@cactusmoving.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-805-5855",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-stevo-auto-clinic",
+      "kind": "business",
+      "slug": "stevo-auto-clinic",
+      "name": "Stevo Auto Clinic",
+      "title": "Stevo Auto Clinic",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Stevo Auto Clinic is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "3505 16 Street SW, Calgary, AB",
+      "website": "https://www.stevoautoclinic.ca/",
+      "sources": [
+        {
+          "name": "Stevo Auto Clinic official website",
+          "url": "https://www.stevoautoclinic.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.stevoautoclinic.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@stevoautoclinic.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-287-1334",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-jerome-s-appliance-gallery",
+      "kind": "business",
+      "slug": "jerome-s-appliance-gallery",
+      "name": "Jerome's Appliance Gallery",
+      "title": "Jerome's Appliance Gallery",
+      "summary": "A Calgary appliance store and service shop.",
+      "description": "Jerome's Appliance Gallery is a Calgary appliance store and service shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "appliances",
+        "appliance repair"
+      ],
+      "address": "7152 Fisher Street SE, Calgary, AB",
+      "website": "https://www.jeromesappliancegalleryinc.ca/",
+      "sources": [
+        {
+          "name": "Jerome's Appliance Gallery official website",
+          "url": "https://www.jeromesappliancegalleryinc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.jeromesappliancegalleryinc.ca/"
+      },
+      "services": [
+        "Appliances",
+        "Appliance repair"
+      ],
+      "email": "admin@jeromesappliancegalleryinc.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-255-6050",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-lighting-renewal-by-glazier-electric",
+      "kind": "business",
+      "slug": "lighting-renewal-by-glazier-electric",
+      "name": "Lighting Renewal by Glazier Electric",
+      "title": "Lighting Renewal by Glazier Electric",
+      "summary": "A Calgary electrical and lighting repair company.",
+      "description": "Lighting Renewal by Glazier Electric is a Calgary electrical and lighting repair company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "electrician",
+        "electrical",
+        "lighting"
+      ],
+      "address": "7134 Fisher Street SE, Calgary, AB",
+      "website": "https://www.lightingrenewal.com/",
+      "sources": [
+        {
+          "name": "Lighting Renewal by Glazier Electric official website",
+          "url": "https://www.lightingrenewal.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lightingrenewal.com/"
+      },
+      "services": [
+        "Electrician",
+        "Electrical",
+        "Lighting"
+      ],
+      "email": "info@lightingrenewal.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-283-4111",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-panel-upgrade-experts",
+      "kind": "business",
+      "slug": "panel-upgrade-experts",
+      "name": "Panel Upgrade Experts",
+      "title": "Panel Upgrade Experts",
+      "summary": "A Calgary electrical contractor.",
+      "description": "Panel Upgrade Experts is a Calgary electrical contractor. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "electrician",
+        "electrical"
+      ],
+      "address": "4838 Richard Road SW, Calgary, AB",
+      "website": "https://panelupgradeexperts.com/",
+      "sources": [
+        {
+          "name": "Panel Upgrade Experts official website",
+          "url": "https://panelupgradeexperts.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://panelupgradeexperts.com/"
+      },
+      "services": [
+        "Electrician",
+        "Electrical"
+      ],
+      "email": "admin@panelupgradeexperts.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-774-7460",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-tower-cleaners",
+      "kind": "business",
+      "slug": "tower-cleaners",
+      "name": "Tower Cleaners",
+      "title": "Tower Cleaners",
+      "summary": "A Calgary dry cleaner.",
+      "description": "Tower Cleaners is a Calgary dry cleaner. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dry cleaning",
+        "alterations"
+      ],
+      "address": "#26-12030 Symons Valley Road NW, Calgary, AB",
+      "website": "https://www.towercleaners.ca/stores",
+      "sources": [
+        {
+          "name": "Tower Cleaners official website",
+          "url": "https://www.towercleaners.ca/stores",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.towercleaners.ca/stores"
+      },
+      "services": [
+        "Dry cleaning",
+        "Alterations"
+      ],
+      "email": "info@towercleaners.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-275-8545",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-my-auto",
+      "kind": "business",
+      "slug": "my-auto",
+      "name": "MY Auto",
+      "title": "MY Auto",
+      "summary": "A Calgary auto repair shop.",
+      "description": "MY Auto is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "4115 Macleod Trail SW, Calgary, AB",
+      "website": "https://myautoyyc.com/",
+      "sources": [
+        {
+          "name": "MY Auto official website",
+          "url": "https://myautoyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://myautoyyc.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@myautoyyc.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 587-318-0167",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-ecuprogram",
+      "kind": "business",
+      "slug": "ecuprogram",
+      "name": "Ecuprogram",
+      "title": "Ecuprogram",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Ecuprogram is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "4527 1 Street SE, Calgary, AB",
+      "website": "https://www.ecuprogram.com/",
+      "sources": [
+        {
+          "name": "Ecuprogram official website",
+          "url": "https://www.ecuprogram.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ecuprogram.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "contact@ecuprogram.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-457-3650",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-lakeview-automotive-service-and-performance",
+      "kind": "business",
+      "slug": "lakeview-automotive-service-and-performance",
+      "name": "Lakeview Automotive Service & Performance",
+      "title": "Lakeview Automotive Service & Performance",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Lakeview Automotive Service & Performance is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "4400 1st St SE, Calgary, AB",
+      "website": "https://www.lakeviewautomotive.ca",
+      "sources": [
+        {
+          "name": "Lakeview Automotive Service & Performance official website",
+          "url": "https://www.lakeviewautomotive.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lakeviewautomotive.ca"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "peter.badin@lakeviewautomotive.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-242-1575",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-macleod-auto-and-truck-repair",
+      "kind": "business",
+      "slug": "macleod-auto-and-truck-repair",
+      "name": "Macleod Auto & Truck Repair",
+      "title": "Macleod Auto & Truck Repair",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Macleod Auto & Truck Repair is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "4002 Macleod Trail SE, Calgary, AB",
+      "website": "https://macleodauto.com/",
+      "sources": [
+        {
+          "name": "Macleod Auto & Truck Repair official website",
+          "url": "https://macleodauto.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://macleodauto.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@macleodauto.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-287-2929",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-freeze-maxwell-roofing",
+      "kind": "business",
+      "slug": "freeze-maxwell-roofing",
+      "name": "Freeze Maxwell Roofing",
+      "title": "Freeze Maxwell Roofing",
+      "summary": "A Calgary roofing and exteriors company.",
+      "description": "Freeze Maxwell Roofing is a Calgary roofing and exteriors company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "roofing",
+        "roofer",
+        "eavestrough"
+      ],
+      "address": "4635 1 Street SE, Calgary, AB",
+      "website": "https://freezemaxwell.ca/",
+      "sources": [
+        {
+          "name": "Freeze Maxwell Roofing official website",
+          "url": "https://freezemaxwell.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://freezemaxwell.ca/"
+      },
+      "services": [
+        "Roofing",
+        "Roofer",
+        "Eavestrough"
+      ],
+      "email": "information@freezemaxwell.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-253-0101",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-autorite-automotive-repair-centres",
+      "kind": "business",
+      "slug": "autorite-automotive-repair-centres",
+      "name": "Autorite Automotive Repair Centres",
+      "title": "Autorite Automotive Repair Centres",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Autorite Automotive Repair Centres is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "11 Crowfoot Rise NW, Calgary, AB",
+      "website": "https://www.germanautomotive.ca/",
+      "sources": [
+        {
+          "name": "Autorite Automotive Repair Centres official website",
+          "url": "https://www.germanautomotive.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.germanautomotive.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@germanautomotive.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-239-4004",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-knight-plumbing-heating-and-air-conditioning",
+      "kind": "business",
+      "slug": "knight-plumbing-heating-and-air-conditioning",
+      "name": "Knight Plumbing, Heating & Air Conditioning",
+      "title": "Knight Plumbing, Heating & Air Conditioning",
+      "summary": "A Calgary plumbing and heating company.",
+      "description": "Knight Plumbing, Heating & Air Conditioning is a Calgary plumbing and heating company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "plumber",
+        "plumbing",
+        "heating"
+      ],
+      "address": "10861 50 Street SE, Calgary, AB",
+      "website": "https://www.knightplumbing.ca/",
+      "sources": [
+        {
+          "name": "Knight Plumbing, Heating & Air Conditioning official website",
+          "url": "https://www.knightplumbing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.knightplumbing.ca/"
+      },
+      "services": [
+        "Plumber",
+        "Plumbing",
+        "Heating"
+      ],
+      "email": "info@knightplumbing.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 587-317-1583",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-the-local-detailers-auto-detailing",
+      "kind": "business",
+      "slug": "the-local-detailers-auto-detailing",
+      "name": "The Local Detailers - Auto Detailing",
+      "title": "The Local Detailers - Auto Detailing",
+      "summary": "A Calgary auto detailing shop.",
+      "description": "The Local Detailers - Auto Detailing is a Calgary auto detailing shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "detailing",
+        "car wash"
+      ],
+      "address": "412B 36 Avenue SE, Calgary, AB",
+      "website": "https://localdetailers.ca/",
+      "sources": [
+        {
+          "name": "The Local Detailers - Auto Detailing official website",
+          "url": "https://localdetailers.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://localdetailers.ca/"
+      },
+      "services": [
+        "Detailing",
+        "Car wash"
+      ],
+      "email": "46-ave@localdetailers.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-903-9452",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-trs-automotive",
+      "kind": "business",
+      "slug": "trs-automotive",
+      "name": "TRS Automotive",
+      "title": "TRS Automotive",
+      "summary": "A Calgary auto repair shop.",
+      "description": "TRS Automotive is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "5035 12A Street SE, Calgary, AB",
+      "website": "https://www.trsauto.ca/",
+      "sources": [
+        {
+          "name": "TRS Automotive official website",
+          "url": "https://www.trsauto.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.trsauto.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "service@trsauto.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-davenport-motorsports",
+      "kind": "business",
+      "slug": "davenport-motorsports",
+      "name": "Davenport Motorsports",
+      "title": "Davenport Motorsports",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Davenport Motorsports is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "1530 Aviation Road NE, Calgary, AB",
+      "website": "https://www.davenportmotorsports.com/",
+      "sources": [
+        {
+          "name": "Davenport Motorsports official website",
+          "url": "https://www.davenportmotorsports.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.davenportmotorsports.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "matt@davenportmotorsports.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-274-7271",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-autokosmetik",
+      "kind": "business",
+      "slug": "autokosmetik",
+      "name": "Autokosmetik",
+      "title": "Autokosmetik",
+      "summary": "A Calgary auto detailing studio.",
+      "description": "Autokosmetik is a Calgary auto detailing studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "detailing"
+      ],
+      "address": "6420 79 Avenue SE, Calgary, AB",
+      "website": "https://www.autokosmetik.ca/",
+      "sources": [
+        {
+          "name": "Autokosmetik official website",
+          "url": "https://www.autokosmetik.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.autokosmetik.ca/"
+      },
+      "services": [
+        "Detailing"
+      ],
+      "email": "info@autokosmetik.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-874-6988",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-propainting-solutions",
+      "kind": "business",
+      "slug": "propainting-solutions",
+      "name": "ProPainting Solutions",
+      "title": "ProPainting Solutions",
+      "summary": "A Calgary painting company.",
+      "description": "ProPainting Solutions is a Calgary painting company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "painter",
+        "painting"
+      ],
+      "address": "3513 62 Avenue SE, Calgary, AB",
+      "website": "https://propaintingsolutions.com/",
+      "sources": [
+        {
+          "name": "ProPainting Solutions official website",
+          "url": "https://propaintingsolutions.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://propaintingsolutions.com/"
+      },
+      "services": [
+        "Painter",
+        "Painting"
+      ],
+      "email": "stefan@propaintingsolutions.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-714-3400",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-royal-view-windows-doors-and-exteriors",
+      "kind": "business",
+      "slug": "royal-view-windows-doors-and-exteriors",
+      "name": "Royal View Windows, Doors & Exteriors",
+      "title": "Royal View Windows, Doors & Exteriors",
+      "summary": "A Calgary windows, doors and exteriors company.",
+      "description": "Royal View Windows, Doors & Exteriors is a Calgary windows, doors and exteriors company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "windows",
+        "doors",
+        "siding"
+      ],
+      "address": "1122 40 Avenue NE, Calgary, AB",
+      "website": "https://rvwltd.ca",
+      "sources": [
+        {
+          "name": "Royal View Windows, Doors & Exteriors official website",
+          "url": "https://rvwltd.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://rvwltd.ca"
+      },
+      "services": [
+        "Windows",
+        "Doors",
+        "Siding"
+      ],
+      "email": "info@rvwltd.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-587-707-9257",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-kitchen-cabinets-calgary-by-chief",
+      "kind": "business",
+      "slug": "kitchen-cabinets-calgary-by-chief",
+      "name": "Kitchen Cabinets Calgary by Chief",
+      "title": "Kitchen Cabinets Calgary by Chief",
+      "summary": "A Calgary kitchen cabinet maker.",
+      "description": "Kitchen Cabinets Calgary by Chief is a Calgary kitchen cabinet maker. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "cabinets",
+        "renovations"
+      ],
+      "address": "5700 Barlow Trail SE, Calgary, AB",
+      "website": "https://www.kitchencabinetscalgary.ca",
+      "sources": [
+        {
+          "name": "Kitchen Cabinets Calgary by Chief official website",
+          "url": "https://www.kitchencabinetscalgary.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kitchencabinetscalgary.ca"
+      },
+      "services": [
+        "Cabinets",
+        "Renovations"
+      ],
+      "email": "info@kitchencabinetscalgary.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-587-855-4269",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-dhl-mechanical",
+      "kind": "business",
+      "slug": "dhl-mechanical",
+      "name": "DHL Mechanical",
+      "title": "DHL Mechanical",
+      "summary": "A Calgary furnace, heating and air conditioning company.",
+      "description": "DHL Mechanical is a Calgary furnace, heating and air conditioning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furnace",
+        "hvac",
+        "heating",
+        "air conditioning"
+      ],
+      "address": "115 Midglen Road SE, Calgary, AB",
+      "website": "https://dhlmechanical.ca/",
+      "sources": [
+        {
+          "name": "DHL Mechanical official website",
+          "url": "https://dhlmechanical.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://dhlmechanical.ca/"
+      },
+      "services": [
+        "Furnace",
+        "Hvac",
+        "Heating",
+        "Air conditioning"
+      ],
+      "email": "info@dhlmechanical.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-863-8246",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-horizon-heating",
+      "kind": "business",
+      "slug": "horizon-heating",
+      "name": "Horizon Heating",
+      "title": "Horizon Heating",
+      "summary": "A Calgary furnace, heating and air conditioning company.",
+      "description": "Horizon Heating is a Calgary furnace, heating and air conditioning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furnace",
+        "hvac",
+        "heating",
+        "air conditioning"
+      ],
+      "address": "666 Goddard Avenue NE, Calgary, AB",
+      "website": "https://horizonheating.ca/",
+      "sources": [
+        {
+          "name": "Horizon Heating official website",
+          "url": "https://horizonheating.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://horizonheating.ca/"
+      },
+      "services": [
+        "Furnace",
+        "Hvac",
+        "Heating",
+        "Air conditioning"
+      ],
+      "email": "info@horizonheating.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-274-0790",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-clutch-pro",
+      "kind": "business",
+      "slug": "clutch-pro",
+      "name": "Clutch-Pro",
+      "title": "Clutch-Pro",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Clutch-Pro is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "3813 17 Avenue SW, Calgary, AB",
+      "website": "https://www.clutch-pro.com/",
+      "sources": [
+        {
+          "name": "Clutch-Pro official website",
+          "url": "https://www.clutch-pro.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.clutch-pro.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@clutch-pro.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-246-6246",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-ram-cleaning-services",
+      "kind": "business",
+      "slug": "ram-cleaning-services",
+      "name": "Ram Cleaning Services",
+      "title": "Ram Cleaning Services",
+      "summary": "A Calgary cleaning company.",
+      "description": "Ram Cleaning Services is a Calgary cleaning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "cleaning",
+        "cleaner"
+      ],
+      "address": "3611 27 Street NE, Calgary, AB",
+      "website": "https://www.ramservice.com/",
+      "sources": [
+        {
+          "name": "Ram Cleaning Services official website",
+          "url": "https://www.ramservice.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ramservice.com/"
+      },
+      "services": [
+        "Cleaning",
+        "Cleaner"
+      ],
+      "email": "customerservice@ramservice.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-291-1051",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-action-furnace",
+      "kind": "business",
+      "slug": "action-furnace",
+      "name": "Action Furnace",
+      "title": "Action Furnace",
+      "summary": "A Calgary furnace, heating and air conditioning company.",
+      "description": "Action Furnace is a Calgary furnace, heating and air conditioning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furnace",
+        "hvac",
+        "heating",
+        "air conditioning"
+      ],
+      "address": "926 26 Street NE, Calgary, AB",
+      "website": "https://www.actionfurnace.ca/",
+      "sources": [
+        {
+          "name": "Action Furnace official website",
+          "url": "https://www.actionfurnace.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.actionfurnace.ca/"
+      },
+      "services": [
+        "Furnace",
+        "Hvac",
+        "Heating",
+        "Air conditioning"
+      ],
+      "email": "enquiries@actionfurnace.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-288-4004",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-franklin-auto-repair",
+      "kind": "business",
+      "slug": "franklin-auto-repair",
+      "name": "Franklin Auto Repair",
+      "title": "Franklin Auto Repair",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Franklin Auto Repair is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "700 33 Street NE, Calgary, AB",
+      "website": "https://www.franklinautorepair.ca/",
+      "sources": [
+        {
+          "name": "Franklin Auto Repair official website",
+          "url": "https://www.franklinautorepair.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.franklinautorepair.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "john@franklinautorepair.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-569-1639",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-urban-piping",
+      "kind": "business",
+      "slug": "urban-piping",
+      "name": "Urban Piping",
+      "title": "Urban Piping",
+      "summary": "A Calgary plumbing and heating company.",
+      "description": "Urban Piping is a Calgary plumbing and heating company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "plumber",
+        "plumbing",
+        "heating"
+      ],
+      "address": "160 Quarry Park Boulevard SE, Calgary, AB",
+      "website": "https://www.urbanpiping.com/",
+      "sources": [
+        {
+          "name": "Urban Piping official website",
+          "url": "https://www.urbanpiping.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.urbanpiping.com/"
+      },
+      "services": [
+        "Plumber",
+        "Plumbing",
+        "Heating"
+      ],
+      "email": "info@urbanpiping.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-988-3801",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-marianna-s-alterations",
+      "kind": "business",
+      "slug": "marianna-s-alterations",
+      "name": "Marianna's Alterations",
+      "title": "Marianna's Alterations",
+      "summary": "A Calgary tailoring, sewing and upholstery shop.",
+      "description": "Marianna's Alterations is a Calgary tailoring, sewing and upholstery shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tailor",
+        "alterations"
+      ],
+      "address": "10816 Macleod Trail S, Calgary, AB",
+      "website": "https://mariannasalterations.com/",
+      "sources": [
+        {
+          "name": "Marianna's Alterations official website",
+          "url": "https://mariannasalterations.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mariannasalterations.com/"
+      },
+      "services": [
+        "Tailor",
+        "Alterations"
+      ],
+      "email": "contact@mariannasalterations.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-278-2655",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-a-burst-of-colour",
+      "kind": "business",
+      "slug": "a-burst-of-colour",
+      "name": "A Burst of Colour",
+      "title": "A Burst of Colour",
+      "summary": "A Calgary painting company.",
+      "description": "A Burst of Colour is a Calgary painting company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "painter",
+        "painting"
+      ],
+      "address": "64 Brookpark Mews SW, Calgary, AB",
+      "website": "https://aburstofcolour.ca",
+      "sources": [
+        {
+          "name": "A Burst of Colour official website",
+          "url": "https://aburstofcolour.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://aburstofcolour.ca"
+      },
+      "services": [
+        "Painter",
+        "Painting"
+      ],
+      "email": "info@aburstofcolour.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-702-3470",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-movin-air-heating-and-air-conditioning-ltd",
+      "kind": "business",
+      "slug": "movin-air-heating-and-air-conditioning-ltd",
+      "name": "Movin' Air Heating & Air Conditioning Ltd.",
+      "title": "Movin' Air Heating & Air Conditioning Ltd.",
+      "summary": "A Calgary furnace, heating and air conditioning company.",
+      "description": "Movin' Air Heating & Air Conditioning Ltd. is a Calgary furnace, heating and air conditioning company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furnace",
+        "hvac",
+        "heating",
+        "air conditioning"
+      ],
+      "address": "6323 35 Street SE, Calgary, AB",
+      "website": "https://www.movinair.com/",
+      "sources": [
+        {
+          "name": "Movin' Air Heating & Air Conditioning Ltd. official website",
+          "url": "https://www.movinair.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.movinair.com/"
+      },
+      "services": [
+        "Furnace",
+        "Hvac",
+        "Heating",
+        "Air conditioning"
+      ],
+      "email": "info@movinair.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-225-6082",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-s-i-s-exterior-renovations",
+      "kind": "business",
+      "slug": "s-i-s-exterior-renovations",
+      "name": "S.I.S. Exterior Renovations",
+      "title": "S.I.S. Exterior Renovations",
+      "summary": "A Calgary roofing and exteriors company.",
+      "description": "S.I.S. Exterior Renovations is a Calgary roofing and exteriors company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "roofing",
+        "roofer",
+        "eavestrough"
+      ],
+      "address": "3517 64 Avenue SE, Calgary, AB",
+      "website": "https://www.sisltd.ca/",
+      "sources": [
+        {
+          "name": "S.I.S. Exterior Renovations official website",
+          "url": "https://www.sisltd.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sisltd.ca/"
+      },
+      "services": [
+        "Roofing",
+        "Roofer",
+        "Eavestrough"
+      ],
+      "email": "contact@sisltd.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-ramsay-animal-clinic",
+      "kind": "business",
+      "slug": "ramsay-animal-clinic",
+      "name": "Ramsay Animal Clinic",
+      "title": "Ramsay Animal Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Ramsay Animal Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "1639 17A Street SE, Calgary, AB",
+      "website": "https://ramsayanimalclinic.ca/",
+      "sources": [
+        {
+          "name": "Ramsay Animal Clinic official website",
+          "url": "https://ramsayanimalclinic.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://ramsayanimalclinic.ca/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@ramsayanimalclinic.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-587-480-8100",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bow-bottom-veterinary-hospital",
+      "kind": "business",
+      "slug": "bow-bottom-veterinary-hospital",
+      "name": "Bow Bottom Veterinary Hospital",
+      "title": "Bow Bottom Veterinary Hospital",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Bow Bottom Veterinary Hospital is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "1186 137 Avenue SE, Calgary, AB",
+      "website": "https://www.bowbottomvet.com/",
+      "sources": [
+        {
+          "name": "Bow Bottom Veterinary Hospital official website",
+          "url": "https://www.bowbottomvet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bowbottomvet.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "welcome@bowbottomvet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-278-1984",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-out-of-hand",
+      "kind": "business",
+      "slug": "out-of-hand",
+      "name": "Out of Hand",
+      "title": "Out of Hand",
+      "summary": "A Calgary tailoring, sewing and upholstery shop.",
+      "description": "Out of Hand is a Calgary tailoring, sewing and upholstery shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tailor",
+        "alterations"
+      ],
+      "address": "6449 Crowchild Trail SW, Calgary, AB",
+      "website": "https://outofhandquilting.com/",
+      "sources": [
+        {
+          "name": "Out of Hand official website",
+          "url": "https://outofhandquilting.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://outofhandquilting.com/"
+      },
+      "services": [
+        "Tailor",
+        "Alterations"
+      ],
+      "email": "hello@outofhandquilting.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-217-4871",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-little-creek-veterinary-clinic",
+      "kind": "business",
+      "slug": "little-creek-veterinary-clinic",
+      "name": "Little Creek Veterinary Clinic",
+      "title": "Little Creek Veterinary Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Little Creek Veterinary Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://www.littlecreekvet.ca/",
+      "sources": [
+        {
+          "name": "Little Creek Veterinary Clinic official website",
+          "url": "https://www.littlecreekvet.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.littlecreekvet.ca/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@littlecreekvet.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-midnapore-cat-clinic",
+      "kind": "business",
+      "slug": "midnapore-cat-clinic",
+      "name": "Midnapore Cat Clinic",
+      "title": "Midnapore Cat Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Midnapore Cat Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "22 Midlake Boulevard SE, Calgary, AB",
+      "website": "https://midnaporecat.com/",
+      "sources": [
+        {
+          "name": "Midnapore Cat Clinic official website",
+          "url": "https://midnaporecat.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://midnaporecat.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@midnaporecat.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-254-0071",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-midlake-veterinary-clinic",
+      "kind": "business",
+      "slug": "midlake-veterinary-clinic",
+      "name": "Midlake Veterinary Clinic",
+      "title": "Midlake Veterinary Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Midlake Veterinary Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "108 Shawville Place SE, Calgary, AB",
+      "website": "https://www.midlakevet.com/",
+      "sources": [
+        {
+          "name": "Midlake Veterinary Clinic official website",
+          "url": "https://www.midlakevet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.midlakevet.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@midlakevet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-256-0079",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bikebike",
+      "kind": "business",
+      "slug": "bikebike",
+      "name": "BikeBike",
+      "title": "BikeBike",
+      "summary": "A Calgary bike shop for sales, tune-ups and repairs.",
+      "description": "BikeBike is a Calgary bike shop for sales, tune-ups and repairs. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bike shop",
+        "bike repair"
+      ],
+      "address": "430 40 Avenue NE, Calgary, AB",
+      "website": "https://www.bikebike.ca/",
+      "sources": [
+        {
+          "name": "BikeBike official website",
+          "url": "https://www.bikebike.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bikebike.ca/"
+      },
+      "services": [
+        "Bike shop",
+        "Bike repair"
+      ],
+      "email": "info@bikebike.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403 457 2453",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-rascals-pet-supply-and-grooming",
+      "kind": "business",
+      "slug": "rascals-pet-supply-and-grooming",
+      "name": "Rascals Pet Supply & Grooming",
+      "title": "Rascals Pet Supply & Grooming",
+      "summary": "A Calgary pet grooming shop.",
+      "description": "Rascals Pet Supply & Grooming is a Calgary pet grooming shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "groomer",
+        "pet"
+      ],
+      "address": "3804 Edmonton Trail NE, Calgary, AB",
+      "website": "https://rascals.pet",
+      "sources": [
+        {
+          "name": "Rascals Pet Supply & Grooming official website",
+          "url": "https://rascals.pet",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://rascals.pet"
+      },
+      "services": [
+        "Groomer",
+        "Pet"
+      ],
+      "email": "info@rascals.pet",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-275-3647",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-megan-ironside-photography",
+      "kind": "business",
+      "slug": "megan-ironside-photography",
+      "name": "Megan Ironside Photography",
+      "title": "Megan Ironside Photography",
+      "summary": "A Calgary photography studio.",
+      "description": "Megan Ironside Photography is a Calgary photography studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "photographer",
+        "photography"
+      ],
+      "address": "1334 11 Avenue SW, Calgary, AB",
+      "website": "https://www.meganironside.com/",
+      "sources": [
+        {
+          "name": "Megan Ironside Photography official website",
+          "url": "https://www.meganironside.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.meganironside.com/"
+      },
+      "services": [
+        "Photographer",
+        "Photography"
+      ],
+      "email": "hello@meganironside.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-973-6334",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-tcr-bike-shop-and-fitness-centre",
+      "kind": "business",
+      "slug": "tcr-bike-shop-and-fitness-centre",
+      "name": "TCR Bike Shop & Fitness Centre",
+      "title": "TCR Bike Shop & Fitness Centre",
+      "summary": "A Calgary bike shop for sales, tune-ups and repairs.",
+      "description": "TCR Bike Shop & Fitness Centre is a Calgary bike shop for sales, tune-ups and repairs. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bike shop",
+        "bike repair"
+      ],
+      "address": "Unit A, 1817 10 Avenue SW, Calgary, AB",
+      "website": "https://www.tcrsportlab.com/",
+      "sources": [
+        {
+          "name": "TCR Bike Shop & Fitness Centre official website",
+          "url": "https://www.tcrsportlab.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tcrsportlab.com/"
+      },
+      "services": [
+        "Bike shop",
+        "Bike repair"
+      ],
+      "email": "info@tcrsportlab.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-270-9453",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-the-bike-shop",
+      "kind": "business",
+      "slug": "the-bike-shop",
+      "name": "The Bike Shop",
+      "title": "The Bike Shop",
+      "summary": "A Calgary bike shop for sales, tune-ups and repairs.",
+      "description": "The Bike Shop is a Calgary bike shop for sales, tune-ups and repairs. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bike shop",
+        "bike repair"
+      ],
+      "address": "801 11 Avenue SW, Calgary, AB",
+      "website": "https://www.thebikeshop.com",
+      "sources": [
+        {
+          "name": "The Bike Shop official website",
+          "url": "https://www.thebikeshop.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thebikeshop.com"
+      },
+      "services": [
+        "Bike shop",
+        "Bike repair"
+      ],
+      "email": "mailcentral@thebikeshop.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-264-0735",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-2c-media",
+      "kind": "business",
+      "slug": "2c-media",
+      "name": "2C Media",
+      "title": "2C Media",
+      "summary": "A Calgary photography studio.",
+      "description": "2C Media is a Calgary photography studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "photographer",
+        "photography"
+      ],
+      "address": "1048 21 Avenue SE, Calgary, AB",
+      "website": "https://www.2cmedia.ca",
+      "sources": [
+        {
+          "name": "2C Media official website",
+          "url": "https://www.2cmedia.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.2cmedia.ca"
+      },
+      "services": [
+        "Photographer",
+        "Photography"
+      ],
+      "email": "create@2cmedia.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403 680 0602",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-royal-loop-vet-clinic",
+      "kind": "business",
+      "slug": "royal-loop-vet-clinic",
+      "name": "Royal Loop Vet Clinic",
+      "title": "Royal Loop Vet Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Royal Loop Vet Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "1508 29 Avenue SW, Calgary, AB",
+      "website": "https://royalloopvet.com/",
+      "sources": [
+        {
+          "name": "Royal Loop Vet Clinic official website",
+          "url": "https://royalloopvet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://royalloopvet.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@royalloopvet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-255-0221",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-petzoic-vet-hospital",
+      "kind": "business",
+      "slug": "petzoic-vet-hospital",
+      "name": "Petzoic Vet Hospital",
+      "title": "Petzoic Vet Hospital",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Petzoic Vet Hospital is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "11501 Buffalo Run Boulevard, Calgary, AB",
+      "website": "https://petzoicvet.com/",
+      "sources": [
+        {
+          "name": "Petzoic Vet Hospital official website",
+          "url": "https://petzoicvet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://petzoicvet.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "hello@petzoicvet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-453-9111",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-calgary-cat-clinic",
+      "kind": "business",
+      "slug": "calgary-cat-clinic",
+      "name": "Calgary Cat Clinic",
+      "title": "Calgary Cat Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Calgary Cat Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "2116 Crowchild Trail NW, Calgary, AB",
+      "website": "https://www.calgarycatclinic.com/",
+      "sources": [
+        {
+          "name": "Calgary Cat Clinic official website",
+          "url": "https://www.calgarycatclinic.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarycatclinic.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "meow@calgarycatclinic.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-289-9999",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-glamorgan-animal-clinic",
+      "kind": "business",
+      "slug": "glamorgan-animal-clinic",
+      "name": "Glamorgan Animal Clinic",
+      "title": "Glamorgan Animal Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Glamorgan Animal Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "5255 Richmond Road SW, Calgary, AB",
+      "website": "https://www.glamorgananimalclinic.com/",
+      "sources": [
+        {
+          "name": "Glamorgan Animal Clinic official website",
+          "url": "https://www.glamorgananimalclinic.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.glamorgananimalclinic.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "gac@glamorgananimalclinic.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-246-1774",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-resolve-photo",
+      "kind": "business",
+      "slug": "resolve-photo",
+      "name": "Resolve Photo",
+      "title": "Resolve Photo",
+      "summary": "A Calgary photography studio.",
+      "description": "Resolve Photo is a Calgary photography studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "photographer",
+        "photography"
+      ],
+      "address": "333 36 Avenue SE, Calgary, AB",
+      "website": "https://resolvephoto.ca/",
+      "sources": [
+        {
+          "name": "Resolve Photo official website",
+          "url": "https://resolvephoto.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://resolvephoto.ca/"
+      },
+      "services": [
+        "Photographer",
+        "Photography"
+      ],
+      "email": "info@resolvephoto.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-457-5527",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-brilliant-best-friends",
+      "kind": "business",
+      "slug": "brilliant-best-friends",
+      "name": "Brilliant Best Friends",
+      "title": "Brilliant Best Friends",
+      "summary": "A Calgary pet grooming shop.",
+      "description": "Brilliant Best Friends is a Calgary pet grooming shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "groomer",
+        "pet"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://brilliantbestfriends.org",
+      "sources": [
+        {
+          "name": "Brilliant Best Friends official website",
+          "url": "https://brilliantbestfriends.org",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://brilliantbestfriends.org"
+      },
+      "services": [
+        "Groomer",
+        "Pet"
+      ],
+      "email": "info@brilliantbestfriends.org",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-454-7342",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-cranston-veterinary-hospital",
+      "kind": "business",
+      "slug": "cranston-veterinary-hospital",
+      "name": "Cranston Veterinary Hospital",
+      "title": "Cranston Veterinary Hospital",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Cranston Veterinary Hospital is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "356 Cranston Road SE, Calgary, AB",
+      "website": "https://cranstonvethospital.com/",
+      "sources": [
+        {
+          "name": "Cranston Veterinary Hospital official website",
+          "url": "https://cranstonvethospital.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cranstonvethospital.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@cranstonvethospital.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-288-7299",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-silver-springs-animal-hospital",
+      "kind": "business",
+      "slug": "silver-springs-animal-hospital",
+      "name": "Silver Springs Animal Hospital",
+      "title": "Silver Springs Animal Hospital",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Silver Springs Animal Hospital is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "5720 Silver Springs Boulevard NW, Calgary, AB",
+      "website": "https://www.silverspringsanimalhospital.ca/",
+      "sources": [
+        {
+          "name": "Silver Springs Animal Hospital official website",
+          "url": "https://www.silverspringsanimalhospital.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.silverspringsanimalhospital.ca/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@silverspringsanimalhospital.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-288-2123",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-yyc-cabinets",
+      "kind": "business",
+      "slug": "yyc-cabinets",
+      "name": "YYC Cabinets",
+      "title": "YYC Cabinets",
+      "summary": "A Calgary kitchen cabinet maker.",
+      "description": "YYC Cabinets is a Calgary kitchen cabinet maker. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "cabinets",
+        "renovations"
+      ],
+      "address": "666 Goddard Avenue NE, Calgary, AB",
+      "website": "https://yyccabinets.ca/",
+      "sources": [
+        {
+          "name": "YYC Cabinets official website",
+          "url": "https://yyccabinets.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://yyccabinets.ca/"
+      },
+      "services": [
+        "Cabinets",
+        "Renovations"
+      ],
+      "email": "info@yyccabinets.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 587-841-5243",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-signal-hill-animal-clinic",
+      "kind": "business",
+      "slug": "signal-hill-animal-clinic",
+      "name": "Signal Hill Animal Clinic",
+      "title": "Signal Hill Animal Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Signal Hill Animal Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "1919 Sirocco Drive SW, Calgary, AB",
+      "website": "https://www.signalhillanimalclinic.com/",
+      "sources": [
+        {
+          "name": "Signal Hill Animal Clinic official website",
+          "url": "https://www.signalhillanimalclinic.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.signalhillanimalclinic.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@signalhillanimalclinic.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1-403-249-3411",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-cambrian-animal-hospital",
+      "kind": "business",
+      "slug": "cambrian-animal-hospital",
+      "name": "Cambrian Animal Hospital",
+      "title": "Cambrian Animal Hospital",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Cambrian Animal Hospital is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "veterinary",
+        "pet"
+      ],
+      "address": "765 Northmount Drive NW, Calgary, AB",
+      "website": "https://www.cambriananimalhospital.com/",
+      "sources": [
+        {
+          "name": "Cambrian Animal Hospital official website",
+          "url": "https://www.cambriananimalhospital.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-20T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cambriananimalhospital.com/"
+      },
+      "services": [
+        "Vet",
+        "Veterinary",
+        "Pet"
+      ],
+      "email": "info@cambriananimalhospital.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-20T11:30:00-06:00",
+      "updatedAt": "2026-11-20T11:30:00-06:00",
+      "phone": "+1 403-457-3911",
+      "awaitingClaim": true
     }
   ],
   "occurrences": [

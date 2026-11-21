@@ -34319,6 +34319,134 @@
       "updatedAt": "2026-11-20T11:30:00-06:00",
       "phone": "+1 403-457-3911",
       "awaitingClaim": true
+    },
+    {
+      "id": "biz-chinook-blast",
+      "kind": "business",
+      "slug": "chinook-blast",
+      "title": "Chinook Blast",
+      "name": "Chinook Blast",
+      "website": "https://www.chinookblast.ca/",
+      "address": "Eau Claire Plaza, Calgary, AB",
+      "summary": "Calgary's free winter festival of lights, music and outdoor fun returns in February 2027. Dates TBD.",
+      "description": "Chinook Blast is Calgary's free winter festival, with light installations, live music, skating and outdoor activities downtown. It moved to a new home at Eau Claire Plaza for 2026. The 2027 festival is set for February, with exact dates to be announced (dates TBD). We'll list each day here as soon as the organizers publish the schedule.",
+      "categories": [
+        "festival",
+        "outdoor",
+        "family"
+      ],
+      "tags": [
+        "organizer",
+        "festival",
+        "dates tbd"
+      ],
+      "sources": [
+        {
+          "name": "Chinook Blast — official site",
+          "url": "https://www.chinookblast.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.chinookblast.ca/"
+      },
+      "services": [
+        "Winter festival",
+        "Light installations",
+        "Live music"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-21T19:15:00Z",
+      "neighbourhood": "Downtown"
+    },
+    {
+      "id": "biz-block-heater",
+      "kind": "business",
+      "slug": "block-heater",
+      "title": "Block Heater",
+      "name": "Block Heater",
+      "website": "https://calgaryfolkfest.com/block-heater/info",
+      "address": "Calgary, AB",
+      "summary": "The Calgary Folk Music Festival's winter music festival returns in February 2027. Dates TBD.",
+      "description": "Block Heater is the Calgary Folk Music Festival's winter festival: a weekend of folk, roots and indie concerts in venues around Inglewood and East Village. The 2027 edition is set for February, with exact dates to be announced (dates TBD). Shows and tickets will be listed here once the festival publishes its lineup.",
+      "categories": [
+        "music",
+        "festival"
+      ],
+      "tags": [
+        "organizer",
+        "festival",
+        "dates tbd"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Folk Music Festival — Block Heater",
+          "url": "https://calgaryfolkfest.com/block-heater/info",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryfolkfest.com/block-heater/info"
+      },
+      "services": [
+        "Winter music festival",
+        "Concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-21T19:15:00Z"
+    },
+    {
+      "id": "biz-calgary-expo",
+      "kind": "business",
+      "slug": "calgary-expo",
+      "title": "Calgary Expo",
+      "name": "Calgary Expo",
+      "website": "https://www.calgaryexpo.com/",
+      "address": "Stampede Park, Calgary, AB",
+      "summary": "Calgary Comics & Entertainment Expo, the city's biggest fan convention at Stampede Park. 2027 dates TBD.",
+      "description": "Calgary Expo is the Calgary Comics & Entertainment Expo: celebrity guests, comics, gaming, cosplay and an exhibitor floor at Stampede Park, usually in April. The 2026 show ran April 23 to 26. Dates for 2027 have not been announced yet (dates TBD); we'll list them here as soon as they are.",
+      "categories": [
+        "festival",
+        "arts"
+      ],
+      "tags": [
+        "organizer",
+        "festival",
+        "dates tbd"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Expo — official site",
+          "url": "https://www.calgaryexpo.com/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryexpo.com/"
+      },
+      "services": [
+        "Fan convention",
+        "Comics",
+        "Cosplay"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-11-21T19:15:00Z",
+      "neighbourhood": "Beltline"
     }
   ]
 }

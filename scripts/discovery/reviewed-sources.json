@@ -404,7 +404,8 @@
       "name": "Spruce Meadows",
       "approved": true,
       "hosts": [
-        "www.sprucemeadows.com"
+        "www.sprucemeadows.com",
+        "sprucemeadows.com"
       ],
       "kind": "official"
     },
@@ -509,6 +510,34 @@
               "cancelled": false
             }
           ]
+        }
+      },
+      {
+        "id": "enchanted-festival-2026",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "christmas lights",
+            "holiday",
+            "kids",
+            "date night"
+          ],
+          "categories": [
+            "family",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "Spruce Meadows",
+          "pricing": "paid",
+          "title": "Enchanted Festival at Spruce Meadows",
+          "summary": "Spruce Meadows' ticketed Christmas lights festival: an outdoor night walk, an indoor light wonderland and a roller rink, Dec. 12–23.",
+          "description": "The Enchanted Festival runs nightly from December 12 to 23, 2026, 5 to 9 p.m., at Spruce Meadows. It pairs the outdoor Enchanted Night Walk with Enchanted Wonderland inside the Equi-Plex, plus a roller rink, visits with Santa and food. Admission is by ticket; early-bird pricing runs until December 11, groups buying 4 or more tickets save another 20%, and parking is free. December 15 is sold out.\n\nBuy only through Spruce Meadows' own links or its ticket partner Showpass.",
+          "address": "18011 Spruce Meadows Way SW, Calgary, AB",
+          "venue": "Spruce Meadows",
+          "sourceUrl": "https://sprucemeadows.com/enchanted/",
+          "tickets": "https://sprucemeadows.com/enchanted/?tmenu=tickets",
+          "start": "2026-12-12T17:00:00-06:00",
+          "end": "2026-12-23T21:00:00-06:00"
         }
       }
     ]
@@ -7530,6 +7559,49 @@
           ],
           "start": "2026-11-20T11:00:00-06:00",
           "end": "2026-11-20T17:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "one-yellow-rabbit",
+      "name": "One Yellow Rabbit — High Performance Rodeo",
+      "approved": true,
+      "hosts": [
+        "www.oyr.org",
+        "oyr.org"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "high-performance-rodeo-2027",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "festival",
+            "theatre",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "theatre",
+            "music"
+          ],
+          "organizer": "One Yellow Rabbit",
+          "pricing": "paid",
+          "title": "High Performance Rodeo 2027",
+          "summary": "Calgary's three-week winter festival of live performance: theatre, dance, music, comedy and immersive shows, Jan. 15 – Feb. 6, 2027.",
+          "description": "One Yellow Rabbit's High Performance Rodeo, billed as Calgary's wildest winter festival of live performance, runs January 15 to February 6, 2027, with theatre, dance, music, comedy and immersive work across three weeks. A few listings start as early as January 13. All tickets are on sale now; shows, venues and times are on the festival's 2027 page.",
+          "address": "225 8 Avenue SE, Calgary, AB",
+          "venue": "Werklund Centre and other Calgary venues",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.oyr.org/hprodeo/2027",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true,
+          "start": "2027-01-15T00:00:00-06:00",
+          "end": "2027-02-07T00:00:00-06:00"
         }
       }
     ]

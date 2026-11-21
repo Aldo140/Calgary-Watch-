@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildEntityJsonLd, buildSitemap } from '../src/lib/discoverySeo';
 import { buildPageJsonLd, getSeoConfig } from '../src/lib/seo';
-import { DESCRIPTION_MAX, TITLE_MAX, clip, listingBlurb, listingDescription, listingTitle, relatedGroups } from '../src/lib/listingSeo';
+import { DESCRIPTION_MAX, TITLE_MAX, clip, organizerSeries, listingBlurb, listingDescription, listingTitle, relatedGroups } from '../src/lib/listingSeo';
 import { discoveryRepository } from '../src/data/discovery';
 import { entityPath } from '../src/lib/discovery';
 import { renderRouteHtml } from '../scripts/seo/rewriteHtml';
@@ -25,7 +25,7 @@ test('event titles name the date and venue, and stay short enough to show', () =
 
 test('descriptions lead with when, where and the price we hold, then the listing’s words', () => {
   const d = listingDescription(event);
-  assert.match(d, /^Wednesday, November 4, 2026, 7:30 p\.m\. at Max Bell Theatre, Downtown, Calgary\. Tickets \$35–\$90\./);
+  assert.match(d, /^Wednesday, November 4, 2026, 7:30 p\.m\. to 10:00 p\.m\. at Max Bell Theatre, Downtown, Calgary\. Tickets \$35–\$90\./);
   assert.ok(d.length <= DESCRIPTION_MAX);
   assert.doesNotMatch(listingDescription({ ...event, pricing: 'unknown', priceRange: undefined }), /Tickets|Free/);
   assert.match(listingDescription({ ...event, pricing: 'free', priceRange: undefined }), /Free\./);
@@ -81,4 +81,49 @@ test('prerendered listing pages carry breadcrumbs, facts and onward links', () =
   assert.match(html, /<dt>Phone<\/dt><dd>403-221-3708<\/dd>/);
   assert.match(html, /<h2>Upcoming events from Vertigo Theatre<\/h2>/);
   assert.match(html, /<meta name="robots" content="index, follow/);
+});
+
+// Search Console, Nov 2026: "screamfest hours", "what time does screamfest start", "screamfest 2026".
+const night = (day: number): Event => ({ ...event, id: `n${day}`, slug: `scream-${day}`, title: 'ScreamFest at Stampede Park', venue: 'GMC Stadium, Stampede Park', neighbourhood: 'Beltline', organizerEntityId: 'biz-scream', priceRange: undefined, start: `2026-10-${String(day).padStart(2, '0')}T19:00:00-06:00`, end: `2026-10-${String(day + 1).padStart(2, '0')}T00:00:00-06:00` });
+const nights = [9, 10, 16, 17, 30].map(night);
+const profile = { ...base, id: 'biz-scream', kind: 'business', slug: 'screamfest', title: 'ScreamFest', name: 'ScreamFest', summary: 'A Calgary Halloween attraction with haunted houses.', description: 'd', address: '2200 Stampede Trail SE, Calgary, AB', images: [], socials: {}, services: [], claimed: false, partner: false, editorialSelection: false, sources: event.sources } as Business;
+
+test('a 7 p.m. to midnight night is one evening, with its closing time in the snippet', () => {
+  assert.match(listingTitle(night(24)), /^ScreamFest at Stampede Park, Oct 24, 2026/);
+  assert.doesNotMatch(listingTitle(night(24)), /Oct 25/);
+  assert.match(listingDescription(night(24)), /^Saturday, October 24, 2026, 7:00 p\.m\. to midnight at GMC Stadium/);
+});
+
+test('a profile that runs one nightly attraction is its evergreen page: year in season, none after', () => {
+  const all = [profile, ...nights];
+  const inSeason = new Date('2026-10-12T12:00:00-06:00');
+  assert.equal(organizerSeries('biz-scream', all, inSeason)?.upcoming, 3);
+  assert.equal(listingTitle(profile, all, inSeason), 'ScreamFest Calgary 2026: Dates, Times & Tickets | CalgaryWatch');
+  assert.match(listingDescription(profile, [], all, inSeason), /^3 nights left, Oct 16 – Oct 30, 2026, from 7:00 p\.m\. at GMC Stadium/);
+  const after = new Date('2026-11-21T12:00:00-06:00');
+  assert.equal(listingTitle(profile, all, after), 'ScreamFest Calgary: Dates, Times & Tickets | CalgaryWatch');
+  assert.match(listingDescription(profile, [], all, after), /^The 2026 run was 5 nights, Oct 9 – Oct 30, 2026/);
+  assert.equal(organizerSeries('biz-scream', [profile, nights[0], nights[1]], inSeason), undefined, 'two nights is not a series');
+});
+
+test('weekend boards are indexed with search-shaped titles; today stays noindex', () => {
+  assert.equal(getSeoConfig('/events/this-weekend').index, true);
+  assert.match(getSeoConfig('/events/this-weekend').title, /^Things to Do in Calgary This Weekend/);
+  assert.equal(getSeoConfig('/markets/this-weekend').index, true);
+  assert.equal(getSeoConfig('/events/today').index, false);
+  assert.match(renderRouteHtml(shell, '/events/this-weekend', origin), /<h1>Things to do in Calgary this weekend\.<\/h1>/);
+});
+
+test('an ended event is noindex but keeps its links followed, so its search value reaches the organizer', () => {
+  const ended = discoveryRepository.list().find((e): e is Event => e.kind === 'event' && e.status === 'published' && Date.parse(e.end) < Date.now());
+  assert.ok(ended, 'snapshot has an ended event');
+  const config = getSeoConfig(entityPath(ended));
+  assert.equal(config.index, false);
+  assert.equal(config.follow, true);
+  assert.match(renderRouteHtml(shell, entityPath(ended), origin), /<meta name="robots" content="noindex, follow"/);
+});
+
+test('an announced festival with no dates yet is titled for "<name> 2027" searches', () => {
+  const fest = { ...profile, id: 'biz-fest', slug: 'chinook-blast', title: 'Chinook Blast', name: 'Chinook Blast', tags: ['organizer', 'dates tbd'], summary: 'Calgary’s free winter festival returns in February 2027. Dates TBD.' } as Business;
+  assert.equal(listingTitle(fest, [fest]), 'Chinook Blast Calgary 2027: Dates TBD & What to Expect | CalgaryWatch');
 });

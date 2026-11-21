@@ -55,12 +55,17 @@ const shortDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', 
 const shortDayYear = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric', year: 'numeric' });
 const longDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 const clock = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+const calgaryHour = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', hourCycle: 'h23' });
 const yearOf = (d: Date) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric' }).format(d);
 
 /** First and last calendar day of an event, respecting date-only schedules. */
 function eventDays(e: Event): { first: Date; last: Date } {
   if (e.schedulePrecision === 'date') return { first: calendarDateForDisplay(e.start), last: calendarDateForDisplay(lastEventDate(e.end)) };
-  return { first: new Date(e.start), last: new Date(e.end) };
+  const first = new Date(e.start), last = new Date(e.end);
+  // A night that runs 7 p.m. to midnight (or 1 a.m.) is one evening, not "Oct 24 – Oct 25".
+  const hours = (last.getTime() - first.getTime()) / 3600000;
+  if (hours > 0 && hours <= 12 && Number(calgaryHour.format(last)) % 24 <= 5) return { first, last: first };
+  return { first, last };
 }
 
 /** "Nov 8, 2026" or "Nov 8 – Dec 24, 2026". */
@@ -76,7 +81,10 @@ function eventWhenLong(e: Event): string {
   const { first, last } = eventDays(e);
   const a = longDay.format(first), b = longDay.format(last);
   if (e.schedulePrecision === 'date') return a === b ? a : `${a} to ${b}`;
-  return a === b ? `${a}, ${clock.format(first)}` : `${a}, ${clock.format(first)} to ${b}`;
+  // Same-evening listings name when they end too: people search "<event> hours" and "what time".
+  const end = new Date(e.end);
+  const until = !e.endTimeEstimated && Number.isFinite(end.getTime()) && end.getTime() > first.getTime() ? ` to ${clock.format(end).replace(/^12:00 a\.m\.$/, 'midnight')}` : '';
+  return a === b ? `${a}, ${clock.format(first)}${until}` : `${a}, ${clock.format(first)} to ${b}`;
 }
 
 function eventPlace(e: Event): string {
@@ -93,6 +101,45 @@ function priceLine(e: Event): string {
 }
 
 const withBrand = (core: string) => (core.length + BRAND.length <= TITLE_MAX + 6 ? core + BRAND : core);
+
+/** One attraction an organizer runs night after night: the same title, three or more dates. */
+export interface EventSeries { title: string; nights: Event[]; upcoming: number; year: string; venue: string }
+
+/**
+ * The run a profile is best known for, from its current or most recent season (the last
+ * 13 months), when most of its events are nights of one attraction. Undefined otherwise.
+ */
+export function organizerSeries(id: string, all: readonly DiscoveryEntity[], now = new Date()): EventSeries | undefined {
+  const t = now.getTime();
+  const since = t - 400 * 86400000;
+  const events = all.filter((e): e is Event => e.kind === 'event' && e.organizerEntityId === id && !e.cancelled
+    && e.status === 'published' && Number.isFinite(Date.parse(e.end)) && Date.parse(e.end) > since);
+  const byTitle = new Map<string, Event[]>();
+  for (const e of events) {
+    const key = tidy(e.title).toLowerCase();
+    byTitle.set(key, [...(byTitle.get(key) ?? []), e]);
+  }
+  const [nights] = [...byTitle.values()].sort((a, b) => b.length - a.length);
+  if (!nights || nights.length < 3 || nights.length * 2 < events.length) return undefined;
+  nights.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  const upcoming = nights.filter(e => Date.parse(e.end) > t).length;
+  const shown = upcoming ? nights.filter(e => Date.parse(e.end) > t) : nights;
+  return { title: tidy(nights[0].title), nights, upcoming, year: yearOf(new Date(shown[0].start)), venue: eventPlace(nights[0]) };
+}
+
+/** "11 nights, Oct 9 – Oct 31, 2026, from 7:00 p.m., at GMC Stadium." or the season that ended. */
+export function seriesLine(s: EventSeries, now = new Date()): string {
+  const t = now.getTime();
+  const nights = s.upcoming ? s.nights.filter(e => Date.parse(e.end) > t) : s.nights;
+  const first = nights[0], last = nights[nights.length - 1];
+  const range = shortDay.format(new Date(first.start)) === shortDay.format(new Date(last.start))
+    ? shortDayYear.format(new Date(first.start))
+    : `${shortDay.format(new Date(first.start))} – ${shortDayYear.format(new Date(last.start))}`;
+  const from = first.schedulePrecision === 'date' ? '' : `, from ${clock.format(new Date(first.start))}`;
+  const at = s.venue ? ` at ${s.venue}` : '';
+  if (!s.upcoming) return `The ${s.year} run was ${nights.length} nights, ${range}${from}${at}. Next season’s dates are added here once announced.`;
+  return `${nights.length} night${nights.length === 1 ? '' : 's'} left, ${range}${from}${at}.${priceLine(first) ? ` ${priceLine(first)}` : ''}`;
+}
 
 /** The page title for a single listing. */
 export function listingTitle(entity: DiscoveryEntity, all: readonly DiscoveryEntity[] = [], now = new Date()): string {
@@ -115,7 +162,12 @@ export function listingTitle(entity: DiscoveryEntity, all: readonly DiscoveryEnt
     }
     case 'market': {
       const suffix = hasCalgary(title) ? '' : ' (Calgary)';
-      return withBrand(fit([`${title}: Dates, Hours & Location${suffix}`, `${title}: Dates & Hours${suffix}`, `${title}${suffix}`], TITLE_MAX));
+      // Seasonal markets are searched with the year ("granary road christmas market 2026").
+      const seasonal = /christmas|holiday|winter|night market|halloween|artisan|craft/i.test(title) && !/\b20\d\d\b/.test(title);
+      const year = seasonal ? ` ${yearOf(now)}` : '';
+      return withBrand(fit([
+        ...(year ? [`${title}${year}: Dates, Hours & Location${suffix}`, `${title}${year}: Dates & Hours${suffix}`, `${title}${year}: Dates & Hours`] : []),
+        `${title}: Dates, Hours & Location${suffix}`, `${title}: Dates & Hours${suffix}`, `${title}${suffix}`], TITLE_MAX));
     }
     case 'business': {
       const hood = tidy(entity.neighbourhood);
@@ -123,7 +175,18 @@ export function listingTitle(entity: DiscoveryEntity, all: readonly DiscoveryEnt
       const named = hood && title.toLowerCase().includes(hood.toLowerCase());
       const where = hood && !named ? ` in ${hood}, Calgary` : named ? city : city ? ' in Calgary' : '';
       const upcoming = organizerEvents(entity.id, all, now.getTime()).length;
+      const series = organizerSeries(entity.id, all, now);
+      // A profile that runs one recurring attraction (ScreamFest, a light festival) is the
+      // evergreen page for it: people search "<name> hours", "<name> tickets", "<name> 2026".
+      // Off-season the year is left out, so the page keeps fitting next year's searches.
+      const year = series?.upcoming ? ` ${series.year}` : '';
+      const seriesTitles = series ? [
+        `${title}${hasCalgary(title) ? '' : ' Calgary'}${year}: Dates, Times & Tickets`,
+        `${title}${year}: Dates, Times & Tickets`,
+        `${title}${year}: Dates & Times`,
+      ] : [];
       return withBrand(fit([
+        ...seriesTitles,
         ...(upcoming ? [`${title}: Upcoming Events${where}`, `${title}: Upcoming Events${city}`] : []),
         `${title}${where}`,
         `${title}${city}`,
@@ -155,6 +218,8 @@ export function listingDescription(entity: DiscoveryEntity, occurrences: readonl
     }
     case 'business': {
       const upcoming = organizerEvents(entity.id, all, now.getTime()).length;
+      const series = organizerSeries(entity.id, all, now);
+      if (series) return clip([seriesLine(series, now), blurb].filter(Boolean).join(' '), DESCRIPTION_MAX);
       const events = upcoming ? `${upcoming} upcoming event${upcoming === 1 ? '' : 's'} listed.` : '';
       const address = tidy(entity.address);
       const at = address && address !== 'Calgary, AB' ? `${address}.` : '';

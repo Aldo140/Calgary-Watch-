@@ -2,7 +2,7 @@ import { useOrganizationLive } from '../lib/organizationLive';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-  ROBOTS_INDEX,
+  robotsFor,
   ROBOTS_NOINDEX,
   DEFAULT_IMAGE,
   buildPageJsonLd,
@@ -78,7 +78,7 @@ export default function SeoManager() {
     document.title = config.title;
 
     setMeta('description', 'name', config.description);
-    setMeta('robots', 'name', config.index ? ROBOTS_INDEX : ROBOTS_NOINDEX);
+    setMeta('robots', 'name', robotsFor(config));
 
     setMeta('og:title', 'property', config.title);
     setMeta('og:description', 'property', config.description);

@@ -59,7 +59,7 @@ describe('Discovery search and calendar', () => {
 describe('Discovery routes and presentation', () => {
   it('indexes the hubs with real content; keeps search, derived and unknown pages out', () => {
     for (const path of ['/events', '/markets', '/local', '/guides', '/neighbourhoods']) assert.equal(getSeoConfig(path).index, true, path);
-    for (const path of ['/search', '/events/missing', '/events/today', '/events/this-weekend', '/local/food']) assert.equal(getSeoConfig(path).index, false, path);
+    for (const path of ['/search', '/events/missing', '/events/today', '/local/food']) assert.equal(getSeoConfig(path).index, false, path);
     assert.ok(!/being prepared/.test(getSeoConfig('/events').description));
     assert.equal(getSeoConfig('/map').index, true);
     assert.equal(getSeoConfig('/calgary-neighbourhood-watch').index, true);

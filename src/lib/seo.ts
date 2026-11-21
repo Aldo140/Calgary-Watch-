@@ -40,6 +40,9 @@ export interface SeoConfig {
   title: string;
   description: string;
   index: boolean;
+  /** A noindex page whose links still count, e.g. an event that has ended: its link equity
+   * flows on to the organizer's evergreen profile instead of being thrown away. */
+  follow?: boolean;
   pageType: PageSchemaType;
   dateModified?: string;
   image?: string;
@@ -256,10 +259,18 @@ for (const shelf of allShelves(discoveryRepository.list())) {
     ? { title: deskTitle(shelf, SEO_YEAR), description: deskDescription(shelf), index: true, pageType: 'CollectionPage', image: DEFAULT_IMAGE, ...(deskUpdated(shelf) ? { dateModified: deskUpdated(shelf) } : {}) }
     : { title: `${s.label} in Calgary, checked | CalgaryWatch Picks`, description: `Local Calgary ${s.label.toLowerCase()}, A–Z, with what to ask on the phone and when to book. One CalgaryWatch Pick per service, vetted and never bought.`, index: false, pageType: 'CollectionPage', image: DEFAULT_IMAGE };
 }
+// "calgary events this weekend" / "things to do in calgary this weekend" are some of the biggest
+// local searches; /events ranked ~19 for them (Search Console, Nov 2026) because the weekend page
+// was noindex. The weekend boards are real, dated lists, so they are indexed (2026-11-21).
+const WEEKEND_SEO: Record<string, { title: string; description: string }> = {
+  '/events/this-weekend': { title: 'Things to Do in Calgary This Weekend: Events & Festivals | CalgaryWatch', description: 'Calgary events this weekend, Friday to Sunday: festivals, lights, shows, concerts, markets and family days out, each checked against the organizer’s own listing. Updated every day.' },
+  '/markets/this-weekend': { title: 'Calgary Markets This Weekend: Christmas & Farmers’ Markets | CalgaryWatch', description: 'Which Calgary Christmas, farmers’ and makers’ markets are open this weekend, with real dates, hours and locations, checked against each market’s own site. Updated every day.' },
+};
 ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Search a Calgary neighbourhood or street for recent reports, or find events, markets and local places.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
   ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], index: false, title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
 }
+for (const [route, seo] of Object.entries(WEEKEND_SEO)) ROUTE_SEO[route] = { ...ROUTE_SEO[route], ...seo, index: true };
 
 /** Breadcrumb entries per route for JSON-LD. */
 export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]> = {
@@ -357,7 +368,14 @@ function routeSeoConfig(pathname: string, repository: DiscoveryRepository): SeoC
   const [section, slug] = pathname.split('/').filter(Boolean);
   const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
   const entity = kind && slug ? repository.find(kind, slug) : undefined;
-  if (entity) return { title: listingTitle(entity, repository.list()), description: listingDescription(entity, repository.occurrences(), repository.list()), ...(lastChecked(entity) ? { dateModified: lastChecked(entity) } : {}), index: discoveryIndexingEnabled && INDEXED_DISCOVERY_KINDS.has(entity.kind) && indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
+  if (entity) {
+    const index = discoveryIndexingEnabled && INDEXED_DISCOVERY_KINDS.has(entity.kind) && indexableEntities([entity]).length > 0;
+    // An ended event stays out of the index, but its links (organizer profile, venue, similar
+    // events) still pass on what the page earned in search. ScreamFest's nightly pages drew 5,800+
+    // impressions in Oct 2026; with nofollow all of that was dropped when the run ended.
+    const follow = !index && entity.kind === 'event' && entity.status === 'published' && Date.parse(entity.end) <= Date.now();
+    return { title: listingTitle(entity, repository.list()), description: listingDescription(entity, repository.occurrences(), repository.list()), ...(lastChecked(entity) ? { dateModified: lastChecked(entity) } : {}), index, ...(follow ? { follow } : {}), pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
+  }
   return ROUTE_SEO[pathname] ?? { title: 'Listing unavailable | CalgaryWatch', description: 'This listing has not been published or could not be found.', index: false, pageType: 'WebPage' };
 }
 
@@ -368,6 +386,9 @@ export function pageUrlFor(pathname: string, origin: string): string {
 
 export const ROBOTS_INDEX = 'index, follow, max-image-preview:large, max-snippet:-1';
 export const ROBOTS_NOINDEX = 'noindex, nofollow';
+export const ROBOTS_NOINDEX_FOLLOW = 'noindex, follow';
+/** The robots value for a page's config. */
+export const robotsFor = (config: Pick<SeoConfig, 'index' | 'follow'>) => (config.index ? ROBOTS_INDEX : config.follow ? ROBOTS_NOINDEX_FOLLOW : ROBOTS_NOINDEX);
 
 /**
  * WebPage JSON-LD for a route. Shared so the prerendered markup and the

@@ -6,14 +6,15 @@
  */
 
 import {
-  ROBOTS_INDEX,
+  robotsFor,
   ROBOTS_NOINDEX,
   buildPageJsonLd,
   getSeoConfig,
   pageUrlFor,
 } from '../../src/lib/seo.js';
 import { discoveryRepository } from '../../src/data/discovery';
-import { DISCOVERY_SECTIONS, entityPath } from '../../src/lib/discovery';
+import { DISCOVERY_SECTIONS, entityPath, matchesPeriod } from '../../src/lib/discovery';
+import { publishedInventory } from '../../src/lib/discoveryPublication';
 import {
   GUIDE_COMPARISON,
   GUIDE_FAQS,
@@ -189,10 +190,30 @@ function hubListingsHtml(kind: DiscoveryEntity['kind'], label: string, now: Date
   return `<section><h2>${escapeText(label)} in Calgary</h2><ul>${items}</ul></section>`;
 }
 
+/** /events/this-weekend and /markets/this-weekend: what is on Friday to Sunday, soonest first. */
+function weekendListingsHtml(kind: 'event' | 'market', now: Date): string {
+  const occurrences = discoveryRepository.occurrences();
+  const weekendOf = (id: string) => occurrences.filter((o) => o.marketId === id && !o.cancelled && matchesPeriod(o.start, o.end, 'this-weekend', now)).map((o) => o.start).sort()[0];
+  const rows = discoveryRepository.list()
+    .filter((e) => e.kind === kind && publishedInventory(e, now))
+    .map((e) => ({ e, when: e.kind === 'event' ? (!e.cancelled && matchesPeriod(e.start, e.end, 'this-weekend', now) ? e.start : undefined) : weekendOf(e.id) }))
+    .filter((x): x is { e: DiscoveryEntity; when: string } => !!x.when)
+    .sort((a, b) => Date.parse(a.when) - Date.parse(b.when))
+    .slice(0, 60);
+  if (!rows.length) return '';
+  const items = rows.map(({ e, when }) => {
+    const meta = [calgaryDateTime.format(new Date(Math.max(Date.parse(when), now.getTime()))), 'venue' in e && e.venue ? e.venue : e.neighbourhood ?? ''].filter(Boolean).join(' · ');
+    return `<li>${staticLink(entityPath(e), e.title)} — ${escapeText(meta)}<br />${escapeText(e.summary)}</li>`;
+  }).join('');
+  return `<section><h2>${kind === 'event' ? 'On this weekend' : 'Open this weekend'}</h2><ul>${items}</ul></section>`;
+}
+
 /** Extra sections for routes whose page shows more than a heading and a paragraph. */
 function routeSections(pathname: string, now: Date): string {
   const hub = DISCOVERY_SECTIONS.find((section) => section.path === pathname);
   if (hub) return hubListingsHtml(hub.kind, hub.label, now);
+  if (pathname === '/events/this-weekend') return weekendListingsHtml('event', now);
+  if (pathname === '/markets/this-weekend') return weekendListingsHtml('market', now);
   switch (pathname) {
     case '/':
       return weekPlannerHtml(now);
@@ -342,6 +363,16 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
       heading: 'Calgary farmers’ markets and makers’ markets.',
       copy: 'Calgary’s farmers’ and makers’ markets with their next real dates and hours: Calgary Farmers’ Market South and West, Crossroads Market, Hillhurst Sunnyside, Bridgeland-Riverside, Farmers & Makers at cSPACE, Dalhousie, the Calgary Winter Market, Market Collective and the Spruce Meadows International Christmas Market. Dates come from each market’s own site.',
       links: [['/markets/this-weekend', 'Markets this weekend'], ['/guides', 'Calgary guides'], ['/events', 'Events']],
+    },
+    '/events/this-weekend': {
+      heading: 'Things to do in Calgary this weekend.',
+      copy: 'Calgary events from Friday to Sunday, from the organizers’ own listings: light festivals and holiday shows, theatre, concerts, markets, festivals and family days out. Every listing links back to the organizer and is checked again every day, so cancelled and past events drop off.',
+      links: [['/events/today', 'Today in Calgary'], ['/markets/this-weekend', 'Markets this weekend'], ['/date-night', 'Date night ideas'], ['/events', 'All events this week']],
+    },
+    '/markets/this-weekend': {
+      heading: 'Calgary markets open this weekend.',
+      copy: 'Which Calgary Christmas markets, farmers’ markets and makers’ markets are open this Friday to Sunday, with their real hours and locations. Dates come from each market’s own site and are checked again every day.',
+      links: [['/markets', 'All Calgary markets'], ['/events/this-weekend', 'Things to do this weekend'], ['/guides', 'Calgary guides']],
     },
     '/guides': {
       heading: 'Calgary guides.',
@@ -559,7 +590,7 @@ export function renderRouteHtml(shell: string, pathname: string, origin: string)
   if (pathname !== '/') html = html.replace(/<link[^>]*rel="preload"[^>]*as="image"[^>]*>/g, '');
   html = upsertTitle(html, config.title);
   html = upsertMeta(html, 'name', 'description', config.description);
-  html = upsertMeta(html, 'name', 'robots', config.index ? ROBOTS_INDEX : ROBOTS_NOINDEX);
+  html = upsertMeta(html, 'name', 'robots', robotsFor(config));
 
   html = upsertMeta(html, 'property', 'og:title', config.title);
   html = upsertMeta(html, 'property', 'og:description', config.description);

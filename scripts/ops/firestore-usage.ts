@@ -134,7 +134,7 @@ async function watchFunnel() {
     const x = d.data();
     if (x.authorUid && x.authorUid !== 'system' && !x.source_type) bump(Number(x.timestamp), 'resident_reports');
   }
-  const names = ['watch_opened', 'report_viewed', 'report_started', 'report_submitted'];
+  const names = ['watch_opened', 'report_viewed', 'report_gate', 'report_started', 'report_submitted'];
   const events = await db.collection('product_events').where('ts', '>=', since).select('name', 'ts').get();
   for (const d of events.docs) {
     const x = d.data();

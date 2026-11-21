@@ -1264,6 +1264,9 @@ export default function MapPage() {
    */
   const requestReport = useCallback((location: { lat: number; lng: number } | null = null) => {
     if (!user) {
+      // report_started only fires once the form opens, after sign-in, so without this the
+      // readers who gave up at the sign-in step never showed up in the funnel.
+      logProductEvent('report_gate', { pinned: location ? 1 : 0 });
       setPendingReport({ location });
       openAuthPanel('signin');
       return;

@@ -16,6 +16,8 @@ export type ProductEventName =
   | 'notification_opened'
   | 'report_viewed'
   | 'report_started'
+  /** A signed-out reader tapped a report button and was sent to sign in first (`via`: entry point). */
+  | 'report_gate'
   | 'report_submitted'
   | 'feedback_added'
   | 'digest_enabled'

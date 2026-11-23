@@ -121,8 +121,10 @@ export const MARKET_TYPES: { id: string; label: string; test: (m: Market) => boo
   { id: 'pets', label: 'Dogs welcome', test: m => !!m.petFriendly },
 ];
 
-export function directionsUrl(market: Pick<Market, 'venue' | 'address'>) {
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([market.venue, market.address].filter(Boolean).join(', '))}`;
+/** Directions to a place. A pinned spot (coordinates) wins over the street address, for entrances an address can't pin down. */
+export function directionsUrl(market: Pick<Market, 'venue' | 'address' | 'coordinates'>) {
+  const to = market.coordinates ? `${market.coordinates.lat},${market.coordinates.lng}` : [market.venue, market.address].filter(Boolean).join(', ');
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(to)}`;
 }
 
 /** Where each market sits, from its street address. Keyed by the feed's record id so it survives re-imports. */

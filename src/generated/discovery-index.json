@@ -22927,6 +22927,53 @@
       "updatedAt": "2026-11-18T04:00:00Z"
     },
     {
+      "id": "biz-crossroads-community-church",
+      "kind": "business",
+      "slug": "crossroads-community-church",
+      "title": "Crossroads Community Church",
+      "name": "Crossroads Community Church",
+      "website": "https://www.crossroads-communitychurch.org/",
+      "address": "912 19 Street NE, Calgary, AB T2E 4X7",
+      "summary": "A welcoming church in northeast Calgary, with Sunday worship at 10:30 a.m. in person and online.",
+      "description": "Crossroads Community Church at 912 19 Street NE gathers every Sunday at 10:30 a.m. for a relaxed, community-led service with a variety of worship and music, Sunday School for kids from age 3 to Grade 5, and a live online option. Its motto is a passion for God and a heart for people. This December it holds a Christmas Eve Candlelight service at 6:30 p.m.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "northeast calgary"
+      ],
+      "sources": [
+        {
+          "name": "Crossroads Community Church",
+          "url": "https://www.crossroads-communitychurch.org/",
+          "kind": "official",
+          "retrievedAt": "2026-11-23T22:45:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crossroads-communitychurch.org/"
+      },
+      "services": [
+        "Sunday worship",
+        "Livestreamed services",
+        "Sunday School",
+        "Christmas services"
+      ],
+      "phone": "403-276-1263",
+      "email": "office@crossroads-communitychurch.org",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-23T22:45:00Z",
+      "updatedAt": "2026-11-23T22:45:00Z"
+    },
+    {
       "id": "biz-calgary-first-church-of-the-nazarene",
       "kind": "business",
       "slug": "calgary-first-church-of-the-nazarene",
@@ -23268,7 +23315,7 @@
       "title": "The Bike Root",
       "name": "The Bike Root",
       "website": "https://bikeroot.ca/",
-      "address": "Arts Parkade, University of Calgary, Calgary, AB",
+      "address": "Arts Parkade (northwest corner, off University Gate NW), University of Calgary, Calgary, AB",
       "neighbourhood": "University of Calgary",
       "summary": "Volunteer-run community DIY bicycle workshop at the University of Calgary, with repair tools, refurbished bikes and parts.",
       "description": "The Bike Root is a volunteer-run community DIY bike workshop based in the northwest corner of the Arts Parkade at the University of Calgary. Members can use the space and tools for bicycle maintenance and repairs; the group also sells refurbished bikes, parts and accessories, and welcomes volunteers. The volunteer-managed schedule can change, so check Bike Root's website for current hours and access instructions before visiting.",
@@ -23316,7 +23363,11 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-11-20T18:00:00Z",
-      "updatedAt": "2026-11-20T18:00:00Z"
+      "updatedAt": "2026-11-23T22:45:00Z",
+      "coordinates": {
+        "lat": 51.07532,
+        "lng": -114.13104
+      }
     },
     {
       "id": "biz-floors-on-crowfoot",

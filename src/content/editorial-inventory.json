@@ -34447,6 +34447,3975 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-21T19:15:00Z",
       "neighbourhood": "Beltline"
+    },
+    {
+      "id": "biz-tuscany-dental",
+      "kind": "business",
+      "slug": "tuscany-dental",
+      "name": "Tuscany Dental",
+      "title": "Tuscany Dental",
+      "summary": "A Calgary dental clinic.",
+      "description": "Tuscany Dental is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "11300 Tuscany Boulevard NW, Calgary, AB",
+      "website": "https://tuscanydental.com/",
+      "sources": [
+        {
+          "name": "Tuscany Dental official website",
+          "url": "https://tuscanydental.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://tuscanydental.com/"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "info@tuscanydental.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-239-0010",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-the-doctrine-training",
+      "kind": "business",
+      "slug": "the-doctrine-training",
+      "name": "The Doctrine Training",
+      "title": "The Doctrine Training",
+      "summary": "A Calgary cycling training studio.",
+      "description": "The Doctrine Training is a Calgary cycling training studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "cycling training",
+        "bike fitting"
+      ],
+      "address": "1053 10 Street SW, Calgary, AB",
+      "website": "https://thedoctrine.ca/",
+      "sources": [
+        {
+          "name": "The Doctrine Training official website",
+          "url": "https://thedoctrine.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thedoctrine.ca/"
+      },
+      "services": [
+        "Cycling training",
+        "Bike fitting"
+      ],
+      "email": "trev@thedoctrine.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-fish-creek-24hr-pet-hospital",
+      "kind": "business",
+      "slug": "fish-creek-24hr-pet-hospital",
+      "name": "Fish Creek 24hr Pet Hospital",
+      "title": "Fish Creek 24hr Pet Hospital",
+      "summary": "A Calgary 24-hour pet hospital.",
+      "description": "Fish Creek 24hr Pet Hospital is a Calgary 24-hour pet hospital. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "emergency vet"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://www.fishcreekpethospital.com/",
+      "sources": [
+        {
+          "name": "Fish Creek 24hr Pet Hospital official website",
+          "url": "https://www.fishcreekpethospital.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.fishcreekpethospital.com/"
+      },
+      "services": [
+        "Vet",
+        "Emergency vet"
+      ],
+      "email": "info@fishcreekpethospital.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-flower-chix",
+      "kind": "business",
+      "slug": "flower-chix",
+      "name": "Flower Chix",
+      "title": "Flower Chix",
+      "summary": "A Calgary florist.",
+      "description": "Flower Chix is a Calgary florist. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "florist",
+        "flowers"
+      ],
+      "address": "1919 Southland Drive SW, Calgary, AB",
+      "website": "https://www.flowerchix.com/",
+      "sources": [
+        {
+          "name": "Flower Chix official website",
+          "url": "https://www.flowerchix.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.flowerchix.com/"
+      },
+      "services": [
+        "Florist",
+        "Flowers"
+      ],
+      "email": "info@flowerchix.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-984-4260",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-stanley-accounting",
+      "kind": "business",
+      "slug": "stanley-accounting",
+      "name": "Stanley Accounting",
+      "title": "Stanley Accounting",
+      "summary": "An Calgary accounting firm.",
+      "description": "Stanley Accounting is an Calgary accounting firm. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "accountant",
+        "tax prep"
+      ],
+      "address": "5005 Dalhousie Drive NW, Calgary, AB",
+      "website": "https://www.stanleyaccounting.ca/",
+      "sources": [
+        {
+          "name": "Stanley Accounting official website",
+          "url": "https://www.stanleyaccounting.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.stanleyaccounting.ca/"
+      },
+      "services": [
+        "Accountant",
+        "Tax prep"
+      ],
+      "email": "info@stanleyaccounting.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-expressions-dental",
+      "kind": "business",
+      "slug": "expressions-dental",
+      "name": "Expressions Dental",
+      "title": "Expressions Dental",
+      "summary": "A Calgary dental clinic.",
+      "description": "Expressions Dental is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "41 Crowfoot Rise NW, Calgary, AB",
+      "website": "https://expressionsdental.ca/",
+      "sources": [
+        {
+          "name": "Expressions Dental official website",
+          "url": "https://expressionsdental.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://expressionsdental.ca/"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "info@expressionsdental.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-848-8295",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-yoga-and-meditation-centre",
+      "kind": "business",
+      "slug": "yoga-and-meditation-centre",
+      "name": "Yoga and Meditation Centre",
+      "title": "Yoga and Meditation Centre",
+      "summary": "A Calgary yoga and meditation studio.",
+      "description": "Yoga and Meditation Centre is a Calgary yoga and meditation studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "yoga",
+        "meditation"
+      ],
+      "address": "2028B 33 Avenue SW, Calgary, AB",
+      "website": "https://www.yogamcc.com/",
+      "sources": [
+        {
+          "name": "Yoga and Meditation Centre official website",
+          "url": "https://www.yogamcc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.yogamcc.com/"
+      },
+      "services": [
+        "Yoga",
+        "Meditation"
+      ],
+      "email": "info@yogamcc.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-251-9642",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-petals-n-blooms",
+      "kind": "business",
+      "slug": "petals-n-blooms",
+      "name": "Petals 'N Blooms",
+      "title": "Petals 'N Blooms",
+      "summary": "A Calgary florist.",
+      "description": "Petals 'N Blooms is a Calgary florist. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "florist",
+        "flowers"
+      ],
+      "address": "4820 Northland Drive NW, Calgary, AB",
+      "website": "https://www.calgaryflowers.net/",
+      "sources": [
+        {
+          "name": "Petals 'N Blooms official website",
+          "url": "https://www.calgaryflowers.net/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryflowers.net/"
+      },
+      "services": [
+        "Florist",
+        "Flowers"
+      ],
+      "email": "pnb@flowerscalgary.net",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-220-0123",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-lucky-granite",
+      "kind": "business",
+      "slug": "lucky-granite",
+      "name": "Lucky Granite",
+      "title": "Lucky Granite",
+      "summary": "A Calgary countertop and stone company.",
+      "description": "Lucky Granite is a Calgary countertop and stone company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "countertops",
+        "granite",
+        "quartz"
+      ],
+      "address": "4632 1 Street SE, Calgary, AB",
+      "website": "https://luckygraniteonline.com/",
+      "sources": [
+        {
+          "name": "Lucky Granite official website",
+          "url": "https://luckygraniteonline.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://luckygraniteonline.com/"
+      },
+      "services": [
+        "Countertops",
+        "Granite",
+        "Quartz"
+      ],
+      "email": "info@luckygraniteonline.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-802-1188",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-couch9",
+      "kind": "business",
+      "slug": "couch9",
+      "name": "Couch9",
+      "title": "Couch9",
+      "summary": "A Calgary furniture and mattress store.",
+      "description": "Couch9 is a Calgary furniture and mattress store. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furniture",
+        "mattresses"
+      ],
+      "address": "8180 11 Street SE, Calgary, AB",
+      "website": "https://couch9.ca/",
+      "sources": [
+        {
+          "name": "Couch9 official website",
+          "url": "https://couch9.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://couch9.ca/"
+      },
+      "services": [
+        "Furniture",
+        "Mattresses"
+      ],
+      "email": "sales@couch9.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-452-4722",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-a-1-affordable-locksmiths",
+      "kind": "business",
+      "slug": "a-1-affordable-locksmiths",
+      "name": "A-1 Affordable Locksmiths",
+      "title": "A-1 Affordable Locksmiths",
+      "summary": "A Calgary locksmith.",
+      "description": "A-1 Affordable Locksmiths is a Calgary locksmith. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "locksmith",
+        "locks"
+      ],
+      "address": "4114 Macleod Trail SE, Calgary, AB",
+      "website": "https://www.affordablelocksmiths.com/",
+      "sources": [
+        {
+          "name": "A-1 Affordable Locksmiths official website",
+          "url": "https://www.affordablelocksmiths.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.affordablelocksmiths.com/"
+      },
+      "services": [
+        "Locksmith",
+        "Locks"
+      ],
+      "email": "info@affordablelocksmiths.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-272-8923",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-wow-electric-rides",
+      "kind": "business",
+      "slug": "wow-electric-rides",
+      "name": "Wow Electric Rides",
+      "title": "Wow Electric Rides",
+      "summary": "An Calgary e-bike and scooter shop.",
+      "description": "Wow Electric Rides is an Calgary e-bike and scooter shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "e-bikes",
+        "scooters"
+      ],
+      "address": "8180 11 Street SE, Calgary, AB",
+      "website": "https://wowentertainmentforlife.ca/",
+      "sources": [
+        {
+          "name": "Wow Electric Rides official website",
+          "url": "https://wowentertainmentforlife.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wowentertainmentforlife.ca/"
+      },
+      "services": [
+        "E-bikes",
+        "Scooters"
+      ],
+      "email": "info@wowerides.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-452-9892",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-willowridge-auto-service",
+      "kind": "business",
+      "slug": "willowridge-auto-service",
+      "name": "Willowridge Auto Service",
+      "title": "Willowridge Auto Service",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Willowridge Auto Service is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "9900 Fairmount Drive SE, Calgary, AB",
+      "website": "https://willowridgeauto.mechanicnet.com/",
+      "sources": [
+        {
+          "name": "Willowridge Auto Service official website",
+          "url": "https://willowridgeauto.mechanicnet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://willowridgeauto.mechanicnet.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "willowridgeauto@mechanicnet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-271-2717",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-dental-choice-macleod",
+      "kind": "business",
+      "slug": "dental-choice-macleod",
+      "name": "Dental Choice Macleod",
+      "title": "Dental Choice Macleod",
+      "summary": "A Calgary dental clinic.",
+      "description": "Dental Choice Macleod is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "9737 Macleod Trail S, Calgary, AB",
+      "website": "https://www.dentalchoice.ca/locations/calgary/macleod-dental-choice/",
+      "sources": [
+        {
+          "name": "Dental Choice Macleod official website",
+          "url": "https://www.dentalchoice.ca/locations/calgary/macleod-dental-choice/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.dentalchoice.ca/locations/calgary/macleod-dental-choice/"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "mel@dentalchoice.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-262-3035",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-gypsy-rose-florist",
+      "kind": "business",
+      "slug": "gypsy-rose-florist",
+      "name": "Gypsy Rose Florist",
+      "title": "Gypsy Rose Florist",
+      "summary": "A Calgary florist.",
+      "description": "Gypsy Rose Florist is a Calgary florist. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "florist",
+        "flowers"
+      ],
+      "address": "1600 90 Avenue SW, Calgary, AB",
+      "website": "https://www.gypsyroseflowershop.com/",
+      "sources": [
+        {
+          "name": "Gypsy Rose Florist official website",
+          "url": "https://www.gypsyroseflowershop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.gypsyroseflowershop.com/"
+      },
+      "services": [
+        "Florist",
+        "Flowers"
+      ],
+      "email": "gypsyroseflorist@shaw.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-255-1010",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-haysboro-dental-care",
+      "kind": "business",
+      "slug": "haysboro-dental-care",
+      "name": "Haysboro Dental Care",
+      "title": "Haysboro Dental Care",
+      "summary": "A Calgary dental clinic.",
+      "description": "Haysboro Dental Care is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "8421 Elbow Drive SW, Calgary, AB",
+      "website": "https://haysborodentalcare.ca/",
+      "sources": [
+        {
+          "name": "Haysboro Dental Care official website",
+          "url": "https://haysborodentalcare.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://haysborodentalcare.ca/"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "info@haysborodentalcare.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-252-7731",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-glamorgan-bakery",
+      "kind": "business",
+      "slug": "glamorgan-bakery",
+      "name": "Glamorgan Bakery",
+      "title": "Glamorgan Bakery",
+      "summary": "A Calgary bakery.",
+      "description": "Glamorgan Bakery is a Calgary bakery. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bakery",
+        "custom cakes"
+      ],
+      "address": "3919 Richmond Road SW, Calgary, AB",
+      "website": "https://glamorganbakery.com/",
+      "sources": [
+        {
+          "name": "Glamorgan Bakery official website",
+          "url": "https://glamorganbakery.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://glamorganbakery.com/"
+      },
+      "services": [
+        "Bakery",
+        "Custom cakes"
+      ],
+      "email": "info@glamorganbakery.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-242-2800",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-37th-street-barber-shop",
+      "kind": "business",
+      "slug": "37th-street-barber-shop",
+      "name": "37th Street Barber Shop",
+      "title": "37th Street Barber Shop",
+      "summary": "A Calgary barbershop.",
+      "description": "37th Street Barber Shop is a Calgary barbershop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "barber",
+        "haircuts"
+      ],
+      "address": "4604 37 Street SW, Calgary, AB",
+      "website": "https://www.37stbarbershop.com/",
+      "sources": [
+        {
+          "name": "37th Street Barber Shop official website",
+          "url": "https://www.37stbarbershop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.37stbarbershop.com/"
+      },
+      "services": [
+        "Barber",
+        "Haircuts"
+      ],
+      "email": "touchfinest@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-719-0208",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-wow-lighting-and-controls",
+      "kind": "business",
+      "slug": "wow-lighting-and-controls",
+      "name": "WOW Lighting & Controls",
+      "title": "WOW Lighting & Controls",
+      "summary": "A Calgary lighting company.",
+      "description": "WOW Lighting & Controls is a Calgary lighting company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "lighting",
+        "smart home"
+      ],
+      "address": "4467 104 Avenue SE, Calgary, AB",
+      "website": "https://wowlighting.com/",
+      "sources": [
+        {
+          "name": "WOW Lighting & Controls official website",
+          "url": "https://wowlighting.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wowlighting.com/"
+      },
+      "services": [
+        "Lighting",
+        "Smart home"
+      ],
+      "email": "info@wowlighting.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-266-6249",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-al-fraches-flowers",
+      "kind": "business",
+      "slug": "al-fraches-flowers",
+      "name": "Al Frache's Flowers",
+      "title": "Al Frache's Flowers",
+      "summary": "A Calgary florist.",
+      "description": "Al Frache's Flowers is a Calgary florist. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "florist",
+        "flowers"
+      ],
+      "address": "3505 18 Street SW, Calgary, AB",
+      "website": "https://alfrachesflowers.com/",
+      "sources": [
+        {
+          "name": "Al Frache's Flowers official website",
+          "url": "https://alfrachesflowers.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://alfrachesflowers.com/"
+      },
+      "services": [
+        "Florist",
+        "Flowers"
+      ],
+      "email": "alfrachesflowers@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-777-0080",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-sugarstream",
+      "kind": "business",
+      "slug": "sugarstream",
+      "name": "SugarStream",
+      "title": "SugarStream",
+      "summary": "A Calgary bakery.",
+      "description": "SugarStream is a Calgary bakery. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bakery",
+        "custom cakes"
+      ],
+      "address": "2133 33 Avenue SW, Calgary, AB",
+      "website": "https://sugarstreamyyc.com/",
+      "sources": [
+        {
+          "name": "SugarStream official website",
+          "url": "https://sugarstreamyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://sugarstreamyyc.com/"
+      },
+      "services": [
+        "Bakery",
+        "Custom cakes"
+      ],
+      "email": "sugarstreamyyc@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-742-7888",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-ridleys-cycle",
+      "kind": "business",
+      "slug": "ridleys-cycle",
+      "name": "Ridley's Cycle",
+      "title": "Ridley's Cycle",
+      "summary": "A Calgary bike shop.",
+      "description": "Ridley's Cycle is a Calgary bike shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bike shop",
+        "bike repair"
+      ],
+      "address": "223 10 Street NW, Calgary, AB",
+      "website": "https://www.ridleys.com/",
+      "sources": [
+        {
+          "name": "Ridley's Cycle official website",
+          "url": "https://www.ridleys.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ridleys.com/"
+      },
+      "services": [
+        "Bike shop",
+        "Bike repair"
+      ],
+      "email": "westhillsinfo@ridleys.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-283-1421",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-kingsview-dental",
+      "kind": "business",
+      "slug": "kingsview-dental",
+      "name": "Kingsview Dental",
+      "title": "Kingsview Dental",
+      "summary": "A Calgary dental clinic.",
+      "description": "Kingsview Dental is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "1032 17 Avenue SW, Calgary, AB",
+      "website": "https://www.kingsviewdental.ca/calgary/",
+      "sources": [
+        {
+          "name": "Kingsview Dental official website",
+          "url": "https://www.kingsviewdental.ca/calgary/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kingsviewdental.ca/calgary/"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "info@kingsviewdental.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-602-0292",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-old-street-optometry",
+      "kind": "business",
+      "slug": "old-street-optometry",
+      "name": "Old Street Optometry",
+      "title": "Old Street Optometry",
+      "summary": "An Calgary optometry clinic.",
+      "description": "Old Street Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "4825 Mount Royal Gate SW, Calgary, AB",
+      "website": "https://oldst.ca",
+      "sources": [
+        {
+          "name": "Old Street Optometry official website",
+          "url": "https://oldst.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://oldst.ca"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "info@oldst.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-764-4825",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-everthine-bridal-consignment-boutique",
+      "kind": "business",
+      "slug": "everthine-bridal-consignment-boutique",
+      "name": "Everthine Bridal Consignment Boutique",
+      "title": "Everthine Bridal Consignment Boutique",
+      "summary": "A Calgary bridal consignment boutique.",
+      "description": "Everthine Bridal Consignment Boutique is a Calgary bridal consignment boutique. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bridal",
+        "wedding dresses"
+      ],
+      "address": "1111 3 Street SE, Calgary, AB",
+      "website": "https://www.everthineboutique.ca/",
+      "sources": [
+        {
+          "name": "Everthine Bridal Consignment Boutique official website",
+          "url": "https://www.everthineboutique.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.everthineboutique.ca/"
+      },
+      "services": [
+        "Bridal",
+        "Wedding dresses"
+      ],
+      "email": "info@everthineboutique.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-452-0603",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-the-hitch-shop",
+      "kind": "business",
+      "slug": "the-hitch-shop",
+      "name": "The Hitch Shop",
+      "title": "The Hitch Shop",
+      "summary": "A Calgary trailer hitch shop.",
+      "description": "The Hitch Shop is a Calgary trailer hitch shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "trailer hitches",
+        "auto accessories"
+      ],
+      "address": "464 42 Avenue SE, Calgary, AB",
+      "website": "https://calgary-hitchshop.ca/",
+      "sources": [
+        {
+          "name": "The Hitch Shop official website",
+          "url": "https://calgary-hitchshop.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgary-hitchshop.ca/"
+      },
+      "services": [
+        "Trailer hitches",
+        "Auto accessories"
+      ],
+      "email": "darrengardner04@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-287-3566",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-elite-wheel-repair",
+      "kind": "business",
+      "slug": "elite-wheel-repair",
+      "name": "Elite Wheel Repair",
+      "title": "Elite Wheel Repair",
+      "summary": "A Calgary wheel repair shop.",
+      "description": "Elite Wheel Repair is a Calgary wheel repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "wheel repair",
+        "auto body"
+      ],
+      "address": "414 36 Avenue SE, Calgary, AB",
+      "website": "https://elitewheelrepair.ca/",
+      "sources": [
+        {
+          "name": "Elite Wheel Repair official website",
+          "url": "https://elitewheelrepair.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://elitewheelrepair.ca/"
+      },
+      "services": [
+        "Wheel repair",
+        "Auto body"
+      ],
+      "email": "info@elitewheelrepair.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-926-2995",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-parry-bros-lock-and-safe",
+      "kind": "business",
+      "slug": "parry-bros-lock-and-safe",
+      "name": "Parry Bros. Lock & Safe",
+      "title": "Parry Bros. Lock & Safe",
+      "summary": "A Calgary locksmith.",
+      "description": "Parry Bros. Lock & Safe is a Calgary locksmith. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "locksmith",
+        "locks"
+      ],
+      "address": "1318 11 Avenue SW, Calgary, AB",
+      "website": "https://www.parrybros.com/",
+      "sources": [
+        {
+          "name": "Parry Bros. Lock & Safe official website",
+          "url": "https://www.parrybros.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.parrybros.com/"
+      },
+      "services": [
+        "Locksmith",
+        "Locks"
+      ],
+      "email": "parrybroslock@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-245-6666",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-almond-nail-bar",
+      "kind": "business",
+      "slug": "almond-nail-bar",
+      "name": "Almond Nail Bar",
+      "title": "Almond Nail Bar",
+      "summary": "A Calgary nail salon.",
+      "description": "Almond Nail Bar is a Calgary nail salon. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "nails",
+        "manicure"
+      ],
+      "address": "3925 University Avenue NW, Calgary, AB",
+      "website": "https://almondnailbar.com/",
+      "sources": [
+        {
+          "name": "Almond Nail Bar official website",
+          "url": "https://almondnailbar.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://almondnailbar.com/"
+      },
+      "services": [
+        "Nails",
+        "Manicure"
+      ],
+      "email": "info@almondnailbar.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-radiance-day-spa",
+      "kind": "business",
+      "slug": "radiance-day-spa",
+      "name": "Radiance Day Spa",
+      "title": "Radiance Day Spa",
+      "summary": "A Calgary day spa and esthetics clinic.",
+      "description": "Radiance Day Spa is a Calgary day spa and esthetics clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "spa",
+        "skincare"
+      ],
+      "address": "1528 9 Avenue SE, Calgary, AB",
+      "website": "https://www.radiancedayspayyc.com/",
+      "sources": [
+        {
+          "name": "Radiance Day Spa official website",
+          "url": "https://www.radiancedayspayyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.radiancedayspayyc.com/"
+      },
+      "services": [
+        "Spa",
+        "Skincare"
+      ],
+      "email": "radiancedayspa@hotmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-923-3787",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-easy-optometry",
+      "kind": "business",
+      "slug": "easy-optometry",
+      "name": "Easy Optometry",
+      "title": "Easy Optometry",
+      "summary": "An Calgary optometry clinic.",
+      "description": "Easy Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "125 Oakmoor Place SW, Calgary, AB",
+      "website": "https://easyoptometry.com/locations/oakridge/",
+      "sources": [
+        {
+          "name": "Easy Optometry official website",
+          "url": "https://easyoptometry.com/locations/oakridge/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://easyoptometry.com/locations/oakridge/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "hello@easyoptometry.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-300-3939",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-performance-cycle-and-auto",
+      "kind": "business",
+      "slug": "performance-cycle-and-auto",
+      "name": "Performance Cycle & Auto",
+      "title": "Performance Cycle & Auto",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Performance Cycle & Auto is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "114 Forge Road SE, Calgary, AB",
+      "website": "https://www.pcacanada.ca/",
+      "sources": [
+        {
+          "name": "Performance Cycle & Auto official website",
+          "url": "https://www.pcacanada.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.pcacanada.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "pcacanada@shaw.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-eyecare-plus",
+      "kind": "business",
+      "slug": "eyecare-plus",
+      "name": "Eyecare Plus",
+      "title": "Eyecare Plus",
+      "summary": "An Calgary optometry clinic.",
+      "description": "Eyecare Plus is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "5255 Richmond Road SW, Calgary, AB",
+      "website": "https://eyecareplus.ca/",
+      "sources": [
+        {
+          "name": "Eyecare Plus official website",
+          "url": "https://eyecareplus.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://eyecareplus.ca/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "ep2richmond@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-685-2020",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-trinity-hills-24hr-pet-hospital",
+      "kind": "business",
+      "slug": "trinity-hills-24hr-pet-hospital",
+      "name": "Trinity Hills 24hr Pet Hospital",
+      "title": "Trinity Hills 24hr Pet Hospital",
+      "summary": "A Calgary 24-hour pet hospital.",
+      "description": "Trinity Hills 24hr Pet Hospital is a Calgary 24-hour pet hospital. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "emergency vet"
+      ],
+      "address": "240 Na'a Plaza SW, Calgary, AB",
+      "website": "https://www.thph.ca/",
+      "sources": [
+        {
+          "name": "Trinity Hills 24hr Pet Hospital official website",
+          "url": "https://www.thph.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.thph.ca/"
+      },
+      "services": [
+        "Vet",
+        "Emergency vet"
+      ],
+      "email": "info@thph.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-233-2888",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-next-level-tires",
+      "kind": "business",
+      "slug": "next-level-tires",
+      "name": "Next Level Tires",
+      "title": "Next Level Tires",
+      "summary": "A Calgary tire shop.",
+      "description": "Next Level Tires is a Calgary tire shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tires",
+        "mechanic"
+      ],
+      "address": "2116 25 Avenue NE, Calgary, AB",
+      "website": "https://nextleveltires.ca/",
+      "sources": [
+        {
+          "name": "Next Level Tires official website",
+          "url": "https://nextleveltires.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://nextleveltires.ca/"
+      },
+      "services": [
+        "Tires",
+        "Mechanic"
+      ],
+      "email": "nextlvltires@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-891-8922",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-stone-selection",
+      "kind": "business",
+      "slug": "stone-selection",
+      "name": "Stone Selection",
+      "title": "Stone Selection",
+      "summary": "A Calgary countertop and stone company.",
+      "description": "Stone Selection is a Calgary countertop and stone company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "countertops",
+        "granite",
+        "quartz"
+      ],
+      "address": "1240 26 Avenue SE, Calgary, AB",
+      "website": "https://stoneselection.ca/",
+      "sources": [
+        {
+          "name": "Stone Selection official website",
+          "url": "https://stoneselection.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://stoneselection.ca/"
+      },
+      "services": [
+        "Countertops",
+        "Granite",
+        "Quartz"
+      ],
+      "email": "info@stoneselection.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-214-2363",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-saltillo-tile-calgary",
+      "kind": "business",
+      "slug": "saltillo-tile-calgary",
+      "name": "Saltillo Tile Calgary",
+      "title": "Saltillo Tile Calgary",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "Saltillo Tile Calgary is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "tile"
+      ],
+      "address": "1212 26 Avenue SE, Calgary, AB",
+      "website": "https://saltillocalgary.ca/",
+      "sources": [
+        {
+          "name": "Saltillo Tile Calgary official website",
+          "url": "https://saltillocalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://saltillocalgary.ca/"
+      },
+      "services": [
+        "Flooring",
+        "Tile"
+      ],
+      "email": "info@saltillocalgary.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-287-2100",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-academy-hearing-centre",
+      "kind": "business",
+      "slug": "academy-hearing-centre",
+      "name": "Academy Hearing Centre",
+      "title": "Academy Hearing Centre",
+      "summary": "A Calgary hearing clinic.",
+      "description": "Academy Hearing Centre is a Calgary hearing clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "hearing tests",
+        "hearing aids"
+      ],
+      "address": "3630 Brentwood Road NW, Calgary, AB",
+      "website": "https://academyhearing.ca/",
+      "sources": [
+        {
+          "name": "Academy Hearing Centre official website",
+          "url": "https://academyhearing.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://academyhearing.ca/"
+      },
+      "services": [
+        "Hearing tests",
+        "Hearing aids"
+      ],
+      "email": "info@academyhearing.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-210-2482",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-leader-auto-service",
+      "kind": "business",
+      "slug": "leader-auto-service",
+      "name": "Leader Auto Service",
+      "title": "Leader Auto Service",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Leader Auto Service is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "2404 4 Street NW, Calgary, AB",
+      "website": "https://www.leaderautoservice.com",
+      "sources": [
+        {
+          "name": "Leader Auto Service official website",
+          "url": "https://www.leaderautoservice.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.leaderautoservice.com"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "leader_autoservice@hotmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-276-6669",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-arthouse-collective",
+      "kind": "business",
+      "slug": "arthouse-collective",
+      "name": "Arthouse Collective",
+      "title": "Arthouse Collective",
+      "summary": "A Calgary tattoo studio.",
+      "description": "Arthouse Collective is a Calgary tattoo studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tattoo",
+        "piercing"
+      ],
+      "address": "330 10 Street NW, Calgary, AB",
+      "website": "https://www.arthousecollective.ca/",
+      "sources": [
+        {
+          "name": "Arthouse Collective official website",
+          "url": "https://www.arthousecollective.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.arthousecollective.ca/"
+      },
+      "services": [
+        "Tattoo",
+        "Piercing"
+      ],
+      "email": "arthousecollectiveyyc@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 825-735-2883",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-dog-town-grooming-yyc",
+      "kind": "business",
+      "slug": "dog-town-grooming-yyc",
+      "name": "Dog Town Grooming YYC",
+      "title": "Dog Town Grooming YYC",
+      "summary": "A Calgary dog grooming salon.",
+      "description": "Dog Town Grooming YYC is a Calgary dog grooming salon. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "groomer",
+        "dog grooming"
+      ],
+      "address": "2832 Morley Trail NW, Calgary, AB",
+      "website": "https://www.dogtowngroomingyyc.ca/",
+      "sources": [
+        {
+          "name": "Dog Town Grooming YYC official website",
+          "url": "https://www.dogtowngroomingyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.dogtowngroomingyyc.ca/"
+      },
+      "services": [
+        "Groomer",
+        "Dog grooming"
+      ],
+      "email": "dogtowngroomingyyc@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-391-9341",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-electronics-planet",
+      "kind": "business",
+      "slug": "electronics-planet",
+      "name": "Electronics Planet",
+      "title": "Electronics Planet",
+      "summary": "A Calgary phone repair shop.",
+      "description": "Electronics Planet is a Calgary phone repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "phone repair"
+      ],
+      "address": "150 Crowfoot Crescent NW, Calgary, AB",
+      "website": "https://electronicsplanetyyc.com",
+      "sources": [
+        {
+          "name": "Electronics Planet official website",
+          "url": "https://electronicsplanetyyc.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://electronicsplanetyyc.com"
+      },
+      "services": [
+        "Phone repair"
+      ],
+      "email": "electronicsplanetyyc@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-349-2550",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-total-image-interiors",
+      "kind": "business",
+      "slug": "total-image-interiors",
+      "name": "Total Image Interiors",
+      "title": "Total Image Interiors",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "Total Image Interiors is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "tile"
+      ],
+      "address": "7012 Fisher Road SE, Calgary, AB",
+      "website": "https://totalimageinterior.com/",
+      "sources": [
+        {
+          "name": "Total Image Interiors official website",
+          "url": "https://totalimageinterior.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://totalimageinterior.com/"
+      },
+      "services": [
+        "Flooring",
+        "Tile"
+      ],
+      "email": "christina@totalimageinterior.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-640-1618",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-viva-musica-academy-of-performing-arts",
+      "kind": "business",
+      "slug": "viva-musica-academy-of-performing-arts",
+      "name": "Viva Musica Academy of Performing Arts",
+      "title": "Viva Musica Academy of Performing Arts",
+      "summary": "A Calgary music and performing arts school.",
+      "description": "Viva Musica Academy of Performing Arts is a Calgary music and performing arts school. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "music lessons",
+        "performing arts"
+      ],
+      "address": "500 Royal Oak Drive NW, Calgary, AB",
+      "website": "https://www.vivamusicastudio.ca",
+      "sources": [
+        {
+          "name": "Viva Musica Academy of Performing Arts official website",
+          "url": "https://www.vivamusicastudio.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.vivamusicastudio.ca"
+      },
+      "services": [
+        "Music lessons",
+        "Performing arts"
+      ],
+      "email": "info@vivamusicastudio.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-374-0833",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-village-vet-animal-clinic",
+      "kind": "business",
+      "slug": "village-vet-animal-clinic",
+      "name": "Village Vet Animal Clinic",
+      "title": "Village Vet Animal Clinic",
+      "summary": "A Calgary veterinary clinic.",
+      "description": "Village Vet Animal Clinic is a Calgary veterinary clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "vet",
+        "pet care"
+      ],
+      "address": "2102 14 Street NW, Calgary, AB",
+      "website": "https://village-vet.ca/",
+      "sources": [
+        {
+          "name": "Village Vet Animal Clinic official website",
+          "url": "https://village-vet.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://village-vet.ca/"
+      },
+      "services": [
+        "Vet",
+        "Pet care"
+      ],
+      "email": "info@village-vet.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-800-0392",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-barnes-powersports-blackfoot",
+      "kind": "business",
+      "slug": "barnes-powersports-blackfoot",
+      "name": "Barnes Powersports Blackfoot",
+      "title": "Barnes Powersports Blackfoot",
+      "summary": "A Calgary powersports dealer.",
+      "description": "Barnes Powersports Blackfoot is a Calgary powersports dealer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "powersports",
+        "ATVs"
+      ],
+      "address": "6 Highfield Circle SE, Calgary, AB",
+      "website": "https://www.barnespowersports.com/",
+      "sources": [
+        {
+          "name": "Barnes Powersports Blackfoot official website",
+          "url": "https://www.barnespowersports.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.barnespowersports.com/"
+      },
+      "services": [
+        "Powersports",
+        "ATVs"
+      ],
+      "email": "sales@barnespowersports.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-243-2636",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-canvas-loft-furniture",
+      "kind": "business",
+      "slug": "canvas-loft-furniture",
+      "name": "Canvas + Loft Furniture",
+      "title": "Canvas + Loft Furniture",
+      "summary": "A Calgary furniture and home decor store.",
+      "description": "Canvas + Loft Furniture is a Calgary furniture and home decor store. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "furniture",
+        "home decor"
+      ],
+      "address": "9631 Macleod Trl SW, Calgary, AB",
+      "website": "https://canvasandloft.com/",
+      "sources": [
+        {
+          "name": "Canvas + Loft Furniture official website",
+          "url": "https://canvasandloft.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://canvasandloft.com/"
+      },
+      "services": [
+        "Furniture",
+        "Home decor"
+      ],
+      "email": "info@canvasandloft.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-353-3369",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-rubaiyat",
+      "kind": "business",
+      "slug": "rubaiyat",
+      "name": "Rubaiyat",
+      "title": "Rubaiyat",
+      "summary": "A Calgary jeweller and gift gallery.",
+      "description": "Rubaiyat is a Calgary jeweller and gift gallery. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "jeweller",
+        "gifts"
+      ],
+      "address": "722 17 Avenue SW, Calgary, AB",
+      "website": "https://rubaiyatcalgary.com/",
+      "sources": [
+        {
+          "name": "Rubaiyat official website",
+          "url": "https://rubaiyatcalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://rubaiyatcalgary.com/"
+      },
+      "services": [
+        "Jeweller",
+        "Gifts"
+      ],
+      "email": "mh@rubaiyatcalgary.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-canadian-motor-company",
+      "kind": "business",
+      "slug": "canadian-motor-company",
+      "name": "Canadian Motor Company",
+      "title": "Canadian Motor Company",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Canadian Motor Company is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "2016 25 Avenue NE, Calgary, AB",
+      "website": "https://canadianmotorcompany.com/",
+      "sources": [
+        {
+          "name": "Canadian Motor Company official website",
+          "url": "https://canadianmotorcompany.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://canadianmotorcompany.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "cmc123@telus.net",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-250-2257",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-sandras-drycleaning-and-alterations",
+      "kind": "business",
+      "slug": "sandras-drycleaning-and-alterations",
+      "name": "Sandra's Drycleaning & Alterations",
+      "title": "Sandra's Drycleaning & Alterations",
+      "summary": "A Calgary dry cleaner.",
+      "description": "Sandra's Drycleaning & Alterations is a Calgary dry cleaner. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dry cleaning",
+        "alterations"
+      ],
+      "address": "207 Haddon Road SW, Calgary, AB",
+      "website": "https://calgarydrycleaning.ca/",
+      "sources": [
+        {
+          "name": "Sandra's Drycleaning & Alterations official website",
+          "url": "https://calgarydrycleaning.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarydrycleaning.ca/"
+      },
+      "services": [
+        "Dry cleaning",
+        "Alterations"
+      ],
+      "email": "shlahfamily@hotmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-315-5299",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-my-calgary-mechanic",
+      "kind": "business",
+      "slug": "my-calgary-mechanic",
+      "name": "My Calgary Mechanic",
+      "title": "My Calgary Mechanic",
+      "summary": "An Calgary auto repair shop.",
+      "description": "My Calgary Mechanic is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "4321 54 Avenue SE, Calgary, AB",
+      "website": "https://mycalgarymechanic.ca/",
+      "sources": [
+        {
+          "name": "My Calgary Mechanic official website",
+          "url": "https://mycalgarymechanic.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mycalgarymechanic.ca/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "general@mycalgarymechanic.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-323-7916",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-pro-tire",
+      "kind": "business",
+      "slug": "pro-tire",
+      "name": "Pro Tire",
+      "title": "Pro Tire",
+      "summary": "A Calgary tire shop.",
+      "description": "Pro Tire is a Calgary tire shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tires",
+        "mechanic"
+      ],
+      "address": "666 Goddard Avenue NE, Calgary, AB",
+      "website": "https://protirecanada.com/",
+      "sources": [
+        {
+          "name": "Pro Tire official website",
+          "url": "https://protirecanada.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://protirecanada.com/"
+      },
+      "services": [
+        "Tires",
+        "Mechanic"
+      ],
+      "email": "info@protirecanada.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-295-2100",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-glassmasters-autoglass",
+      "kind": "business",
+      "slug": "glassmasters-autoglass",
+      "name": "GlassMasters Autoglass",
+      "title": "GlassMasters Autoglass",
+      "summary": "An Calgary auto repair shop.",
+      "description": "GlassMasters Autoglass is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "6221 Centre Street SW, Calgary, AB",
+      "website": "https://glassmastersautoglass.com/locations/calgary-south.html",
+      "sources": [
+        {
+          "name": "GlassMasters Autoglass official website",
+          "url": "https://glassmastersautoglass.com/locations/calgary-south.html",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://glassmastersautoglass.com/locations/calgary-south.html"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "air@glassmastersautoglass.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-692-0340",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-video-game-trader",
+      "kind": "business",
+      "slug": "video-game-trader",
+      "name": "Video Game Trader",
+      "title": "Video Game Trader",
+      "summary": "A Calgary video game store.",
+      "description": "Video Game Trader is a Calgary video game store. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "video games",
+        "retro games"
+      ],
+      "address": "755 Lake Bonavista Drive SE, Calgary, AB",
+      "website": "https://videogametrader.ca/",
+      "sources": [
+        {
+          "name": "Video Game Trader official website",
+          "url": "https://videogametrader.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://videogametrader.ca/"
+      },
+      "services": [
+        "Video games",
+        "Retro games"
+      ],
+      "email": "vgtcalgary@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-620-2406",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-revolution-detailing-supplies",
+      "kind": "business",
+      "slug": "revolution-detailing-supplies",
+      "name": "Revolution Detailing Supplies",
+      "title": "Revolution Detailing Supplies",
+      "summary": "An Calgary auto parts and accessories shop.",
+      "description": "Revolution Detailing Supplies is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto parts",
+        "detailing"
+      ],
+      "address": "4032 4 Street SE, Calgary, AB",
+      "website": "https://revolutiondetailingsupplies.com/",
+      "sources": [
+        {
+          "name": "Revolution Detailing Supplies official website",
+          "url": "https://revolutiondetailingsupplies.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://revolutiondetailingsupplies.com/"
+      },
+      "services": [
+        "Auto parts",
+        "Detailing"
+      ],
+      "email": "info@revolutiondetailingsupplies.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-209-0555",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bridgeland-crossings-optometry",
+      "kind": "business",
+      "slug": "bridgeland-crossings-optometry",
+      "name": "Bridgeland Crossings Optometry",
+      "title": "Bridgeland Crossings Optometry",
+      "summary": "An Calgary optometry clinic.",
+      "description": "Bridgeland Crossings Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "38 9 Street NE, Calgary, AB",
+      "website": "https://www.yycoptometry.ca/",
+      "sources": [
+        {
+          "name": "Bridgeland Crossings Optometry official website",
+          "url": "https://www.yycoptometry.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.yycoptometry.ca/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "info@bridgelandoptometry.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-764-3937",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-tmh-landscape-supply",
+      "kind": "business",
+      "slug": "tmh-landscape-supply",
+      "name": "TMH Landscape Supply",
+      "title": "TMH Landscape Supply",
+      "summary": "A Calgary landscape supply yard.",
+      "description": "TMH Landscape Supply is a Calgary landscape supply yard. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "landscape supply",
+        "gravel"
+      ],
+      "address": "3240 11 Street SE, Calgary, AB",
+      "website": "https://www.tmhindustries.com/",
+      "sources": [
+        {
+          "name": "TMH Landscape Supply official website",
+          "url": "https://www.tmhindustries.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tmhindustries.com/"
+      },
+      "services": [
+        "Landscape supply",
+        "Gravel"
+      ],
+      "email": "sales@tmhindustries.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-ola-luna",
+      "kind": "business",
+      "slug": "ola-luna",
+      "name": "Ola Luna",
+      "title": "Ola Luna",
+      "summary": "A Calgary bakery.",
+      "description": "Ola Luna is a Calgary bakery. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bakery",
+        "custom cakes"
+      ],
+      "address": "1047 40 Avenue NW, Calgary, AB",
+      "website": "https://www.olaluna.com/",
+      "sources": [
+        {
+          "name": "Ola Luna official website",
+          "url": "https://www.olaluna.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.olaluna.com/"
+      },
+      "services": [
+        "Bakery",
+        "Custom cakes"
+      ],
+      "email": "hello@olaluna.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-district-family-dental",
+      "kind": "business",
+      "slug": "district-family-dental",
+      "name": "District Family Dental",
+      "title": "District Family Dental",
+      "summary": "A Calgary dental clinic.",
+      "description": "District Family Dental is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "11064 14 Street NE, Calgary, AB",
+      "website": "https://districtfamilydental.com/",
+      "sources": [
+        {
+          "name": "District Family Dental official website",
+          "url": "https://districtfamilydental.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://districtfamilydental.com/"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "info@districtfamilydental.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-407-0874",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-rascals-pet-supplies",
+      "kind": "business",
+      "slug": "rascals-pet-supplies",
+      "name": "Rascals Pet Supplies",
+      "title": "Rascals Pet Supplies",
+      "summary": "A Calgary pet supply store.",
+      "description": "Rascals Pet Supplies is a Calgary pet supply store. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "pet supplies",
+        "pet store"
+      ],
+      "address": "3804 Edmonton Trail NE, Calgary, AB",
+      "website": "https://www.rascalsdelivery.ca/",
+      "sources": [
+        {
+          "name": "Rascals Pet Supplies official website",
+          "url": "https://www.rascalsdelivery.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.rascalsdelivery.ca/"
+      },
+      "services": [
+        "Pet supplies",
+        "Pet store"
+      ],
+      "email": "info@rascalsdelivery.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-275-3647",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-swish-oral-care",
+      "kind": "business",
+      "slug": "swish-oral-care",
+      "name": "Swish Oral Care",
+      "title": "Swish Oral Care",
+      "summary": "A Calgary dental clinic.",
+      "description": "Swish Oral Care is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "69 7A Street NE, Calgary, AB",
+      "website": "https://www.swishoralcare.ca/location/bridgeland",
+      "sources": [
+        {
+          "name": "Swish Oral Care official website",
+          "url": "https://www.swishoralcare.ca/location/bridgeland",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.swishoralcare.ca/location/bridgeland"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "bridgeland@swishoralcare.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 825-540-7183",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-oakridge-automotive",
+      "kind": "business",
+      "slug": "oakridge-automotive",
+      "name": "Oakridge Automotive",
+      "title": "Oakridge Automotive",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Oakridge Automotive is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "9405 24 Street SW, Calgary, AB",
+      "website": "https://oakridgeauto.mechanicnet.com/",
+      "sources": [
+        {
+          "name": "Oakridge Automotive official website",
+          "url": "https://oakridgeauto.mechanicnet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://oakridgeauto.mechanicnet.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "oakridgeauto@mechanicnet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-281-1353",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-anian",
+      "kind": "business",
+      "slug": "anian",
+      "name": "ANIÁN",
+      "title": "ANIÁN",
+      "summary": "A Calgary Made-in-Canada clothing store.",
+      "description": "ANIÁN is a Calgary Made-in-Canada clothing store. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "clothing",
+        "made in Canada"
+      ],
+      "address": "825 17 Avenue SW, Calgary, AB",
+      "website": "https://anianmfg.com/",
+      "sources": [
+        {
+          "name": "ANIÁN official website",
+          "url": "https://anianmfg.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://anianmfg.com/"
+      },
+      "services": [
+        "Clothing",
+        "Made in Canada"
+      ],
+      "email": "calgary@anianmfg.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-885-3874",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-profix-automotive-services",
+      "kind": "business",
+      "slug": "profix-automotive-services",
+      "name": "Profix Automotive Services",
+      "title": "Profix Automotive Services",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Profix Automotive Services is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "927 46 Avenue SE, Calgary, AB",
+      "website": "https://profixautomotiveservices.com/",
+      "sources": [
+        {
+          "name": "Profix Automotive Services official website",
+          "url": "https://profixautomotiveservices.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://profixautomotiveservices.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "sales@profixautomotiveservices.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-333-4312",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-our-mechanic",
+      "kind": "business",
+      "slug": "our-mechanic",
+      "name": "Our Mechanic",
+      "title": "Our Mechanic",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Our Mechanic is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "3927 3a St NE, Calgary, AB T2E 6S7, Calgary, AB",
+      "website": "https://ourmechanicinc.mechanicnet.com",
+      "sources": [
+        {
+          "name": "Our Mechanic official website",
+          "url": "https://ourmechanicinc.mechanicnet.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://ourmechanicinc.mechanicnet.com"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "ourmechanicinc@mechanicnet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-277-7174",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-lugnutz",
+      "kind": "business",
+      "slug": "lugnutz",
+      "name": "Lugnutz",
+      "title": "Lugnutz",
+      "summary": "A Calgary self-service auto shop.",
+      "description": "Lugnutz is a Calgary self-service auto shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "DIY garage",
+        "auto repair"
+      ],
+      "address": "500 Barlow Square SE, Calgary, AB",
+      "website": "https://lugnutz.ca/",
+      "sources": [
+        {
+          "name": "Lugnutz official website",
+          "url": "https://lugnutz.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://lugnutz.ca/"
+      },
+      "services": [
+        "DIY garage",
+        "Auto repair"
+      ],
+      "email": "george@lugnutz.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-281-8878",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-second-specs",
+      "kind": "business",
+      "slug": "second-specs",
+      "name": "Second Specs",
+      "title": "Second Specs",
+      "summary": "An Calgary optometry clinic.",
+      "description": "Second Specs is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "3625 Shaganappi Trail NW, Calgary, AB",
+      "website": "https://second-specs.com/pages/market-mall",
+      "sources": [
+        {
+          "name": "Second Specs official website",
+          "url": "https://second-specs.com/pages/market-mall",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://second-specs.com/pages/market-mall"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "info@secondspecs.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-747-7353",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-calgary-flooring-boutique",
+      "kind": "business",
+      "slug": "calgary-flooring-boutique",
+      "name": "Calgary Flooring Boutique",
+      "title": "Calgary Flooring Boutique",
+      "summary": "A Calgary flooring store and installer.",
+      "description": "Calgary Flooring Boutique is a Calgary flooring store and installer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "flooring",
+        "tile"
+      ],
+      "address": "290 Na'a Common SW, Calgary, AB",
+      "website": "https://www.calgaryflooringboutique.com/",
+      "sources": [
+        {
+          "name": "Calgary Flooring Boutique official website",
+          "url": "https://www.calgaryflooringboutique.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryflooringboutique.com/"
+      },
+      "services": [
+        "Flooring",
+        "Tile"
+      ],
+      "email": "calgaryflooringboutique@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-620-4145",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-carzilla",
+      "kind": "business",
+      "slug": "carzilla",
+      "name": "Carzilla",
+      "title": "Carzilla",
+      "summary": "An Calgary auto parts and accessories shop.",
+      "description": "Carzilla is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto parts",
+        "detailing"
+      ],
+      "address": "239 Mayland Place NE, Calgary, AB",
+      "website": "https://carzilla.ca/",
+      "sources": [
+        {
+          "name": "Carzilla official website",
+          "url": "https://carzilla.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://carzilla.ca/"
+      },
+      "services": [
+        "Auto parts",
+        "Detailing"
+      ],
+      "email": "info@carzilla.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-speedfactor",
+      "kind": "business",
+      "slug": "speedfactor",
+      "name": "Speedfactor",
+      "title": "Speedfactor",
+      "summary": "An Calgary auto parts and accessories shop.",
+      "description": "Speedfactor is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto parts",
+        "detailing"
+      ],
+      "address": "239 Mayland Place NE, Calgary, AB",
+      "website": "https://speedfactorracing.com/",
+      "sources": [
+        {
+          "name": "Speedfactor official website",
+          "url": "https://speedfactorracing.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://speedfactorracing.com/"
+      },
+      "services": [
+        "Auto parts",
+        "Detailing"
+      ],
+      "email": "calgary@speedfactorracing.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-573-2070",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-brant-lake-wagyu",
+      "kind": "business",
+      "slug": "brant-lake-wagyu",
+      "name": "Brant Lake Wagyu",
+      "title": "Brant Lake Wagyu",
+      "summary": "An Calgary Alberta wagyu beef producer.",
+      "description": "Brant Lake Wagyu is an Calgary Alberta wagyu beef producer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "butcher",
+        "wagyu"
+      ],
+      "address": "507 42 Avenue SE, Calgary, AB",
+      "website": "https://www.brantlakewagyu.ca/",
+      "sources": [
+        {
+          "name": "Brant Lake Wagyu official website",
+          "url": "https://www.brantlakewagyu.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.brantlakewagyu.ca/"
+      },
+      "services": [
+        "Butcher",
+        "Wagyu"
+      ],
+      "email": "sales@brantlakewagyu.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-352-3311",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-radiocrafts",
+      "kind": "business",
+      "slug": "radiocrafts",
+      "name": "Radiocrafts",
+      "title": "Radiocrafts",
+      "summary": "A Calgary home theatre store.",
+      "description": "Radiocrafts is a Calgary home theatre store. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "home theatre",
+        "audio"
+      ],
+      "address": "710 16 Avenue NW, Calgary, AB",
+      "website": "https://www.radiocrafts.ca/",
+      "sources": [
+        {
+          "name": "Radiocrafts official website",
+          "url": "https://www.radiocrafts.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.radiocrafts.ca/"
+      },
+      "services": [
+        "Home theatre",
+        "Audio"
+      ],
+      "email": "radiocrafts@shaw.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-289-4448",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-focused-optometry",
+      "kind": "business",
+      "slug": "focused-optometry",
+      "name": "Focused Optometry",
+      "title": "Focused Optometry",
+      "summary": "An Calgary optometry clinic.",
+      "description": "Focused Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "4820 Northland Drive NW, Calgary, AB",
+      "website": "https://focusedoptometry.com/",
+      "sources": [
+        {
+          "name": "Focused Optometry official website",
+          "url": "https://focusedoptometry.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://focusedoptometry.com/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "info@focusedoptometry.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 587-353-6287",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-silver-springs-automotive",
+      "kind": "business",
+      "slug": "silver-springs-automotive",
+      "name": "Silver Springs Automotive",
+      "title": "Silver Springs Automotive",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Silver Springs Automotive is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "5858 Silver Springs Boulevard NW, Calgary, AB",
+      "website": "https://silverspringsauto.mechanicnet.com/",
+      "sources": [
+        {
+          "name": "Silver Springs Automotive official website",
+          "url": "https://silverspringsauto.mechanicnet.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://silverspringsauto.mechanicnet.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "silverspringsauto@mechanicnet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-247-6316",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-vitamin-boba",
+      "kind": "business",
+      "slug": "vitamin-boba",
+      "name": "Vitamin Boba",
+      "title": "Vitamin Boba",
+      "summary": "A Calgary bubble tea shop.",
+      "description": "Vitamin Boba is a Calgary bubble tea shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "bubble tea",
+        "drinks"
+      ],
+      "address": "130 10 Street NW, Calgary, AB",
+      "website": "https://www.vitaminboba.com",
+      "sources": [
+        {
+          "name": "Vitamin Boba official website",
+          "url": "https://www.vitaminboba.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.vitaminboba.com"
+      },
+      "services": [
+        "Bubble tea",
+        "Drinks"
+      ],
+      "email": "info@vitaminboba.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 866-274-7469",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bowness-auto-parts",
+      "kind": "business",
+      "slug": "bowness-auto-parts",
+      "name": "Bowness Auto Parts",
+      "title": "Bowness Auto Parts",
+      "summary": "An Calgary auto parts and accessories shop.",
+      "description": "Bowness Auto Parts is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto parts",
+        "detailing"
+      ],
+      "address": "6419 Bowness Road NW, Calgary, AB",
+      "website": "https://www.bownessauto.com/",
+      "sources": [
+        {
+          "name": "Bowness Auto Parts official website",
+          "url": "https://www.bownessauto.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bownessauto.com/"
+      },
+      "services": [
+        "Auto parts",
+        "Detailing"
+      ],
+      "email": "info@bownessauto.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-288-5444",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-bumper-to-bumper-dalhousie",
+      "kind": "business",
+      "slug": "bumper-to-bumper-dalhousie",
+      "name": "Bumper to Bumper Dalhousie",
+      "title": "Bumper to Bumper Dalhousie",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Bumper to Bumper Dalhousie is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "5302 Northland Drive NW, Calgary, AB",
+      "website": "https://local.bumpertobumper.ca/en/shop/ab/calgary/5302-northland-drive-northwest/",
+      "sources": [
+        {
+          "name": "Bumper to Bumper Dalhousie official website",
+          "url": "https://local.bumpertobumper.ca/en/shop/ab/calgary/5302-northland-drive-northwest/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://local.bumpertobumper.ca/en/shop/ab/calgary/5302-northland-drive-northwest/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "dalauto1@telus.net",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-289-5581",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-glen-meadows-auto-service",
+      "kind": "business",
+      "slug": "glen-meadows-auto-service",
+      "name": "Glen Meadows Auto Service",
+      "title": "Glen Meadows Auto Service",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Glen Meadows Auto Service is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "2631 37 Street SW, Calgary, AB",
+      "website": "https://glenmeadowsautoservice.com/",
+      "sources": [
+        {
+          "name": "Glen Meadows Auto Service official website",
+          "url": "https://glenmeadowsautoservice.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://glenmeadowsautoservice.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "glenmeadowsauto@mechanicnet.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-246-0405",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-allspec-collision",
+      "kind": "business",
+      "slug": "allspec-collision",
+      "name": "Allspec Collision",
+      "title": "Allspec Collision",
+      "summary": "A Calgary collision repair shop.",
+      "description": "Allspec Collision is a Calgary collision repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "auto body",
+        "collision repair"
+      ],
+      "address": "4120 15A Street SE, Calgary, AB",
+      "website": "https://allspeccollision.com/",
+      "sources": [
+        {
+          "name": "Allspec Collision official website",
+          "url": "https://allspeccollision.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://allspeccollision.com/"
+      },
+      "services": [
+        "Auto body",
+        "Collision repair"
+      ],
+      "email": "greg@allspeccollision.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-244-9444",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-central-roofing",
+      "kind": "business",
+      "slug": "central-roofing",
+      "name": "Central Roofing",
+      "title": "Central Roofing",
+      "summary": "A Calgary roofing company.",
+      "description": "Central Roofing is a Calgary roofing company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "roofing",
+        "roof repair"
+      ],
+      "address": "4007 Ogden Road SE, Calgary, AB",
+      "website": "https://www.centralroofingcalgary.org/",
+      "sources": [
+        {
+          "name": "Central Roofing official website",
+          "url": "https://www.centralroofingcalgary.org/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.centralroofingcalgary.org/"
+      },
+      "services": [
+        "Roofing",
+        "Roof repair"
+      ],
+      "email": "crcalg@telus.net",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-287-1333",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-calgary-granite-and-marble",
+      "kind": "business",
+      "slug": "calgary-granite-and-marble",
+      "name": "Calgary Granite & Marble",
+      "title": "Calgary Granite & Marble",
+      "summary": "A Calgary countertop and stone company.",
+      "description": "Calgary Granite & Marble is a Calgary countertop and stone company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "countertops",
+        "granite",
+        "quartz"
+      ],
+      "address": "2716 16 Street SE, Calgary, AB",
+      "website": "https://calgarygranite.com/",
+      "sources": [
+        {
+          "name": "Calgary Granite & Marble official website",
+          "url": "https://calgarygranite.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarygranite.com/"
+      },
+      "services": [
+        "Countertops",
+        "Granite",
+        "Quartz"
+      ],
+      "email": "info@calgarygranite.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-291-6798",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-strange-world-tattoo",
+      "kind": "business",
+      "slug": "strange-world-tattoo",
+      "name": "Strange World Tattoo",
+      "title": "Strange World Tattoo",
+      "summary": "A Calgary tattoo studio.",
+      "description": "Strange World Tattoo is a Calgary tattoo studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "tattoo",
+        "piercing"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://strangeworldtattoo.com/",
+      "sources": [
+        {
+          "name": "Strange World Tattoo official website",
+          "url": "https://strangeworldtattoo.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://strangeworldtattoo.com/"
+      },
+      "services": [
+        "Tattoo",
+        "Piercing"
+      ],
+      "email": "mona@strangeworldtattoo.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-282-8181",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-sunshine-auto-repairs",
+      "kind": "business",
+      "slug": "sunshine-auto-repairs",
+      "name": "Sunshine Auto Repairs",
+      "title": "Sunshine Auto Repairs",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Sunshine Auto Repairs is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "1806 17 Avenue SE, Calgary, AB",
+      "website": "https://www.sunshineautorepairs.com/",
+      "sources": [
+        {
+          "name": "Sunshine Auto Repairs official website",
+          "url": "https://www.sunshineautorepairs.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sunshineautorepairs.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "sunshineautorepairs@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-264-8787",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-moonlight-and-eli",
+      "kind": "business",
+      "slug": "moonlight-and-eli",
+      "name": "Moonlight & Eli",
+      "title": "Moonlight & Eli",
+      "summary": "A Calgary dessert and fondue bar.",
+      "description": "Moonlight & Eli is a Calgary dessert and fondue bar. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "fondue",
+        "desserts"
+      ],
+      "address": "627 1 Avenue NE, Calgary, AB",
+      "website": "https://msha.ke/moonlightandeli",
+      "sources": [
+        {
+          "name": "Moonlight & Eli official website",
+          "url": "https://msha.ke/moonlightandeli",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://msha.ke/moonlightandeli"
+      },
+      "services": [
+        "Fondue",
+        "Desserts"
+      ],
+      "email": "moonlightandeli@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 825-437-9202",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-ara-auto-accessories",
+      "kind": "business",
+      "slug": "ara-auto-accessories",
+      "name": "ARA Auto Accessories",
+      "title": "ARA Auto Accessories",
+      "summary": "An Calgary auto repair shop.",
+      "description": "ARA Auto Accessories is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "408 36 Avenue SE, Calgary, AB",
+      "website": "https://araautoaccessories.com/wordpress/",
+      "sources": [
+        {
+          "name": "ARA Auto Accessories official website",
+          "url": "https://araautoaccessories.com/wordpress/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://araautoaccessories.com/wordpress/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@araautoaccessories.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-287-3130",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-northland-village-dental-centre",
+      "kind": "business",
+      "slug": "northland-village-dental-centre",
+      "name": "Northland Village Dental Centre",
+      "title": "Northland Village Dental Centre",
+      "summary": "A Calgary dental clinic.",
+      "description": "Northland Village Dental Centre is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "5117 Northland Drive NW, Calgary, AB",
+      "website": "https://northlandvillagedental.ca",
+      "sources": [
+        {
+          "name": "Northland Village Dental Centre official website",
+          "url": "https://northlandvillagedental.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://northlandvillagedental.ca"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "careyou@nvdcdental.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-255-6688",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-the-marble-factory",
+      "kind": "business",
+      "slug": "the-marble-factory",
+      "name": "The Marble Factory",
+      "title": "The Marble Factory",
+      "summary": "A Calgary countertop and stone company.",
+      "description": "The Marble Factory is a Calgary countertop and stone company. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "countertops",
+        "granite",
+        "quartz"
+      ],
+      "address": "4303 1 Street SE, Calgary, AB",
+      "website": "https://www.marblefactory.com/",
+      "sources": [
+        {
+          "name": "The Marble Factory official website",
+          "url": "https://www.marblefactory.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.marblefactory.com/"
+      },
+      "services": [
+        "Countertops",
+        "Granite",
+        "Quartz"
+      ],
+      "email": "info@marblefactory.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-279-2552",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-calgary-custom-photo-services",
+      "kind": "business",
+      "slug": "calgary-custom-photo-services",
+      "name": "Calgary Custom Photo Services",
+      "title": "Calgary Custom Photo Services",
+      "summary": "A Calgary photo printing studio.",
+      "description": "Calgary Custom Photo Services is a Calgary photo printing studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "photo printing",
+        "framing"
+      ],
+      "address": "1632 14 Avenue NW, Calgary, AB",
+      "website": "https://calgarycustomphotoservices.com/",
+      "sources": [
+        {
+          "name": "Calgary Custom Photo Services official website",
+          "url": "https://calgarycustomphotoservices.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarycustomphotoservices.com/"
+      },
+      "services": [
+        "Photo printing",
+        "Framing"
+      ],
+      "email": "ccpsnorth@teamccps.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-282-3800",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-dentrix-dental-care",
+      "kind": "business",
+      "slug": "dentrix-dental-care",
+      "name": "Dentrix Dental Care",
+      "title": "Dentrix Dental Care",
+      "summary": "A Calgary dental clinic.",
+      "description": "Dentrix Dental Care is a Calgary dental clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "dentist",
+        "dental care"
+      ],
+      "address": "1632 14 Avenue NW, Calgary, AB",
+      "website": "https://dentrixdentalcare.com/",
+      "sources": [
+        {
+          "name": "Dentrix Dental Care official website",
+          "url": "https://dentrixdentalcare.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://dentrixdentalcare.com/"
+      },
+      "services": [
+        "Dentist",
+        "Dental care"
+      ],
+      "email": "ask.nh@dentrixdentalcare.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-289-9908",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-knibbe-automotive-repair",
+      "kind": "business",
+      "slug": "knibbe-automotive-repair",
+      "name": "Knibbe Automotive Repair",
+      "title": "Knibbe Automotive Repair",
+      "summary": "An Calgary auto repair shop.",
+      "description": "Knibbe Automotive Repair is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "mechanic",
+        "auto repair"
+      ],
+      "address": "160 Crowfoot Way NW, Calgary, AB",
+      "website": "https://www.knibbeautomotive.com/",
+      "sources": [
+        {
+          "name": "Knibbe Automotive Repair official website",
+          "url": "https://www.knibbeautomotive.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-22T20:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.knibbeautomotive.com/"
+      },
+      "services": [
+        "Mechanic",
+        "Auto repair"
+      ],
+      "email": "info@knibbeautomotive.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "phone": "+1 403-547-7771",
+      "awaitingClaim": true
     }
   ]
 }

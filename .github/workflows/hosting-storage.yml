@@ -20,9 +20,10 @@ on:
 permissions:
   contents: read
 
+# No shared concurrency group with the deploy: a queued run there could be
+# replaced. Deleting only old versions is safe while a deploy runs.
 concurrency:
-  group: "firebase"
-  cancel-in-progress: false
+  group: "hosting-storage"
 
 jobs:
   trim:

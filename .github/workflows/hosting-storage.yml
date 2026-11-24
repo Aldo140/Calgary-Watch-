@@ -2,11 +2,9 @@ name: Trim Hosting storage
 
 # Every deploy stores a full Hosting version. This reports how much the stored
 # versions hold and, when asked, keeps only the newest ones (the live release is
-# never touched). See scripts/deploy/hosting-versions.mjs.
+# never touched). Hosting now keeps 20 versions on its own (set Nov 23, 2026),
+# so this is only needed to check or change that. See scripts/deploy/hosting-versions.mjs.
 on:
-  push:
-    branches: ["claude/project-thread-y9vcbr"]
-    paths: [".github/workflows/hosting-storage.yml", "scripts/deploy/hosting-versions.mjs"]
   workflow_dispatch:
     inputs:
       keep:
@@ -39,4 +37,4 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-        run: node scripts/deploy/hosting-versions.mjs --keep "${{ inputs.keep || '20' }}" ${{ (inputs.apply || github.event_name == 'push') && '--apply' || '' }}
+        run: node scripts/deploy/hosting-versions.mjs --keep "${{ inputs.keep || '20' }}" ${{ inputs.apply && '--apply' || '' }}

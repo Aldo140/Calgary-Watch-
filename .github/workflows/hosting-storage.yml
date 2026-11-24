@@ -11,7 +11,7 @@ on:
     inputs:
       keep:
         description: "Versions to keep (at least 5)"
-        default: "10"
+        default: "20"
       apply:
         description: "Set the limit and delete older versions (otherwise just report)"
         type: boolean
@@ -39,4 +39,4 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-        run: node scripts/deploy/hosting-versions.mjs --keep "${{ inputs.keep || '10' }}" ${{ inputs.apply && '--apply' || '' }}
+        run: node scripts/deploy/hosting-versions.mjs --keep "${{ inputs.keep || '20' }}" ${{ (inputs.apply || github.event_name == 'push') && '--apply' || '' }}

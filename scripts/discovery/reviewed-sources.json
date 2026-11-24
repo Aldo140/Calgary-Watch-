@@ -7605,5 +7605,95 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "st-andrews-anglican-church",
+      "name": "St. Andrew's Anglican Church",
+      "approved": true,
+      "hosts": [
+        "standrewsanglicancalgary.ca",
+        "www.standrewsanglicancalgary.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-eve-family-2026",
+        "input": {
+          "kind": "event",
+          "address": "1611 St. Andrew's Place NW, Calgary, AB",
+          "venue": "St. Andrew's Anglican Church",
+          "organizer": "St. Andrew's Anglican Church",
+          "pricing": "free",
+          "title": "St. Andrew's Family Christmas Eve Service",
+          "summary": "A family-friendly 4 p.m. Christmas Eve service at St. Andrew's Anglican Church in St. Andrews Heights.",
+          "description": "St. Andrew's Anglican Church holds a family-friendly Christmas Eve service on Thursday, December 24, 2026, at 4 p.m. at 1611 St. Andrew's Place NW. It runs about an hour. Everyone is welcome.",
+          "sourceUrl": "https://standrewsanglicancalgary.ca/",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "family service",
+            "church"
+          ],
+          "start": "2026-12-24T16:00:00-06:00",
+          "end": "2026-12-24T17:00:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-eve-7pm-2026",
+        "input": {
+          "kind": "event",
+          "address": "1611 St. Andrew's Place NW, Calgary, AB",
+          "venue": "St. Andrew's Anglican Church",
+          "organizer": "St. Andrew's Anglican Church",
+          "pricing": "free",
+          "title": "St. Andrew's Christmas Eve Service",
+          "summary": "A 7 p.m. Christmas Eve service at St. Andrew's Anglican Church in northwest Calgary.",
+          "description": "St. Andrew's Anglican Church holds its evening Christmas Eve service on Thursday, December 24, 2026, at 7 p.m. at 1611 St. Andrew's Place NW. It runs about two hours. Everyone is welcome.",
+          "sourceUrl": "https://standrewsanglicancalgary.ca/",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "church"
+          ],
+          "start": "2026-12-24T19:00:00-06:00",
+          "end": "2026-12-24T21:00:00-06:00"
+        }
+      },
+      {
+        "id": "christmas-day-2026",
+        "input": {
+          "kind": "event",
+          "address": "1611 St. Andrew's Place NW, Calgary, AB",
+          "venue": "St. Andrew's Anglican Church",
+          "organizer": "St. Andrew's Anglican Church",
+          "pricing": "free",
+          "title": "St. Andrew's Christmas Day Service",
+          "summary": "A 10 a.m. Christmas Day service at St. Andrew's Anglican Church in northwest Calgary.",
+          "description": "St. Andrew's Anglican Church holds a Christmas Day service on Friday, December 25, 2026, at 10 a.m. at 1611 St. Andrew's Place NW. It runs about an hour. Everyone is welcome.",
+          "sourceUrl": "https://standrewsanglicancalgary.ca/",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas day",
+            "church"
+          ],
+          "start": "2026-12-25T10:00:00-06:00",
+          "end": "2026-12-25T11:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

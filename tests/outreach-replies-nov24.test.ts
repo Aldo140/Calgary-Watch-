@@ -24,3 +24,13 @@ describe('November 24 replies', () => {
     for (const r of records) assert.equal(r.address, "1611 St. Andrew's Place NW, Calgary, AB");
   });
 });
+
+describe('November 24 replies, afternoon', () => {
+  it('Arch & Bow Exteriors asked to be listed under fences and decks', () => {
+    const biz = editorial.entities.find(e => e.id === 'biz-arch-and-bow-exteriors') as any;
+    assert.equal(biz.status, 'published');
+    assert.ok(!biz.awaitingClaim, 'the owner asked for the listing, so it is live now');
+    assert.ok(biz.tags.includes('fence builder') && biz.tags.includes('deck builder'));
+    assert.deepEqual(generated.entities.find(e => e.id === biz.id), biz);
+  });
+});

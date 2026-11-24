@@ -679,7 +679,7 @@ function useWeatherAlerts(isAuthReady: boolean) {
 
 export default function MapPage() {
   const INCIDENT_PAGE_SIZE = 60;
-  const { user, signIn, logout, isAuthReady, isAdmin } = useAuth();
+  const { user, signIn, signInWithGoogle, logout, isAuthReady, isAdmin } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
@@ -1263,16 +1263,17 @@ export default function MapPage() {
    * first and remembers what they were doing (see pendingReport).
    */
   const requestReport = useCallback((location: { lat: number; lng: number } | null = null) => {
-    if (!user) {
-      // report_started only fires once the form opens, after sign-in, so without this the
-      // readers who gave up at the sign-in step never showed up in the funnel.
-      logProductEvent('report_gate', { pinned: location ? 1 : 0 });
-      setPendingReport({ location });
-      openAuthPanel('signin');
-      return;
-    }
+    // Signed out, the form opens straight away; sign-in is its last step (Aldo, 2026-11-23:
+    // keep sign-in, make it faster). The old sign-in-first panel lost most reporters.
     openReportForm(location);
-  }, [user, openAuthPanel, openReportForm]);
+  }, [openReportForm]);
+
+  /** Sign-in from inside the report form: Google in one tap, or the email dialog. */
+  const signInFromReport = useCallback(async (method: 'google' | 'email') => {
+    logProductEvent('report_gate', { method });
+    if (method === 'google') await signInWithGoogle();
+    else await signIn({ title: 'Sign in to post your report', intro: 'Your report stays open behind this. Your email is never shown.' });
+  }, [signIn, signInWithGoogle]);
 
   const handleReportFromIncident = useCallback((incident: Incident) => {
     setSelectedIncident(null);
@@ -2430,7 +2431,8 @@ export default function MapPage() {
   }, [getAreaStats, handleNotificationClick, openAuthPanel]);
 
   const showProfileStep = Boolean(user);
-  const authPanelVisible = authPanelOpen || (profileNeedsSetup && !onboardingDismissedThisSession);
+  // Profile setup waits while a report is open, so signing in from the form doesn't cover it.
+  const authPanelVisible = authPanelOpen || (profileNeedsSetup && !onboardingDismissedThisSession && !isFormOpen);
   // A signed-out visitor may open this panel just to learn what an account is
   // for. Keep the exit available before Google auth as well as during profile
   // setup so choosing "Sign in" never becomes a one-way action.
@@ -4069,6 +4071,7 @@ export default function MapPage() {
           onRequestMapPin={handleRequestMapPin}
           onClearPin={() => setConfirmedPinLocation(null)}
           isPinMode={isPinMode}
+          onSignIn={signInFromReport}
           userProfile={user ? {
             displayName: user.displayName || 'Calgary User',
             email: user.email || 'No email',

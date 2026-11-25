@@ -34,3 +34,11 @@ describe('November 24 replies, afternoon', () => {
     assert.deepEqual(generated.entities.find(e => e.id === biz.id), biz);
   });
 });
+
+describe('November 25 replies', () => {
+  it('Verb Theatre accepted the free Featured Partner trial for November and December', () => {
+    const verb = editorial.entities.find(e => e.id === 'biz-verb-theatre') as any;
+    assert.equal(verb.partner, true);
+    assert.match(verb.sponsorshipDisclosure, /November and December 2026/);
+  });
+});

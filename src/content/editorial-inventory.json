@@ -12319,12 +12319,13 @@
         "Holiday performances"
       ],
       "claimed": false,
-      "partner": false,
+      "partner": true,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-11-20T18:00:00Z",
-      "email": "info@verbtheatre.com"
+      "updatedAt": "2026-11-25T06:30:00Z",
+      "email": "info@verbtheatre.com",
+      "sponsorshipDisclosure": "Featured partner placement, offered free to Verb Theatre for November and December 2026. It does not affect editorial picks."
     },
     {
       "id": "biz-workshop-theatre",

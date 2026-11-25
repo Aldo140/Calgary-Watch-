@@ -500,3 +500,10 @@ html.cw-splashing .sx-city img { animation-play-state: paused; }
   .sx .sx-starter { min-height: 126px; padding: 14px; }
   .sx .sx-starter strong { font-size: 21px; }
 }
+
+/* White pages: unclaimed listings, a plain phone-book row rather than a card that lifts. */
+.sx .sx-result-plain { grid-template-columns: minmax(0, 1fr); padding: 12px 14px; box-shadow: none; border-style: dashed; }
+.sx .sx-result-plain:hover { transform: none; box-shadow: none; }
+.sx-result-plain .sx-kind { background: #fff; }
+.sx-dir-links { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 4px; }
+.sx-dir-links a { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }

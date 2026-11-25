@@ -30227,7 +30227,8 @@
       ],
       "tags": [
         "mechanic",
-        "auto repair"
+        "auto repair",
+        "Cars Inc."
       ],
       "address": "112 100 Crowfoot Gate NW, Calgary, AB",
       "website": "https://www.cars-inc.ca/",
@@ -34680,8 +34681,8 @@
       "slug": "stanley-accounting",
       "name": "Stanley Accounting",
       "title": "Stanley Accounting",
-      "summary": "An Calgary accounting firm.",
-      "description": "Stanley Accounting is an Calgary accounting firm. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary accounting firm.",
+      "description": "Stanley Accounting is a Calgary accounting firm. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -35042,8 +35043,8 @@
       "slug": "wow-electric-rides",
       "name": "Wow Electric Rides",
       "title": "Wow Electric Rides",
-      "summary": "An Calgary e-bike and scooter shop.",
-      "description": "Wow Electric Rides is an Calgary e-bike and scooter shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary e-bike and scooter shop.",
+      "description": "Wow Electric Rides is a Calgary e-bike and scooter shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -35086,8 +35087,8 @@
       "slug": "willowridge-auto-service",
       "name": "Willowridge Auto Service",
       "title": "Willowridge Auto Service",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Willowridge Auto Service is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Willowridge Auto Service is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -35570,8 +35571,8 @@
       "slug": "old-street-optometry",
       "name": "Old Street Optometry",
       "title": "Old Street Optometry",
-      "summary": "An Calgary optometry clinic.",
-      "description": "Old Street Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Old Street Optometry is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -35608,6 +35609,189 @@
       "verifiedAt": "2026-11-22T20:30:00-06:00",
       "updatedAt": "2026-11-22T20:30:00-06:00",
       "phone": "+1 403-764-4825",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-eyedeology-optometry",
+      "kind": "business",
+      "slug": "eyedeology-optometry",
+      "name": "Eyedeology Optometry",
+      "title": "Eyedeology Optometry",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Eyedeology Optometry is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "1011 Glenmore Trail SW, Calgary, AB",
+      "website": "https://eyedeology.ca/",
+      "sources": [
+        {
+          "name": "Eyedeology Optometry official website",
+          "url": "https://eyedeology.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://eyedeology.ca/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "info@eyedeology.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-25T11:30:00-06:00",
+      "updatedAt": "2026-11-25T11:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-eye-effects",
+      "kind": "business",
+      "slug": "eye-effects",
+      "name": "Eye Effects",
+      "title": "Eye Effects",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Eye Effects is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "108-555 Strathcona Boulevard SW, Calgary, AB",
+      "website": "https://eyeeffects.ca/",
+      "sources": [
+        {
+          "name": "Eye Effects official website",
+          "url": "https://eyeeffects.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://eyeeffects.ca/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "info@eyeeffects.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-25T11:30:00-06:00",
+      "updatedAt": "2026-11-25T11:30:00-06:00",
+      "phone": "+1 403-686-4990",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-mountain-view-optometry",
+      "kind": "business",
+      "slug": "mountain-view-optometry",
+      "name": "Mountain View Optometry",
+      "title": "Mountain View Optometry",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Mountain View Optometry is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "600 Crowfoot Crescent NW, Calgary, AB",
+      "website": "https://mountainviewoptometry.com/",
+      "sources": [
+        {
+          "name": "Mountain View Optometry official website",
+          "url": "https://mountainviewoptometry.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mountainviewoptometry.com/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "mvomail@mvopt.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-25T11:30:00-06:00",
+      "updatedAt": "2026-11-25T11:30:00-06:00",
+      "phone": "+1 403-286-0888",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-eyecu-optometry",
+      "kind": "business",
+      "slug": "eyecu-optometry",
+      "name": "EyeCU Optometry",
+      "title": "EyeCU Optometry",
+      "summary": "A Calgary optometry clinic.",
+      "description": "EyeCU Optometry is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "optometrist",
+        "eye exams",
+        "glasses"
+      ],
+      "address": "3160-40 Christie Park View SW, Calgary, AB",
+      "website": "https://eyecuoptometry.com/",
+      "sources": [
+        {
+          "name": "EyeCU Optometry official website",
+          "url": "https://eyecuoptometry.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T11:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://eyecuoptometry.com/"
+      },
+      "services": [
+        "Optometrist",
+        "Eye exams",
+        "Glasses"
+      ],
+      "email": "eyecuoptometry.reception@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-25T11:30:00-06:00",
+      "updatedAt": "2026-11-25T11:30:00-06:00",
+      "phone": "+1 403-798-3711",
       "awaitingClaim": true
     },
     {
@@ -35879,8 +36063,8 @@
       "slug": "easy-optometry",
       "name": "Easy Optometry",
       "title": "Easy Optometry",
-      "summary": "An Calgary optometry clinic.",
-      "description": "Easy Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Easy Optometry is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -35925,8 +36109,8 @@
       "slug": "performance-cycle-and-auto",
       "name": "Performance Cycle & Auto",
       "title": "Performance Cycle & Auto",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Performance Cycle & Auto is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Performance Cycle & Auto is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -35968,8 +36152,8 @@
       "slug": "eyecare-plus",
       "name": "Eyecare Plus",
       "title": "Eyecare Plus",
-      "summary": "An Calgary optometry clinic.",
-      "description": "Eyecare Plus is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Eyecare Plus is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -36236,8 +36420,8 @@
       "slug": "leader-auto-service",
       "name": "Leader Auto Service",
       "title": "Leader Auto Service",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Leader Auto Service is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Leader Auto Service is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -36673,8 +36857,8 @@
       "slug": "canadian-motor-company",
       "name": "Canadian Motor Company",
       "title": "Canadian Motor Company",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Canadian Motor Company is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Canadian Motor Company is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -36761,8 +36945,8 @@
       "slug": "my-calgary-mechanic",
       "name": "My Calgary Mechanic",
       "title": "My Calgary Mechanic",
-      "summary": "An Calgary auto repair shop.",
-      "description": "My Calgary Mechanic is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "My Calgary Mechanic is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -36849,8 +37033,8 @@
       "slug": "glassmasters-autoglass",
       "name": "GlassMasters Autoglass",
       "title": "GlassMasters Autoglass",
-      "summary": "An Calgary auto repair shop.",
-      "description": "GlassMasters Autoglass is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "GlassMasters Autoglass is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -36937,8 +37121,8 @@
       "slug": "revolution-detailing-supplies",
       "name": "Revolution Detailing Supplies",
       "title": "Revolution Detailing Supplies",
-      "summary": "An Calgary auto parts and accessories shop.",
-      "description": "Revolution Detailing Supplies is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto parts and accessories shop.",
+      "description": "Revolution Detailing Supplies is a Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -36981,8 +37165,8 @@
       "slug": "bridgeland-crossings-optometry",
       "name": "Bridgeland Crossings Optometry",
       "title": "Bridgeland Crossings Optometry",
-      "summary": "An Calgary optometry clinic.",
-      "description": "Bridgeland Crossings Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Bridgeland Crossings Optometry is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37296,8 +37480,8 @@
       "slug": "oakridge-automotive",
       "name": "Oakridge Automotive",
       "title": "Oakridge Automotive",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Oakridge Automotive is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Oakridge Automotive is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37384,8 +37568,8 @@
       "slug": "profix-automotive-services",
       "name": "Profix Automotive Services",
       "title": "Profix Automotive Services",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Profix Automotive Services is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Profix Automotive Services is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37428,8 +37612,8 @@
       "slug": "our-mechanic",
       "name": "Our Mechanic",
       "title": "Our Mechanic",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Our Mechanic is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Our Mechanic is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37516,8 +37700,8 @@
       "slug": "second-specs",
       "name": "Second Specs",
       "title": "Second Specs",
-      "summary": "An Calgary optometry clinic.",
-      "description": "Second Specs is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Second Specs is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37606,8 +37790,8 @@
       "slug": "carzilla",
       "name": "Carzilla",
       "title": "Carzilla",
-      "summary": "An Calgary auto parts and accessories shop.",
-      "description": "Carzilla is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto parts and accessories shop.",
+      "description": "Carzilla is a Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37649,8 +37833,8 @@
       "slug": "speedfactor",
       "name": "Speedfactor",
       "title": "Speedfactor",
-      "summary": "An Calgary auto parts and accessories shop.",
-      "description": "Speedfactor is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto parts and accessories shop.",
+      "description": "Speedfactor is a Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37693,8 +37877,8 @@
       "slug": "brant-lake-wagyu",
       "name": "Brant Lake Wagyu",
       "title": "Brant Lake Wagyu",
-      "summary": "An Calgary Alberta wagyu beef producer.",
-      "description": "Brant Lake Wagyu is an Calgary Alberta wagyu beef producer. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary Alberta wagyu beef producer.",
+      "description": "Brant Lake Wagyu is a Calgary Alberta wagyu beef producer. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37781,8 +37965,8 @@
       "slug": "focused-optometry",
       "name": "Focused Optometry",
       "title": "Focused Optometry",
-      "summary": "An Calgary optometry clinic.",
-      "description": "Focused Optometry is an Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary optometry clinic.",
+      "description": "Focused Optometry is a Calgary optometry clinic. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37827,8 +38011,8 @@
       "slug": "silver-springs-automotive",
       "name": "Silver Springs Automotive",
       "title": "Silver Springs Automotive",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Silver Springs Automotive is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Silver Springs Automotive is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37915,8 +38099,8 @@
       "slug": "bowness-auto-parts",
       "name": "Bowness Auto Parts",
       "title": "Bowness Auto Parts",
-      "summary": "An Calgary auto parts and accessories shop.",
-      "description": "Bowness Auto Parts is an Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto parts and accessories shop.",
+      "description": "Bowness Auto Parts is a Calgary auto parts and accessories shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -37959,8 +38143,8 @@
       "slug": "bumper-to-bumper-dalhousie",
       "name": "Bumper to Bumper Dalhousie",
       "title": "Bumper to Bumper Dalhousie",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Bumper to Bumper Dalhousie is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Bumper to Bumper Dalhousie is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -38003,8 +38187,8 @@
       "slug": "glen-meadows-auto-service",
       "name": "Glen Meadows Auto Service",
       "title": "Glen Meadows Auto Service",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Glen Meadows Auto Service is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Glen Meadows Auto Service is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -38225,8 +38409,8 @@
       "slug": "sunshine-auto-repairs",
       "name": "Sunshine Auto Repairs",
       "title": "Sunshine Auto Repairs",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Sunshine Auto Repairs is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Sunshine Auto Repairs is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -38313,8 +38497,8 @@
       "slug": "ara-auto-accessories",
       "name": "ARA Auto Accessories",
       "title": "ARA Auto Accessories",
-      "summary": "An Calgary auto repair shop.",
-      "description": "ARA Auto Accessories is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "ARA Auto Accessories is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
@@ -38535,8 +38719,8 @@
       "slug": "knibbe-automotive-repair",
       "name": "Knibbe Automotive Repair",
       "title": "Knibbe Automotive Repair",
-      "summary": "An Calgary auto repair shop.",
-      "description": "Knibbe Automotive Repair is an Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary auto repair shop.",
+      "description": "Knibbe Automotive Repair is a Calgary auto repair shop. Services, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],

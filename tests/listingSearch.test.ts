@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { bestPicks, correctQuery, daysFor, expandAbbreviations, parseListingQuery, searchListings, serviceFor, stem } from '../src/lib/listingSearch';
+import { bestPicks, correctQuery, daysFor, expandAbbreviations, parseListingQuery, searchListings, serviceFor, stem, addressKey } from '../src/lib/listingSearch';
 import type { DiscoveryEntity, MarketOccurrence } from '../src/types/discovery';
 
 // Thursday 2026-10-15, 10:00 in Calgary.
@@ -102,5 +102,27 @@ describe('listing search', () => {
     assert.equal(serviceFor('snow removal')?.id, 'snow');
     assert.equal(serviceFor('window cleaners')?.id, 'windows', 'its own service, not house cleaning');
     assert.equal(serviceFor('pho'), undefined);
+  });
+});
+
+describe('search demand, Nov 25: clinics, web addresses and street addresses', () => {
+  const biz = (id: string, title: string, more: object) => ({ ...base, id, slug: id, kind: 'business', title, name: title, services: [], images: [], socials: {}, claimed: false, partner: false, editorialSelection: false, address: '', ...more }) as unknown as DiscoveryEntity;
+  const CLINICS = [
+    biz('eyes', 'Old Street Optometry', { tags: ['optometry clinic'], website: 'https://oldst.ca', address: '4825 Mount Royal Gate SW, Calgary, AB' }),
+    biz('yoga', 'Yoga and Meditation Centre', { tags: ['yoga'], website: 'https://www.yogamcc.com/', address: '2028B 33 Avenue SW, Calgary, AB' }),
+    biz('spa', 'Kane Medical Aesthetics', { tags: ['med spa'], website: 'https://kanemedicalaesthetics.com/', address: '908 17 Ave SW #212, Calgary, AB' }),
+  ];
+  const found = (q: string) => Object.values(searchListings(CLINICS, [], q, NOW).groups).flat().map(e => e!.id);
+  it('finds an optometry clinic when someone types optometrist', () => assert.deepEqual(found('optometrist'), ['eyes']));
+  it('finds a business by the name in its web address', () => assert.deepEqual(found('yogamcc'), ['yoga']));
+  it('finds a business by its street address, suite and spelling aside', () => {
+    assert.deepEqual(found('908 17 ave sw #212, calgary'), ['spa']);
+    assert.deepEqual(found('908 17 Avenue SW'), ['spa']);
+    assert.deepEqual(found('2028b 33 ave sw'), ['yoga']);
+  });
+  it('reads a street address down to its quadrant', () => {
+    assert.equal(addressKey('908 17 Ave SW #212, Calgary, AB'), '908 17 ave sw');
+    assert.equal(addressKey('Suite 5, 1504 14 Street SW'), '1504 14 st sw');
+    assert.equal(addressKey('17 ave'), null);
   });
 });

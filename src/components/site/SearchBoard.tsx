@@ -75,7 +75,7 @@ export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: Discove
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, pickShelf }: {
+export function SearchBoard({ q, intent, now, groups, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, pickShelf, directory = [] }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
@@ -83,6 +83,8 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
   popular?: Suggestion[];
   /** For a community search with no listings of its own: what's on nearby. */
   nearby?: { title: ReactNode; note?: string; items: DiscoveryEntity[] };
+  /** Unclaimed listings that match: free white-pages rows, not curated picks. */
+  directory?: DiscoveryEntity[];
   /** Listed places for a "best pho" search. */
   best?: BestAnswer;
   /** Service lists the search asks for ("plumber"): shown as the Pick and the A–Z list. */
@@ -146,7 +148,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
             <div className="sx-bar">
               <p className="sx-count" role="status">
                 {resultCount
-                  ? <>{deskCount ? <><b>{deskCount}</b> local {pickShelf!.service.label.toLowerCase()}{shownBest.length || answerTotal || distinct ? ', ' : null}</> : null}{shownBest.length ? <><b>{shownBest.length}</b> Best of Calgary {shownBest.length === 1 ? 'list' : 'lists'}{answerTotal || distinct ? ', ' : null}</> : null}{answerTotal ? ready : null}{answerTotal > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
+                  ? <>{deskCount ? <><b>{deskCount}</b> local {pickShelf!.service.label.toLowerCase()}{shownBest.length || answerTotal || distinct ? ', ' : null}</> : null}{shownBest.length ? <><b>{shownBest.length}</b> Best of Calgary {shownBest.length === 1 ? 'list' : 'lists'}{answerTotal || distinct ? ', ' : null}</> : null}{answerTotal ? ready : null}{answerTotal > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{directory.length ? <>{shownBest.length || answerTotal || distinct || deskCount ? ' and ' : null}<b>{directory.length}</b> in the white pages</> : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
                   : best && intent.best ? <>Nothing on CalgaryWatch for <b>“{intent.best.thing}”</b> yet. Here’s where to look.</>
                   : <>Nothing matched <b>“{q}”</b> yet. Try a neighbourhood, a street, or one of these.</>}
               </p>
@@ -237,6 +239,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
                 </section>
               );
             })}
+            {directory.length ? <WhitePagesRows rows={directory} /> : null}
             {nearby?.items.length ? (
               <section className="bp-section sx-group" aria-labelledby="sx-nearby">
                 <div className="bp-head"><h2 id="sx-nearby">{nearby.title}</h2><p>{nearby.note ?? 'Nothing listed in this community yet, so here’s what’s closest.'}</p></div>
@@ -299,6 +302,43 @@ function TopHit({ e, more }: { e: DiscoveryEntity; more: number }) {
           <span className="sx-top-go">Open <ArrowRight size={18} aria-hidden="true" /></span>
         </span>
       </Link>
+    </section>
+  );
+}
+
+/**
+ * Businesses we list for free that haven't claimed their listing: a phone-book
+ * row (name, address, call, website) beside the competition, no profile page,
+ * no ranking promise, and a way for the owner to claim it.
+ */
+function WhitePagesRows({ rows }: { rows: DiscoveryEntity[] }) {
+  return (
+    <section className="bp-section sx-group" aria-labelledby="sx-directory">
+      <div className="bp-head">
+        <h2 id="sx-directory">White pages <small className="sx-n">{rows.length}</small></h2>
+        <p>Listed free and not yet claimed by the business, so check the details with them.</p>
+      </div>
+      <ul className="sx-results sx-directory">
+        {rows.map(e => {
+          const biz = e as DiscoveryEntity & { address?: string; phone?: string; website?: string };
+          return (
+            <li key={e.id}>
+              <div className="sx-result sx-result-plain">
+                <span className="sx-result-copy">
+                  <span className="sx-kind">Unclaimed</span>
+                  <strong>{e.title}</strong>
+                  {biz.address ? <small>{biz.address.replace(/, Calgary, AB$/, '')}</small> : null}
+                  <small className="sx-dir-links">
+                    {biz.phone ? <a href={`tel:${biz.phone.replace(/[^+\d]/g, '')}`}>Call {biz.phone.replace(/^\+1 /, '')}</a> : null}
+                    {biz.website ? <a href={biz.website} target="_blank" rel="noopener noreferrer">Website</a> : null}
+                    <Link to={`/claim/${encodeURIComponent(e.id)}`}>Your business? Claim it free</Link>
+                  </small>
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

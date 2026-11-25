@@ -9,6 +9,7 @@ import { bareStreetGuess, describeAnswer, parseSearchIntent } from '../../lib/se
 import { lookupStreet } from '../../hooks/useStreetLookup';
 import { searchListings } from '../../lib/listingSearch';
 import { discoveryRepository } from '../../data/discovery';
+import { awaitingOwner } from '../../lib/discovery';
 import { trackSubscription } from '../../lib/readEfficiency';
 import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, TimeAgo, mono } from './ui';
 
@@ -106,7 +107,10 @@ function LatestSearches() {
           <ol className="divide-y" style={{ borderColor: T.line }}>
             {rows.map((r, i) => (
               <li key={`${r.ts}-${i}`} className="flex items-center gap-3 px-4 py-2">
-                <Link to={`/search?q=${encodeURIComponent(r.q)}`} target="_blank" className="min-w-0 flex-1 truncate text-sm font-semibold hover:underline" style={{ color: T.ink }}>{r.q}</Link>
+                <div className="min-w-0 flex-1">
+                  <Link to={`/search?q=${encodeURIComponent(r.q)}`} target="_blank" className="block truncate text-sm font-semibold hover:underline" style={{ color: T.ink }}>{r.q}</Link>
+                  <SellHint q={r.q} />
+                </div>
                 <span className="text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: r.results ? T.muted : T.attention }}>{r.results ? `${r.results} ${r.results === 1 ? 'result' : 'results'}` : 'no results'}</span>
                 <span className="w-16 text-right"><TimeAgo ts={r.ts} /></span>
               </li>
@@ -130,6 +134,33 @@ function TermList({ rows, miss = false }: { rows: DemandRow[]; miss?: boolean })
       {rows.map((r) => <TermRow key={r.q} r={r} max={max} miss={miss} />)}
     </ol>
   );
+}
+
+/**
+ * Listings set up for an owner who hasn't claimed yet are hidden from the site,
+ * so a search for them reads "no results". Name them here: someone searched for
+ * that business or its category, which is the moment to pitch the Featured spot.
+ */
+const unclaimedCache = new Map<string, string[]>();
+export function unclaimedMatches(q: string): string[] {
+  const key = q.trim().toLowerCase();
+  const cached = unclaimedCache.get(key);
+  if (cached) return cached;
+  let titles: string[] = [];
+  try {
+    const waiting = discoveryRepository.claimable().filter(awaitingOwner);
+    const found = searchListings(waiting, [], q);
+    if (!found.partial) titles = Object.values(found.groups).flat().map((e) => e.title);
+  } catch (error) { console.warn('[admin search] Unclaimed matches unavailable', error); }
+  unclaimedCache.set(key, titles);
+  return titles;
+}
+
+function SellHint({ q }: { q: string }) {
+  const titles = useMemo(() => unclaimedMatches(q), [q]);
+  if (!titles.length) return null;
+  const shown = titles.slice(0, 3).join(', ') + (titles.length > 3 ? ` +${titles.length - 3} more` : '');
+  return <p className="mt-0.5 text-[0.68rem]" style={{ color: T.signal }}>Unclaimed {titles.length === 1 ? 'listing' : 'listings'} it would find: {shown}. Pitch the Featured spot.</p>;
 }
 
 function TermRow({ r, max, miss }: { r: DemandRow; max: number; miss: boolean }) {
@@ -161,6 +192,7 @@ function TermRow({ r, max, miss }: { r: DemandRow; max: number; miss: boolean })
         <div className="mt-1 h-1.5 rounded-full" style={{ background: `${miss ? T.attention : T.signal}1F` }}>
           <div className="h-full rounded-full" style={{ width: `${(r.searches / max) * 100}%`, background: miss ? T.attention : T.signal }} />
         </div>
+        <SellHint q={r.q} />
         {now ? <p className="mt-1 text-[0.68rem]" style={{ color: T.muted }}>Answered now: {now}</p>
         : r.lastResults === 0 ? <p className="mt-1 text-[0.68rem]" style={{ color: T.muted }}>If it’s a real Calgary organization with no profile, add one (docs/search-gap-profiles.md). <a href={`https://www.google.com/search?q=${encodeURIComponent(`"${r.q}" Calgary`)}`} target="_blank" rel="noopener noreferrer" className="underline">Look it up ↗</a></p>
         : null}

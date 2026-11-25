@@ -67,6 +67,9 @@ const SYNONYMS: Record<string, string[]> = {
   talk: ['lecture', 'learning', 'workshop'], workshop: ['class', 'learning'], class: ['workshop'],
   // Admin Search demand, Nov 2026: seasonal words people type that listings spell another way.
   christmas: ['holiday', 'festive', 'santa'], holiday: ['christmas', 'festive'], festive: ['christmas', 'holiday'],
+  // Admin Search demand, Nov 25: clinics people look for by the job, not the clinic's word for it.
+  optometrist: ['optometry', 'optician', 'eyewear'], optometry: ['optometrist'], optician: ['optometrist', 'eyewear'],
+  dentist: ['dental'], dental: ['dentist'], aesthetic: ['botox'],
   game: ['vs', 'match'], skating: ['skate', 'rink'], skate: ['skating', 'rink'], lights: ['zoolights', 'lantern', 'illumination'], parade: ['procession'],
 };
 
@@ -149,11 +152,33 @@ function index(e: DiscoveryEntity): Indexed {
     fields: [
       [FIELD.title, tokens(e.title), normalizeWords(e.title).join(' ')],
       [FIELD.place, tokens(place), ''],
-      [FIELD.tag, tokens([...e.categories, ...e.tags, e.kind === 'business' ? e.services.join(' ') : ''].join(' ')), ''],
+      [FIELD.tag, tokens([...e.categories, ...e.tags, e.kind === 'business' ? e.services.join(' ') : '', siteName(e)].join(' ')), ''],
       [FIELD.summary, tokens(e.summary), ''],
       [FIELD.body, tokens(body), ''],
     ],
   };
+}
+
+/** "yogamcc" from https://www.yogamcc.com/: people type a business's web address as its name. */
+export function siteName(e: DiscoveryEntity): string {
+  const url = 'website' in e && typeof e.website === 'string' ? e.website : '';
+  try { return url ? new URL(url).hostname.replace(/^www\./, '').split('.')[0] : ''; } catch { return ''; }
+}
+
+const STREET_WORDS: Record<string, string> = { avenue: 'ave', av: 'ave', street: 'st', road: 'rd', drive: 'dr', boulevard: 'blvd', trail: 'tr', crescent: 'cres', place: 'pl', gate: 'ga', court: 'ct', way: 'way', rise: 'rise' };
+const QUADRANTS = new Set(['nw', 'ne', 'sw', 'se']);
+/**
+ * "908 17 Ave SW #212, Calgary" and "908 17 avenue sw" both give "908 17 ave sw":
+ * a street address up to its quadrant, suite and city dropped. Null when it isn't one.
+ */
+export function addressKey(s: string | undefined): string | null {
+  if (!s) return null;
+  const words = s.toLowerCase().replace(/#\s*\w+|\bsuite\s+\w+|\bunit\s+\w+/g, ' ').replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
+  const start = words.findIndex(w => /^\d+[a-z]?$/.test(w));
+  if (start < 0) return null;
+  const out: string[] = [];
+  for (const w of words.slice(start)) { out.push(STREET_WORDS[w] ?? w); if (QUADRANTS.has(w)) break; }
+  return out.length >= 3 && QUADRANTS.has(out[out.length - 1]) ? out.join(' ') : null;
 }
 
 const cache = new WeakMap<DiscoveryEntity, Indexed>();
@@ -267,7 +292,13 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
   const phrase = normalizeWords(expandAbbreviations(q)).join(' ');
   // "Panorama Hills" is a place, not two keywords: listings have to name it.
   const placeName = query.words.length > 1 && COMMUNITY_PHRASES.has(phrase) ? phrase : null;
+  // "908 17 ave sw #212": someone looking up the business at that address.
+  const address = /^\s*\d/.test(q) ? addressKey(q) : null;
   for (const e of entities) {
+    if (address && 'address' in e && addressKey(e.address as string) === address) {
+      hits.push({ e, score: 100, matched: query.words.length, sure: query.words.length, at: nextTime(e, occurrences, undefined, now) ?? Infinity });
+      continue;
+    }
     const at = nextTime(e, occurrences, query.when, now);
     if (at === null) continue;
     if (query.free && !isFree(e)) continue;

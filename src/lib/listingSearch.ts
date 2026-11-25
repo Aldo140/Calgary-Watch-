@@ -71,6 +71,9 @@ const SYNONYMS: Record<string, string[]> = {
   // Admin Search demand, Nov 25: clinics people look for by the job, not the clinic's word for it.
   optometrist: ['optometry', 'optician', 'eyewear'], optometry: ['optometrist'], optician: ['optometrist', 'eyewear'],
   dentist: ['dental'], dental: ['dentist'], aesthetic: ['botox'],
+  // Wellness clinics (Docere, Nov 25): the profession people type vs the service a clinic lists.
+  naturopath: ['naturopathic'], naturopathic: ['naturopath'], acupuncturist: ['acupuncture'], acupuncture: ['acupuncturist'],
+  dietician: ['dietitian'], nutritionist: ['dietitian', 'nutrition'], psychologist: ['psychology', 'counselling'], counseling: ['counselling'], perimenopause: ['menopause'],
   game: ['vs', 'match'], skating: ['skate', 'rink'], skate: ['skating', 'rink'], lights: ['zoolights', 'lantern', 'illumination'], parade: ['procession'],
 };
 

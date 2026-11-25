@@ -31,6 +31,15 @@ describe('Featured partner niches', () => {
     assert.equal((withFeaturedExpiry(owner, later) as Business).partner, false);
     assert.equal((withFeaturedExpiry(owner, NOW) as Business).partner, true);
   });
+  it('Docere owns its wellness searches through the pilot and shows first', () => {
+    const docere = editorial.entities.find(e => e.id === 'biz-docere-wellness-centre') as unknown as Business;
+    for (const q of ['naturopaths', 'naturopath near me', 'iv therapy', 'acupuncture nw calgary', 'dietitian', 'psychologist']) assert.equal(ownsSearch(docere, q, NOW), true, q);
+    assert.equal(ownsSearch(docere, 'pizza', NOW), false);
+    assert.equal(featuredActive(docere, Date.parse('2027-01-31T12:00:00-06:00')), true);
+    assert.equal(featuredActive(docere, Date.parse('2027-02-01T00:00:01-06:00')), false);
+    const ids = Object.values(searchListings([biz('alpha-naturopathic', { tags: ['naturopath'] }), docere as unknown as DiscoveryEntity], [], 'naturopath', new Date(NOW)).groups).flat().map(e => e!.id);
+    assert.equal(ids[0], 'biz-docere-wellness-centre');
+  });
   it('Verb Theatre\'s free trial ends with December', () => {
     const verb = editorial.entities.find(e => e.id === 'biz-verb-theatre') as unknown as Business;
     assert.equal(verb.featuredPlan, 'trial');

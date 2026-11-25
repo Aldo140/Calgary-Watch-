@@ -112,7 +112,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
   const answerTotal = answers + (safety?.topics.length ?? 0) + (nearby?.items.length ? 1 : 0);
   const ready = <><b>{answerTotal}</b> {answerTotal === 1 ? 'answer' : 'answers'}</>;
   return (
-    <div className={`bp sx${q ? ' sx-has-q' : ''}`}>
+    <div className={`bp sx${q ? ' sx-has-q' : ''}`} data-cw-q={q || undefined}>
       <section className="sx-hero" aria-labelledby="sx-title">
         {!q && <div className="sx-city" aria-hidden="true">
           <picture>
@@ -168,7 +168,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
             {pickShelf && tab === 'all' ? (
               <section className="bp-section sx-group" aria-labelledby="sx-pick">
                 <div className="bp-head"><h2 id="sx-pick">{pickShelf.service.label} <span>in Calgary</span></h2><Link className="bp-link" to="/picks">How Picks work <ArrowRight size={15} aria-hidden="true" /></Link></div>
-                <PickBoard shelf={pickShelf} via="search" compact />
+                <PickBoard shelf={pickShelf} via="search" compact searchQ={q} />
               </section>
             ) : null}
             {shownBest.length && tab === 'all' ? (
@@ -291,7 +291,7 @@ function Thumb({ e, big = false }: { e: DiscoveryEntity; big?: boolean }) {
 function TopHit({ e, more }: { e: DiscoveryEntity; more: number }) {
   const { place, date } = detail(e);
   return (
-    <section className="sx-top" aria-label="Best match">
+    <section className="sx-top" aria-label="Best match" data-cw-entity={e.id}>
       <Link to={entityPath(e)} className="sx-top-card">
         <Thumb e={e} big />
         <span className="sx-top-copy">
@@ -322,7 +322,7 @@ function WhitePagesRows({ rows }: { rows: DiscoveryEntity[] }) {
         {rows.map(e => {
           const biz = e as DiscoveryEntity & { address?: string; phone?: string; website?: string };
           return (
-            <li key={e.id}>
+            <li key={e.id} data-cw-entity={e.id}>
               <div className="sx-result sx-result-plain">
                 <span className="sx-result-copy">
                   <span className="sx-kind">Unclaimed</span>
@@ -349,7 +349,7 @@ function Rows({ rows }: { rows: Array<{ e: DiscoveryEntity; more: number }> }) {
       {rows.map(({ e, more }) => {
         const { place, date } = detail(e);
         return (
-          <li key={e.id}>
+          <li key={e.id} data-cw-entity={e.id}>
             <Link to={entityPath(e)} className="sx-result">
               <Thumb e={e} />
               <span className="sx-result-copy">

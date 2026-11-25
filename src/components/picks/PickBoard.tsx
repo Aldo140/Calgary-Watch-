@@ -1,4 +1,5 @@
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
+import { recordSearchClick } from '../../lib/searchClicks';
 import { oneOf, seoNounInline } from '../../lib/pickSeo';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -17,8 +18,13 @@ const one = (s: Shelf) => oneOf(s.service);
  * labelled), then every local company we list, A–Z, one tap from a call. A tap
  * opens one sheet with one optional box: a check-in a week later.
  */
-export function PickBoard({ shelf, via, compact = false }: { shelf: Shelf; via: ContactVia; compact?: boolean }) {
-  const [sheet, setSheet] = useState<{ c: Contender; kind: ContactKind } | null>(null);
+export function PickBoard({ shelf, via, compact = false, searchQ = '' }: { shelf: Shelf; via: ContactVia; compact?: boolean; searchQ?: string }) {
+  const [sheet, setSheetState] = useState<{ c: Contender; kind: ContactKind } | null>(null);
+  // From a search, a Call or Website tap also counts toward that search (admin: did searches reach businesses?).
+  const setSheet = (next: { c: Contender; kind: ContactKind } | null) => {
+    if (next && searchQ) recordSearchClick({ q: searchQ, keys: [next.c.path ?? `pick-${next.c.key}`], act: next.kind === 'call' ? 'call' : 'site', from: 'search' });
+    setSheetState(next);
+  };
   // This device only: "you called them Tuesday", so coming back picks up where you left off.
   const [recent, setRecent] = useState<RecentContact | null>(null);
   useEffect(() => { setRecent(recentContacts(shelf.service.id)[0] ?? null); }, [shelf.service.id, sheet]);
@@ -165,7 +171,7 @@ function Card({ c, i, need, onContact }: { c: Contender; i: number; need: Need |
   const proofs = proofsFor(c);
   const lit = (p: Proof) => (need === 'urgent' && p.id === 'always-on') || (need === 'quote' && p.id === 'upfront');
   return (
-    <li id={`pk-c-${c.key}`} className={`pk-c${proofs.some(lit) ? ' is-fit' : ''}`} style={{ ['--i' as string]: i }}>
+    <li id={`pk-c-${c.key}`} data-cw-entity={c.path ?? `pick-${c.key}`} className={`pk-c${proofs.some(lit) ? ' is-fit' : ''}`} style={{ ['--i' as string]: i }}>
       <div className="pk-c-top">
         <span className="pk-mono" style={{ ['--h' as string]: hue(c.key) }} aria-hidden="true">{initials(c.name)}</span>
         <div className="pk-c-who">

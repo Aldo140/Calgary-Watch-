@@ -117,6 +117,11 @@ interface IncidentFormProps {
   isPinMode?: boolean;
   /** Clear parent's stored pin (e.g. after "Change" or when choosing GPS over a prior pin) */
   onClearPin?: () => void;
+  /**
+   * Signed out, the form still opens: people fill it in first and sign in on the last step,
+   * in place, so nothing they typed is lost. Resolves once signed in (or the dialog closes).
+   */
+  onSignIn?: (method: 'google' | 'email') => Promise<void>;
 }
 
 export default function IncidentForm({
@@ -132,7 +137,24 @@ export default function IncidentForm({
   isPinMode = false,
   onClearPin,
   userUid,
+  onSignIn,
 }: IncidentFormProps) {
+  const signedOut = !userProfile && !!onSignIn;
+  const [signingIn, setSigningIn] = useState<null | 'google' | 'email'>(null);
+  const [signInError, setSignInError] = useState<string | null>(null);
+  const signInHere = async (method: 'google' | 'email') => {
+    if (!onSignIn || signingIn) return;
+    setSigningIn(method);
+    setSignInError(null);
+    try {
+      await onSignIn(method);
+    } catch (err) {
+      const code = (err as { code?: string })?.code ?? '';
+      if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') setSignInError('Sign-in didn’t finish. Your report is still here, so try again.');
+    } finally {
+      setSigningIn(null);
+    }
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photo, setPhoto] = useState<PreparedPhoto | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
@@ -392,7 +414,7 @@ export default function IncidentForm({
     what: <>What <span>happened?</span></>,
     choose: <>Where <span>was it?</span></>,
     details: <>Tell <span>neighbours</span></>,
-    photo: <>Add a photo, <span>then post</span></>,
+    photo: signedOut ? <>One tap, <span>then post</span></> : <>Add a photo, <span>then post</span></>,
   };
 
   const header = (
@@ -573,7 +595,26 @@ export default function IncidentForm({
         </motion.div>
       )}
 
-      {step === 'photo' && (
+      {step === 'photo' && signedOut && (
+        <motion.div key="signin" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="lv-rf-step lv-rf-signin">
+          {/* Signed out, the report is filled in first and the one sign-in step sits here,
+              so the person never leaves the form and loses nothing they typed. */}
+          <div className="lv-rf-signin-card">
+            <p className="lv-rf-signin-lead"><Check size={18} aria-hidden="true" /> Your report is ready.</p>
+            <p>Sign in once so neighbours know a real person posted it. Your email is never shown, and you can still post as Anonymous.</p>
+            <button type="button" className="lv-rf-google" onClick={() => void signInHere('google')} disabled={!!signingIn}>
+              {signingIn === 'google' ? <Loader2 size={18} className="animate-spin" /> : <GoogleMark />}
+              Continue with Google
+            </button>
+            <button type="button" className="lv-rf-email" onClick={() => void signInHere('email')} disabled={!!signingIn}>
+              {signingIn === 'email' ? 'Opening…' : 'Use email instead'}
+            </button>
+            {signInError ? <p className="lv-o-err" role="alert">{signInError}</p> : null}
+          </div>
+        </motion.div>
+      )}
+
+      {step === 'photo' && !signedOut && (
         <motion.div key="photo" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="lv-rf-step">
           {/* Photo: optional, and never allowed to cost the reporter their report. */}
           <div>
@@ -688,7 +729,7 @@ export default function IncidentForm({
           <ArrowLeft size={18} /> Back
         </button>
       )}
-      {step === 'photo' ? (
+      {step === 'photo' && signedOut ? null : step === 'photo' ? (
         // Keyed and type="button" on purpose. Continue on the details step and
         // Post sit in the same slot; unkeyed, React reused one <button> and
         // turned it into the submit button while the Continue tap was still being
@@ -781,5 +822,17 @@ export default function IncidentForm({
         {body}
       </div>
     </div>
+  );
+}
+
+/** Google's "G", drawn inline so the button needs no image request. */
+function GoogleMark() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.9 6.2C12.4 13.6 17.7 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 7l7.2 5.6c4.2-3.9 7.1-9.6 7.1-17.1z"/>
+      <path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.2C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.2z"/>
+      <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.2-5.6c-2 1.4-4.7 2.3-8.7 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/>
+    </svg>
   );
 }

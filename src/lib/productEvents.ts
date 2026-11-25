@@ -16,6 +16,8 @@ export type ProductEventName =
   | 'notification_opened'
   | 'report_viewed'
   | 'report_started'
+  /** A signed-out reporter reached the form's sign-in step and tapped a method (`method`: google or email). */
+  | 'report_gate'
   | 'report_submitted'
   | 'feedback_added'
   | 'digest_enabled'

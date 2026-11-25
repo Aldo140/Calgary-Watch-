@@ -676,3 +676,13 @@ textarea.lv-o-input { resize: none; min-height: 120px; }
   .lv-cp-quads > span { grid-column: 1 / -1; }
   .lv-cp-quads button { padding: 0 4px; }
 }
+
+/* Report form, signed out: the one sign-in step, in place of the photo step. */
+.lv-rf-signin-card { display: grid; gap: 12px; padding: 18px; border: 2px solid var(--o-ink); border-radius: 18px; background: var(--o-card); box-shadow: 4px 4px 0 var(--o-cyan); }
+.lv-rf-signin-card p { margin: 0; color: #3d4148; font: 500 14.5px/1.45 var(--o-sans); }
+.lv-rf-signin-card .lv-rf-signin-lead { display: flex; align-items: center; gap: 8px; color: var(--o-ink); font: 800 17px/1.2 var(--o-sans); }
+.lv-rf-google, .lv-rf-email { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 12px 18px; border-radius: 999px; font: 700 15.5px/1.1 var(--o-sans); cursor: pointer; }
+.lv-rf-google { border: 2px solid var(--o-ink); background: #fff; color: #1f1f1f; box-shadow: 3px 3px 0 var(--o-ink); }
+.lv-rf-google:not(:disabled):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--o-ink); }
+.lv-rf-email { min-height: 44px; border: 0; background: none; color: var(--o-ink); text-decoration: underline; text-underline-offset: 3px; }
+.lv-rf-google:disabled, .lv-rf-email:disabled { opacity: .6; cursor: progress; }

@@ -7736,5 +7736,48 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "pawsitively-natural",
+      "name": "PAWSitively Natural Pet Food & Supplies",
+      "approved": true,
+      "hosts": [
+        "pawsitivelynatural.ca",
+        "www.pawsitivelynatural.ca",
+        "instagram.com",
+        "www.instagram.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "black-friday-sale-2026",
+        "input": {
+          "kind": "event",
+          "address": "2100 4 St SW, Calgary, AB",
+          "venue": "PAWSitively Natural Pet Food & Supplies",
+          "organizer": "PAWSitively Natural Pet Food & Supplies",
+          "pricing": "free",
+          "title": "PAWSitively Natural Black Friday Sale: 20% Off Everything",
+          "summary": "20% off everything for cats and dogs at PAWSitively Natural on 4 St SW, November 25 to 30, including locally made Artisan Raw Dog food.",
+          "description": "PAWSitively Natural's biggest sale of the year runs Wednesday, November 25 to Monday, November 30, 2026: 20% off everything in the store, from food and treats to beds and toys. Locally made raw food from Artisan Raw Dog is 20% off too. The shop is at 2100 4 St SW with free parking, open 9 a.m. to 7 p.m. Monday to Saturday and 11 a.m. to 5 p.m. on Sunday.",
+          "sourceUrl": "https://www.instagram.com/pawsitivelynatural",
+          "categories": [
+            "shopping",
+            "holiday"
+          ],
+          "tags": [
+            "black friday",
+            "pet store",
+            "sale",
+            "dogs",
+            "cats"
+          ],
+          "start": "2026-11-25T09:00:00-06:00",
+          "end": "2026-11-30T19:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

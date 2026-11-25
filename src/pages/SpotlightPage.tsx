@@ -196,6 +196,8 @@ export default function SpotlightPage() {
   const tickets = s.links.find(l => l.id === 'tickets')!;
   const films = demoFilms(s.showcase.films);
   const answered = s.interview.questions.filter(q => q.answer);
+  // After the visit date (Calgary, UTC-6) the scene stops promising a future visit.
+  const visited = Date.now() >= new Date(`${s.review.visitOn}T23:59:59-06:00`).getTime();
   const nextNight = nights[0];
 
   return (
@@ -308,12 +310,14 @@ export default function SpotlightPage() {
               </div>
             </Scene>
 
-            <Scene n={6} id="friday" look="polaroid" kicker="Developing…" label="After Friday" take={s.review.status === 'published' ? 2 : 1} title={<>We’re going <span>on October 30.</span></>}>
-              {s.review.status === 'published' ? null : <Polaroids />}
+            <Scene n={6} id="friday" look="polaroid" kicker={visited ? 'We were there' : 'Developing…'} label={visited ? 'October 30' : 'After Friday'} take={s.review.status === 'published' ? 2 : 1} title={visited ? <>A CalgaryWatch member <span>was there on October 30.</span></> : <>We’re going <span>on October 30.</span></>}>
+              {s.review.status === 'published' || visited ? null : <Polaroids />}
               {s.review.status === 'published' && s.review.body.length ? (
                 <div className="hx-prose">
                   {s.review.body.map(p => <p key={p}>{p}</p>)}
                 </div>
+              ) : visited ? (
+                <p className="hx-line">{s.partnerLabel}. Hex After Dark is tentatively set to return to The GRAND next year; follow the festival for next year’s call for films.</p>
               ) : (
                 <p className="hx-line">Our review of the night and a conversation with {s.interview.with}, after Friday.</p>
               )}

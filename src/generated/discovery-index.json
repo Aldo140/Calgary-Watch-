@@ -22927,6 +22927,53 @@
       "updatedAt": "2026-11-18T04:00:00Z"
     },
     {
+      "id": "biz-st-andrews-anglican-church",
+      "kind": "business",
+      "slug": "st-andrews-anglican-church",
+      "title": "St. Andrew's Anglican Church",
+      "name": "St. Andrew's Anglican Church",
+      "website": "https://standrewsanglicancalgary.ca/",
+      "address": "1611 St. Andrew's Place NW, Calgary, AB",
+      "neighbourhood": "St. Andrews Heights",
+      "summary": "An Anglican parish in St. Andrews Heights, near the University of Calgary and Foothills Hospital, with Sunday worship and a livestream.",
+      "description": "St. Andrew's Anglican Church at 1611 St. Andrew's Place NW is a parish in St. Andrews Heights, close to the University of Calgary and the Foothills Hospital. Children and adults worship together on Sundays, with Sunday School at the 10:30 a.m. service and a Sunday livestream. This Christmas it holds a family-friendly Christmas Eve service at 4 p.m., a Christmas Eve service at 7 p.m. and a Christmas Day service at 10 a.m.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "northwest calgary"
+      ],
+      "sources": [
+        {
+          "name": "St. Andrew's Anglican Church",
+          "url": "https://standrewsanglicancalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T19:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://standrewsanglicancalgary.ca/"
+      },
+      "services": [
+        "Sunday worship",
+        "Sunday livestream",
+        "Sunday School",
+        "Christmas services"
+      ],
+      "email": "office@standrewsanglicancalgary.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T19:30:00Z",
+      "updatedAt": "2026-11-24T19:30:00Z"
+    },
+    {
       "id": "biz-calgary-first-church-of-the-nazarene",
       "kind": "business",
       "slug": "calgary-first-church-of-the-nazarene",
@@ -30032,6 +30079,57 @@
       "verifiedAt": "2026-11-22T20:30:00-06:00",
       "updatedAt": "2026-11-22T20:30:00-06:00",
       "awaitingClaim": true
+    },
+    {
+      "id": "biz-arch-and-bow-exteriors",
+      "kind": "business",
+      "slug": "arch-and-bow-exteriors",
+      "name": "Arch & Bow Exteriors",
+      "title": "Arch & Bow Exteriors",
+      "summary": "Deck and fence builder based in Airdrie, serving Calgary and area with decks, fences, railings and commercial chain-link.",
+      "description": "Arch & Bow Exteriors builds decks, fences, railings, pergolas, patios and fire pits for homes in Calgary, Airdrie, Okotoks, High River and the surrounding area, and installs commercial chain-link fencing. Quote requests get a quick text back. Pricing and availability change by season, so confirm details and book through their official website or by phone.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "fence builder",
+        "deck builder",
+        "decks",
+        "fences",
+        "railings",
+        "chain-link fencing",
+        "outdoor living"
+      ],
+      "address": "317 Kings Heights Dr SE, Airdrie, AB T4A 0S6",
+      "website": "https://archandbow.ca/",
+      "sources": [
+        {
+          "name": "Arch & Bow Exteriors official website",
+          "url": "https://archandbow.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T23:00:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://archandbow.ca/"
+      },
+      "services": [
+        "Decks",
+        "Fences",
+        "Railings",
+        "Pergolas and patios",
+        "Commercial chain-link fencing"
+      ],
+      "phone": "587-700-3513",
+      "email": "info@archandbow.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T23:00:00Z",
+      "updatedAt": "2026-11-24T23:00:00Z"
     },
     {
       "id": "biz-ola-luna",

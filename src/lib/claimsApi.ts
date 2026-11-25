@@ -14,7 +14,7 @@ export { useMyClaims, useClaimLoadError } from './myClaims';
 
 export async function submitClaim(user: User, entity: { id: string; title: string; path: string }, draft: ClaimDraft): Promise<void> {
   if (!db) throw new Error('Sign-in is unavailable right now.');
-  const published = discoveryRepository.list().find(e => e.id === entity.id && ['event', 'market', 'business'].includes(e.kind) && !e.developmentOnly);
+  const published = discoveryRepository.claimable().find(e => e.id === entity.id && ['event', 'market', 'business'].includes(e.kind) && !e.developmentOnly);
   if (!published || entityPath(published) !== entity.path) throw new Error('This listing is not published.');
   if (!user.emailVerified) throw new Error('Verify your email address before submitting a claim.');
   await syncVerifiedToken(user);

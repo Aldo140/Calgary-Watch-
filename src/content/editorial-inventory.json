@@ -38514,6 +38514,1663 @@
       "updatedAt": "2026-11-22T20:30:00-06:00",
       "phone": "+1 403-547-7771",
       "awaitingClaim": true
+    },
+    {
+      "id": "biz-south-gate-alliance",
+      "kind": "business",
+      "slug": "south-gate-alliance",
+      "name": "South Gate Alliance",
+      "title": "South Gate Alliance",
+      "summary": "A Calgary church community.",
+      "description": "South Gate Alliance is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "evangelical"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://southgatealliance.net/",
+      "sources": [
+        {
+          "name": "South Gate Alliance official website",
+          "url": "https://southgatealliance.net/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://southgatealliance.net/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@southgatealliance.org",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-rainbow-christian-church",
+      "kind": "business",
+      "slug": "rainbow-christian-church",
+      "name": "Rainbow Christian Church",
+      "title": "Rainbow Christian Church",
+      "summary": "A Calgary church community.",
+      "description": "Rainbow Christian Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "baptist"
+      ],
+      "address": "5336 Lakeview Drive SW, Calgary, AB",
+      "website": "https://rainbowchurch.ca/new/",
+      "sources": [
+        {
+          "name": "Rainbow Christian Church official website",
+          "url": "https://rainbowchurch.ca/new/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://rainbowchurch.ca/new/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "rainbow_church@shaw.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-commons-church-marda-loop",
+      "kind": "business",
+      "slug": "commons-church-marda-loop",
+      "name": "Commons Church Marda Loop",
+      "title": "Commons Church Marda Loop",
+      "summary": "A Calgary church community.",
+      "description": "Commons Church Marda Loop is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "reformed"
+      ],
+      "address": "1638 30 Avenue SW, Calgary, AB",
+      "website": "https://www.commons.church/",
+      "sources": [
+        {
+          "name": "Commons Church Marda Loop official website",
+          "url": "https://www.commons.church/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.commons.church/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "leadteam@commonschurch.org",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-winners-chapel-international-calgary",
+      "kind": "business",
+      "slug": "winners-chapel-international-calgary",
+      "name": "Winners Chapel International Calgary",
+      "title": "Winners Chapel International Calgary",
+      "summary": "A Calgary church community.",
+      "description": "Winners Chapel International Calgary is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church"
+      ],
+      "address": "3740 27 Street NE, Calgary, AB",
+      "website": "https://winnerschapelcalgary.org/",
+      "sources": [
+        {
+          "name": "Winners Chapel International Calgary official website",
+          "url": "https://winnerschapelcalgary.org/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://winnerschapelcalgary.org/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "info@winnerschapelcalgary.org",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-balzac-united-church",
+      "kind": "business",
+      "slug": "balzac-united-church",
+      "name": "Balzac United Church",
+      "title": "Balzac United Church",
+      "summary": "A Calgary church community.",
+      "description": "Balzac United Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "united"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://balzacunitedchurch.com/",
+      "sources": [
+        {
+          "name": "Balzac United Church official website",
+          "url": "https://balzacunitedchurch.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://balzacunitedchurch.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "balzacunitedchurch@gmail.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-st-cecilia-roman-catholic-church",
+      "kind": "business",
+      "slug": "st-cecilia-roman-catholic-church",
+      "name": "St. Cecilia Roman Catholic Church",
+      "title": "St. Cecilia Roman Catholic Church",
+      "summary": "A Calgary church community.",
+      "description": "St. Cecilia Roman Catholic Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "roman-catholic"
+      ],
+      "address": "321 90 Avenue SE, Calgary, AB",
+      "website": "https://stceciliacalgary.com/",
+      "sources": [
+        {
+          "name": "St. Cecilia Roman Catholic Church official website",
+          "url": "https://stceciliacalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://stceciliacalgary.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@stceciliacalgary.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-red-deer-lake-united-church",
+      "kind": "business",
+      "slug": "red-deer-lake-united-church",
+      "name": "Red Deer Lake United Church",
+      "title": "Red Deer Lake United Church",
+      "summary": "A Calgary church community.",
+      "description": "Red Deer Lake United Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "united"
+      ],
+      "address": "96187 Highway 22X, Calgary, AB",
+      "website": "https://reddeerlakeuc.com/",
+      "sources": [
+        {
+          "name": "Red Deer Lake United Church official website",
+          "url": "https://reddeerlakeuc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://reddeerlakeuc.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@reddeerlakeuc.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-knox-presbyterian-church",
+      "kind": "business",
+      "slug": "knox-presbyterian-church",
+      "name": "Knox Presbyterian Church",
+      "title": "Knox Presbyterian Church",
+      "summary": "A Calgary church community.",
+      "description": "Knox Presbyterian Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "presbyterian"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://www.knoxcalgary.ca/",
+      "sources": [
+        {
+          "name": "Knox Presbyterian Church official website",
+          "url": "https://www.knoxcalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.knoxcalgary.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@knoxcalgary.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-grace-lutheran-church",
+      "kind": "business",
+      "slug": "grace-lutheran-church",
+      "name": "Grace Lutheran Church",
+      "title": "Grace Lutheran Church",
+      "summary": "A Calgary church community.",
+      "description": "Grace Lutheran Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "lutheran"
+      ],
+      "address": "3610 Sarcee Road SW, Calgary, AB",
+      "website": "https://calgarygracelutheran.360unite.com/home",
+      "sources": [
+        {
+          "name": "Grace Lutheran Church official website",
+          "url": "https://calgarygracelutheran.360unite.com/home",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarygracelutheran.360unite.com/home"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@calgarygracelutheran.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-brentview-baptist-church",
+      "kind": "business",
+      "slug": "brentview-baptist-church",
+      "name": "Brentview Baptist Church",
+      "title": "Brentview Baptist Church",
+      "summary": "A Calgary church community.",
+      "description": "Brentview Baptist Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "baptist"
+      ],
+      "address": "3512 Charleswood Drive NW, Calgary, AB",
+      "website": "https://brentview.church/",
+      "sources": [
+        {
+          "name": "Brentview Baptist Church official website",
+          "url": "https://brentview.church/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://brentview.church/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "mail@brentview.church",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-st-james-anglican-church",
+      "kind": "business",
+      "slug": "st-james-anglican-church",
+      "name": "St. James Anglican Church",
+      "title": "St. James Anglican Church",
+      "summary": "A Calgary church community.",
+      "description": "St. James Anglican Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "anglican"
+      ],
+      "address": "6351 Ranchview Drive NW, Calgary, AB",
+      "website": "https://www.stjamescalgary.com/",
+      "sources": [
+        {
+          "name": "St. James Anglican Church official website",
+          "url": "https://www.stjamescalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.stjamescalgary.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "dee@stjamescalgary.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-westview-baptist-church",
+      "kind": "business",
+      "slug": "westview-baptist-church",
+      "name": "Westview Baptist Church",
+      "title": "Westview Baptist Church",
+      "summary": "A Calgary church community.",
+      "description": "Westview Baptist Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "baptist"
+      ],
+      "address": "1313 Ranchlands Way NW, Calgary, AB",
+      "website": "https://www.westviewchurch.ca:443/",
+      "sources": [
+        {
+          "name": "Westview Baptist Church official website",
+          "url": "https://www.westviewchurch.ca:443/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.westviewchurch.ca:443/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "info@westviewchurch.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-altadore-baptist-church",
+      "kind": "business",
+      "slug": "altadore-baptist-church",
+      "name": "Altadore Baptist Church",
+      "title": "Altadore Baptist Church",
+      "summary": "A Calgary church community.",
+      "description": "Altadore Baptist Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church"
+      ],
+      "address": "4304 16 Street SW, Calgary, AB",
+      "website": "https://www.altadorebaptistchurch.com/",
+      "sources": [
+        {
+          "name": "Altadore Baptist Church official website",
+          "url": "https://www.altadorebaptistchurch.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.altadorebaptistchurch.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@altadorebaptistchurch.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-immanuel-church",
+      "kind": "business",
+      "slug": "immanuel-church",
+      "name": "Immanuel Church",
+      "title": "Immanuel Church",
+      "summary": "A Calgary church community.",
+      "description": "Immanuel Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "evangelical"
+      ],
+      "address": "1512 1 Street SW, Calgary, AB",
+      "website": "https://www.amazingchurch.ca/",
+      "sources": [
+        {
+          "name": "Immanuel Church official website",
+          "url": "https://www.amazingchurch.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.amazingchurch.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "info@amazingchurch.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-calvary-grace-church",
+      "kind": "business",
+      "slug": "calvary-grace-church",
+      "name": "Calvary Grace Church",
+      "title": "Calvary Grace Church",
+      "summary": "A Calgary church community.",
+      "description": "Calvary Grace Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "evangelical"
+      ],
+      "address": "204 6A Street NE, Calgary, AB",
+      "website": "https://www.calvarygrace.ca/",
+      "sources": [
+        {
+          "name": "Calvary Grace Church official website",
+          "url": "https://www.calvarygrace.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calvarygrace.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "info@calvarygrace.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-lakeview-united-church",
+      "kind": "business",
+      "slug": "lakeview-united-church",
+      "name": "Lakeview United Church",
+      "title": "Lakeview United Church",
+      "summary": "A Calgary church community.",
+      "description": "Lakeview United Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "united"
+      ],
+      "address": "3023 63 Avenue SW, Calgary, AB",
+      "website": "https://www.lakeviewunitedchurch.ca/",
+      "sources": [
+        {
+          "name": "Lakeview United Church official website",
+          "url": "https://www.lakeviewunitedchurch.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lakeviewunitedchurch.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "lakeviewuc@telus.net",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-south-calgary-chinese-evangelical-free-church",
+      "kind": "business",
+      "slug": "south-calgary-chinese-evangelical-free-church",
+      "name": "South Calgary Chinese Evangelical Free Church",
+      "title": "South Calgary Chinese Evangelical Free Church",
+      "summary": "A Calgary church community.",
+      "description": "South Calgary Chinese Evangelical Free Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "evangelical"
+      ],
+      "address": "340 39 Avenue SE, Calgary, AB",
+      "website": "https://www.sccefc.ca/",
+      "sources": [
+        {
+          "name": "South Calgary Chinese Evangelical Free Church official website",
+          "url": "https://www.sccefc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sccefc.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@sccefc.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-glamorgan-church",
+      "kind": "business",
+      "slug": "glamorgan-church",
+      "name": "Glamorgan Church",
+      "title": "Glamorgan Church",
+      "summary": "A Calgary church community.",
+      "description": "Glamorgan Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "church-of-god"
+      ],
+      "address": "4715 45 Street SW, Calgary, AB",
+      "website": "https://www.glamorganchurch.com/",
+      "sources": [
+        {
+          "name": "Glamorgan Church official website",
+          "url": "https://www.glamorganchurch.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.glamorganchurch.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@glamorganchurch.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-st-francis-of-assisi-catholic-church",
+      "kind": "business",
+      "slug": "st-francis-of-assisi-catholic-church",
+      "name": "St. Francis of Assisi Catholic Church",
+      "title": "St. Francis of Assisi Catholic Church",
+      "summary": "A Calgary church community.",
+      "description": "St. Francis of Assisi Catholic Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "roman-catholic"
+      ],
+      "address": "211 6 Avenue SE, Calgary, AB",
+      "website": "https://www.stfranciscalgary.com/",
+      "sources": [
+        {
+          "name": "St. Francis of Assisi Catholic Church official website",
+          "url": "https://www.stfranciscalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.stfranciscalgary.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "info@stfranciscalgary.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-hillhurst-united-church",
+      "kind": "business",
+      "slug": "hillhurst-united-church",
+      "name": "Hillhurst United Church",
+      "title": "Hillhurst United Church",
+      "summary": "A Calgary church community.",
+      "description": "Hillhurst United Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "united"
+      ],
+      "address": "1227 Kensington Close NW, Calgary, AB",
+      "website": "https://hillhurstunited.com/",
+      "sources": [
+        {
+          "name": "Hillhurst United Church official website",
+          "url": "https://hillhurstunited.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://hillhurstunited.com/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@hillhurstunited.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-holy-name-catholic-church",
+      "kind": "business",
+      "slug": "holy-name-catholic-church",
+      "name": "Holy Name Catholic Church",
+      "title": "Holy Name Catholic Church",
+      "summary": "A Calgary church community.",
+      "description": "Holy Name Catholic Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "catholic"
+      ],
+      "address": "2223 34 Street SW, Calgary, AB",
+      "website": "https://holynamecalgary.ca/",
+      "sources": [
+        {
+          "name": "Holy Name Catholic Church official website",
+          "url": "https://holynamecalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://holynamecalgary.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@holynamecalgary.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-first-mennonite-church",
+      "kind": "business",
+      "slug": "first-mennonite-church",
+      "name": "First Mennonite Church",
+      "title": "First Mennonite Church",
+      "summary": "A Calgary church community.",
+      "description": "First Mennonite Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "mennonite"
+      ],
+      "address": "2600 Richmond Road SW, Calgary, AB",
+      "website": "https://calgaryfirstmennonite.ca/",
+      "sources": [
+        {
+          "name": "First Mennonite Church official website",
+          "url": "https://calgaryfirstmennonite.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryfirstmennonite.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "info@calgaryfirstmennonite.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-calgary-chinese-baptist-church",
+      "kind": "business",
+      "slug": "calgary-chinese-baptist-church",
+      "name": "Calgary Chinese Baptist Church",
+      "title": "Calgary Chinese Baptist Church",
+      "summary": "A Calgary church community.",
+      "description": "Calgary Chinese Baptist Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "baptist"
+      ],
+      "address": "3907 44 Avenue NE, Calgary, AB",
+      "website": "https://www.calgarychinesebaptist.ca/",
+      "sources": [
+        {
+          "name": "Calgary Chinese Baptist Church official website",
+          "url": "https://www.calgarychinesebaptist.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarychinesebaptist.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "info@calgarychinesebaptist.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-sonrise-community-baptist-church",
+      "kind": "business",
+      "slug": "sonrise-community-baptist-church",
+      "name": "Sonrise Community Baptist Church",
+      "title": "Sonrise Community Baptist Church",
+      "summary": "A Calgary church community.",
+      "description": "Sonrise Community Baptist Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "baptist"
+      ],
+      "address": "7015 32 Avenue NE, Calgary, AB",
+      "website": "https://www.sonrisecbc.ca/",
+      "sources": [
+        {
+          "name": "Sonrise Community Baptist Church official website",
+          "url": "https://www.sonrisecbc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sonrisecbc.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "sonriseb@shaw.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-varsity-bible-church",
+      "kind": "business",
+      "slug": "varsity-bible-church",
+      "name": "Varsity Bible Church",
+      "title": "Varsity Bible Church",
+      "summary": "A Calgary church community.",
+      "description": "Varsity Bible Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church"
+      ],
+      "address": "4807 Valiant Drive NW, Calgary, AB",
+      "website": "https://www.vbchurch.ca/",
+      "sources": [
+        {
+          "name": "Varsity Bible Church official website",
+          "url": "https://www.vbchurch.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.vbchurch.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@vbchurch.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-west-springs-church",
+      "kind": "business",
+      "slug": "west-springs-church",
+      "name": "West Springs Church",
+      "title": "West Springs Church",
+      "summary": "A Calgary church community.",
+      "description": "West Springs Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "free-methodist"
+      ],
+      "address": "816 78 Street SW, Calgary, AB",
+      "website": "https://westsprings.church/",
+      "sources": [
+        {
+          "name": "West Springs Church official website",
+          "url": "https://westsprings.church/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://westsprings.church/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@westsprings.church",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-sacred-heart-church",
+      "kind": "business",
+      "slug": "sacred-heart-church",
+      "name": "Sacred Heart Church",
+      "title": "Sacred Heart Church",
+      "summary": "A Calgary church community.",
+      "description": "Sacred Heart Church is a church in Calgary. Service times, Christmas services and community events can change, so confirm the details on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "church",
+        "catholic"
+      ],
+      "address": "1307 14 Street SW, Calgary, AB",
+      "website": "https://www.sacredheartcalgary.ca/",
+      "sources": [
+        {
+          "name": "Sacred Heart Church official website",
+          "url": "https://www.sacredheartcalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sacredheartcalgary.ca/"
+      },
+      "services": [
+        "Worship services",
+        "Community events"
+      ],
+      "email": "office@sacredheartcalgary.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-laser-city-calgary-south",
+      "kind": "business",
+      "slug": "laser-city-calgary-south",
+      "name": "Laser City Calgary South",
+      "title": "Laser City Calgary South",
+      "summary": "A Calgary laser tag arena.",
+      "description": "Laser City Calgary South is a laser tag arena in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "recreation",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "laser-tag-arena"
+      ],
+      "address": "9950 Macleod Trail SE, Calgary, AB",
+      "website": "https://www.lasercity.ca/calgarysouth",
+      "sources": [
+        {
+          "name": "Laser City Calgary South official website",
+          "url": "https://www.lasercity.ca/calgarysouth",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lasercity.ca/calgarysouth"
+      },
+      "services": [
+        "Laser tag",
+        "Parties and group bookings"
+      ],
+      "email": "calgarysouth@lasercity.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-arcadia-adventures-escape-rooms",
+      "kind": "business",
+      "slug": "arcadia-adventures-escape-rooms",
+      "name": "Arcadia Adventures Escape Rooms",
+      "title": "Arcadia Adventures Escape Rooms",
+      "summary": "A Calgary escape room.",
+      "description": "Arcadia Adventures Escape Rooms is a escape room in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "recreation",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "escape-room"
+      ],
+      "address": "105 58 Avenue SE, Calgary, AB",
+      "website": "https://arcadiaescaperoom.ca",
+      "sources": [
+        {
+          "name": "Arcadia Adventures Escape Rooms official website",
+          "url": "https://arcadiaescaperoom.ca",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://arcadiaescaperoom.ca"
+      },
+      "services": [
+        "Escape rooms",
+        "Group bookings"
+      ],
+      "email": "bookings@arcadiaescaperoom.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-toppler-bowl",
+      "kind": "business",
+      "slug": "toppler-bowl",
+      "name": "Toppler Bowl",
+      "title": "Toppler Bowl",
+      "summary": "A Calgary bowling centre.",
+      "description": "Toppler Bowl is a bowling centre in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "recreation",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "bowling-centre"
+      ],
+      "address": "7640 Fairmount Drive SE, Calgary, AB",
+      "website": "https://topplerbowl.com/",
+      "sources": [
+        {
+          "name": "Toppler Bowl official website",
+          "url": "https://topplerbowl.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://topplerbowl.com/"
+      },
+      "services": [
+        "Bowling",
+        "Parties and group bookings"
+      ],
+      "email": "topplerbowl@telus.net",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-blox-arts-centre",
+      "kind": "business",
+      "slug": "blox-arts-centre",
+      "name": "Blox Arts Centre",
+      "title": "Blox Arts Centre",
+      "summary": "A Calgary arts centre.",
+      "description": "Blox Arts Centre is a arts centre in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "recreation",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "arts-centre"
+      ],
+      "address": "834 11 Avenue SW, Calgary, AB",
+      "website": "https://bloxartscentre.ca/",
+      "sources": [
+        {
+          "name": "Blox Arts Centre official website",
+          "url": "https://bloxartscentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://bloxartscentre.ca/"
+      },
+      "services": [
+        "Arts programs",
+        "Venue bookings"
+      ],
+      "email": "bookings@bloxbia.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-soul-to-sole-dance-company",
+      "kind": "business",
+      "slug": "soul-to-sole-dance-company",
+      "name": "Soul to Sole Dance Company",
+      "title": "Soul to Sole Dance Company",
+      "summary": "A Calgary dance studio.",
+      "description": "Soul to Sole Dance Company is a dance studio in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "learning",
+        "arts",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "dance-studio"
+      ],
+      "address": "7138 Fisher Street SE, Calgary, AB",
+      "website": "https://www.soultosoledance.ca/",
+      "sources": [
+        {
+          "name": "Soul to Sole Dance Company official website",
+          "url": "https://www.soultosoledance.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.soultosoledance.ca/"
+      },
+      "services": [
+        "Dance classes",
+        "Recitals"
+      ],
+      "email": "info@soultosoledance.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-escape60",
+      "kind": "business",
+      "slug": "escape60",
+      "name": "Escape60",
+      "title": "Escape60",
+      "summary": "A Calgary escape room.",
+      "description": "Escape60 is a escape room in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "recreation",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "escape-room"
+      ],
+      "address": "1638 10 Avenue SW, Calgary, AB",
+      "website": "https://escape60.ca/",
+      "sources": [
+        {
+          "name": "Escape60 official website",
+          "url": "https://escape60.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://escape60.ca/"
+      },
+      "services": [
+        "Escape rooms",
+        "Group bookings"
+      ],
+      "email": "bookings@escape60.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-counterpoint-dance-academy",
+      "kind": "business",
+      "slug": "counterpoint-dance-academy",
+      "name": "Counterpoint Dance Academy",
+      "title": "Counterpoint Dance Academy",
+      "summary": "A Calgary dance studio.",
+      "description": "Counterpoint Dance Academy is a dance studio in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "learning",
+        "arts",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "dance-studio"
+      ],
+      "address": "3425 22 Street SW, Calgary, AB",
+      "website": "https://www.counterpointdancemarda.com",
+      "sources": [
+        {
+          "name": "Counterpoint Dance Academy official website",
+          "url": "https://www.counterpointdancemarda.com",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.counterpointdancemarda.com"
+      },
+      "services": [
+        "Dance classes",
+        "Recitals"
+      ],
+      "email": "office@counterpointdancemarda.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-north-hill-curling-club",
+      "kind": "business",
+      "slug": "north-hill-curling-club",
+      "name": "North Hill Curling Club",
+      "title": "North Hill Curling Club",
+      "summary": "A Calgary curling club.",
+      "description": "North Hill Curling Club is a curling club in Calgary. Prices, hours and bookings can change, so confirm the details on their official website.",
+      "categories": [
+        "recreation",
+        "family"
+      ],
+      "tags": [
+        "things-to-do",
+        "curling-club"
+      ],
+      "address": "1201 2 Street NW, Calgary, AB",
+      "website": "https://www.northhillcurlingclub.ca/",
+      "sources": [
+        {
+          "name": "North Hill Curling Club official website",
+          "url": "https://www.northhillcurlingclub.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.northhillcurlingclub.ca/"
+      },
+      "services": [
+        "Curling leagues",
+        "Learn to curl",
+        "Rentals"
+      ],
+      "email": "curl@nhcc.ca",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-cambrian-heights-community-association",
+      "kind": "business",
+      "slug": "cambrian-heights-community-association",
+      "name": "Cambrian Heights Community Association",
+      "title": "Cambrian Heights Community Association",
+      "summary": "A Calgary community association with neighbourhood programs, events and hall rentals.",
+      "description": "Cambrian Heights Community Association runs neighbourhood programs, seasonal events and a community hall. Current programs, events and rental details are on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "community-association"
+      ],
+      "address": "600 Northmount Drive NW, Calgary, AB",
+      "website": "https://www.cambrianheightscommunity.com/",
+      "sources": [
+        {
+          "name": "Cambrian Heights Community Association official website",
+          "url": "https://www.cambrianheightscommunity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cambrianheightscommunity.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "email": "market@cambrianheightscommunity.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
+    },
+    {
+      "id": "biz-crestmont-hall",
+      "kind": "business",
+      "slug": "crestmont-hall",
+      "name": "Crestmont Hall",
+      "title": "Crestmont Hall",
+      "summary": "A Calgary community association with neighbourhood programs, events and hall rentals.",
+      "description": "Crestmont Hall runs neighbourhood programs, seasonal events and a community hall. Current programs, events and rental details are on their official website.",
+      "categories": [
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "community-association"
+      ],
+      "address": "12400 Crestmont Boulevard SW, Calgary, AB",
+      "website": "https://www.crestmonthall.com/",
+      "sources": [
+        {
+          "name": "Crestmont Hall official website",
+          "url": "https://www.crestmonthall.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-24T13:30:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crestmonthall.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "email": "events@crestmonthall.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-24T13:30:00-06:00",
+      "updatedAt": "2026-11-24T13:30:00-06:00",
+      "awaitingClaim": true
     }
   ]
 }

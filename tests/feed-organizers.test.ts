@@ -39,6 +39,7 @@ test('one-off organizers, relists and existing profiles get no generated profile
  assert.deepEqual(feedOrganizerProfiles(past,now),[]);
  const placeholder=[1,2,3].map(n=>show(`x${n}`,{organizer:'Organizer not listed'}));
  assert.deepEqual(feedOrganizerProfiles(placeholder,now),[]);
+ assert.deepEqual(feedOrganizerProfiles([1,2,3].map(n=>show(`y${n}`,{organizer:'PROMOTER NOT DEFINED'})),now),[]);
  const werklund=all.find(e=>e.id==='biz-werklund-centre')!;
  assert.deepEqual(feedOrganizerProfiles([werklund,...[1,2,3].map(n=>show(`w${n}`,{organizer:'Werklund Centre'}))],now),[]);
 });

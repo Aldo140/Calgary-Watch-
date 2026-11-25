@@ -18,3 +18,13 @@ describe('listings awaiting their owner', () => {
     assert.deepEqual(repo.claimable().map(e => e.id), ['live', 'waiting', 'claimed']);
   });
 });
+
+describe('claiming a listing that is awaiting its owner', () => {
+  it('accepts the claim instead of calling the hidden listing unpublished', async () => {
+    const { readFileSync } = await import('node:fs');
+    const source = readFileSync(new URL('../src/lib/claimsApi.ts', import.meta.url), 'utf8');
+    const submit = source.slice(source.indexOf('export async function submitClaim'), source.indexOf('export async function submitUpdate'));
+    assert.match(submit, /discoveryRepository\.claimable\(\)/);
+    assert.doesNotMatch(submit, /discoveryRepository\.list\(\)/);
+  });
+});

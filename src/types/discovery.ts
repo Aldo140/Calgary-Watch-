@@ -10,7 +10,7 @@ export interface EntityBase {
   updatedAt: string; developmentOnly?: boolean; neighbourhood?: string;
   /** Set by the build only when an admin approved a listing claim for it (src/lib/verified.ts). Not the source check above. */
   ownerVerifiedAt?: string;
-  /** A listing we set up for an owner: hidden from the site until an approved claim stamps ownerVerifiedAt. Only /claim can open it. */
+  /** A listing we set up for an owner and they have not claimed: shown only as a white-pages row in search (Nov 25), no profile page, until an approved claim stamps ownerVerifiedAt. */
   awaitingClaim?: boolean;
   /** Server-applied content version, used only to acknowledge successful publication. */
   ownerContentAppliedAt?: number;
@@ -32,6 +32,12 @@ export interface Business extends EntityBase, Location {
   kind: 'business'; name: string; phone?: string; email?: string; website?: string; hours?: Record<string, string>;
   priceLevel?: 1 | 2 | 3 | 4; images: EntityImage[]; socials: Record<string, string>; services: string[];
   claimed: boolean; partner: boolean; editorialSelection: boolean; offer?: string; sponsorshipDisclosure?: string;
+  /** Featured Partner niche: searches it owns ("optometrist", "eye exam"), shown first for them. */
+  featuredNiches?: string[];
+  /** When the Featured placement ends (ISO). After it, the listing is an ordinary one again. */
+  featuredUntil?: string;
+  /** "paid" or "trial": for the admin report, never shown to readers. */
+  featuredPlan?: 'paid' | 'trial';
 }
 export interface GuideEntry { entityId: string; note: string; comparison?: Record<string, string> }
 /** One stop on a guide's route. `entityId` links a listing we already carry (a market, a local place). */

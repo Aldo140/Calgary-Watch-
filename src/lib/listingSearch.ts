@@ -4,6 +4,7 @@ import { matchesTonight } from './discoveryCalendar';
 import { communityByName, editDistance, normalizeWords, parseSearchIntent } from './searchIntent';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
 import { verifiedBoost } from './verified';
+import { featuredActive, ownsSearch } from './featured';
 import { LOCAL_SERVICES, type LocalService } from '../data/localServices';
 
 /**
@@ -316,6 +317,8 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
     score += Math.min(3, (e.scores?.featured ?? 0) + (e.scores?.editorial ?? 0));
     // Verified by the organization: a notch up, never past a better match (verified.ts).
     score += verifiedBoost(e, 'search', now.getTime());
+    // A Featured Partner leads the searches its niche covers, and gets a nudge on any other match.
+    if (ownsSearch(e, q, now.getTime())) score += 60; else if (featuredActive(e, now.getTime())) score += 2;
     hits.push({ e, score, matched, sure, at });
   }
   const need = query.words.length;

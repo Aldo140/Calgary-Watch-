@@ -126,3 +126,12 @@ describe('search demand, Nov 25: clinics, web addresses and street addresses', (
     assert.equal(addressKey('17 ave'), null);
   });
 });
+
+describe('bowling', () => {
+  const biz = (id: string, title: string, summary: string, tags: string[]) => ({ ...base, id, slug: id, kind: 'business', title, name: title, summary, categories: ['food'], tags, services: [], images: [], socials: {}, claimed: false, partner: false, editorialSelection: false, address: '' }) as unknown as DiscoveryEntity;
+  it('a bowling search finds bowling alleys, not noodle bowls', () => {
+    const all = [biz('lanes', 'Paradise Lanes', 'A bowling alley with public bowling.', ['bowling']), biz('noodle', 'Oodle Noodle', 'Noodle bowls to go.', ['noodles', 'bowl'])];
+    const ids = Object.values(searchListings(all, [], 'bowling', NOW).groups).flat().map(e => e.id);
+    assert.deepEqual(ids, ['lanes']);
+  });
+});

@@ -70,7 +70,7 @@ const SYNONYMS: Record<string, string[]> = {
   christmas: ['holiday', 'festive', 'santa'], holiday: ['christmas', 'festive'], festive: ['christmas', 'holiday'],
   // Admin Search demand, Nov 25: clinics people look for by the job, not the clinic's word for it.
   optometrist: ['optometry', 'optician', 'eyewear'], optometry: ['optometrist'], optician: ['optometrist', 'eyewear'],
-  dentist: ['dental'], dental: ['dentist'], aesthetic: ['botox'], bowl: ['bowling'], bowling: ['bowl'],
+  dentist: ['dental'], dental: ['dentist'], aesthetic: ['botox'],
   game: ['vs', 'match'], skating: ['skate', 'rink'], skate: ['skating', 'rink'], lights: ['zoolights', 'lantern', 'illumination'], parade: ['procession'],
 };
 

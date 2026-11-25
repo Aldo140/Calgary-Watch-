@@ -13,6 +13,7 @@ import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 import { installChunkRecovery, lazyWithRecovery as lazy, restoreRecoveredScroll } from '@/src/lib/chunkRecovery';
 import { isUpdateReady, startVersionWatch } from '@/src/lib/appVersion';
 import { logProductEvent } from '@/src/lib/productEvents';
+import { SearchClickTracker } from '@/src/components/site/SearchClickTracker';
 
 installChunkRecovery();
 startVersionWatch();
@@ -226,6 +227,7 @@ export default function App() {
     <BrowserRouter>
       <RedirectHandler />
       <PageTracker />
+      <SearchClickTracker />
       <DeferredSiteTools />
       <BuildSwap />
       <RouteBoundary>

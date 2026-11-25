@@ -120,7 +120,7 @@ function BestCard({ thing, answer, where }: { thing: string; answer?: BestAnswer
             <h3>On CalgaryWatch</h3>
             <ol className="cw-best-picks">
               {picks.map((e, i) => (
-                <li key={e.id}>
+                <li key={e.id} data-cw-entity={e.id}>
                   <Link to={entityPath(e)}>
                     <b className="cw-best-rank" aria-hidden="true">{i + 1}</b>
                     <span><b>{e.title}</b><small>{[PICK_KIND[e.kind], e.neighbourhood].filter(Boolean).join(' · ')}</small></span>

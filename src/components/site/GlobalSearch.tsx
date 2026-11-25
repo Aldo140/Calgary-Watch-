@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, ArrowRight } from 'lucide-react';
 import { normalizeSearch } from '../../lib/discovery';
 import { recordSearch } from '../../lib/searchDemand';
+import { clickAction, recordSearchClick } from '../../lib/searchClicks';
 
 export interface Suggestion { label: string; note?: string; to: string }
 
@@ -50,6 +51,8 @@ export function GlobalSearch({ initial = '', suggest, popular = [], showSubmitTe
   const go = (s: Suggestion) => {
     // A pick that skips /search ("hex" → the Hex profile) is still a search, and it found something.
     if (!s.to.startsWith('/search')) recordSearch(normalizeSearch(inputRef.current?.value ?? ''), Math.max(1, options.length));
+    // A typeahead pick that opens a listing is a search click too (admin: did searches reach businesses?).
+    if (clickAction(s.to, window.location.origin, false) === 'open') recordSearchClick({ q: normalizeSearch(inputRef.current?.value ?? ''), keys: [s.to.split(/[?#]/)[0].replace(/\/$/, '')], act: 'open', from: 'typeahead' });
     close(); inputRef.current?.blur(); navigate(s.to);
   };
   const onKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {

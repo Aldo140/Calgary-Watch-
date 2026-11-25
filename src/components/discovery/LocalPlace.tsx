@@ -148,7 +148,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const ribbon = [name, shelf.label, ahead.count ? `${ahead.count} ${ahead.count === 1 ? 'date' : 'dates'} coming up` : note?.since ? `Since ${note.since}` : 'Calgary, Alberta', place.neighbourhood || (q ? `${q} Calgary` : 'Calgary'), 'CalgaryWatch Local'];
 
   return (
-    <div ref={revealRef} className="cw-loc lp" data-long-name={name.length > 20 || undefined} data-profile-category={presentation.key} style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink } as CSSProperties}>
+    <div ref={revealRef} className="cw-loc lp" data-cw-entity={place.id} data-cw-profile="" data-long-name={name.length > 20 || undefined} data-profile-category={presentation.key} style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink } as CSSProperties}>
       <LiveSky className="lp-hero" labelledBy="lp-title">
         {sky => <>
           <div className="cw-wrap lp-hero-in">

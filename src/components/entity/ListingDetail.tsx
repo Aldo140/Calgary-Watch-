@@ -151,7 +151,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const where = event.venue || event.neighbourhood || cleanAddress(event.address);
 
   return (
-    <div className={`mk mk-detail cw-home2 ld ev ev-${theme.id}`} ref={revealRef} style={orgShelf ? { ['--tone' as string]: orgShelf.tone, ['--tink' as string]: orgShelf.ink } as CSSProperties : undefined}>
+    <div className={`mk mk-detail cw-home2 ld ev ev-${theme.id}`} data-cw-entity={event.id} data-cw-profile="" ref={revealRef} style={orgShelf ? { ['--tone' as string]: orgShelf.tone, ['--tink' as string]: orgShelf.ink } as CSSProperties : undefined}>
       <section className={`mk-dhero ld-hero ev-hero${on ? ' is-open' : ''}`} aria-labelledby="ld-title">
         <EventScene theme={theme.id} />
         <div className="cw-wrap mk-dhero-in">

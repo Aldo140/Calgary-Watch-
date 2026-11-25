@@ -11,6 +11,7 @@ import { searchListings } from '../../lib/listingSearch';
 import { discoveryRepository } from '../../data/discovery';
 import { awaitingOwner } from '../../lib/discovery';
 import { trackSubscription } from '../../lib/readEfficiency';
+import { SearchReachPanel } from './SearchReachPanel';
 import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, TimeAgo, mono } from './ui';
 
 const WINDOWS = [7, 30, 90] as const;
@@ -69,6 +70,7 @@ export function DemandWorkspace() {
         <StatTile label="Hit rate" value={rows && total ? Math.round((1 - (rows.filter((r) => r.results === 0).length / total)) * 100) : null} unit="%" />
       </StatGrid>
       <LatestSearches />
+      <SearchReachPanel days={days} attempt={attempt} searches={rows} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Looked for, not found" subtitle="What to list next. Each is a real search that came back empty.">
           {rows === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>

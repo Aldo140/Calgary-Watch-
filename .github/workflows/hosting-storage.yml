@@ -1,0 +1,40 @@
+name: Trim Hosting storage
+
+# Every deploy stores a full Hosting version. This reports how much the stored
+# versions hold and, when asked, keeps only the newest ones (the live release is
+# never touched). Hosting now keeps 20 versions on its own (set Nov 23, 2026),
+# so this is only needed to check or change that. See scripts/deploy/hosting-versions.mjs.
+on:
+  workflow_dispatch:
+    inputs:
+      keep:
+        description: "Versions to keep (at least 5)"
+        default: "20"
+      apply:
+        description: "Set the limit and delete older versions (otherwise just report)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# No shared concurrency group with the deploy: a queued run there could be
+# replaced. Deleting only old versions is safe while a deploy runs.
+concurrency:
+  group: "hosting-storage"
+
+jobs:
+  trim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Report or trim Hosting versions
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+        run: node scripts/deploy/hosting-versions.mjs --keep "${{ inputs.keep || '20' }}" ${{ inputs.apply && '--apply' || '' }}

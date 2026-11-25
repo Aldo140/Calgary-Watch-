@@ -12335,6 +12335,123 @@
       "featuredPlan": "trial"
     },
     {
+      "id": "biz-docere-wellness-centre",
+      "kind": "business",
+      "slug": "docere-wellness-centre",
+      "name": "Docere Wellness Centre",
+      "title": "Docere Wellness Centre",
+      "summary": "A Ranchlands wellness clinic in NW Calgary with naturopathic doctors, a nurse practitioner, an acupuncturist, a registered dietitian and a registered psychologist under one roof.",
+      "description": "Docere Wellness Centre is a multidisciplinary clinic at 15-7750 Ranchview Dr NW in Ranchlands. Its team includes naturopathic doctors (among them Dr. Rabia Meghji, the naturopathic medical director, Dr. Avni Harchad and Dr. Xermã Palmares), nurse practitioner Andy Haile, registered acupuncturist Dr. Marcia Gray, registered dietitian Michelle Capicio and registered psychologist Tina Nikolaou. Services include naturopathic medicine, functional medicine, bio-identical hormone therapy, NAET allergy care, lab testing, IV therapy and a vitamin shot bar, acupuncture and TCM, vein therapy (sclerotherapy), nutrition and weight management, and psychological counselling for individuals, couples and families. New patients can book online at docerewellness.janeapp.com or call 403-452-6262. The clinic direct-bills a number of insurers; its website lists which.",
+      "categories": [
+        "wellness"
+      ],
+      "tags": [
+        "naturopath",
+        "naturopathic doctor",
+        "acupuncture",
+        "iv therapy",
+        "dietitian",
+        "psychologist",
+        "nurse practitioner",
+        "hormone therapy",
+        "allergies",
+        "menopause",
+        "wellness clinic"
+      ],
+      "address": "15-7750 Ranchview Dr NW, Calgary, AB T3G 1Y9",
+      "neighbourhood": "Ranchlands",
+      "website": "https://docerewellness.com/",
+      "phone": "+1 403-452-6262",
+      "email": "info@docerewellness.com",
+      "hours": {
+        "Monday": "10:00–18:00",
+        "Tuesday": "10:00–18:00",
+        "Wednesday": "10:00–18:00",
+        "Thursday": "10:00–18:00",
+        "Friday": "10:00–18:00",
+        "Saturday": "09:00–17:00",
+        "Sunday": "Closed"
+      },
+      "sources": [
+        {
+          "name": "Docere Wellness Centre official website",
+          "url": "https://docerewellness.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T16:30:00-06:00"
+        },
+        {
+          "name": "Docere Wellness Centre practitioners",
+          "url": "https://docerewellness.com/practitioners.html",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T16:30:00-06:00"
+        }
+      ],
+      "image": {
+        "src": "https://calgarywatch.ca/images/orgs/biz-docere-wellness-centre.webp",
+        "alt": "A treatment room at Docere Wellness Centre with two leather recliners, green cushions and blossom artwork",
+        "credit": "Image from docerewellness.com"
+      },
+      "images": [],
+      "socials": {
+        "website": "https://docerewellness.com/",
+        "instagram": "https://www.instagram.com/docerewellnesscentre/",
+        "facebook": "https://www.facebook.com/DocereWellnessCenter"
+      },
+      "services": [
+        "Naturopathic medicine",
+        "Functional medicine",
+        "Bio-identical hormone therapy (BHRT)",
+        "NAET allergy care",
+        "Lab testing",
+        "IV therapy",
+        "Vitamin shot bar",
+        "Acupuncture & TCM",
+        "Vein therapy (sclerotherapy)",
+        "Registered dietitian",
+        "Weight management",
+        "Psychological counselling",
+        "Online booking"
+      ],
+      "claimed": false,
+      "partner": true,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-25T16:30:00-06:00",
+      "updatedAt": "2026-11-25T16:30:00-06:00",
+      "sponsorshipDisclosure": "Featured partner placement, part of a free pilot with Docere Wellness Centre through January 2027. It does not affect editorial picks.",
+      "featuredNiches": [
+        "naturopath",
+        "naturopathic",
+        "naturopathic doctor",
+        "iv therapy",
+        "iv drip",
+        "vitamin iv",
+        "b12 shot",
+        "acupuncture",
+        "acupuncturist",
+        "dietitian",
+        "dietician",
+        "nutritionist",
+        "psychologist",
+        "nurse practitioner",
+        "bhrt",
+        "hormone therapy",
+        "menopause",
+        "perimenopause",
+        "naet",
+        "allergy testing",
+        "functional medicine",
+        "sclerotherapy",
+        "holistic",
+        "wellness clinic",
+        "wellness centre",
+        "wellness center"
+      ],
+      "featuredUntil": "2027-02-01T00:00:00-06:00",
+      "featuredPlan": "trial"
+    },
+    {
       "id": "biz-workshop-theatre",
       "kind": "business",
       "slug": "workshop-theatre",

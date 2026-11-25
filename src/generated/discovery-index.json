@@ -27879,6 +27879,59 @@
       "awaitingClaim": true
     },
     {
+      "id": "biz-kane-medical-aesthetics",
+      "kind": "business",
+      "slug": "kane-medical-aesthetics",
+      "name": "Kane Medical Aesthetics",
+      "title": "Kane Medical Aesthetics",
+      "summary": "A medical spa on 17 Ave SW for Botox, dermal fillers, PRP, laser hair removal, microneedling and facials.",
+      "description": "Kane Medical Aesthetics is a medical spa at 908 17 Ave SW, Suite 212. Its nurses and aestheticians offer non-surgical treatments including Botox, dermal fillers, Sculptra, PRP, Belkyra, laser hair removal, microneedling, skin tightening and facials, starting with a consultation. Prices depend on the treatment, so book a consultation through their official website for a quote.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "medical spa",
+        "med spa",
+        "botox",
+        "dermal fillers",
+        "laser hair removal",
+        "facials"
+      ],
+      "address": "908 17 Ave SW #212, Calgary, AB",
+      "website": "https://kanemedicalaesthetics.com/",
+      "sources": [
+        {
+          "name": "Kane Medical Aesthetics official website",
+          "url": "https://kanemedicalaesthetics.com/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T08:00:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://kanemedicalaesthetics.com/",
+        "facebook": "https://www.facebook.com/KaneMedicalAesthetics"
+      },
+      "services": [
+        "Botox",
+        "Dermal fillers",
+        "PRP",
+        "Laser hair removal",
+        "Microneedling",
+        "Facials"
+      ],
+      "email": "info@kanemedicalaesthetics.com",
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-25T08:00:00-06:00",
+      "updatedAt": "2026-11-25T08:00:00-06:00",
+      "phone": "+1 403-771-2921",
+      "awaitingClaim": true
+    },
+    {
       "id": "biz-petals-n-blooms",
       "kind": "business",
       "slug": "petals-n-blooms",

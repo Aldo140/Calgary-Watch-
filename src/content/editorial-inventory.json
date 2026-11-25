@@ -40467,6 +40467,58 @@
       "verification": "source-checked",
       "verifiedAt": "2026-11-23T22:45:00Z",
       "updatedAt": "2026-11-23T22:45:00Z"
+    },
+    {
+      "id": "biz-paradise-lanes",
+      "kind": "business",
+      "slug": "paradise-lanes",
+      "title": "Paradise Lanes",
+      "name": "Paradise Lanes",
+      "website": "https://paradiselanes.ca/",
+      "address": "3411 17 Avenue SE, Calgary, AB T2A 0R3",
+      "summary": "A bowling alley on 17 Avenue SE with public bowling and leagues.",
+      "description": "Paradise Lanes is a bowling alley at 3411 17 Avenue SE with public bowling hours most days. Hours change for leagues and holidays, so check their official website or call before you go.",
+      "categories": [
+        "recreation",
+        "family"
+      ],
+      "tags": [
+        "search-gap",
+        "organization",
+        "bowling",
+        "5-pin bowling"
+      ],
+      "sources": [
+        {
+          "name": "Paradise Lanes official website",
+          "url": "https://paradiselanes.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T13:10:00-06:00"
+        },
+        {
+          "name": "Paradise Lanes contact page",
+          "url": "https://paradiselanes.ca/contact/",
+          "kind": "official",
+          "retrievedAt": "2026-11-25T13:10:00-06:00"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://paradiselanes.ca/"
+      },
+      "services": [
+        "Public bowling",
+        "Leagues",
+        "Parties"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-11-25T13:10:00-06:00",
+      "updatedAt": "2026-11-25T13:10:00-06:00",
+      "phone": "+1 403-272-4570"
     }
   ]
 }

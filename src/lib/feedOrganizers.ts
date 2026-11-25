@@ -14,7 +14,7 @@ import { organizationIdentityForName } from './organizations';
  */
 export const FEED_PROFILE_MIN = 3;
 
-const PLACEHOLDER = /^(organizer not listed|see the organizer|tbd|tba|unknown|(promoter|organizer|presenter)s? (not defined|not listed|unknown|tbd|tba)|n\/?a|none|various)$/i;
+const PLACEHOLDER = /^(organizer not listed|see the organizer|tbd|tba|unknown|(promoter|organizer|presenter)s? (not defined|not listed|unknown|tbd|tba)|(misc\.?|miscellaneous|various|other) (promoters?|organizers?|presenters?)|n\/?a|none|various)$/i;
 const normalize = (s: string) => s.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 const slugify = (s: string) => s.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const host = (url: string) => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };

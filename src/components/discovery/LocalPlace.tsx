@@ -29,6 +29,8 @@ import { OwnerPitch, PlanIt, StoryCard } from './ProfileExtras';
 import { isOwnerVerified } from '../../lib/verified';
 import { spotlightForProfile } from '../../lib/spotlights';
 import { SpotlightCard } from '../spotlight/SpotlightCard';
+import { MEMBER_VISITS } from '../../data/memberVisits';
+import { MemberVisitCard } from './MemberVisitCard';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const short = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
@@ -242,6 +244,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           {hours.length ? <div className="lp-fact lp-fact-hours"><small><Clock size={14} aria-hidden="true" />Hours</small><ul>{hours.map(([d, h]) => <li key={d}><b>{d}</b>{h}</li>)}</ul></div> : null}
         </section>
 
+        {MEMBER_VISITS[place.id] ? <MemberVisitCard visit={MEMBER_VISITS[place.id]} name={name} /> : null}
         {spotlight ? <SpotlightCard spotlight={spotlight} at="profile" entities={all} compact /> : null}
         {spot ? <NextUp date={spot} now={now} count={ahead.count} onNow={spot === ahead.onNow} /> : null}
         {spot ? <PlanIt date={spot} place={place} /> : null}

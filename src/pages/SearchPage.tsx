@@ -6,7 +6,7 @@ import { SearchBoard } from '../components/site/SearchBoard';
 import type { Suggestion } from '../components/site/GlobalSearch';
 import { discoveryRepository } from '../data/discovery';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
-import { DISCOVERY_SECTIONS, entityPath, normalizeSearch } from '../lib/discovery';
+import { DISCOVERY_SECTIONS, awaitingOwner, entityPath, normalizeSearch } from '../lib/discovery';
 import { bestPicks, nearbyListings, searchListings, serviceFor } from '../lib/listingSearch';
 import { answerCount, bareStreetGuess, normalizeWords, parseSearchIntent, quadrantOnly } from '../lib/searchIntent';
 import { useStreetLookup } from '../hooks/useStreetLookup';
@@ -57,7 +57,15 @@ export default function SearchPage() {
   const all = discoveryRepository.list();
   const occurrences = useMemo(() => discoveryRepository.occurrences(), [all]);
   const now = useMemo(() => Date.now(), [q]);
-  const results = useMemo(() => searchListings(all, occurrences, q, new Date(now)), [all, occurrences, q, now]);
+  const ranked = useMemo(() => searchListings(all, occurrences, q, new Date(now)), [all, occurrences, q, now]);
+  // Listed free but not claimed yet: white-pages rows beside the listings, never ranked in them (Aldo, Nov 25).
+  const directory = useMemo(() => {
+    if (!q) return [];
+    const found = searchListings(discoveryRepository.claimable().filter(awaitingOwner), [], q, new Date(now));
+    return found.partial ? [] : Object.values(found.groups).flat().filter((e): e is NonNullable<typeof e> => Boolean(e)).slice(0, 24);
+  }, [q, now, all]);
+  // An exact white-pages hit ("908 17 ave sw #212") beats listings that only match some of the words.
+  const results = useMemo(() => ranked.partial && directory.length ? { ...ranked, groups: {}, total: 0, partial: false } : ranked, [ranked, directory.length]);
   const parsed = useMemo(() => {
     const p = parseSearchIntent(q, now);
     // "plumber", "mechanic", "snow removal" with no listing of our own: answer it like
@@ -112,7 +120,7 @@ export default function SearchPage() {
 
   const answers = q ? answerCount(intent) + (best?.picks.length ? 1 : 0) : 0;
   // Nearby listings are real answers too, so a community search isn't logged as "1 result" when there's more to show.
-  const resultCount = results.total + answers + (pickShelf ? 1 : 0) + bestLists.length + (safety?.topics.length ?? 0) + (nearby?.items.length ? 1 : 0);
+  const resultCount = results.total + directory.length + answers + (pickShelf ? 1 : 0) + bestLists.length + (safety?.topics.length ?? 0) + (nearby?.items.length ? 1 : 0);
 
   // Record what people look for (anonymously), once the result count settles.
   const pending = useRef<{ q: string; n: number } | null>(null);
@@ -169,7 +177,7 @@ export default function SearchPage() {
     <SiteLayout>
       <SearchBoard key={q} q={q} best={best} pickShelf={pickShelf} bestLists={bestLists} safety={safety} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
         resultCount={resultCount} answers={answers}
-        partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} popular={POPULAR} nearby={nearby} />
+        partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} popular={POPULAR} nearby={nearby} directory={directory} />
     </SiteLayout>
   );
 }

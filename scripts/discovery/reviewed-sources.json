@@ -7695,5 +7695,46 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "crossroads-community-church",
+      "name": "Crossroads Community Church",
+      "approved": true,
+      "hosts": [
+        "www.crossroads-communitychurch.org",
+        "crossroads-communitychurch.org"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-eve-candlelight-2026",
+        "input": {
+          "kind": "event",
+          "address": "912 19 Street NE, Calgary, AB T2E 4X7",
+          "venue": "Crossroads Community Church",
+          "organizer": "Crossroads Community Church",
+          "pricing": "free",
+          "title": "Crossroads Christmas Eve Candlelight Service",
+          "summary": "A 6:30 p.m. Christmas Eve candlelight service at Crossroads Community Church in northeast Calgary.",
+          "description": "Crossroads Community Church holds its Christmas Eve Candlelight service on Thursday, December 24, 2026, beginning at 6:30 p.m. at 912 19 Street NE. Everyone is welcome. Questions: 403-276-1263.",
+          "sourceUrl": "https://www.crossroads-communitychurch.org/",
+          "categories": [
+            "community",
+            "holiday",
+            "family"
+          ],
+          "tags": [
+            "christmas eve",
+            "candlelight",
+            "church"
+          ],
+          "start": "2026-12-24T18:30:00-06:00",
+          "end": "2026-12-24T19:30:00-06:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
   }
 ]

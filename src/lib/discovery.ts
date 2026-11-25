@@ -2,6 +2,7 @@ import { cleanBlock, cleanText } from './cleanText';
 import { publishedInventory } from './discoveryPublication';
 import type { DiscoveryEntity, EntityKind, MarketOccurrence } from '../types/discovery';
 import { calgaryDateTimeFormat } from './calgaryTz';
+import { withFeaturedExpiry } from './featured';
 
 export const DISCOVERY_SECTIONS = [
   { path: '/markets', label: 'Markets', kind: 'market' },
@@ -86,7 +87,7 @@ function cleanEntity<T extends DiscoveryEntity>(e: T): T {
 export const awaitingOwner = (e: DiscoveryEntity) => Boolean(e.awaitingClaim && !e.ownerVerifiedAt);
 
 export function createDiscoveryRepository(entities: DiscoveryEntity[], occurrences: MarketOccurrence[] = [], development = false): DiscoveryRepository {
-  const ready = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e))).map(cleanEntity);
+  const ready = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e))).map(cleanEntity).map(e => withFeaturedExpiry(e));
   const visible = ready.filter(e => !awaitingOwner(e));
   return { list: () => visible, claimable: () => ready, occurrences: () => occurrences.filter(o => visible.some(e => e.id === o.marketId)), find: (kind, slug) => visible.find(e => e.kind === kind && e.slug === slug) };
 }

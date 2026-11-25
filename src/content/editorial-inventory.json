@@ -12325,7 +12325,14 @@
       "verification": "source-checked",
       "updatedAt": "2026-11-25T06:30:00Z",
       "email": "info@verbtheatre.com",
-      "sponsorshipDisclosure": "Featured partner placement, offered free to Verb Theatre for November and December 2026. It does not affect editorial picks."
+      "sponsorshipDisclosure": "Featured partner placement, offered free to Verb Theatre for November and December 2026. It does not affect editorial picks.",
+      "featuredNiches": [
+        "theatre",
+        "theater",
+        "play"
+      ],
+      "featuredUntil": "2027-01-01T00:00:00-06:00",
+      "featuredPlan": "trial"
     },
     {
       "id": "biz-workshop-theatre",

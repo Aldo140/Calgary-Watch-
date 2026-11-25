@@ -23,3 +23,13 @@ describe('Kane Medical Aesthetics', () => {
     }
   });
 });
+
+describe('Yoga and Meditation Centre', () => {
+  it('names both studios (owner sent the Bowness address)', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { entities } = JSON.parse(readFileSync(new URL('../src/content/editorial-inventory.json', import.meta.url), 'utf8'));
+    const yoga = entities.find((e: { id: string }) => e.id === 'biz-yoga-and-meditation-centre');
+    assert.match(yoga.description, /6323 Bowness Road NW/);
+    assert.match(yoga.description, /2028B 33 Avenue SW/);
+  });
+});

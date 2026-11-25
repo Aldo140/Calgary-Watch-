@@ -27840,14 +27840,16 @@
       "slug": "yoga-and-meditation-centre",
       "name": "Yoga and Meditation Centre",
       "title": "Yoga and Meditation Centre",
-      "summary": "A Calgary yoga and meditation studio.",
-      "description": "Yoga and Meditation Centre is a Calgary yoga and meditation studio. Services, pricing and hours can change, so confirm the details and book through their official website.",
+      "summary": "A Calgary yoga and meditation studio with locations in Marda Loop and Bowness.",
+      "description": "Yoga and Meditation Centre is a Calgary yoga and meditation studio with two locations: Marda Loop at 2028B 33 Avenue SW (403-251-9642) and Bowness at 202, 6323 Bowness Road NW (403-288-2909). Classes, pricing and hours can change, so confirm the details and book through their official website.",
       "categories": [
         "services"
       ],
       "tags": [
         "yoga",
-        "meditation"
+        "meditation",
+        "bowness",
+        "marda loop"
       ],
       "address": "2028B 33 Avenue SW, Calgary, AB",
       "website": "https://www.yogamcc.com/",
@@ -27874,7 +27876,7 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-11-22T20:30:00-06:00",
-      "updatedAt": "2026-11-22T20:30:00-06:00",
+      "updatedAt": "2026-11-25T10:30:00-06:00",
       "phone": "+1 403-251-9642",
       "awaitingClaim": true
     },

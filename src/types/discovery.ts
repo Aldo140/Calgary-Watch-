@@ -28,6 +28,8 @@ export interface Market extends EntityBase, Location {
   petFriendly?: boolean; familyFriendly?: boolean; organizer: string; vendorIds: string[]; images: EntityImage[];
 }
 export interface MarketOccurrence { id: string; marketId: string; start: string; end: string; timezone: 'America/Edmonton'; cancelled: boolean; source: EntitySource }
+/** A promo a local community partner offers CalgaryWatch readers. Shown only on searches about its topics and on the partner's own profile, never as an ad. */
+export interface CommunityOffer { title: string; detail: string; topics: string[]; until: string; url?: string; urlLabel?: string }
 export interface Business extends EntityBase, Location {
   kind: 'business'; name: string; phone?: string; email?: string; website?: string; hours?: Record<string, string>;
   priceLevel?: 1 | 2 | 3 | 4; images: EntityImage[]; socials: Record<string, string>; services: string[];
@@ -38,6 +40,8 @@ export interface Business extends EntityBase, Location {
   featuredUntil?: string;
   /** "paid" or "trial": for the admin report, never shown to readers. */
   featuredPlan?: 'paid' | 'trial';
+  /** Community partner promos, matched to what the reader searched for (src/lib/communityOffers.ts). */
+  communityOffers?: CommunityOffer[];
 }
 export interface GuideEntry { entityId: string; note: string; comparison?: Record<string, string> }
 /** One stop on a guide's route. `entityId` links a listing we already carry (a market, a local place). */

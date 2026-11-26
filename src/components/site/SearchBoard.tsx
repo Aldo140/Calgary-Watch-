@@ -4,7 +4,7 @@ import { useRef, useState, type ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers, type BestAnswer } from './SearchAnswers';
 import type { SearchIntent } from '../../lib/searchIntent';
-import type { DiscoveryEntity } from '../../types/discovery';
+import type { Business, CommunityOffer, DiscoveryEntity } from '../../types/discovery';
 import type { SafetyHeadline } from '../../lib/safetyNews';
 import { DISCOVERY_SECTIONS, entityPath } from '../../lib/discovery';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
@@ -75,7 +75,7 @@ export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: Discove
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, pickShelf, directory = [] }: {
+export function SearchBoard({ q, intent, now, groups, resultCount, answers, partial = false, didYouMean, suggest, popular = [], nearby, best, bestLists = [], safety, pickShelf, directory = [], offers = [] }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
@@ -85,6 +85,8 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
   nearby?: { title: ReactNode; note?: string; items: DiscoveryEntity[] };
   /** Unclaimed listings that match: free white-pages rows, not curated picks. */
   directory?: DiscoveryEntity[];
+  /** Community partner promos whose topics match this search (communityOffers.ts). */
+  offers?: Array<{ partner: Business; offer: CommunityOffer }>;
   /** Listed places for a "best pho" search. */
   best?: BestAnswer;
   /** Service lists the search asks for ("plumber"): shown as the Pick and the A–Z list. */
@@ -219,6 +221,7 @@ export function SearchBoard({ q, intent, now, groups, resultCount, answers, part
               </section>
             ) : null}
             {top && tab === 'all' ? <TopHit e={top.e} more={top.more} /> : null}
+            {offers.length && tab === 'all' ? <CommunityOffers offers={offers} /> : null}
             {shown.map(kind => {
               const section = DISCOVERY_SECTIONS.find(s => s.kind === kind);
               const rows = collapsed[kind].filter(r => !(tab === 'all' && r === top));
@@ -286,6 +289,29 @@ function Thumb({ e, big = false }: { e: DiscoveryEntity; big?: boolean }) {
     return <span className={`sx-thumb sx-thumb-date${big ? ' is-big' : ''}`} aria-hidden="true"><small>{parts.weekday}</small><b>{parts.day}</b><small>{parts.month}</small></span>;
   }
   return <span className={`sx-thumb sx-thumb-${e.kind}${big ? ' is-big' : ''}`} aria-hidden="true">{KIND_ICON[e.kind]}</span>;
+}
+
+/** "From a local community partner": a promo shown only because the search is about its topic. Not an ad, not a ranking. */
+function CommunityOffers({ offers }: { offers: Array<{ partner: Business; offer: CommunityOffer }> }) {
+  return (
+    <section className="sx-offers" aria-label="Community partner offers">
+      <p className="sx-offers-eyebrow"><Heart size={14} aria-hidden="true" /> From a local community partner</p>
+      <ul>
+        {offers.map(({ partner, offer }) => (
+          <li key={partner.id + offer.title} className="sx-offer" data-cw-entity={partner.id}>
+            <span className="sx-offer-who">{partner.name}{partner.neighbourhood ? ` · ${partner.neighbourhood}` : ''}</span>
+            <strong>{offer.title}</strong>
+            <span className="sx-offer-detail">{offer.detail}</span>
+            <span className="sx-offer-links">
+              {offer.url ? <a href={offer.url} target="_blank" rel="noopener noreferrer">{offer.urlLabel || 'Details'} <ArrowUpRight size={15} aria-hidden="true" /></a> : null}
+              <Link to={entityPath(partner)}>About {partner.name} <ArrowRight size={15} aria-hidden="true" /></Link>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="sx-offers-note">Shown because of what you searched. Offers are set by the business; book and confirm details with them.</p>
+    </section>
+  );
 }
 
 function TopHit({ e, more }: { e: DiscoveryEntity; more: number }) {

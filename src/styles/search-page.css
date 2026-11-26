@@ -64,6 +64,17 @@
 .sx-top-summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-width: 46ch; font: 400 16px/1.5 Inter, sans-serif; color: #e4ebf5; }
 .sx-top-go { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin-top: auto; padding: 12px 20px; border-radius: 999px; background: var(--yellow); color: var(--ink); font: 800 16px/1 Inter, sans-serif; }
 
+.sx-offers { margin-top: 22px; padding: 18px; border: 2px dashed var(--ink); border-radius: 22px; background: #f2fbf4; color: var(--ink); }
+.sx-offers-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 12px !important; font: 600 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .1em; color: #1f6b3a; }
+.sx-offers ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.sx-offer { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 2px solid var(--ink); border-radius: 16px; background: #fff; min-width: 0; }
+.sx-offer-who { font: 600 12px/1.3 var(--mono); color: #4a5568; }
+.sx-offer strong { font: 800 22px/1.1 var(--display); letter-spacing: -.02em; }
+.sx-offer-detail { font: 400 15px/1.45 Inter, sans-serif; }
+.sx-offer-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 4px; }
+.sx-offer-links a { display: inline-flex; align-items: center; gap: 4px; font: 700 14px/1.3 Inter, sans-serif; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.sx-offers-note { margin: 12px 0 0 !important; font: 400 12px/1.4 Inter, sans-serif; color: #4a5568; }
+
 .sx-thumb {
   position: relative; display: grid; place-items: center; width: 96px; height: 96px; overflow: hidden; flex: none;
   border: 2px solid var(--ink); border-radius: 16px; background: #fff5cc; color: var(--ink);

@@ -45,7 +45,8 @@ async function run(): Promise<void> {
   }
 
   let written = 0;
-  const claimRoutes = discoveryRepository.list()
+  // Claim invitations need a route even when the public listing is awaiting its owner.
+  const claimRoutes = discoveryRepository.claimable()
     .filter(entity => ['event', 'market', 'business'].includes(entity.kind))
     .map(entity => `/claim/${encodeURIComponent(entity.id)}`);
 

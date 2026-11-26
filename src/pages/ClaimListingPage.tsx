@@ -278,6 +278,7 @@ function ClaimForm({ id }: { id: string }) {
                 <Clock size={22} aria-hidden="true" />
                 <div>
                   <h2>We’re confirming your claim.</h2>
+                  <p>We received your request. No need to submit it again. Check this page for updates.</p>
                   <p>{claimTimeline(claimEvidence({ accountEmail: claim.accountEmail, workEmail: claim.workEmail, sources: entity.sources }))}</p>
                   <p className="pl-fine">Sent {new Date(claim.createdAt).toLocaleDateString('en-CA', { month: 'long', day: 'numeric' })} as {claim.role.toLowerCase()} · {claim.workEmail}</p>
                 </div>

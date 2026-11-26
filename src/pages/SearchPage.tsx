@@ -11,6 +11,7 @@ import { bestPicks, nearbyListings, searchListings, serviceFor } from '../lib/li
 import { answerCount, bareStreetGuess, normalizeWords, parseSearchIntent, quadrantOnly } from '../lib/searchIntent';
 import { useStreetLookup } from '../hooks/useStreetLookup';
 import { recordSearch } from '../lib/searchDemand';
+import { offersForSearch } from '../lib/communityOffers';
 import { POPULAR_VIA, TRENDING, popularHref, primeByDemand } from '../lib/searchTrends';
 import { BEST_CATEGORIES, type BestCategory } from '../content/bestOf';
 import { bestForQuery, bestPath, isRanked } from '../lib/bestOf';
@@ -75,6 +76,8 @@ export default function SearchPage() {
   const bestMatches = useMemo(() => bestForQuery(q), [q]);
   const bestLists = useMemo(() => bestMatches.map(c => ({ to: bestPath(c), label: bestLabel(c), note: bestNote(c) })), [bestMatches]);
   // "plumber", "window cleaning": a service list answers as a decision, Pick first (src/components/picks).
+  // Community partner promos, only for searches about their topics.
+  const offers = useMemo(() => offersForSearch(all, q, now), [all, q, now]);
   const pickShelf = useMemo(() => { const svc = serviceForQuery(q); return svc ? shelfFor(svc.id, all, now) : null; }, [q, all, now]);
   // A cited Best of Calgary list beats the "best …" card; the card covers everything else.
   // A service with a Pick desk answers on its own, so the generic "best …" card stays out of the way.
@@ -177,7 +180,7 @@ export default function SearchPage() {
     <SiteLayout>
       <SearchBoard key={q} q={q} best={best} pickShelf={pickShelf} bestLists={bestLists} safety={safety} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
         resultCount={resultCount} answers={answers}
-        partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} popular={POPULAR} nearby={nearby} directory={directory} />
+        partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} popular={POPULAR} nearby={nearby} directory={directory} offers={offers} />
     </SiteLayout>
   );
 }

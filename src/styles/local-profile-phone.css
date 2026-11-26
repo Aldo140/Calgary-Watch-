@@ -361,3 +361,5 @@
 @media (max-width: 640px) and (prefers-reduced-motion: reduce) {
   .lp-story-phone { animation: none; }
 }
+
+.lp-fact-offer a { color: inherit; text-decoration: underline; text-underline-offset: 3px; font-weight: 700; }

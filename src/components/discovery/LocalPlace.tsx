@@ -1,3 +1,4 @@
+import { activeOffers } from '../../lib/communityOffers';
 import '../../styles/profile-category.css';
 import '../../styles/local-directory.css';
 import '../../styles/local-profile.css';
@@ -240,6 +241,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
               {otherSocials.map(([k, url]) => <li key={k}><a href={url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} aria-hidden="true" />{SOCIAL_NAMES[k]}</a></li>)}
             </ul>
           </div> : null}
+          {activeOffers(place).map(o => <div key={o.title} className="lp-fact lp-fact-offer"><small><BadgePercent size={14} aria-hidden="true" />Community partner offer</small><span><b>{o.title}</b> {o.detail}{o.url ? <> <a href={o.url} target="_blank" rel="noopener noreferrer">{o.urlLabel || 'Details'}</a></> : null}</span></div>)}
           {place.offer?.trim() ? <div className="lp-fact lp-fact-offer"><small><BadgePercent size={14} aria-hidden="true" />Special offer</small><span>{place.offer.trim()}</span></div> : null}
           {hours.length ? <div className="lp-fact lp-fact-hours"><small><Clock size={14} aria-hidden="true" />Hours</small><ul>{hours.map(([d, h]) => <li key={d}><b>{d}</b>{h}</li>)}</ul></div> : null}
         </section>
